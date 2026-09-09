@@ -45,29 +45,29 @@ class Translator:
         if self.lang_index <= self.key_len:
             validated = False
             current_text = cmds.scrollField(self.new_lang_text_sf, query=True, text=True)
-            if current_text != None and current_text != "" and current_text != " " and current_text != self.ar.data.lang['t007_writeText']:
+            if current_text != None and current_text != "" and current_text != ' ' and current_text != self.ar.data.lang['t007_writeText']:
                 sourceText = cmds.scrollField(self.source_text_sf, query=True, text=True)
                 
-                if sourceText.startswith("\n"):
-                    if not current_text.startswith("\n"):
+                if sourceText.startswith('\n'):
+                    if not current_text.startswith('\n'):
                         current_text = "\n"+current_text
                 elif sourceText[0].isupper():
                     current_text = current_text[0].upper()+current_text[1:]
                 elif sourceText[0].islower():
                     current_text = current_text[0].lower()+current_text[1:]
-                if sourceText.endswith("\n"):
-                    if not current_text.endswith("\n"):
+                if sourceText.endswith('\n'):
+                    if not current_text.endswith('\n'):
                         current_text = current_text+"\n"
                 else:
-                    if current_text.endswith("\n"):
+                    if current_text.endswith('\n'):
                         current_text = current_text[:-1]
-                    elif sourceText.endswith("."):
-                        if not current_text.endswith("."):
+                    elif sourceText.endswith('.'):
+                        if not current_text.endswith('.'):
                             current_text = current_text+"."
-                    elif sourceText.endswith(":") and not current_text.endswith(":"):
+                    elif sourceText.endswith(':') and not current_text.endswith(':'):
                         current_text = current_text+":"
                 
-                if self.source_langs[self.lang_index].startswith("c"): #control
+                if self.source_langs[self.lang_index].startswith('c'): #control
                     if not self.check_no_special_char.search(current_text): #no special char
                         validated = True
                 else:
@@ -119,7 +119,7 @@ class Translator:
         self.str_result += "}"
         
         # avoid json fail changing "\" to "\\":
-        self.str_result = self.str_result.replace("\n", "\\n")
+        self.str_result = self.str_result.replace('\n', '\\n')
         
         # create json file:
         result_data = self.ar.config.save_json_file(self.str_result, self.ar.data.language_folder, '_preset')
@@ -172,7 +172,7 @@ class Translator:
         
         # parse user info:
         if self.author_name and self.new_lang_name:
-            contact_name = ""
+            contact_name = ''
             if email_name and website_name:
                 contact_name = email_name+"\n"+website_name
             self.new_lang_name = self.new_lang_name[0].upper()+self.new_lang_name[1:]
@@ -232,35 +232,35 @@ class Translator:
         cmds.text('key_id_txt', edit=True, label=self.source_langs[self.lang_index])
         cmds.scrollField(self.source_text_sf, edit=True, text=self.ar.data.lang[self.source_langs[self.lang_index]])
         
-        if self.lang_index == self.key_len or self.new_langs[self.lang_index] == "empty":
+        if self.lang_index == self.key_len or self.new_langs[self.lang_index] == 'empty':
             cmds.scrollField(self.new_lang_text_sf, edit=True, text='')
         else:
             cmds.scrollField(self.new_lang_text_sf, edit=True, text=self.new_langs[self.lang_index])
         
         # case index_id for each type:
         footer_text = ""
-        if self.source_langs[self.lang_index].startswith("_"):
+        if self.source_langs[self.lang_index].startswith('_'):
             current_key_type = self.ar.data.lang['i013_info']
-        elif self.source_langs[self.lang_index].startswith("a"):
+        elif self.source_langs[self.lang_index].startswith('a'):
             current_key_type = self.ar.data.lang['i153_presentation']
-        elif self.source_langs[self.lang_index].startswith("b"):
+        elif self.source_langs[self.lang_index].startswith('b'):
             current_key_type = self.ar.data.lang['i139_bug']
-        elif self.source_langs[self.lang_index].startswith("c"):
+        elif self.source_langs[self.lang_index].startswith('c'):
             current_key_type = self.ar.data.lang['i140_control']
             footer_text = self.ar.data.lang['i152_noSpecialChar']
-        elif self.source_langs[self.lang_index].startswith("e"):
+        elif self.source_langs[self.lang_index].startswith('e'):
             current_key_type = self.ar.data.lang['i141_error']
-        elif self.source_langs[self.lang_index].startswith("i"):
+        elif self.source_langs[self.lang_index].startswith('i'):
             current_key_type = self.ar.data.lang['i142_interface']
-        elif self.source_langs[self.lang_index].startswith("m"):
+        elif self.source_langs[self.lang_index].startswith('m'):
             current_key_type = self.ar.data.lang['i143_module']
-        elif self.source_langs[self.lang_index].startswith("p"):
+        elif self.source_langs[self.lang_index].startswith('p'):
             current_key_type = self.ar.data.lang['i144_prefix']
-        elif self.source_langs[self.lang_index].startswith("t"):
+        elif self.source_langs[self.lang_index].startswith('t'):
             current_key_type = self.ar.data.lang['t000_translator']
-        elif self.source_langs[self.lang_index].startswith("r"):
+        elif self.source_langs[self.lang_index].startswith('r'):
             current_key_type = self.ar.data.lang['r000_rebuilder']
-        elif self.source_langs[self.lang_index].startswith("v"):
+        elif self.source_langs[self.lang_index].startswith('v'):
             current_key_type = self.ar.data.lang['v000_validator']
         
         # update UI elements:

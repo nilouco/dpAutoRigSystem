@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "UnusedDeformer"
-TITLE = "v148_unusedDeformer"
-DESCRIPTION = "v149_unusedDeformerDesc"
-WIKI = "07-‐-Validator#-unused-deformer-cleaner"
+CLASS_NAME = 'UnusedDeformer'
+TITLE = 'v148_unusedDeformer'
+DESCRIPTION = 'v149_unusedDeformerDesc'
+WIKI = '07-‐-Validator#-unused-deformer-cleaner'
 
 
 
@@ -35,9 +35,9 @@ class UnusedDeformer(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             unused_items = []
-            #cmds.findDeformers("*")
-            deformers = cmds.ls(type="geometryFilter") #deformers
-            intermediates = cmds.ls(type="controlPoint", intermediateObjects=True)
+            #cmds.findDeformers('*')
+            deformers = cmds.ls(type='geometryFilter') #deformers
+            intermediates = cmds.ls(type='controlPoint', intermediateObjects=True)
             if inputs:
                 check_items = inputs
             else:
@@ -71,7 +71,7 @@ class UnusedDeformer(action.BaseAction):
                             unused_items.append(intermediate)
                 # conditional to check here
                 if unused_items:
-                    self.checked_items.append("\n".join(unused_items))
+                    self.checked_items.append('\n'.join(unused_items))
                     self.found_issues.append(True)
                     if self.first_mode:
                         self.good_results.append(False)

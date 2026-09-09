@@ -9,7 +9,7 @@ class Naming:
         self.ar = ar
 
 
-    def find_last_number(self, name="dpGuideNet", attr="guideNumber", pad=3):
+    def find_last_number(self, name='dpGuideNet', attr='guideNumber', pad=3):
         """ Returns a padding string of the number of network node in the scene or zero.
         """
         nodes = self.ar.utils.get_network_by_attr(name)
@@ -34,7 +34,7 @@ class Naming:
         nodes, numbers = [], []
         guide_type_count = 0
         if guide_net:
-            nodes = self.ar.utils.get_network_by_attr("dpGuideNet")
+            nodes = self.ar.utils.get_network_by_attr('dpGuideNet')
         else:
             nodes = cmds.ls(selection=False, transforms=True)
         if nodes:
@@ -51,7 +51,7 @@ class Naming:
             return len(numbers)
     
         
-    def normalize_text(self, inputted_text="", prefixMax=4):
+    def normalize_text(self, inputted_text='', prefixMax=4):
         """ Analisys the inputted_text to conform it in order to use in Application (Maya).
             Return the normalized text.
         """
@@ -59,13 +59,13 @@ class Naming:
         inputted_text = ''.join(c for c in unicodedata.normalize('NFD', inputted_text) if unicodedata.category(c) != 'Mn') #strip accents
         if inputted_text:
             # analisys if it starts with number or has a whitespace or special character:
-            if re.match("[0-9]", inputted_text[0]): #starts with number
+            if re.match('[0-9]', inputted_text[0]): #starts with number
                 return normal_text
             else:
-                #if re.search("\s", inputted_text[:len(inputted_text)-1]): #has space
-                inputted_text = inputted_text.replace(" ", "_")
-                while re.search(r"\W", inputted_text): #special character
-                    span = re.search(r"\W", inputted_text).span()[0]
+                #if re.search('\s', inputted_text[:len(inputted_text)-1]): #has space
+                inputted_text = inputted_text.replace(' ', '_')
+                while re.search(r'\W', inputted_text): #special character
+                    span = re.search(r'\W', inputted_text).span()[0]
                     inputted_text = inputted_text[:span]+"_"+inputted_text[span+1:]
                 if not len(inputted_text) < prefixMax:
                     inputted_text = inputted_text[:prefixMax]
@@ -95,13 +95,13 @@ class Naming:
         cmds.setAttr(joint_name+".side", side_number)
         cmds.setAttr(joint_name+".type", type_number)
         if type_number == 18: #other
-            cmds.setAttr(joint_name+".otherType", label, type="string")
+            cmds.setAttr(joint_name+".otherType", label, type='string')
 
 
     def extract_suffix(self, item):
         """ Remove suffix from a node name and return the base name.
         """
-        end_suffixes = ["_Mesh", "_Msh", "_Geo", "_Ges", "_Tgt", "_Ctrl", "_Grp", "_Crv"]
+        end_suffixes = ['_Mesh', '_Msh', '_Geo', '_Ges', '_Tgt', '_Ctrl', '_Grp', '_Crv']
         for end_suffix in end_suffixes:
             if item.endswith(end_suffix):
                 base_name = item[:item.rfind(end_suffix)]
@@ -139,7 +139,7 @@ class Naming:
             need_restore_suffix = False
             if suffix and item.endswith("_"+suffix):
                 need_restore_suffix = True
-                item = item[:item.rfind("_")]
+                item = item[:item.rfind('_')]
             # find numering:
             i = 1
             if not need_restore_suffix:
@@ -160,7 +160,7 @@ class Naming:
         """ Resolve repeated name adding number in the middle of the string.
             Returns the resolved base_name and name (including the suffix).
         """
-        name = name[0].upper()+name[1:].replace(" ", "_")
+        name = name[0].upper()+name[1:].replace(' ', '_')
         base_name = name
         name = name+"_00_"+suffix
         if cmds.objExists(name):
@@ -184,7 +184,7 @@ class Naming:
         return attr_name_lower
 
 
-    def node_renaming_treatment(self, items=None, node_type="unitConversion", suffix="_UC"):
+    def node_renaming_treatment(self, items=None, node_type='unitConversion', suffix='_UC'):
         """ Rename unitConversion nodes to something like this:
             [IN]capitals+#+attr+_+[OUT]capitals+#+attr+"_UC"
             or the given node_type and suffix.
@@ -199,7 +199,7 @@ class Naming:
                         new_name = self.get_capitals_name(cmds.listConnections(item+".input", plugs=True, source=True, destination=False)[0])
                     elif cmds.attributeQuery("input1", node=item, exists=True):
                         new_name = self.get_capitals_name(cmds.listConnections(item+".input1", plugs=True, source=True, destination=False)[0])
-                    new_name += "_"
+                    new_name += '_'
                     if cmds.listConnections(item+".output", plugs=True, source=False, destination=True):
                         new_name += self.get_capitals_name(cmds.listConnections(item+".output", plugs=True, source=False, destination=True)[0])
                     new_name += suffix
@@ -212,7 +212,7 @@ class Naming:
                     Head_Head_Ctrl.rotateX = HHCrotateX
                     L_Arm_Wrist_Ctrl.translateZ = LAWCtranslateZ
         """
-        return str("".join([n for n in plug.split(".")[0] if n.isupper() or n.isnumeric()])+plug.split(".")[1].replace("[", "").replace("]", ""))
+        return str(''.join([n for n in plug.split('.')[0] if n.isupper() or n.isnumeric()])+plug.split('.')[1].replace('[', '').replace(']', ''))
 
 
     def get_short_name(self, name, v_bar=True):
@@ -224,12 +224,12 @@ class Naming:
         short_name = None
         if name:
             short_name = name
-            if "|" in name:
-                if name.count("|") > 1:
+            if '|' in name:
+                if name.count('|') > 1:
                     if v_bar:
-                        short_name = name[name.rfind("|"):]
+                        short_name = name[name.rfind('|'):]
                     else:
-                        short_name = name[name.rfind("|")+1:]
+                        short_name = name[name.rfind('|')+1:]
                 elif not v_bar:   
                     short_name = name[1:]
         return short_name
@@ -239,7 +239,7 @@ class Naming:
         """ Returns a list of duplicated names.
             Returns False if there are only unique names.
         """
-        return [n for n in cmds.ls(selection=False, shortNames=True) if "|" in n] or False
+        return [n for n in cmds.ls(selection=False, shortNames=True) if '|' in n] or False
 
 
     def get_mdagpath_by_name(self, item):
@@ -252,9 +252,9 @@ class Naming:
         return dagpath
 
 
-    def get_translated_names(self, name, from_lang="english"):
+    def get_translated_names(self, name, from_lang='english'):
         custom_name = ""
-        splitted_names = name.split("_")
+        splitted_names = name.split('_')
         for n, splitted_name in enumerate(splitted_names):
             # splits capital letters and numbers:
             capitals = re.findall(r'\d+|[A-Z][a-z]*', splitted_name)
@@ -275,7 +275,7 @@ class Naming:
             else:
                 custom_name += splitted_name    
             if n < len(splitted_names)-1:
-                custom_name += "_"
+                custom_name += '_'
         if custom_name:
             return custom_name
         return name

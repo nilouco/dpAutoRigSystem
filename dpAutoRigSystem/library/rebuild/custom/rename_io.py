@@ -3,19 +3,19 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "RenameIO"
-TITLE = "r056_renameIO"
-DESCRIPTION = "r057_renameIODesc"
-WIKI = "10-‐-Rebuilder#-rename"
+CLASS_NAME = 'RenameIO'
+TITLE = 'r056_renameIO'
+DESCRIPTION = 'r057_renameIODesc'
+WIKI = '10-‐-Rebuilder#-rename'
 
 
 
 class RenameIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.set_action_type("r000_rebuilder")
-        self.io_folder = "s_renameIO"
-        self.start_name = "dpRename"
+        self.set_action_type('r000_rebuilder')
+        self.io_folder = 's_renameIO'
+        self.start_name = 'dpRename'
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -53,7 +53,7 @@ class RenameIO(action.BaseAction):
                             else:
                                 self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                     else:
-                        self.fail_io("Ctrls_Grp")
+                        self.fail_io('Ctrls_Grp')
                 else:
                     self.fail_io(self.ar.data.lang['r010_notFoundPath'])
             else:
@@ -102,7 +102,7 @@ class RenameIO(action.BaseAction):
                     if cmds.objExists(old_id_data[1]):
                         cmds.rename(old_id_data[1], item)
                         well_imported_items.append(item)
-                    elif item.endswith("Shape"):
+                    elif item.endswith('Shape'):
                         maybe_items.append(item)
                     else:
                         not_found_nodes.append(item)

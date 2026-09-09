@@ -3,10 +3,10 @@ from maya import cmds, mel
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "NonManifold"
-TITLE = "v101_nonManifold"
-DESCRIPTION = "v102_nonManifoldDesc"
-WIKI = "07-‐-Validator#-nonmanifold-cleaner"
+CLASS_NAME = 'NonManifold'
+TITLE = 'v101_nonManifold'
+DESCRIPTION = 'v102_nonManifoldDesc'
+WIKI = '07-‐-Validator#-nonmanifold-cleaner'
 
 
 
@@ -32,7 +32,7 @@ class NonManifold(action.BaseAction):
         # ---
         # --- validator code --- beginning
         if not self.ar.utils.get_all_grp():
-            if not self.ar.utils.get_network_by_attr("dpGuideNet"):
+            if not self.ar.utils.get_network_by_attr('dpGuideNet'):
                 if not cmds.file(query=True, reference=True):
                     if inputs:
                         to_clean_geos = inputs

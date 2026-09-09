@@ -10,12 +10,12 @@ from urllib import request
 
 from maya import cmds, mel
 
-RIGPREVIEW = "Rigging Preview"
-CAMERA = "persp"
+RIGPREVIEW = 'Rigging Preview'
+CAMERA = 'persp'
 CAM_ROTX = -10
 CAM_ROTY = 30
 CAM_ROTZ = 0
-CTRL_LAYER = "Ctrl_Lyr"
+CTRL_LAYER = 'Ctrl_Lyr'
 PREVIEW_WIDTH = 1024
 PREVIEW_HEIGHT = 720
 
@@ -37,7 +37,7 @@ class Packager:
             zip_name = file_name[:-3]+"_"+date+".zip"
         else:
             zip_name = file_name[:-3]+".zip"
-        zip = zipfile.ZipFile(destination_folder+"/"+zip_name, "w", zipfile.ZIP_DEFLATED)
+        zip = zipfile.ZipFile(destination_folder+"/"+zip_name, 'w', zipfile.ZIP_DEFLATED)
         zip.write(filename=file_path+"/"+file_name, arcname=file_name)
         zip.close()
         return destination_folder+"/"+zip_name
@@ -54,7 +54,7 @@ class Packager:
         cmds.viewFit(allObjects=True)
         position = cmds.xform(cam, query=True, translation=True, worldSpace=True)
         if not focus_it:
-            focus_it = self.ar.utils.get_node_by_message("renderGrp")
+            focus_it = self.ar.utils.get_node_by_message('renderGrp')
         if focus_it:
             # frame render group
             cmds.select(focus_it)
@@ -72,7 +72,7 @@ class Packager:
         """
         for item in cmds.displayRGBColor(list=True):
             if search_item+' ' in item:
-                values = item[:-1].split(" ")
+                values = item[:-1].split(' ')
                 values = values[1:]
                 values = [float(x) for x in values]
                 return values
@@ -104,7 +104,7 @@ class Packager:
             if cmds.headsUpDisplay(item, query=True, section=True) == 0:
                 h += 1
         cam_vis_attributes = []
-        cam_attributes = ["displayGateMask", "displayResolution", "displayFilmGate", "displayFieldChart", "displaySafeAction", "displaySafeTitle", "displayFilmPivot", "displayFilmOrigin", "depthOfField"]
+        cam_attributes = ['displayGateMask', 'displayResolution', 'displayFilmGate', 'displayFieldChart', 'displaySafeAction', 'displaySafeTitle', 'displayFilmPivot', 'displayFilmOrigin', 'depthOfField']
         for attr in cam_attributes:
             cam_vis_attributes.append(cmds.getAttr(cam+"."+attr)) #current camera vis attr
             cmds.setAttr(cam+"."+attr, False)
@@ -127,35 +127,35 @@ class Packager:
         cmds.displayRGBColor('backgroundBottom', 0.42, 0.42, 0.42)
 
         # file information messages
-        cmds.headsUpDisplay('HudRigPreviewTxt'+str(h+1), section=0, block=(h+1), labelFontSize="large", allowOverlap=True, label="")
-        cmds.headsUpDisplay('HudRigPreviewTxt'+str(h+2), section=0, block=(h+2), labelFontSize="large", allowOverlap=True, label=rig_preview)
+        cmds.headsUpDisplay('HudRigPreviewTxt'+str(h+1), section=0, block=(h+1), labelFontSize='large', allowOverlap=True, label='')
+        cmds.headsUpDisplay('HudRigPreviewTxt'+str(h+2), section=0, block=(h+2), labelFontSize='large', allowOverlap=True, label=rig_preview)
         b = h+3
         if pipe_data['b_i_maya']:
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label=cmds.about(installedVersion=True)) #Maya version
+            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize='large', allowOverlap=True, label=cmds.about(installedVersion=True)) #Maya version
             b += 1
         if pipe_data['b_i_version']:
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label="dpAutoRigSystem "+version)
+            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize='large', allowOverlap=True, label="dpAutoRigSystem "+version)
             b += 1
         if pipe_data['b_i_studio']:
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label=pipe_data['f_studio'])
+            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize='large', allowOverlap=True, label=pipe_data['f_studio'])
             b += 1
         if pipe_data['b_i_project']:
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label=pipe_data['f_project'])
+            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize='large', allowOverlap=True, label=pipe_data['f_project'])
             b += 1
         if pipe_data['b_i_asset']:
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label=pipe_data['assetName'])
+            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize='large', allowOverlap=True, label=pipe_data['assetName'])
             b += 1
         if pipe_data['b_i_model']:
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label="Model "+str(pipe_data['modelVersion']).zfill(int(pipe_data['i_padding'])))
+            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize='large', allowOverlap=True, label="Model "+str(pipe_data['modelVersion']).zfill(int(pipe_data['i_padding'])))
             b += 1
         if pipe_data['b_i_wip']:
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label="Rig "+str(pipe_data['rigVersion']).zfill(int(pipe_data['i_padding'])))
+            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize='large', allowOverlap=True, label="Rig "+str(pipe_data['rigVersion']).zfill(int(pipe_data['i_padding'])))
             b += 1
         if pipe_data['b_i_publish']:
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label="Publish "+str(pipe_data['publishVersion']).zfill(int(pipe_data['i_padding'])))
+            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize='large', allowOverlap=True, label="Publish "+str(pipe_data['publishVersion']).zfill(int(pipe_data['i_padding'])))
             b += 1
         if pipe_data['b_i_date']:
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label=date)
+            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize='large', allowOverlap=True, label=date)
             b += 1
             
         # create a new persp viewport window to get the image from it
@@ -178,11 +178,11 @@ class Packager:
         # take the screenShot
         current_frame = int(cmds.currentTime(query=True))
         destination_folder = pipe_data['toClientPath']
-        if not destination_folder.endswith("/"):
-            destination_folder += "/"
-        export_path = "{}{}_{}.jpg".format(destination_folder, pipe_data['assetName'], rig_preview.replace(" ", ""))
+        if not destination_folder.endswith('/'):
+            destination_folder += '/'
+        export_path = "{}{}_{}.jpg".format(destination_folder, pipe_data['assetName'], rig_preview.replace(' ', ''))
         # playblast to make an image
-        cmds.playblast(frame=current_frame, viewer=False, format="image", compression="jpg", showOrnaments=True, completeFilename=export_path, widthHeight=[width_res, height_res], percent=100, forceOverwrite=False, quality=100, editorPanelName=imager_panel)
+        cmds.playblast(frame=current_frame, viewer=False, format='image', compression='jpg', showOrnaments=True, completeFilename=export_path, widthHeight=[width_res, height_res], percent=100, forceOverwrite=False, quality=100, editorPanelName=imager_panel)
         # clean up the UI
         cmds.deleteUI(imager_panel, panel=True)
         self.ar.ui_manager.close_ui('imager_win')
@@ -242,7 +242,7 @@ class Packager:
 
             # WIP
             #if host:
-                #dropLink = "https://dl.dropboxusercontent.com/u/"+str(host)+file[file.rfind("/"):]+"?dl=1"
+                #dropLink = "https://dl.dropboxusercontent.com/u/"+str(host)+file[file.rfind('/'):]+"?dl=1"
                 #return dropLink
 
 
@@ -266,11 +266,11 @@ class Packager:
         """ This method will send the given message text string to the Discord webhook.
         """
         if webhook and message_text:
-            message_dic = {"content": message_text}
-            message_data = json.dumps(message_dic).encode("utf8")
+            message_dic = {'content': message_text}
+            message_data = json.dumps(message_dic).encode('utf8')
             try:
-                req = request.Request(webhook, message_data, {"content-type": "application/json"})
-                req.add_header("user-agent", "dpAR Discord Webhook")
+                req = request.Request(webhook, message_data, {'content-type': 'application/json'})
+                req.add_header('user-agent', 'dpAR Discord Webhook')
                 request.urlopen(req)
             except:
                 return 'i088_internetFail'
@@ -301,9 +301,9 @@ class Packager:
         """ Just open a folder in exporer, finder, etc if it exists.
         """
         if os.path.exists(path):
-            if platform.system() == "Windows":
+            if platform.system() == 'Windows':
                 os.startfile(path)
-            elif platform.system() == "Darwin": #Mac
+            elif platform.system() == 'Darwin': #Mac
                 subprocess.Popen(['open', path])
             else: #Unix, Linux
                 subprocess.Popen(['xdg-open', path])

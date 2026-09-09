@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "Wip"
-TITLE = "v009_wip"
-DESCRIPTION = "v010_wipDesc"
-WIKI = "07-‐-Validator#-wip-cleaner"
+CLASS_NAME = 'Wip'
+TITLE = 'v009_wip'
+DESCRIPTION = 'v010_wipDesc'
+WIKI = '07-‐-Validator#-wip-cleaner'
 
 
 
@@ -36,9 +36,9 @@ class Wip(action.BaseAction):
             if inputs:
                 wip_grp = inputs
             else:
-                wip_grp = self.ar.utils.get_node_by_message("wipGrp")
-                if not wip_grp and cmds.objExists("WIP_Grp"):
-                    wip_grp = "WIP_Grp"
+                wip_grp = self.ar.utils.get_node_by_message('wipGrp')
+                if not wip_grp and cmds.objExists('WIP_Grp'):
+                    wip_grp = 'WIP_Grp'
             if wip_grp:
                 self.ar.ui_manager.set_progress(max=len(wip_grp), add_one=False, add_number=False)
                 self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])

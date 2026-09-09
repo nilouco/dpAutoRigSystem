@@ -5,14 +5,14 @@ from maya import cmds, mel
 from ..base import base
 
 # global variables to this module:
-CLASS_NAME = "FacialConnection"
-TITLE = "m085_facialConnection"
-DESCRIPTION = "m086_facialConnectionDesc"
-WIKI = "06-‐-Tools#-facial-connection"
+CLASS_NAME = 'FacialConnection'
+TITLE = 'm085_facialConnection'
+DESCRIPTION = 'm086_facialConnectionDesc'
+WIKI = '06-‐-Tools#-facial-connection'
 
-MIDDLE = "Middle"
-SIDED = "Sided"
-FACIALPRESET = "joints"
+MIDDLE = 'Middle'
+SIDED = 'Sided'
+FACIALPRESET = 'joints'
 
 
 
@@ -23,13 +23,13 @@ class FacialConnection(base.BaseLibrary):
             reload(base)
         self.joint_targets = []
         self.rmv_number = 0
-        self.recept_bs_suffix = "Recept_BS"
-        self.bs_suffix = "BS"
-        self.default_targets = ["Base", "Recept", "Tweaks",]
-        self.facial_targets = ["L_BrowUp", "L_BrowDown", "L_BrowSad", "L_BrowFrown", "L_EyelidsClose",  "L_EyelidsOpen",
-                                "L_LipsSide", "L_MouthSmile", "L_MouthSad", "L_MouthWide", "L_MouthNarrow", "L_Sneer", "L_Grimace", "L_Puff",
-                                "Pucker", "LipsUp", "LipsDown", "LipsFront", "LipsBack", "UpperLipFront", "UpperLipBack", "LowerLipFront", "LowerLipBack", "SoftSmile", "BigSmile", "AAA", "OOO", "UUU", "FFF", "MMM"]
-        self.combination_targets = ["L_MouthComb_SmileWide", "L_MouthComb_SmileNarrow", "L_MouthComb_SadWide", "L_MouthComb_SadNarrow", "L_BrowComb_UpSad", "L_BrowComb_UpFrown", "L_BrowComb_DownSad", "L_BrowComb_DownFrown"]
+        self.recept_bs_suffix = 'Recept_BS'
+        self.bs_suffix = 'BS'
+        self.default_targets = ['Base', 'Recept', 'Tweaks',]
+        self.facial_targets = ['L_BrowUp', 'L_BrowDown', 'L_BrowSad', 'L_BrowFrown', 'L_EyelidsClose',  'L_EyelidsOpen',
+                                'L_LipsSide', 'L_MouthSmile', 'L_MouthSad', 'L_MouthWide', 'L_MouthNarrow', 'L_Sneer', 'L_Grimace', 'L_Puff',
+                                'Pucker', 'LipsUp', 'LipsDown', 'LipsFront', 'LipsBack', 'UpperLipFront', 'UpperLipBack', 'LowerLipFront', 'LowerLipBack', 'SoftSmile', 'BigSmile', 'AAA', 'OOO', 'UUU', 'FFF', 'MMM']
+        self.combination_targets = ['L_MouthComb_SmileWide', 'L_MouthComb_SmileNarrow', 'L_MouthComb_SadWide', 'L_MouthComb_SadNarrow', 'L_BrowComb_UpSad', 'L_BrowComb_UpFrown', 'L_BrowComb_DownSad', 'L_BrowComb_DownFrown']
         
 
     def build_tool(self, *args):
@@ -75,10 +75,10 @@ class FacialConnection(base.BaseLibrary):
                                 squint_name_1, squint_name_2, squint_name_3,\
                                 cheek_name_1, cheek_name_2, \
                                 upper_lip_middle_name, upper_lip_name_1, upper_lip_name_2, lower_lip_middle_name, lower_lip_name_1, lower_lip_name_2, lip_corner_name]
-        self.tweaks_string_names = ["eyebrowMiddleName", "eyebrowName1", "eyebrowName2", "eyebrowName3", "eyebrowName4", \
-                                "squintName1", "squintName2", "squintName3", \
-                                "cheekName1", "cheekName2", \
-                                "upperLipMiddleName", "upperLipName1", "upperLipName2", "lowerLipMiddleName", "lowerLipName1", "lowerLipName2", "lipCornerName"]
+        self.tweaks_string_names = ['eyebrowMiddleName', 'eyebrowName1', 'eyebrowName2', 'eyebrowName3', 'eyebrowName4', \
+                                'squintName1', 'squintName2', 'squintName3', \
+                                'cheekName1', 'cheekName2', \
+                                'upperLipMiddleName', 'upperLipName1', 'upperLipName2', 'lowerLipMiddleName', 'lowerLipName1', 'lowerLipName2', 'lipCornerName']
     
     
     def get_tweaks_data(self):
@@ -102,9 +102,9 @@ class FacialConnection(base.BaseLibrary):
                         for i, item in enumerate(self.tweaks_string_names):
                             if to_node_name == item:
                                 preset_content[stored_attr][side_name][self.tweaks_names[i]] = preset_content[stored_attr][side_name].pop(to_node_name)
-                    if side_name == "MIDDLE":
+                    if side_name == 'MIDDLE':
                         preset_content[stored_attr][MIDDLE] = preset_content[stored_attr].pop(side_name)
-                    elif side_name == "SIDED":
+                    elif side_name == 'SIDED':
                         preset_content[stored_attr][SIDED] = preset_content[stored_attr].pop(side_name)
         return preset_content
 
@@ -117,17 +117,17 @@ class FacialConnection(base.BaseLibrary):
             comb = cmds.checkBox('facial_connect_comb_cb', query=True, value=True)
             tweak = cmds.checkBox('facial_connect_tweak_only_cb', query=True, value=True)
             # call run function
-            self.create_targets(from_mesh=None, base_name="Head", create_bs_node=bs, combination_targets=comb,  tweak_tgt_only=tweak)
+            self.create_targets(from_mesh=None, base_name='Head', create_bs_node=bs, combination_targets=comb,  tweak_tgt_only=tweak)
         
 
-    def create_targets(self, from_mesh=None, base_name="Head", create_bs_node=None, combination_targets=None, tweak_tgt_only=None):
+    def create_targets(self, from_mesh=None, base_name='Head', create_bs_node=None, combination_targets=None, tweak_tgt_only=None):
         """ Creates the default blendShape targets used in the system by default.
         """
         if not from_mesh:
-            from_mesh_items = cmds.ls(selection=True, type="transform")
+            from_mesh_items = cmds.ls(selection=True, type='transform')
             if from_mesh_items:
                 for n, node in enumerate(from_mesh_items):
-                    if cmds.listRelatives(node, children=True, type="mesh"): #fromMeshChildrenList
+                    if cmds.listRelatives(node, children=True, type='mesh'): #fromMeshChildrenList
                         from_mesh = node
                         break
         if from_mesh:
@@ -148,12 +148,12 @@ class FacialConnection(base.BaseLibrary):
                         prefix = cmds.promptDialog(query=True, text=True)
                 if prefix == "": # if no name provided in the promptDialog, use the geo_base name
                     prefix = geo_base
-                    if "|" in geo_base:
-                        prefix = geo_base[geo_base.rfind("|")+1:]
-                if not prefix.endswith("_"):
+                    if '|' in geo_base:
+                        prefix = geo_base[geo_base.rfind('|')+1:]
+                if not prefix.endswith('_'):
                     prefix = prefix+"_"
                 prefix = prefix.capitalize()
-                suffix = "_Tgt"
+                suffix = '_Tgt'
                 # get default list of targets to be created:
                 targets = list(self.default_targets)
                 # if the tweak_tgt_only is not checked, add facial targets to the list
@@ -193,7 +193,7 @@ class FacialConnection(base.BaseLibrary):
             if self.ar.data.ui_state and results:
                 self.ar.logger.infoWin('m085_facialConnection', 'm048_createdTgt', '\n'.join(results), 'center', 200, 350)
         else:
-            mel.eval("warning \""+self.ar.data.lang["i042_notSelection"]+"\";")
+            mel.eval("warning \""+self.ar.data.lang['i042_notSelection']+"\";")
         self.ar.ui_manager.close_ui('dpFacialConnectionWindow')
     
 
@@ -204,7 +204,7 @@ class FacialConnection(base.BaseLibrary):
         new_tgt = cmds.rename(dup, prefix+tgt+suffix)
         self.ar.custom_attr.add_attr(0, [new_tgt], descendents=True) #dpID
         cmds.select(new_tgt)
-        cmds.hyperShade(new_tgt, assign="initialShadingGroup")
+        cmds.hyperShade(new_tgt, assign='initialShadingGroup')
         connection = cmds.listConnections(new_tgt+".drawOverride", destination=False, source=True, plugs=True)
         if connection:
             cmds.disconnectAttr(connection[0], new_tgt+".drawOverride")
@@ -220,7 +220,7 @@ class FacialConnection(base.BaseLibrary):
         if controllers:
             for ctrl in controllers:
                 if cmds.objExists(ctrl+".facialList"):
-                    result_data[ctrl] = self.ar.ctrls.get_items_from_string_attr(ctrl, "facialList")
+                    result_data[ctrl] = self.ar.ctrls.get_items_from_string_attr(ctrl, 'facialList')
         return result_data
     
 
@@ -244,7 +244,7 @@ class FacialConnection(base.BaseLibrary):
         facial_ctrl_data = self.get_facial_ctrl_data(controllers)
         # get target list from existing blendShape nodes
         if not bs_items:
-            bs_items = cmds.ls(selection=False, type="blendShape")
+            bs_items = cmds.ls(selection=False, type='blendShape')
         bs_data = self.get_bs_node_data(bs_items)
         # connect them
         if bs_data:
@@ -288,10 +288,10 @@ class FacialConnection(base.BaseLibrary):
                 if tweaks_data:
                     for facial_ctrl in list(facial_ctrl_data.keys()):
                         for facial_attr in facial_ctrl_data[facial_ctrl]:
-                            # check attribute prefix like "L_" or "R_"
+                            # check attribute prefix like 'L_' or 'R_'
                             side_prefix = None
                             side_attr = facial_attr
-                            if facial_attr[1] == "_":
+                            if facial_attr[1] == '_':
                                 side_prefix = facial_attr[0]
                                 side_attr = facial_attr[2:]
                             # work with Middle, L_Middle, R_Middle or Sided data
@@ -301,15 +301,15 @@ class FacialConnection(base.BaseLibrary):
                                     node_datas.append(tweaks_data[side_attr][middle_or_sided])
                                 elif middle_or_sided == SIDED:
                                     data = {}
-                                    for s in ["L", "R"]:
+                                    for s in ['L', 'R']:
                                         if side_prefix == None or side_prefix == s:
                                             for n in list(tweaks_data[side_attr][middle_or_sided].keys()):
                                                 # add prefix to the destination joint target node
                                                 data[s+"_"+n] = tweaks_data[side_attr][middle_or_sided][n]
                                     node_datas.append(data)
                                 else:
-                                    for s in ["L", "R"]:
-                                        if middle_or_sided == s+"_"+MIDDLE and side_prefix == "L":
+                                    for s in ['L', 'R']:
+                                        if middle_or_sided == s+"_"+MIDDLE and side_prefix == 'L':
                                             # simple connection
                                             node_datas.append(tweaks_data[side_attr][middle_or_sided])
                                 if node_datas:
@@ -327,7 +327,7 @@ class FacialConnection(base.BaseLibrary):
                                                         output_max = node_data[to_node][to_attr][1]
                                                         self.create_remap_node(facial_ctrl, facial_attr, joint_target, to_attr, self.rmv_number, size_factor, output_min, output_max)
                                                         self.rmv_number = self.rmv_number+1
-                                                    print(self.ar.data.lang['m143_connected'], facial_ctrl+"."+facial_attr, "->", joint_target)
+                                                    print(self.ar.data.lang['m143_connected'], facial_ctrl+"."+facial_attr, '->', joint_target)
                                                     results.append(facial_ctrl+"."+facial_attr+" -> "+joint_target)
                     self.ar.custom_attr.add_attr(0, self.to_ids) #dpID
                     if self.ar.data.ui_state and results:
@@ -338,9 +338,9 @@ class FacialConnection(base.BaseLibrary):
     def get_joint_nodes(self, items):
         """ Load the respective items to build the joint target list (offset group node) and returns it.
         """
-        self.offset_suffix = "_Ctrl_Offset_Grp"
-        left_prefix = self.ar.data.lang["p002_left"]+"_"
-        right_prefix = self.ar.data.lang["p003_right"]+"_"
+        self.offset_suffix = '_Ctrl_Offset_Grp'
+        left_prefix = self.ar.data.lang['p002_left']+"_"
+        right_prefix = self.ar.data.lang['p003_right']+"_"
         for item in items:
             center_name = item+self.offset_suffix
             left_name   = left_prefix+item+self.offset_suffix
@@ -357,10 +357,10 @@ class FacialConnection(base.BaseLibrary):
     def get_size_factor(self, to_node):
         """ Get the child control size value and return it.
         """
-        children = cmds.listRelatives(to_node, children=True, type="transform")
+        children = cmds.listRelatives(to_node, children=True, type='transform')
         if children:
             for child in children:
-                if "dpControl" in cmds.listAttr(child) and cmds.getAttr(child+".dpControl") == 1 and "size" in cmds.listAttr(child):
+                if 'dpControl' in cmds.listAttr(child) and cmds.getAttr(child+".dpControl") == 1 and 'size' in cmds.listAttr(child):
                     return cmds.getAttr(child+".size") #sizeValue
 
 
@@ -368,15 +368,15 @@ class FacialConnection(base.BaseLibrary):
         """ Creates the nodes to remap values and connect it to final output (joint_target) item.
         """
         from_node_name = self.ar.naming.extract_suffix(from_node)
-        remap = cmds.createNode("remapValue", name=from_node_name+"_"+from_attr+"_"+str(number).zfill(2)+"_"+to_attr.upper()+"_RmV")
+        remap = cmds.createNode('remapValue', name=from_node_name+"_"+from_attr+"_"+str(number).zfill(2)+"_"+to_attr.upper()+"_RmV")
         self.to_ids.append(remap)
         out_max_attr = joint_target.split(self.offset_suffix)[0]+"_"+str(number).zfill(2)+"_"+to_attr.upper()
         if not cmds.objExists(from_node+"."+out_max_attr):
-            cmds.addAttr(from_node, longName=out_max_attr, attributeType="float", defaultValue=output_max, keyable=False)
+            cmds.addAttr(from_node, longName=out_max_attr, attributeType='float', defaultValue=output_max, keyable=False)
         if "t" in to_attr:
             if not cmds.objExists(from_node+".size_factor"):
-                cmds.addAttr(from_node, longName="size_factor", attributeType="float", defaultValue=size_factor, keyable=False)
-            md = cmds.createNode("multiplyDivide", name=from_node_name+"_"+from_attr+"_"+str(number).zfill(2)+"_"+to_attr.upper()+"_SizeFactor_MD")
+                cmds.addAttr(from_node, longName='size_factor', attributeType='float', defaultValue=size_factor, keyable=False)
+            md = cmds.createNode('multiplyDivide', name=from_node_name+"_"+from_attr+"_"+str(number).zfill(2)+"_"+to_attr.upper()+"_SizeFactor_MD")
             self.to_ids.append(md)
             cmds.connectAttr(from_node+"."+out_max_attr, md+".input1X", force=True)
             cmds.connectAttr(from_node+".size_factor", md+".input2X", force=True)
@@ -390,20 +390,20 @@ class FacialConnection(base.BaseLibrary):
         # check if there's an input connection and create a plusMinusAverage if we don't have one to connect in:
         connections = cmds.listConnections(joint_target+"."+to_attr, destination=False, source=True, plugs=False)
         if connections:
-            if cmds.objectType(connections[0]) == "plusMinusAverage":
+            if cmds.objectType(connections[0]) == 'plusMinusAverage':
                 inputs = cmds.listConnections(connections[0]+".input1D", destination=False, source=True, plugs=False)
                 cmds.connectAttr(remap+".outValue", connections[0]+".input1D["+str(len(inputs))+"]", force=True)
             else:
-                if cmds.objectType(connections[0]) == "unitConversion":
+                if cmds.objectType(connections[0]) == 'unitConversion':
                     connected_attr = cmds.listConnections(connections[0]+".input", destination=False, source=True, plugs=True)[0]
                 else:
                     connected_attr = cmds.listConnections(joint_target+"."+to_attr, destination=False, source=True, plugs=True)[0]
-                pma = cmds.createNode("plusMinusAverage", name=joint_target+"_"+to_attr.upper()+"_PMA")
+                pma = cmds.createNode('plusMinusAverage', name=joint_target+"_"+to_attr.upper()+"_PMA")
                 self.to_ids.append(pma)
                 cmds.connectAttr(connected_attr, pma+".input1D[0]", force=True)
                 cmds.connectAttr(remap+".outValue", pma+".input1D[1]", force=True)
                 cmds.connectAttr(pma+".output1D", joint_target+"."+to_attr, force=True)
-                if cmds.objectType(connections[0]) == "unitConversion":
+                if cmds.objectType(connections[0]) == 'unitConversion':
                     cmds.delete(connections[0])
         else:
             cmds.connectAttr(remap+".outValue", joint_target+"."+to_attr, force=True)
@@ -412,7 +412,7 @@ class FacialConnection(base.BaseLibrary):
     def node_has_envelope(self, node):
         """ Check if the given node has an envelope attribute. Avoid tweak nodes.
         """
-        if cmds.nodeType(node) != "tweak":
+        if cmds.nodeType(node) != 'tweak':
             return cmds.attributeQuery('envelope', node=node, exists=True)
 
 
@@ -443,10 +443,10 @@ class FacialConnection(base.BaseLibrary):
         # create blendShape node from recept to main mesh
         bs_main = cmds.blendShape(recept_target, from_mesh, frontOfChain=True, name=prefix+self.bs_suffix)[0]
         # store prefix to define names further
-        cmds.addAttr(bs_recept, longName="dpPrefix", dataType="string")
-        cmds.addAttr(bs_main, longName="dpPrefix", dataType="string")
-        cmds.setAttr(bs_recept+".dpPrefix", prefix, type="string")
-        cmds.setAttr(bs_main+".dpPrefix", prefix, type="string")
+        cmds.addAttr(bs_recept, longName='dpPrefix', dataType='string')
+        cmds.addAttr(bs_main, longName='dpPrefix', dataType='string')
+        cmds.setAttr(bs_recept+".dpPrefix", prefix, type='string')
+        cmds.setAttr(bs_main+".dpPrefix", prefix, type='string')
         # turning on the targets to make it easier to work
         cmds.setAttr(f"{bs_main}.{recept_target}", 1)
         cmds.setAttr(f"{bs_recept}.{tweak_target}", 1)
@@ -463,7 +463,7 @@ class FacialConnection(base.BaseLibrary):
         comb_target_relationship_data = {}
         if bs_node:
             targets = cmds.listAttr(bs_node+".w", multi=True) or []
-            if "dpPrefix" in cmds.listAttr(bs_node):
+            if 'dpPrefix' in cmds.listAttr(bs_node):
                 prefix = cmds.getAttr(bs_node+".dpPrefix")
         if prefix: #only pass if the blendShape node was created by this current tool version
             base_targets = []
@@ -479,7 +479,7 @@ class FacialConnection(base.BaseLibrary):
                 comb_tgt_raw = self.decompose_tgt_name(comb_name, prefix)[-1]
                 comb_lower = comb_tgt_raw.lower()
                 # splitting using "comb_" to get before_comb name e.g: l_mouth and combination part e.g. smilewide
-                before_comb, comb_part = comb_lower.split("comb_")
+                before_comb, comb_part = comb_lower.split('comb_')
                 drivers = []
                 for base_name in base_targets:
                     base_name_attr = self.decompose_tgt_name(base_name, prefix)[-1]
@@ -500,7 +500,7 @@ class FacialConnection(base.BaseLibrary):
         alias = cmds.aliasAttr(bs_node, q=True) or []
         for i in range(0, len(alias), 2):
             if alias[i] == target_name:
-                return int(alias[i+1].split("[")[-1][:-1])
+                return int(alias[i+1].split('[')[-1][:-1])
         return None
     
 
@@ -520,7 +520,7 @@ class FacialConnection(base.BaseLibrary):
                 # add combination only if the target is not locked
                 if not input_weights and not cmds.getAttr(bs_node+"."+comb_tgt, lock=True):
                     cmds.combinationShape(blendShape=bs_node, combineMethod=0, combinationTargetIndex=comb_index, driverTargetIndex=driver_indexes)
-                    print(self.ar.data.lang['m143_connected'], drivers[0]+" + "+drivers[1], "->", comb_tgt)
+                    print(self.ar.data.lang['m143_connected'], drivers[0]+" + "+drivers[1], '->', comb_tgt)
                     results.append(str(drivers[0]+" + "+drivers[1]+" -> "+comb_tgt))
         return results
 
@@ -534,7 +534,7 @@ class FacialConnection(base.BaseLibrary):
         if tgt_name:
             if prefix:
                 tgt_name = tgt_name.replace(prefix, "")
-            splitted_name = tgt_name.split("_")[:-1]
+            splitted_name = tgt_name.split('_')[:-1]
             if len(splitted_name) > 2: # combination target
                 side = splitted_name[0]    
                 comb_region = splitted_name[1]
@@ -556,19 +556,19 @@ class FacialConnection(base.BaseLibrary):
     def recreate_targets(self, *args):
         """ Rebuild the blendShape targets from an old mesh to a new one.
         """
-        selections = cmds.ls(selection=True, type="transform")
+        selections = cmds.ls(selection=True, type='transform')
         if selections and len(selections) == 2 and self.ar.utils.check_geometry(selections[0]) and self.ar.utils.check_geometry(selections[1]):
             old_mesh = selections[0]
             new_mesh = selections[1]
-            bs_node = cmds.ls(cmds.listHistory(old_mesh), type="blendShape")
+            bs_node = cmds.ls(cmds.listHistory(old_mesh), type='blendShape')
             if bs_node:
                 targets = cmds.listAttr(bs_node[0]+".w", multi=True)
                 if targets:
-                    self.ar.ui_manager.set_progress(self.ar.data.lang['c110_start'], self.ar.data.lang["m265_recreateTargets"], max=len(targets), add_one=False, add_number=False)
+                    self.ar.ui_manager.set_progress(self.ar.data.lang['c110_start'], self.ar.data.lang['m265_recreateTargets'], max=len(targets), add_one=False, add_number=False)
                     reconnect_items = []
                     cmds.select([new_mesh, old_mesh])
-                    mel.eval("CreateWrap;")
-                    target_grps = cmds.group(name="New_Tgt_Grp", empty=True)
+                    mel.eval('CreateWrap;')
+                    target_grps = cmds.group(name='New_Tgt_Grp', empty=True)
                     # clear selection
                     cmds.select(clear=True)
                     new_targets = []
@@ -593,7 +593,7 @@ class FacialConnection(base.BaseLibrary):
                             if has_connection:
                                 cmds.connectAttr(has_connection[0], bs_node[0]+"."+item)
                             # clear undo
-                            mel.eval("flushUndo;")
+                            mel.eval('flushUndo;')
                     cmds.delete(new_mesh, constructionHistory=True)
                     cmds.rename(bs_node[0], bs_node[0]+"_Old")
                     cmds.blendShape(new_targets, new_mesh, topologyCheck=False, name=bs_node[0])

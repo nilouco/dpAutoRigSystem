@@ -35,7 +35,7 @@ class Lib:
         if self.ar.pipeliner.pipe_data['addOnsPath'] and self.ar.config.get_validator_addons():
             self.start_modules_by_folder('', path=self.ar.pipeliner.pipe_data['addOnsPath'])
             self.ar.data.checkaddon_folder = self.ar.pipeliner.pipe_data['addOnsPath']
-        if self.ar.pipeliner.pipe_data['finishingPath'] and self.ar.config.get_validator_addons("finishingPath"):
+        if self.ar.pipeliner.pipe_data['finishingPath'] and self.ar.config.get_validator_addons('finishingPath'):
             self.start_modules_by_folder('', path=self.ar.pipeliner.pipe_data['finishingPath'])
             self.ar.data.checkfinishing_folder = self.ar.pipeliner.pipe_data['finishingPath']
         # rebuilders
@@ -66,13 +66,13 @@ class Lib:
                 class_names.append(lib_instance.name)
         
             # avoid print again the same message:
-            if folder == "":
+            if folder == '':
                 folder = path
             if not folder in self.ar.data.lib:
                 self.ar.data.lib[folder] = { 
-                                            "instances" : libs,
-                                            "imported" : imported_modules,
-                                            "names" : class_names
+                                            'instances' : libs,
+                                            'imported' : imported_modules,
+                                            'names' : class_names
                                             }
                 if self.ar.data.verbose:
                     print(f"{folder}: {modules!s}")
@@ -83,9 +83,9 @@ class Lib:
         if templates:
             libs = self.initialize_templates(templates, content)
             self.ar.data.lib[self.ar.data.template_folder] = {
-                                                                "templates" : templates,
-                                                                "content" : content,
-                                                                "instances" : libs
+                                                                'templates' : templates,
+                                                                'content' : content,
+                                                                'instances' : libs
                                                               }
             if self.ar.data.verbose:
                 print(self.ar.data.template_folder+" : "+str(templates))
@@ -95,10 +95,10 @@ class Lib:
         libs = []
         for item in templates:
             base_name = item
-            if "_" in item:
-                base_name = item.split("_")[0]
+            if '_' in item:
+                base_name = item.split('_')[0]
             name = self.ar.config.get_template_name(base_name)
-            lib = template.BaseTemplate(self.ar, item, name, "v002_templateDesc", f"03-‐-Guides#-{base_name}")
+            lib = template.BaseTemplate(self.ar, item, name, 'v002_templateDesc', f"03-‐-Guides#-{base_name}")
             lib.template_data = content[item]
             lib.base_name = base_name
             libs.append(lib)
@@ -115,10 +115,10 @@ class Lib:
 
     def import_library(self, module, folder, path=None):
         imported_module = None
-        basePath = self.ar.env.find_env("PYTHONPATH", "dpAutoRigSystem")
+        basePath = self.ar.env.find_env('PYTHONPATH', 'dpAutoRigSystem')
         try:
             if folder:
-                folder = folder.replace("/", ".")
+                folder = folder.replace('/', '.')
                 imported_module = __import__(f"{basePath}.{folder}.{module}", {}, {}, [module])
             elif path: #addon probably
                 sys.path.append(path)
@@ -141,7 +141,7 @@ class Lib:
         """ Load the Validator's presets from the pipeline path.
         """
         if self.ar.pipeliner.pipe_data['presetsPath'] and os.path.exists(self.ar.pipeliner.pipe_data['presetsPath']):
-            studio_preset, studio_preset_data = self.ar.config.get_json_file_content(self.ar.pipeliner.pipe_data['presetsPath']+"/", True)
+            studio_preset, studio_preset_data = self.ar.config.get_json_file_content(self.ar.pipeliner.pipe_data['presetsPath']+'/', True)
             if studio_preset:
                 self.ar.data.validator_preset = studio_preset_data[studio_preset[0]]
                 self.ar.data.validator_preset_data.update(studio_preset_data)
@@ -151,12 +151,12 @@ class Lib:
     
     def set_validator_preset(self):
         for validator_instance in self.ar.config.get_validator_instances():
-            if validator_instance.name in self.ar.data.validator_preset_data[self.ar.data.validator_preset["_preset"]]:
-                validator_instance.change_active(self.ar.data.validator_preset_data[self.ar.data.validator_preset["_preset"]][validator_instance.name])
+            if validator_instance.name in self.ar.data.validator_preset_data[self.ar.data.validator_preset['_preset']]:
+                validator_instance.change_active(self.ar.data.validator_preset_data[self.ar.data.validator_preset['_preset']][validator_instance.name])
 
 
     def check_missing_modules(self, folder, check_modules):
         """ Verifies if the modules is loaded.
             Returns a list of missing modules or []
         """
-        return [m for m in check_modules if not m in self.ar.data.lib[folder]["names"]]
+        return [m for m in check_modules if not m in self.ar.data.lib[folder]['names']]

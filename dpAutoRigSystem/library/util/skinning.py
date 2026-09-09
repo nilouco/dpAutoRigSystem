@@ -11,8 +11,8 @@ class Skinning(weights.Weights):
             reload(weights)
         weights.Weights.__init__(self, ar)
         # defining variables:
-        self.ignore_skinning_attr = "dpDoNotSkinIt"
-        self.io_start_name = "skinning"
+        self.ignore_skinning_attr = 'dpDoNotSkinIt'
+        self.io_start_name = 'skinning'
         
 
     def validate_geos(self, geos, mode=None):
@@ -31,7 +31,7 @@ class Skinning(weights.Weights):
                         input_deformers = cmds.findDeformers(item)
                         if input_deformers:
                             for deformer_node in input_deformers:
-                                if cmds.objectType(deformer_node) == "skinCluster":
+                                if cmds.objectType(deformer_node) == 'skinCluster':
                                     self.ar.logger.infoWin('i038_canceled', 'i285_alreadySkinned', item, 'center', 205, 270)
                                     return False
                     except:
@@ -43,7 +43,7 @@ class Skinning(weights.Weights):
         """ Configure the skinCluster relative mode.
             Default is 1 = local to avoid only 1 joint deformation issue.
         """
-        if cmds.about(version=True) >= "2023" and "relativeSpaceMode" in cmds.listAttr(sc_node):
+        if cmds.about(version=True) >= '2023' and 'relativeSpaceMode' in cmds.listAttr(sc_node):
             cmds.setAttr(sc_node+".relativeSpaceMode", sc_mode)
     
 
@@ -53,13 +53,13 @@ class Skinning(weights.Weights):
             if joints and geos:
                 not_skinned_items = []
                 for geo in geos:
-                    if (mode == "Add"):
+                    if (mode == 'Add'):
                         for joint in joints:
                             try:
                                 cmds.skinCluster(geo, edit=True, addInfluence=joint, toSelectedBones=True, lockWeights=True, weight=0.0)
                             except:
                                 not_skinned_items.append(joint)
-                    elif (mode == "Remove"):
+                    elif (mode == 'Remove'):
                         for joint in joints:
                             try:
                                 cmds.skinCluster(geo, edit=True, removeInfluence=joint, toSelectedBones=True)
@@ -68,10 +68,10 @@ class Skinning(weights.Weights):
                     else: # None = create a new skinCluster node
                         base_name = self.ar.naming.extract_suffix(geo)
                         skincluster_name = base_name+"_SC"
-                        if "|" in skincluster_name:
-                            skincluster_name = skincluster_name[skincluster_name.rfind("|")+1:]
+                        if '|' in skincluster_name:
+                            skincluster_name = skincluster_name[skincluster_name.rfind('|')+1:]
                         new_skin_cluster_node = cmds.skinCluster(joints, geo, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skincluster_name)[0]
-                        cmds.rename(cmds.listConnections(new_skin_cluster_node+".bindPose", destination=False, source=True), new_skin_cluster_node.replace("_SC", "_BP"))
+                        cmds.rename(cmds.listConnections(new_skin_cluster_node+".bindPose", destination=False, source=True), new_skin_cluster_node.replace('_SC', '_BP'))
                         self.set_skin_relative_mode(new_skin_cluster_node)
                 print(self.ar.data.lang['i077_skinned']+', '.join(geos))
                 if log_win:
@@ -92,7 +92,7 @@ class Skinning(weights.Weights):
         done_items = []
         self.ar.ui_manager.set_progress('Skinning: ', self.ar.data.lang['i287_copy']+" Skinning", len(destinations), add_one=False, add_number=False)
         for source_item in source_items:
-            self.ar.ui_manager.set_progress("Skinning: ")
+            self.ar.ui_manager.set_progress('Skinning: ')
             if one_source:
                 for item in destinations:
                     self.run_copy_skin(source_item, item, by_uvs)
@@ -101,7 +101,7 @@ class Skinning(weights.Weights):
             else:
                 if not source_item in done_items:
                     for item in reversed(destinations): #to avoid find the same item in the same given list
-                        if source_item != item and source_item[source_item.rfind("|")+1:] == item[item.rfind("|")+1:]:
+                        if source_item != item and source_item[source_item.rfind('|')+1:] == item[item.rfind('|')+1:]:
                             if self.check_existing_deformer_node(source_item)[0]:
                                 self.run_copy_skin(source_item, item, by_uvs)
                             elif self.check_existing_deformer_node(item)[0]:
@@ -123,8 +123,8 @@ class Skinning(weights.Weights):
         if source_def_items:
             # get correct naming
             skincluster_name = self.ar.naming.extract_suffix(destination_item)
-            if "|" in skincluster_name:
-                skincluster_name = skincluster_name[skincluster_name.rfind("|")+1:]
+            if '|' in skincluster_name:
+                skincluster_name = skincluster_name[skincluster_name.rfind('|')+1:]
             # clean-up current destination skinCluster
             dest_def_items = self.check_existing_deformer_node(destination_item, deleteIt=True)
             if dest_def_items[0] and dest_def_items[2]:
@@ -135,9 +135,9 @@ class Skinning(weights.Weights):
                 # create skinCluster node
                 if i == 0: #Maya 2022 and 2023 versions
                     new_skin_cluster_node = cmds.skinCluster(skin_influences, destination_item, name=skincluster_name+"_"+str(i)+"_SC", toSelectedBones=True, maximumInfluences=3, skinMethod=skin_method_to_use)[0]
-                elif cmds.about(version=True) >= "2024": #accepting multiple skinClusters
+                elif cmds.about(version=True) >= '2024': #accepting multiple skinClusters
                     new_skin_cluster_node = cmds.skinCluster(skin_influences, destination_item, multi=True, name=skincluster_name+"_"+str(i)+"_SC", toSelectedBones=True, maximumInfluences=3, skinMethod=skin_method_to_use)[0]
-                cmds.rename(cmds.listConnections(new_skin_cluster_node+".bindPose", destination=False, source=True), new_skin_cluster_node.replace("_SC", "_BP"))
+                cmds.rename(cmds.listConnections(new_skin_cluster_node+".bindPose", destination=False, source=True), new_skin_cluster_node.replace('_SC', '_BP'))
                 self.set_skin_relative_mode(new_skin_cluster_node)
                 if skin_method_to_use != 0 and cmds.getAttr(source_def+".dqsSupportNonRigid"):
                     cmds.setAttr(new_skin_cluster_node+".dqsSupportNonRigid", 1)
@@ -150,9 +150,9 @@ class Skinning(weights.Weights):
                 if by_uvs:
                     source_uv_map = cmds.polyUVSet(source_item, query=True, allUVSets=True)[0]
                     destination_uv_map = cmds.polyUVSet(destination_item, query=True, allUVSets=True)[0]
-                    cmds.copySkinWeights(sourceSkin=source_def, destinationSkin=new_skin_cluster_node, noMirror=True, surfaceAssociation="closestPoint", influenceAssociation=["label", "oneToOne", "closestJoint"], uvSpace=[source_uv_map, destination_uv_map])
+                    cmds.copySkinWeights(sourceSkin=source_def, destinationSkin=new_skin_cluster_node, noMirror=True, surfaceAssociation='closestPoint', influenceAssociation=['label', 'oneToOne', 'closestJoint'], uvSpace=[source_uv_map, destination_uv_map])
                 else:
-                    cmds.copySkinWeights(sourceSkin=source_def, destinationSkin=new_skin_cluster_node, noMirror=True, surfaceAssociation="closestPoint", influenceAssociation=["label", "oneToOne", "closestJoint"])
+                    cmds.copySkinWeights(sourceSkin=source_def, destinationSkin=new_skin_cluster_node, noMirror=True, surfaceAssociation='closestPoint', influenceAssociation=['label', 'oneToOne', 'closestJoint'])
                 # deformer order
                 if def_order_index:
                     cmds.reorderDeformers(dest_def_items[1][def_order_index-1], new_skin_cluster_node, destination_item)
@@ -165,7 +165,7 @@ class Skinning(weights.Weights):
         """ Main function to analise and call copy skin process. 
         """
         if not items:
-            items = cmds.ls(selection=True, long=True, type="transform")
+            items = cmds.ls(selection=True, long=True, type='transform')
         if items and len(items) > 1:
             # get first selected item
             source_item = items[0]
@@ -191,9 +191,9 @@ class Skinning(weights.Weights):
         """ Copy the skinning between meshes with the same name, selected or not or using the given list.
         """
         if not items:
-            items = cmds.ls(selection=True, long=True, type="transform")
+            items = cmds.ls(selection=True, long=True, type='transform')
             if not items:
-                items = cmds.ls(selection=False, long=True, type="transform")
+                items = cmds.ls(selection=False, long=True, type='transform')
         if items:
             if ui and self.ar.data.ui_state:
                 by_uvs = self.ar.auto_rig_ui.get_by_uvs_from_ui()
@@ -234,7 +234,7 @@ class Skinning(weights.Weights):
                 cmds.lockNode(skincluster_name, lock=False)
                 cmds.delete(skincluster_name)
         if need_to_create_skincluster:
-            if cmds.about(version=True) >= "2024": #accepting multiple skinClusters
+            if cmds.about(version=True) >= '2024': #accepting multiple skinClusters
                 sc_node = cmds.skinCluster(incoming_joints, item, multi=True, name=skincluster_name, toSelectedBones=True, skinMethod=skin_weight_data[item][skincluster_name]['skinMethodToUse'], obeyMaxInfluences=skin_weight_data[item][skincluster_name]['skinMaintainMaxInf'], maximumInfluences=skin_weight_data[item][skincluster_name]['skinMaxInf'])[0]
             else:
                 sc_node = cmds.skinCluster(incoming_joints, item, name=skincluster_name, toSelectedBones=True, skinMethod=skin_weight_data[item][skincluster_name]['skinMethodToUse'], obeyMaxInfluences=skin_weight_data[item][skincluster_name]['skinMaintainMaxInf'], maximumInfluences=skin_weight_data[item][skincluster_name]['skinMaxInf'])[0]
@@ -252,7 +252,7 @@ class Skinning(weights.Weights):
         return skin_weights
     
 
-    def get_skin_blend_weights_data(self, item, skincluster_node, attr_name="blendWeights"):
+    def get_skin_blend_weights_data(self, item, skincluster_node, attr_name='blendWeights'):
         """ Returns a dictionary with the skin blend weights by each item component (vertex or cv) that has non zero blend weight value.
         """
         skin_data = {}
@@ -279,23 +279,23 @@ class Skinning(weights.Weights):
                 for skincluster_node in skincluster_info_items[2]:
                     # get skinCluster data
                     skin_weights_data[item][skincluster_node] = {
-                        "skinMethodToUse"           : cmds.skinCluster(skincluster_node, query=True, skinMethod=True),
-                        "skinMaintainMaxInf"        : cmds.skinCluster(skincluster_node, query=True, obeyMaxInfluences=True),
-                        "skinMaxInf"                : cmds.skinCluster(skincluster_node, query=True, maximumInfluences=True),
-                        "skinInfList"               : cmds.skinCluster(skincluster_node, query=True, influence=True),
-                        "skinSupportNonRigid"       : cmds.getAttr(skincluster_node+".dqsSupportNonRigid"),
-                        "skinUseComponents"         : cmds.getAttr(skincluster_node+".useComponents"),
-                        "skinDeformUserNormals"     : cmds.getAttr(skincluster_node+".deformUserNormals"),
-                        "skinNormalizeWeights"      : cmds.getAttr(skincluster_node+".normalizeWeights"),
-                        "skinWeightDistribution"    : cmds.getAttr(skincluster_node+".weightDistribution"),
-                        "skinMaxInfluences"         : cmds.getAttr(skincluster_node+".maxInfluences"),
-                        "skinMaintainMaxInfluences" : cmds.getAttr(skincluster_node+".maintainMaxInfluences"),
-                        "skinJointsWeights"         : self.get_skin_weights(item, skincluster_node, True),
-                        "skinBlendWeights"          : self.get_skin_blend_weights_data(item, skincluster_node, "blendWeights"),
-                        "skinDropoffWeights"        : self.get_skin_blend_weights_data(item, skincluster_node, "dropoff")
+                        'skinMethodToUse'           : cmds.skinCluster(skincluster_node, query=True, skinMethod=True),
+                        'skinMaintainMaxInf'        : cmds.skinCluster(skincluster_node, query=True, obeyMaxInfluences=True),
+                        'skinMaxInf'                : cmds.skinCluster(skincluster_node, query=True, maximumInfluences=True),
+                        'skinInfList'               : cmds.skinCluster(skincluster_node, query=True, influence=True),
+                        'skinSupportNonRigid'       : cmds.getAttr(skincluster_node+".dqsSupportNonRigid"),
+                        'skinUseComponents'         : cmds.getAttr(skincluster_node+".useComponents"),
+                        'skinDeformUserNormals'     : cmds.getAttr(skincluster_node+".deformUserNormals"),
+                        'skinNormalizeWeights'      : cmds.getAttr(skincluster_node+".normalizeWeights"),
+                        'skinWeightDistribution'    : cmds.getAttr(skincluster_node+".weightDistribution"),
+                        'skinMaxInfluences'         : cmds.getAttr(skincluster_node+".maxInfluences"),
+                        'skinMaintainMaxInfluences' : cmds.getAttr(skincluster_node+".maintainMaxInfluences"),
+                        'skinJointsWeights'         : self.get_skin_weights(item, skincluster_node, True),
+                        'skinBlendWeights'          : self.get_skin_blend_weights_data(item, skincluster_node, "blendWeights"),
+                        'skinDropoffWeights'        : self.get_skin_blend_weights_data(item, skincluster_node, "dropoff")
                     }
                     if cmds.objExists(skincluster_node+".relativeSpaceMode"):
-                        skin_weights_data[item][skincluster_node]["skinRelativeSpaceMode"] = cmds.getAttr(skincluster_node+".relativeSpaceMode")
+                        skin_weights_data[item][skincluster_node]['skinRelativeSpaceMode'] = cmds.getAttr(skincluster_node+".relativeSpaceMode")
         return skin_weights_data
 
 
@@ -305,7 +305,7 @@ class Skinning(weights.Weights):
         """
         # workaround to have all weights in a temporary joint
         cmds.select(clear=True)
-        self.tmp_joint = cmds.joint(name="dpTemp_Jnt")
+        self.tmp_joint = cmds.joint(name='dpTemp_Jnt')
         cmds.skinCluster(skincluster_name, edit=True, addInfluence=self.tmp_joint, toSelectedBones=True, lockWeights=False, weight=1.0)
         try:
             cmds.skinPercent(skincluster_name, item, transformValue=[(self.tmp_joint, 1)])
@@ -325,7 +325,7 @@ class Skinning(weights.Weights):
         self.normalize_item_weights(item)
 
 
-    def set_imported_skin_items_weights(self, skincluster_name, skin_weight_data, attr_name="blendWeights"):
+    def set_imported_skin_items_weights(self, skincluster_name, skin_weight_data, attr_name='blendWeights'):
         """ Set the skinCluster blend or dropoff weight values from the given dictionary.
         """
         if skin_weight_data:
@@ -345,17 +345,17 @@ class Skinning(weights.Weights):
                     for skincluster_name in skin_weight_data[item]:
                         self.update_or_create_skincluster(item, skincluster_name, skin_weight_data)
                         self.set_imported_skin_weights(item, skincluster_name, skin_weight_data)
-                        self.set_imported_skin_items_weights(skincluster_name, skin_weight_data[item][skincluster_name]['skinBlendWeights'], "blendWeights")
-                        self.set_imported_skin_items_weights(skincluster_name, skin_weight_data[item][skincluster_name]['skinDropoffWeights'], "dropoff")
-                        cmds.setAttr(skincluster_name+".dqsSupportNonRigid", skin_weight_data[item][skincluster_name]["skinSupportNonRigid"])
-                        cmds.setAttr(skincluster_name+".useComponents", skin_weight_data[item][skincluster_name]["skinUseComponents"])
-                        cmds.setAttr(skincluster_name+".deformUserNormals", skin_weight_data[item][skincluster_name]["skinDeformUserNormals"])
-                        cmds.setAttr(skincluster_name+".normalizeWeights", skin_weight_data[item][skincluster_name]["skinNormalizeWeights"])
-                        cmds.setAttr(skincluster_name+".weightDistribution", skin_weight_data[item][skincluster_name]["skinWeightDistribution"])
-                        cmds.setAttr(skincluster_name+".maxInfluences", skin_weight_data[item][skincluster_name]["skinMaxInfluences"])
-                        cmds.setAttr(skincluster_name+".maintainMaxInfluences", skin_weight_data[item][skincluster_name]["skinMaintainMaxInfluences"])
-                        if "relativeSpaceMode" in cmds.listAttrs(skincluster_name) and "skinRelativeSpaceMode" in skin_weight_data[item][skincluster_name]:
-                            cmds.setAttr(skincluster_name+".relativeSpaceMode", skin_weight_data[item][skincluster_name]["skinRelativeSpaceMode"])
+                        self.set_imported_skin_items_weights(skincluster_name, skin_weight_data[item][skincluster_name]['skinBlendWeights'], 'blendWeights')
+                        self.set_imported_skin_items_weights(skincluster_name, skin_weight_data[item][skincluster_name]['skinDropoffWeights'], 'dropoff')
+                        cmds.setAttr(skincluster_name+".dqsSupportNonRigid", skin_weight_data[item][skincluster_name]['skinSupportNonRigid'])
+                        cmds.setAttr(skincluster_name+".useComponents", skin_weight_data[item][skincluster_name]['skinUseComponents'])
+                        cmds.setAttr(skincluster_name+".deformUserNormals", skin_weight_data[item][skincluster_name]['skinDeformUserNormals'])
+                        cmds.setAttr(skincluster_name+".normalizeWeights", skin_weight_data[item][skincluster_name]['skinNormalizeWeights'])
+                        cmds.setAttr(skincluster_name+".weightDistribution", skin_weight_data[item][skincluster_name]['skinWeightDistribution'])
+                        cmds.setAttr(skincluster_name+".maxInfluences", skin_weight_data[item][skincluster_name]['skinMaxInfluences'])
+                        cmds.setAttr(skincluster_name+".maintainMaxInfluences", skin_weight_data[item][skincluster_name]['skinMaintainMaxInfluences'])
+                        if 'relativeSpaceMode' in cmds.listAttrs(skincluster_name) and 'skinRelativeSpaceMode' in skin_weight_data[item][skincluster_name]:
+                            cmds.setAttr(skincluster_name+".relativeSpaceMode", skin_weight_data[item][skincluster_name]['skinRelativeSpaceMode'])
         if verbose:
             self.ar.ui_manager.set_progress(end_it=True)
 
@@ -365,9 +365,9 @@ class Skinning(weights.Weights):
             Export: if export parameter is True
             Import: if export parameter is False
         """
-        items = cmds.ls(selection=True, type="transform")
+        items = cmds.ls(selection=True, type='transform')
         if not items:
-            cmds.confirmDialog(title="SkinCluster Weights IO", message=self.ar.data.lang['i042_notSelection']+"\n"+self.ar.data.lang['m225_selectAnything'], button=[self.ar.data.lang['i038_canceled']])
+            cmds.confirmDialog(title='SkinCluster Weights IO', message=self.ar.data.lang['i042_notSelection']+"\n"+self.ar.data.lang['m225_selectAnything'], button=[self.ar.data.lang['i038_canceled']])
             return
         action = self.ar.data.lang['i196_import']
         if export:
@@ -390,7 +390,7 @@ class Skinning(weights.Weights):
         """
         skinned_items = []
         if not skinclusters:
-            skinclusters = cmds.ls(selection=False, type="skinCluster")
+            skinclusters = cmds.ls(selection=False, type='skinCluster')
         if skinclusters:
             for item in skinclusters:
                 skinned_items.extend(cmds.skinCluster(item, query=True, influence=True))

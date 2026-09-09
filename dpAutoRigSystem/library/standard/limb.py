@@ -7,18 +7,18 @@ from ...library.util import ik_fk_snap, ribbon, soft_ik
 from ..base import standard
 
 # global variables to this module:
-CLASS_NAME = "Limb"
-TITLE = "m019_limb"
-DESCRIPTION = "m020_limbDesc"
-WIKI = "03-‐-Guides#-limb"
+CLASS_NAME = 'Limb'
+TITLE = 'm019_limb'
+DESCRIPTION = 'm020_limbDesc'
+WIKI = '03-‐-Guides#-limb'
 
 
 
 class Limb(standard.BaseStandard):
     def __init__(self, ar):
         standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.arm_name = "Arm"
-        self.leg_name = "Leg"
+        self.arm_name = 'Arm'
+        self.leg_name = 'Leg'
         self.load_variables()
         if self.ar.dev:
             reload(soft_ik)
@@ -55,8 +55,8 @@ class Limb(standard.BaseStandard):
 
 
     def add_follow_attr_name(self, ctrl, attr):
-        cmds.addAttr(ctrl, longName="followAttrName", dataType="string")
-        cmds.setAttr(ctrl+".followAttrName", attr, type="string")
+        cmds.addAttr(ctrl, longName='followAttrName', dataType='string')
+        cmds.setAttr(ctrl+".followAttrName", attr, type='string')
 
 
     # @utils.profiler
@@ -72,22 +72,22 @@ class Limb(standard.BaseStandard):
         self.create_guide_auto_aim()
         self.set_guide_base_initial_position()
         self.add_node_to_guide_net([self.guide_before_loc, self.guide_main_loc, self.guide_corner_loc, self.guide_corner_b_loc, self.guide_extreme_loc, self.guide_up_vector_loc, self.guide_end_loc], 
-                                   ["Before", "Main", "Corner", "CornerB", "Extrem", "CornerUpVector", "JointEnd"])
+                                   ['Before', 'Main', 'Corner', 'CornerB', 'Extrem', 'CornerUpVector', 'JointEnd'])
 
 
     def create_guide_custom_attr(self):
         """ Add guide_base attributes and set them.
         """
-        cmds.addAttr(self.guide_base, longName="type", attributeType='enum', enumName=self.ar.data.lang['m028_arm']+':'+self.ar.data.lang['m030_leg'])
-        cmds.addAttr(self.guide_base, longName="hasBend", defaultValue=1, attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="numBendJoints", defaultValue=5, attributeType='long')
-        cmds.addAttr(self.guide_base, longName="style", attributeType='enum', enumName=self.ar.data.lang['m042_default']+':'+self.ar.data.lang['m026_biped']+':'+self.ar.data.lang['m037_quadruped'])
-        cmds.addAttr(self.guide_base, longName="alignWorld", defaultValue=1, attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="articulation", defaultValue=1, attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="additional", attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="softIk", defaultValue=1, attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="corrective", attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="reorient", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName='type', attributeType='enum', enumName=self.ar.data.lang['m028_arm']+':'+self.ar.data.lang['m030_leg'])
+        cmds.addAttr(self.guide_base, longName='hasBend', defaultValue=1, attributeType='bool')
+        cmds.addAttr(self.guide_base, longName='numBendJoints', defaultValue=5, attributeType='long')
+        cmds.addAttr(self.guide_base, longName='style', attributeType='enum', enumName=self.ar.data.lang['m042_default']+':'+self.ar.data.lang['m026_biped']+':'+self.ar.data.lang['m037_quadruped'])
+        cmds.addAttr(self.guide_base, longName='alignWorld', defaultValue=1, attributeType='bool')
+        cmds.addAttr(self.guide_base, longName='articulation', defaultValue=1, attributeType='bool')
+        cmds.addAttr(self.guide_base, longName='additional', attributeType='bool')
+        cmds.addAttr(self.guide_base, longName='softIk', defaultValue=1, attributeType='bool')
+        cmds.addAttr(self.guide_base, longName='corrective', attributeType='bool')
+        cmds.addAttr(self.guide_base, longName='reorient', attributeType='bool')
 
 
     def create_guide_elements(self):
@@ -111,7 +111,7 @@ class Limb(standard.BaseStandard):
         self.ar.utils.set_template([self.line_before, self.line_main, self.line_corner, self.line_extreme, self.line_end])
         cmds.setAttr(self.guide_corner_b_loc+".translateZ", 2)
         cmds.setAttr(self.guide_corner_b_loc+".visibility", 0)
-        cmds.setAttr(self.guide_end_loc+".tz", 1.3)
+        cmds.setAttr(self.guide_end_loc+".translateZ", 1.3)
         # parenting
         self.corner_grp = cmds.group(self.guide_corner_loc, name=self.guide_corner_loc+"_Grp")
         cmds.parent(self.line_before, self.guide_before_loc, self.guide_main_loc, self.corner_grp, self.guide_extreme_loc, self.guide_up_vector_loc, self.guide_base, relative=True)
@@ -130,11 +130,11 @@ class Limb(standard.BaseStandard):
 
     def align_guide_corner(self):
         # align cornerLocs:
-        self.corner_aic = cmds.aimConstraint(self.guide_extreme_loc, self.corner_grp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.guide_up_vector_loc, name=self.corner_grp+"_AiC")[0]
+        self.corner_aic = cmds.aimConstraint(self.guide_extreme_loc, self.corner_grp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType='object', worldUpObject=self.guide_up_vector_loc, name=self.corner_grp+"_AiC")[0]
         self.corner_point_grp = cmds.group(self.corner_grp, name=self.corner_grp+"_Zero_0_Grp")
         poc = cmds.pointConstraint(self.guide_main_loc, self.guide_extreme_loc, self.corner_point_grp, maintainOffset=False, name=self.corner_point_grp+"_PoC")[0]
-        cmds.setAttr(poc+'.'+self.guide_main_loc[self.guide_main_loc.rfind(":")+1:]+'W0', 0.52)
-        cmds.setAttr(poc+'.'+self.guide_extreme_loc[self.guide_extreme_loc.rfind(":")+1:]+'W1', 0.48)
+        cmds.setAttr(poc+'.'+self.guide_main_loc[self.guide_main_loc.rfind(':')+1:]+'W0', 0.52)
+        cmds.setAttr(poc+'.'+self.guide_extreme_loc[self.guide_extreme_loc.rfind(':')+1:]+'W1', 0.48)
         cmds.setAttr(self.guide_before_loc+".translateX", -0.5)
         cmds.setAttr(self.guide_before_loc+".translateZ", -2)
         cmds.setAttr(self.guide_extreme_loc+".translateZ", 10)
@@ -147,11 +147,11 @@ class Limb(standard.BaseStandard):
         corner_position = cmds.xform(self.guide_corner_loc, query=True, worldSpace=True, rotatePivot=True)
         cmds.move(corner_position[0], corner_position[1], corner_position[2], self.guide_up_vector_grp)
         corner_up_vector_poc = cmds.pointConstraint(self.guide_main_loc, self.guide_extreme_loc, self.guide_up_vector_grp, maintainOffset=True, name=self.guide_up_vector_grp+"_PoC")[0]
-        cmds.setAttr(corner_up_vector_poc+'.'+self.guide_main_loc[self.guide_main_loc.rfind(":")+1:]+'W0', 0.52)
-        cmds.setAttr(corner_up_vector_poc+'.'+self.guide_extreme_loc[self.guide_extreme_loc.rfind(":")+1:]+'W1', 0.48)
+        cmds.setAttr(corner_up_vector_poc+'.'+self.guide_main_loc[self.guide_main_loc.rfind(':')+1:]+'W0', 0.52)
+        cmds.setAttr(corner_up_vector_poc+'.'+self.guide_extreme_loc[self.guide_extreme_loc.rfind(':')+1:]+'W1', 0.48)
         cmds.setAttr(self.guide_up_vector_loc+".translateY", -10)
         # display cornerUpVector:
-        cmds.addAttr(self.guide_corner_loc, longName="displayUpVector", attributeType="bool")
+        cmds.addAttr(self.guide_corner_loc, longName='displayUpVector', attributeType='bool')
         cmds.setAttr(self.guide_corner_loc+".displayUpVector", keyable=False, channelBox=True)
         cmds.connectAttr(self.guide_corner_loc+".displayUpVector", self.guide_up_vector_loc+".visibility", force=True)
 
@@ -192,13 +192,13 @@ class Limb(standard.BaseStandard):
         cmds.matchTransform(temp_before_up_vector, self.guide_before_loc, position=True)
         before_up_vector_translate = cmds.getAttr(temp_before_up_vector+before_translate_axis)
         cmds.setAttr(temp_before_up_vector+before_translate_axis, before_up_vector_translate+10)
-        temp_before_aic = cmds.aimConstraint(self.guide_main_loc, self.guide_before_loc, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=temp_before_up_vector, name=self.guide_before_loc+"_Tmp_AiC")[0]
+        temp_before_aic = cmds.aimConstraint(self.guide_main_loc, self.guide_before_loc, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType='object', worldUpObject=temp_before_up_vector, name=self.guide_before_loc+"_Tmp_AiC")[0]
         cmds.delete(temp_before_aic, temp_before_up_vector)
         
         # re-orient main shoulder guide
         temp_main_up_vector = cmds.group(empty=True, parent=self.guide_base, relative=True, name=self.guide_main_loc+"_UpVector_Tmp")
         cmds.setAttr(temp_main_up_vector+".translateX", 10)
-        temp_main_aic = cmds.aimConstraint(self.guide_corner_loc, self.guide_main_loc, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=temp_main_up_vector, name=self.guide_main_loc+"_Tmp_AiC")[0]
+        temp_main_aic = cmds.aimConstraint(self.guide_corner_loc, self.guide_main_loc, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType='object', worldUpObject=temp_main_up_vector, name=self.guide_main_loc+"_Tmp_AiC")[0]
         
         # aim offset for aimConstraint depending on limb_type
         self.set_aim_offset(temp_main_aic)
@@ -260,18 +260,18 @@ class Limb(standard.BaseStandard):
         self.corner_poc = cmds.pointConstraint(self.guide_main_drv_null, self.guide_extreme_loc, self.corner_point_grp, maintainOffset=True, name=self.corner_point_grp+"_PoC")[0]
         self.corner_up_vector_poc = cmds.pointConstraint(self.guide_main_drv_null, self.guide_extreme_loc, self.guide_up_vector_grp, maintainOffset=True, name=self.guide_up_vector_grp+"_PoC")[0]
         self.corner_null_poc = cmds.pointConstraint(self.guide_main_drv_null, self.guide_extreme_loc, self.corner_drv_null_grp, maintainOffset=True, name=self.corner_drv_null_grp+"_PoC")[0]
-        self.corner_drv_null_aic = cmds.aimConstraint(self.guide_extreme_loc, self.corner_drv_null_grp, aimVector=(0.0, 0.0, 1.0), upVector=up_vector_values, worldUpType="object", worldUpObject=self.guide_up_vector_loc, name=self.corner_drv_null_grp+"_AiC")
+        self.corner_drv_null_aic = cmds.aimConstraint(self.guide_extreme_loc, self.corner_drv_null_grp, aimVector=(0.0, 0.0, 1.0), upVector=up_vector_values, worldUpType='object', worldUpObject=self.guide_up_vector_loc, name=self.corner_drv_null_grp+"_AiC")
 
         # setting constraint values, using 0.5 to don't change the previous one which was used to correct placement:
-        cmds.setAttr(self.corner_poc+'.'+self.guide_main_drv_null[self.guide_main_drv_null.rfind(":")+1:]+'W0', 0.5)
-        cmds.setAttr(self.corner_poc+'.'+self.guide_extreme_loc[self.guide_extreme_loc.rfind(":")+1:]+'W1', 0.5)
-        cmds.setAttr(self.corner_up_vector_poc+'.'+self.guide_main_drv_null[self.guide_main_drv_null.rfind(":")+1:]+'W0', 0.5)
-        cmds.setAttr(self.corner_up_vector_poc+'.'+self.guide_extreme_loc[self.guide_extreme_loc.rfind(":")+1:]+'W1', 0.5)
-        cmds.setAttr(self.corner_null_poc+'.'+self.guide_main_drv_null[self.guide_main_drv_null.rfind(":")+1:]+'W0', 0.5)
-        cmds.setAttr(self.corner_null_poc+'.'+self.guide_extreme_loc[self.guide_extreme_loc.rfind(":")+1:]+'W1', 0.5)
+        cmds.setAttr(self.corner_poc+'.'+self.guide_main_drv_null[self.guide_main_drv_null.rfind(':')+1:]+'W0', 0.5)
+        cmds.setAttr(self.corner_poc+'.'+self.guide_extreme_loc[self.guide_extreme_loc.rfind(':')+1:]+'W1', 0.5)
+        cmds.setAttr(self.corner_up_vector_poc+'.'+self.guide_main_drv_null[self.guide_main_drv_null.rfind(':')+1:]+'W0', 0.5)
+        cmds.setAttr(self.corner_up_vector_poc+'.'+self.guide_extreme_loc[self.guide_extreme_loc.rfind(':')+1:]+'W1', 0.5)
+        cmds.setAttr(self.corner_null_poc+'.'+self.guide_main_drv_null[self.guide_main_drv_null.rfind(':')+1:]+'W0', 0.5)
+        cmds.setAttr(self.corner_null_poc+'.'+self.guide_extreme_loc[self.guide_extreme_loc.rfind(':')+1:]+'W1', 0.5)
         
         # main aimConstraint to the mainLocGrp:
-        self.main_aic = cmds.aimConstraint(self.corner_drv_null, self.guide_main_loc_grp, maintainOffset=True, aimVector=(0.0, 0.0, 1.0), upVector=up_vector_values, worldUpType="object", worldUpObject=self.guide_up_vector_loc, name=self.guide_main_loc_grp+"_AiC")[0]
+        self.main_aic = cmds.aimConstraint(self.corner_drv_null, self.guide_main_loc_grp, maintainOffset=True, aimVector=(0.0, 0.0, 1.0), upVector=up_vector_values, worldUpType='object', worldUpObject=self.guide_up_vector_loc, name=self.guide_main_loc_grp+"_AiC")[0]
         cmds.select(self.guide_base)
 
 
@@ -365,12 +365,12 @@ class Limb(standard.BaseStandard):
         
         # when the limb_type is arm, it will call the cross_product function to get the right offset for X
         if self.get_limb_type() == self.arm_name:
-            offset_axis = ".offsetX"
+            offset_axis = '.offsetX'
             offset_value = self.cross_product(self.arm_name)
         
         # when the limb_type is arm, it will call the cross_product function to get the right offset for Y:
         elif self.get_limb_type() == self.leg_name:
-            offset_axis = ".offsetY"
+            offset_axis = '.offsetY'
             offset_value = self.cross_product(self.leg_name)
 
         # set the aimConstraint's offset according to limb_type:
@@ -398,25 +398,25 @@ class Limb(standard.BaseStandard):
                 to_unparent_items = []
                 pin_guide_state_data = {}
                 cmds.setAttr(self.guide_extreme_loc+".pinGuide", 0)
-                extreme_children = cmds.listRelatives(self.guide_extreme_loc, children=True, type="transform")
+                extreme_children = cmds.listRelatives(self.guide_extreme_loc, children=True, type='transform')
                 if extreme_children:
                     has_sub_guide_base = False
                     for extreme_child in extreme_children:
-                        if "pinGuide" in cmds.listAttr(extreme_child):
+                        if 'pinGuide' in cmds.listAttr(extreme_child):
                             has_sub_guide_base = True
                     if has_sub_guide_base:
-                        temp_extreme_children_grp = cmds.group(empty=True, name="extremChildren_Temp_Grp", parent=self.guide_base)
+                        temp_extreme_children_grp = cmds.group(empty=True, name='extremChildren_Temp_Grp', parent=self.guide_base)
                         for extreme_child in extreme_children:
-                            if "pinGuide" in cmds.listAttr(extreme_child):
+                            if 'pinGuide' in cmds.listAttr(extreme_child):
                                 to_unparent_items.append(extreme_child)
                                 pin_guide_state_data[extreme_child] = cmds.getAttr(extreme_child+".pinGuide")
                                 cmds.setAttr(extreme_child+".pinGuide", 0)
                                 cmds.parent(extreme_child, temp_extreme_children_grp)
-                    temp_up_vector_wrist_grp = cmds.group(empty=True, name="tempUpVectorWrist_Null")
+                    temp_up_vector_wrist_grp = cmds.group(empty=True, name='tempUpVectorWrist_Null')
                     cmds.parent(temp_up_vector_wrist_grp, self.guide_base)
                     cmds.matchTransform(temp_up_vector_wrist_grp, self.guide_extreme_loc)
                     cmds.setAttr(temp_up_vector_wrist_grp+".translateX", 2)
-                    temp_wrist_aic = cmds.aimConstraint(self.guide_corner_loc, self.guide_extreme_loc, aimVector=(0.0, 0.0, -1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=temp_up_vector_wrist_grp, name=self.guide_extreme_loc+"_Tmp_AiC")
+                    temp_wrist_aic = cmds.aimConstraint(self.guide_corner_loc, self.guide_extreme_loc, aimVector=(0.0, 0.0, -1.0), upVector=(1.0, 0.0, 0.0), worldUpType='object', worldUpObject=temp_up_vector_wrist_grp, name=self.guide_extreme_loc+"_Tmp_AiC")
                     cmds.delete(temp_wrist_aic, temp_up_vector_wrist_grp)
                 if to_unparent_items:
                     cmds.parent(to_unparent_items, self.guide_extreme_loc)
@@ -431,7 +431,7 @@ class Limb(standard.BaseStandard):
             
             # setup to reorient the ankle guide to point to the ground when rotate mainGuide
             if self.get_limb_type() == self.leg_name:
-                temp_ankle_to_aim_null = cmds.group(empty=True, world=True, name="Temp_Ankle_ToAim_Null")
+                temp_ankle_to_aim_null = cmds.group(empty=True, world=True, name='Temp_Ankle_ToAim_Null')
                 cmds.matchTransform(temp_ankle_to_aim_null, self.guide_extreme_loc, position=True)
                 cmds.setAttr(temp_ankle_to_aim_null+".translateY", -10)
                 temp_ankle_to_aic = cmds.aimConstraint(temp_ankle_to_aim_null, self.guide_extreme_loc, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), name=self.guide_extreme_loc+"_Tmp_AiC")
@@ -498,7 +498,7 @@ class Limb(standard.BaseStandard):
             cmds.setAttr(self.guide_base+".rotateZ", 90)
             cmds.setAttr(self.guide_up_vector_loc+".translateY", -10)
             cmds.delete(self.corner_aic)
-            self.corner_aic = cmds.aimConstraint(self.guide_extreme_loc, self.corner_grp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.guide_up_vector_loc, name=self.corner_grp+"_AiC")[0]
+            self.corner_aic = cmds.aimConstraint(self.guide_extreme_loc, self.corner_grp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType='object', worldUpObject=self.guide_up_vector_loc, name=self.corner_grp+"_AiC")[0]
             self.set_lock_corner_attr(self.arm_name)
             self.recreate_auto_aim()
             
@@ -518,7 +518,7 @@ class Limb(standard.BaseStandard):
             cmds.setAttr(self.guide_up_vector_loc+".translateX", 10)
             cmds.setAttr(self.guide_up_vector_loc+".translateY", 0.75)
             cmds.delete(self.corner_aic)
-            self.corner_aic = cmds.aimConstraint(self.guide_extreme_loc, self.corner_grp, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=self.guide_up_vector_loc, name=self.corner_grp+"_AiC")[0]
+            self.corner_aic = cmds.aimConstraint(self.guide_extreme_loc, self.corner_grp, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType='object', worldUpObject=self.guide_up_vector_loc, name=self.corner_grp+"_AiC")[0]
             self.set_lock_corner_attr(self.leg_name)
             self.recreate_auto_aim()
     
@@ -590,31 +590,31 @@ class Limb(standard.BaseStandard):
         presets = None
         inverts = None
         if first: #clavicle/hips
-            presets = [{}, {"calibrateTX":1.0, "calibrateTZ":0.5, "calibrateRY":-30}]
+            presets = [{}, {'calibrateTX':1.0, 'calibrateTZ':0.5, 'calibrateRY':-30}]
             if s ==  1:
-                inverts = [[], ["invertTX", "invertRY"]]
+                inverts = [[], ['invertTX', 'invertRY']]
         elif main: #shoulder/leg
             if is_leg:
-                presets = [{}, {"calibrateTY":-0.5, "calibrateTZ":-0.4, "calibrateRX":30}, {"calibrateTX":1.0, "calibrateRY":30}]
+                presets = [{}, {'calibrateTY':-0.5, 'calibrateTZ':-0.4, 'calibrateRX':30}, {'calibrateTX':1.0, 'calibrateRY':30}]
             else:
-                presets = [{}, {"calibrateTY":0.5, "calibrateTZ":0.2}, {"calibrateTX":1.0, "calibrateRY":30}]
+                presets = [{}, {'calibrateTY':0.5, 'calibrateTZ':0.2}, {'calibrateTX':1.0, 'calibrateRY':30}]
             if s == 1:
-                inverts = [[], [], ["invertTX", "invertRY"]]
+                inverts = [[], [], ['invertTX', 'invertRY']]
         elif corner: #elbow/knee
-            presets = [{}, {"calibrateTX":0.1, "calibrateTZ":-0.6, "calibrateRY":45}, {"calibrateTX":-0.4, "calibrateTZ":0.8, "calibrateRY":-65}, {"calibrateTX":0.3, "calibrateTZ":0.8, "calibrateRY":65}]
+            presets = [{}, {'calibrateTX':0.1, 'calibrateTZ':-0.6, 'calibrateRY':45}, {'calibrateTX':-0.4, 'calibrateTZ':0.8, 'calibrateRY':-65}, {'calibrateTX':0.3, 'calibrateTZ':0.8, 'calibrateRY':65}]
             if not is_leg:
-                inverts = [[], ["invertRY"], [], []]
+                inverts = [[], ['invertRY'], [], []]
                 if s == 1:
                     if self.get_guide_attr('hasBend'):
-                        inverts = [[], ["invertTX", "invertTZ", "invertRY"], ["invertTX", "invertTZ"], ["invertTX", "invertTZ"]]
+                        inverts = [[], ['invertTX', 'invertTZ', 'invertRY'], ['invertTX', 'invertTZ'], ['invertTX', 'invertTZ']]
                     else:
-                        inverts = [[], ["invertRY"], [], []]
+                        inverts = [[], ['invertRY'], [], []]
         elif knee_b: #knee_b
-            presets = [{}, {"calibrateTX":0.1, "calibrateTZ":-0.6, "calibrateRY":-45}, {"calibrateTX":-0.4, "calibrateTZ":0.8, "calibrateRY":-65}, {"calibrateTX":0.3, "calibrateTZ":0.8, "calibrateRY":65}]
+            presets = [{}, {'calibrateTX':0.1, 'calibrateTZ':-0.6, 'calibrateRY':-45}, {'calibrateTX':-0.4, 'calibrateTZ':0.8, 'calibrateRY':-65}, {'calibrateTX':0.3, 'calibrateTZ':0.8, 'calibrateRY':65}]
         elif extrem: #wrist/ankle
-            presets = [{}, {"calibrateTX":0.7, "calibrateRY":-30}, {"calibrateTX":-0.7, "calibrateRY":30}, {"calibrateTY":0.7, "calibrateRX":30}, {"calibrateTY":-0.7, "calibrateRX":-30}]
+            presets = [{}, {'calibrateTX':0.7, 'calibrateRY':-30}, {'calibrateTX':-0.7, 'calibrateRY':30}, {'calibrateTY':0.7, 'calibrateRX':30}, {'calibrateTY':-0.7, 'calibrateRX':-30}]
             if s == 1:
-                inverts = [[], ["invertTX", "invertRY", "invertRZ"], ["invertTX", "invertRY", "invertRZ"], ["invertTX", "invertRY", "invertRZ"], ["invertTX", "invertRY", "invertRZ"]]
+                inverts = [[], ['invertTX', 'invertRY', 'invertRZ'], ['invertTX', 'invertRY', 'invertRZ'], ['invertTX', 'invertRY', 'invertRZ'], ['invertTX', 'invertRY', 'invertRZ']]
         return presets, inverts
 
 
@@ -703,9 +703,9 @@ class Limb(standard.BaseStandard):
                 fk_ctrls, orig_from_items = [], []
                 for n, joint_name in enumerate(joint_names):
                     if n == 0:
-                        fk_ctrl = self.ar.ctrls.create_controller("id_030_LimbClavicle", side+self.number_name+"_"+joint_name+"_Ctrl", r=(self.radius * 2), d=self.curve_degree, rot=(45, 0 ,-90), guide_source=self.name_guide+"_Before", parent_tag=self.get_parent_to_tag(fk_ctrls))
+                        fk_ctrl = self.ar.ctrls.create_controller('id_030_LimbClavicle', side+self.number_name+"_"+joint_name+"_Ctrl", r=(self.radius * 2), d=self.curve_degree, rot=(45, 0 ,-90), guide_source=self.name_guide+"_Before", parent_tag=self.get_parent_to_tag(fk_ctrls))
                     else:
-                        fk_ctrl = self.ar.ctrls.create_controller("id_031_LimbFk", side+self.number_name+"_"+joint_name+"_Fk_Ctrl", r=self.radius, d=self.curve_degree, guide_source=self.name+"__"+guide_locs[n][len(side):].replace("_Guide", ":Guide"), parent_tag=self.get_parent_to_tag(fk_ctrls))
+                        fk_ctrl = self.ar.ctrls.create_controller('id_031_LimbFk', side+self.number_name+"_"+joint_name+"_Fk_Ctrl", r=self.radius, d=self.curve_degree, guide_source=self.name+"__"+guide_locs[n][len(side):].replace('_Guide', ':Guide'), parent_tag=self.get_parent_to_tag(fk_ctrls))
                     
                     # Setup axis order
                     if joint_name == before_name:  # Clavicle and hip
@@ -730,22 +730,22 @@ class Limb(standard.BaseStandard):
                     orig_grp = cmds.group(empty=True, name=side+self.number_name+"_"+joint_name+"_OrigFrom_Grp")
                     orig_from_items.append(orig_grp)
                     if n == 0: #Clavicle/Hips
-                        self.ar.utils.set_origined_from_attr(orig_grp, guide_locs[n][guide_locs[n].find("__")+1:].replace(":", "_"))
+                        self.ar.utils.set_origined_from_attr(orig_grp, guide_locs[n][guide_locs[n].find('__')+1:].replace(':', '_'))
                     elif n == 1: #Shoulder/Leg
-                        self.ar.utils.set_origined_from_attr(orig_grp, guide_locs[n][guide_locs[n].find("__")+1:].replace(":", "_")+";"+self.guide_main_loc)
+                        self.ar.utils.set_origined_from_attr(orig_grp, guide_locs[n][guide_locs[n].find('__')+1:].replace(':', '_')+";"+self.guide_main_loc)
                     elif n == len(joint_names)-1: #Wrist/Ankle
-                        self.ar.utils.set_origined_from_attr(orig_grp, guide_locs[n][guide_locs[n].find("__")+1:].replace(":", "_")+";"+self.guide_end_loc+";"+self.guide_radius)
+                        self.ar.utils.set_origined_from_attr(orig_grp, guide_locs[n][guide_locs[n].find('__')+1:].replace(':', '_')+";"+self.guide_end_loc+";"+self.guide_radius)
                     else: #Corner
-                        self.ar.utils.set_origined_from_attr(orig_grp, guide_locs[n][guide_locs[n].find("__")+1:].replace(":", "_"))
+                        self.ar.utils.set_origined_from_attr(orig_grp, guide_locs[n][guide_locs[n].find('__')+1:].replace(':', '_'))
                         if self.get_guide_attr('hasBend'):
-                            to_corner_bend_items.append(guide_locs[n][guide_locs[n].find("__")+1:].replace(":", "_"))
+                            to_corner_bend_items.append(guide_locs[n][guide_locs[n].find('__')+1:].replace(':', '_'))
                     cmds.parentConstraint(skin_joints[n], orig_grp, maintainOffset=False, name=orig_grp+"_PaC")
                     if n > 1:
                         cmds.parent(fk_ctrl, fk_ctrls[n - 1])
                         cmds.parent(orig_grp, orig_from_items[n - 1])
                     # add wrist_toParent_Ctrl
                     if n == len(joint_names)-1:
-                        to_parent_extrem_ctrl = self.ar.ctrls.create_controller("id_032_LimbToParent", ctrl_name=side+self.number_name+"_"+extreme_name+"_ToParent_Ctrl", r=(self.radius * 0.1), d=self.curve_degree, guide_source=self.name_guide+"_Extrem", parent_tag=fk_ctrls[-1])
+                        to_parent_extrem_ctrl = self.ar.ctrls.create_controller('id_032_LimbToParent', ctrl_name=side+self.number_name+"_"+extreme_name+"_ToParent_Ctrl", r=(self.radius * 0.1), d=self.curve_degree, guide_source=self.name_guide+"_Extrem", parent_tag=fk_ctrls[-1])
                         cmds.parent(to_parent_extrem_ctrl, orig_grp)
                         if s == 0:
                             cmds.setAttr(to_parent_extrem_ctrl+".translateX", self.radius)
@@ -790,8 +790,8 @@ class Limb(standard.BaseStandard):
                 cmds.matchTransform(fk_joints[-1], self.guide_end_loc, position=True, rotation=True)
 
                 # creating a group reference to recept the attributes:
-                world_ref = self.ar.ctrls.create_controller("id_036_LimbWorldRef", side+self.number_name+"_WorldRef_Ctrl", r=self.radius, d=self.curve_degree, dir="+Z", guide_source=self.name_guide+"_Base")
-                cmds.addAttr(world_ref, longName="ikFkSnap", attributeType='short', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                world_ref = self.ar.ctrls.create_controller('id_036_LimbWorldRef', side+self.number_name+"_WorldRef_Ctrl", r=self.radius, d=self.curve_degree, dir='+Z', guide_source=self.name_guide+"_Base")
+                cmds.addAttr(world_ref, longName='ikFkSnap', attributeType='short', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 cmds.addAttr(world_ref, longName=self.ar.data.lang['c113_length'], attributeType='float', defaultValue=1)
                 self.world_refs.append(world_ref)
                 self.world_ref_shapes.append(cmds.listRelatives(world_ref, children=True, type='nurbsCurve')[0])
@@ -811,7 +811,7 @@ class Limb(standard.BaseStandard):
                 cmds.parent(shoulder_ref_grp, skin_joints[1], relative=True)
                 cmds.parent(shoulder_ref_grp, skin_joints[0], relative=False)
                 cmds.pointConstraint(shoulder_ref_grp, fk_ctrl_zeros[1], maintainOffset=True, name=fk_ctrl_zeros[1]+"_PoC")
-                fk_isolate_pac = cmds.parentConstraint(shoulder_ref_grp, master_ctrl_ref, fk_ctrl_zeros[1], skipTranslate=["x", "y", "z"], maintainOffset=True, name=fk_ctrl_zeros[1]+"_PaC")[0]               
+                fk_isolate_pac = cmds.parentConstraint(shoulder_ref_grp, master_ctrl_ref, fk_ctrl_zeros[1], skipTranslate=['x', 'y', 'z'], maintainOffset=True, name=fk_ctrl_zeros[1]+"_PaC")[0]               
                 cmds.addAttr(fk_ctrls[1], longName=self.ar.data.lang['m095_isolate'].lower(), attributeType='float', minValue=0, maxValue=1, defaultValue=isolate_default_value, keyable=True)
                 self.add_follow_attr_name(fk_ctrls[1], self.ar.data.lang['m095_isolate'].lower())
                 cmds.connectAttr(fk_ctrls[1]+'.'+self.ar.data.lang['m095_isolate'].lower(), fk_isolate_pac+"."+master_ctrl_ref+"W1", force=True)
@@ -820,7 +820,7 @@ class Limb(standard.BaseStandard):
                 cmds.connectAttr(fk_isolate_rev+'.outputX', fk_isolate_pac+"."+shoulder_ref_grp+"W0", force=True) 
 
                 # create orient constrain in order to blend ikFk:
-                ik_fk_rev = self.ar.utils.create_joint_blend(ik_joints[1:], fk_joints[1:], skin_joints[1:], "Fk_ikFkBlend", attr_name_lower, world_ref)
+                ik_fk_rev = self.ar.utils.create_joint_blend(ik_joints[1:], fk_joints[1:], skin_joints[1:], 'Fk_ikFkBlend', attr_name_lower, world_ref)
 
                 # organize the ikFkBlend from before to limb:
                 cmds.parentConstraint(fk_ctrls[0], ik_joints[0], maintainOffset=True, name=ik_joints[0]+"_PaC")
@@ -829,34 +829,34 @@ class Limb(standard.BaseStandard):
                 cmds.parentConstraint(fk_ctrls[0], skin_joints[0], maintainOffset=True, name=skin_joints[0]+"_PaC")
 
                 # creating ik controls:
-                ik_extreme_ctrl = self.ar.ctrls.create_controller("id_033_LimbWrist", ctrl_name=side+self.number_name+"_"+extreme_name+"_Ik_Ctrl", r=(self.radius * 0.5), d=self.curve_degree, guide_source=self.name_guide+"_Extrem")
-                ik_extreme_sub_ctrl = self.ar.ctrls.create_controller("id_094_LimbExtremSub", ctrl_name=side+self.number_name+"_"+extreme_name+"_Ik_Sub_Ctrl", r=(self.radius * 0.5), d=self.curve_degree, guide_source=self.name_guide+"_Extrem", parent_tag=ik_extreme_ctrl)
+                ik_extreme_ctrl = self.ar.ctrls.create_controller('id_033_LimbWrist', ctrl_name=side+self.number_name+"_"+extreme_name+"_Ik_Ctrl", r=(self.radius * 0.5), d=self.curve_degree, guide_source=self.name_guide+"_Extrem")
+                ik_extreme_sub_ctrl = self.ar.ctrls.create_controller('id_094_LimbExtremSub', ctrl_name=side+self.number_name+"_"+extreme_name+"_Ik_Sub_Ctrl", r=(self.radius * 0.5), d=self.curve_degree, guide_source=self.name_guide+"_Extrem", parent_tag=ik_extreme_ctrl)
                 cmds.parent(ik_extreme_sub_ctrl, ik_extreme_ctrl)
-                self.ar.ctrls.set_lock_hide([ik_extreme_sub_ctrl], ["sx", "sy", "sz", "v"])
+                self.ar.ctrls.set_lock_hide([ik_extreme_sub_ctrl], ['sx', 'sy', 'sz', 'v'])
                 self.ar.ctrls.set_sub_ctrl_display(ik_extreme_ctrl, ik_extreme_sub_ctrl, 0)
                 
                 # creating orient controller
                 if self.limb_types == self.arm_name:
-                    cmds.addAttr(ik_extreme_ctrl, longName="orient", attributeType="double", defaultValue=1, min=0, max=1, keyable=True)
-                    extreme_orient_ctrl = self.ar.ctrls.create_controller("id_101_LimbExtremOrient", ctrl_name=side+self.number_name+"_"+extreme_name+"_Orient_Ctrl", r=(self.radius * 0.7), d=self.curve_degree, guide_source=self.name_guide+"_Extrem", parent_tag=fk_ctrls[0])
+                    cmds.addAttr(ik_extreme_ctrl, longName='orient', attributeType='double', defaultValue=1, min=0, max=1, keyable=True)
+                    extreme_orient_ctrl = self.ar.ctrls.create_controller('id_101_LimbExtremOrient', ctrl_name=side+self.number_name+"_"+extreme_name+"_Orient_Ctrl", r=(self.radius * 0.7), d=self.curve_degree, guide_source=self.name_guide+"_Extrem", parent_tag=fk_ctrls[0])
                     cmds.connectAttr(extreme_orient_ctrl+".message", to_parent_extrem_ctrl+".parentTag", force=True)
                     temp_orient_ctrl_cluster = cmds.cluster(extreme_orient_ctrl)[1]
                     if s == 0:
-                        cmds.setAttr(temp_orient_ctrl_cluster+".tz", 0.2*self.radius)
+                        cmds.setAttr(temp_orient_ctrl_cluster+".translateZ", 0.2*self.radius)
                     else:
-                        cmds.setAttr(temp_orient_ctrl_cluster+".tz", -0.2*self.radius)
+                        cmds.setAttr(temp_orient_ctrl_cluster+".translateZ", -0.2*self.radius)
                     cmds.delete(extreme_orient_ctrl, constructionHistory=True)
-                    ik_corner_ctrl = self.ar.ctrls.create_controller("id_034_LimbElbow", ctrl_name=side+self.number_name+"_"+corner_name+"_Ik_Ctrl", r=(self.radius * 0.5), d=self.curve_degree, guide_source=self.name_guide+"_Corner", parent_tag=fk_ctrls[0])
+                    ik_corner_ctrl = self.ar.ctrls.create_controller('id_034_LimbElbow', ctrl_name=side+self.number_name+"_"+corner_name+"_Ik_Ctrl", r=(self.radius * 0.5), d=self.curve_degree, guide_source=self.name_guide+"_Corner", parent_tag=fk_ctrls[0])
                     cmds.setAttr(ik_extreme_ctrl+".rotateOrder", 2) #zxy
                     cmds.setAttr(ik_extreme_sub_ctrl+".rotateOrder", 2) #zxy
                     cmds.setAttr(extreme_orient_ctrl+".rotateOrder", 2) #zxy
                     extreme_orient_ctrl_zero = self.ar.utils.create_zero_out([extreme_orient_ctrl])[0]
                     cmds.matchTransform(extreme_orient_ctrl_zero, self.guide_extreme_loc, position=True, rotation=True)
-                    self.ar.ctrls.set_lock_hide([extreme_orient_ctrl], ["tx", "ty", "tz", "sx", "sy", "sz", "v"])
+                    self.ar.ctrls.set_lock_hide([extreme_orient_ctrl], ['tx', 'ty', 'tz', 'sx', 'sy', 'sz', 'v'])
                     cmds.delete(orig_grp+"_PaC")
                     cmds.parentConstraint(extreme_orient_ctrl, orig_grp, maintainOffset=False, name=orig_grp+"_PaC")
                 else:
-                    ik_corner_ctrl = self.ar.ctrls.create_controller("id_035_LimbKnee", ctrl_name=side+self.number_name+"_"+corner_name+"_Ik_Ctrl", r=(self.radius * 0.5), d=self.curve_degree, guide_source=self.name_guide+"_Corner", parent_tag=fk_ctrls[0])
+                    ik_corner_ctrl = self.ar.ctrls.create_controller('id_035_LimbKnee', ctrl_name=side+self.number_name+"_"+corner_name+"_Ik_Ctrl", r=(self.radius * 0.5), d=self.curve_degree, guide_source=self.name_guide+"_Corner", parent_tag=fk_ctrls[0])
                     cmds.connectAttr(ik_extreme_ctrl+".message", to_parent_extrem_ctrl+".parentTag", force=True)
                     cmds.setAttr(ik_extreme_ctrl+".rotateOrder", 3) #xzy
                     cmds.setAttr(ik_extreme_sub_ctrl+".rotateOrder", 3) #xzy
@@ -894,7 +894,7 @@ class Limb(standard.BaseStandard):
                 if s == 1 and style != 0 and self.mirror_axis != 'off': #default
                     # these options is valides for Biped, Quadruped, Quadruped Spring and Quadruped Extra
                     for axis in self.mirror_axis:
-                        if axis == "X":
+                        if axis == 'X':
                             if self.limb_types == self.arm_name:
                                 cmds.setAttr(ik_extreme_ctrl_orient_grp+".rotateX", -90)
                                 cmds.setAttr(ik_extreme_ctrl_orient_grp+".rotateY", 90)
@@ -967,7 +967,7 @@ class Limb(standard.BaseStandard):
                 # setup quadruped extra control:
                 if quadruped:
                     cmds.rename(ik_handle_extra_items[1], side+self.number_name+"_"+self.limb_type.capitalize()+"_Extra_Eff")
-                    quad_extra_ctrl = self.ar.ctrls.create_controller("id_058_LimbQuadExtra", ctrl_name=side+self.number_name+"_"+extreme_name+"_Ik_Extra_Ctrl", r=(self.radius * 0.7), d=self.curve_degree, dir="-Z", guide_source=self.name_guide+"_Extrem", parent_tag=ik_extreme_ctrl)
+                    quad_extra_ctrl = self.ar.ctrls.create_controller('id_058_LimbQuadExtra', ctrl_name=side+self.number_name+"_"+extreme_name+"_Ik_Extra_Ctrl", r=(self.radius * 0.7), d=self.curve_degree, dir='-Z', guide_source=self.name_guide+"_Extrem", parent_tag=ik_extreme_ctrl)
                     if s == 1:
                         cmds.setAttr(quad_extra_ctrl+".rotateY", 180)
                         cmds.makeIdentity(quad_extra_ctrl, rotate=True, apply=True)
@@ -983,10 +983,10 @@ class Limb(standard.BaseStandard):
                 
                 # working with world axis orientation for limb extrem ik controls
                 if self.get_guide_attr('alignWorld'):
-                    original_rotate_md = cmds.createNode("multiplyDivide", name=side+self.number_name+"_"+extreme_name+"_OriginalRotate_MD")
-                    align_world_rev = cmds.createNode("reverse", name=side+self.number_name+"_"+extreme_name+"_AlighWorld_Rev")
+                    original_rotate_md = cmds.createNode('multiplyDivide', name=side+self.number_name+"_"+extreme_name+"_OriginalRotate_MD")
+                    align_world_rev = cmds.createNode('reverse', name=side+self.number_name+"_"+extreme_name+"_AlighWorld_Rev")
                     self.to_ids.extend([original_rotate_md, align_world_rev])
-                    cmds.addAttr(ik_extreme_ctrl, longName="alignWorld", attributeType="float", defaultValue=0, minValue=0, maxValue=1, keyable=True)
+                    cmds.addAttr(ik_extreme_ctrl, longName='alignWorld', attributeType='float', defaultValue=0, minValue=0, maxValue=1, keyable=True)
                     cmds.connectAttr(ik_extreme_ctrl+".alignWorld", align_world_rev+".inputX", force=True)
                     if s == 0:
                         original_rotation = self.get_original_rotation(ik_extreme_ctrl)
@@ -997,7 +997,7 @@ class Limb(standard.BaseStandard):
                         cmds.setAttr(ik_extreme_ctrl_orient_grp+".rotate"+axis, 0)
                         cmds.setAttr(ik_extreme_ctrl_zero+".rotate"+axis, 0)
                         # store original rotation values for initial default pose
-                        cmds.addAttr(ik_extreme_ctrl, longName="originalRotate"+axis, attributeType="float", keyable=True)
+                        cmds.addAttr(ik_extreme_ctrl, longName="originalRotate"+axis, attributeType='float', keyable=True)
                         cmds.setAttr(ik_extreme_ctrl+".originalRotate"+axis, original_rotation[a], lock=True)
                         cmds.connectAttr(ik_extreme_ctrl+".originalRotate"+axis, original_rotate_md+".input1"+axis, force=True)
                         cmds.connectAttr(align_world_rev+".outputX", original_rotate_md+".input2"+axis, force=True)
@@ -1087,7 +1087,7 @@ class Limb(standard.BaseStandard):
                 cmds.setAttr(annotation+'.template', 1)
                 cmds.setAttr(annot_loc+'.visibility', 0)
                 # set annotation visibility as a display option attribute:
-                cmds.addAttr(ik_corner_ctrl, longName="displayAnnotation", attributeType='short', minValue=0, maxValue=1, keyable=False, defaultValue=1)
+                cmds.addAttr(ik_corner_ctrl, longName='displayAnnotation', attributeType='short', minValue=0, maxValue=1, keyable=False, defaultValue=1)
                 cmds.setAttr(ik_corner_ctrl+".displayAnnotation", channelBox=True)
                 cmds.connectAttr(ik_corner_ctrl+".displayAnnotation", annotation+".visibility", force=True)
 
@@ -1126,17 +1126,17 @@ class Limb(standard.BaseStandard):
                 if self.limb_types == self.arm_name:
                     cmds.setAttr(ik_corner_ctrl+'.'+self.ar.data.lang['c033_autoOrient'], 0)
                     cmds.addAttr(ik_corner_ctrl+'.'+self.ar.data.lang['c033_autoOrient'], edit=True, defaultValue=0)
-                up_loc_pac = cmds.parentConstraint(ik_extreme_ctrl, root_ctrl_ref, pv_up_loc_grp, skipTranslate=["x", "y", "z"], maintainOffset=True, name=pv_up_loc_grp+"_PaC")[0]
+                up_loc_pac = cmds.parentConstraint(ik_extreme_ctrl, root_ctrl_ref, pv_up_loc_grp, skipTranslate=['x', 'y', 'z'], maintainOffset=True, name=pv_up_loc_grp+"_PaC")[0]
                 cmds.setAttr(up_loc_pac+".interpType", 2) #shortest
                 up_loc_orient_rev = cmds.createNode('reverse', name=side+self.number_name+"_UpLocOrient_Rev")
                 cmds.connectAttr(ik_corner_ctrl+'.'+self.ar.data.lang['c033_autoOrient'], up_loc_orient_rev+".inputX", force=True)
                 cmds.connectAttr(ik_corner_ctrl+'.'+self.ar.data.lang['c033_autoOrient'], up_loc_pac+"."+ik_extreme_ctrl+"W0", force=True)
                 cmds.connectAttr(up_loc_orient_rev+'.outputX', up_loc_pac+"."+root_ctrl_ref+"W1", force=True)
-                cmds.aimConstraint(ik_extreme_sub_ctrl, pv_aim_loc, worldUpType="object", worldUpObject=pv_up_loc, aimVector=(0, 0, 1), upVector=(1, 0, 0), maintainOffset=False, name=pv_up_loc+"_AiC")
+                cmds.aimConstraint(ik_extreme_sub_ctrl, pv_aim_loc, worldUpType='object', worldUpObject=pv_up_loc, aimVector=(0, 0, 1), upVector=(1, 0, 0), maintainOffset=False, name=pv_up_loc+"_AiC")
                 cmds.parentConstraint(pv_aim_loc, self.corner_grp, maintainOffset=True, name=self.corner_grp+"_PaC")
 
                 # make poleVectorCtrl's follow really pin from masterCtrl:
-                cmds.addAttr(ik_corner_ctrl, longName="pin", attributeType='short', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                cmds.addAttr(ik_corner_ctrl, longName='pin', attributeType='short', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 pv_pin_pac = cmds.parentConstraint(master_ctrl_ref, ik_corner_ctrl_zero, maintainOffset=True, name=ik_corner_ctrl_zero+"_PaC")[0]
                 cmds.connectAttr(ik_corner_ctrl+'.pin', pv_pin_pac+"."+master_ctrl_ref+"W0", force=True)
 
@@ -1146,7 +1146,7 @@ class Limb(standard.BaseStandard):
                 if s == 0:
                     rest_items = []
                 for r, rest_axis in enumerate(self.ar.data.axes):
-                    cmds.addAttr(ik_corner_ctrl, longName=self.ar.data.lang['c053_invert']+rest_axis, attributeType="bool", defaultValue=s)
+                    cmds.addAttr(ik_corner_ctrl, longName=self.ar.data.lang['c053_invert']+rest_axis, attributeType='bool', defaultValue=s)
                 for r, rest_axis in enumerate(self.ar.data.axes):
                     corner_invert_cnd = cmds.createNode('condition', name=side+self.number_name+"_"+corner_name+"_Invert"+rest_axis+"_Cnd")
                     self.to_ids.append(corner_invert_cnd)
@@ -1168,16 +1168,16 @@ class Limb(standard.BaseStandard):
                     self.ar.utils.add_attr_to_items([quad_extra_rot_null], self.ar.utils.ignore_transform_io_attr)
                     cmds.matchTransform(quad_extra_rot_null, quad_extra_ctrl, position=True, rotation=True)
                     cmds.parent(quad_extra_rot_null, to_rf_ik_handle_grp)
-                    auto_orient_rev = cmds.createNode("reverse", name=quad_extra_ctrl+"_AutoOrient_Rev")
+                    auto_orient_rev = cmds.createNode('reverse', name=quad_extra_ctrl+"_AutoOrient_Rev")
                     self.to_ids.append(auto_orient_rev)
-                    auto_orient_pac = cmds.parentConstraint(to_rf_ik_handle_grp, quad_extra_rot_null, quad_extra_ctrl_zero, skipTranslate=["x", "y", "z"], maintainOffset=True, name=quad_extra_ctrl_zero+"_PaC")[0]
+                    auto_orient_pac = cmds.parentConstraint(to_rf_ik_handle_grp, quad_extra_rot_null, quad_extra_ctrl_zero, skipTranslate=['x', 'y', 'z'], maintainOffset=True, name=quad_extra_ctrl_zero+"_PaC")[0]
                     cmds.setAttr(auto_orient_pac+".interpType", 0) #noflip
                     cmds.connectAttr(quad_extra_ctrl+".autoOrient", auto_orient_rev+".inputX", force=True)
                     cmds.connectAttr(auto_orient_rev+".outputX", auto_orient_pac+"."+to_rf_ik_handle_grp+"W0", force=True)
                     cmds.connectAttr(quad_extra_ctrl+".autoOrient", auto_orient_pac+"."+quad_extra_rot_null+"W1", force=True)
                     # avoid cycle error from Maya warning:
                     cmds.cycleCheck(evaluation=False)
-                    cmds.aimConstraint(shoulder_ref_grp, quad_extra_rot_null, aimVector=(0, 1, 0), upVector=(0, 0, 1), worldUpType="object", worldUpObject=ik_corner_ctrl, name=quad_extra_ctrl_zero+"_AiC")[0]
+                    cmds.aimConstraint(shoulder_ref_grp, quad_extra_rot_null, aimVector=(0, 1, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=ik_corner_ctrl, name=quad_extra_ctrl_zero+"_AiC")[0]
                     cmds.cycleCheck(evaluation=True)
                     # hack to parent constraint offset recalculation (Update button on Attribute Editor):
                     cmds.parentConstraint(to_rf_ik_handle_grp, quad_extra_rot_null, quad_extra_ctrl_zero, edit=True, maintainOffset=True)
@@ -1191,8 +1191,8 @@ class Limb(standard.BaseStandard):
                 joint_chain_lenght_value = self.ar.utils.joint_chain_length(ik_joints[1:4])
 
                 # creating attributes:
-                cmds.addAttr(ik_extreme_ctrl, longName="startChainLength", attributeType='float', defaultValue=joint_chain_lenght_value, keyable=False)
-                cmds.addAttr(ik_extreme_ctrl, longName="stretchable", attributeType='float', minValue=0, defaultValue=1, maxValue=1, keyable=True)
+                cmds.addAttr(ik_extreme_ctrl, longName='startChainLength', attributeType='float', defaultValue=joint_chain_lenght_value, keyable=False)
+                cmds.addAttr(ik_extreme_ctrl, longName='stretchable', attributeType='float', minValue=0, defaultValue=1, maxValue=1, keyable=True)
                 cmds.addAttr(ik_extreme_ctrl, longName=self.ar.data.lang['c113_length'], attributeType='float', minValue=0.001, defaultValue=1, keyable=True)
                 self.ar.ctrls.set_lock_hide([ik_extreme_ctrl], ['startChainLength'])
 
@@ -1224,12 +1224,12 @@ class Limb(standard.BaseStandard):
                         forearm_dist_z = -(temp_dist / 3)
                     cmds.move(0, 0, forearm_dist_z, forearm_joint, localSpace=True, worldSpaceDistance=True)
                     # create forearm_ctrl:
-                    forearm_ctrl = self.ar.ctrls.create_controller("id_037_LimbForearm", side+self.number_name+"_"+self.ar.data.lang['c030_forearm']+"_Ctrl", r=(self.radius * 0.75), d=self.curve_degree, guide_source=self.name_guide+"_Corner", parent_tag=ik_corner_ctrl)
+                    forearm_ctrl = self.ar.ctrls.create_controller('id_037_LimbForearm', side+self.number_name+"_"+self.ar.data.lang['c030_forearm']+"_Ctrl", r=(self.radius * 0.75), d=self.curve_degree, guide_source=self.name_guide+"_Corner", parent_tag=ik_corner_ctrl)
                     forearm_grp = cmds.group(forearm_ctrl, name=side+self.number_name+"_"+self.ar.data.lang['c030_forearm']+"_Grp")
                     forearm_zero = cmds.group(forearm_grp, name=side+self.number_name+"_"+self.ar.data.lang['c030_forearm']+"_Zero_0_Grp")
                     cmds.matchTransform(forearm_zero, forearm_joint, position=True, rotation=True)
                     cmds.parentConstraint(skin_joints[2], forearm_zero, maintainOffset=True, name=forearm_zero+"_PaC")
-                    cmds.orientConstraint(forearm_ctrl, forearm_joint, skip=["x", "y"], maintainOffset=True, name=forearm_joint+"_OrC")
+                    cmds.orientConstraint(forearm_ctrl, forearm_joint, skip=['x', 'y'], maintainOffset=True, name=forearm_joint+"_OrC")
                     # create attribute to forearm autoRotate:
                     cmds.addAttr(forearm_ctrl, longName=self.ar.data.lang['c033_autoOrient'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.75, keyable=True)
                     self.ar.ctrls.set_lock_hide([forearm_ctrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'sx', 'sy', 'sz', 'v', 'ro'])
@@ -1239,7 +1239,7 @@ class Limb(standard.BaseStandard):
                     cmds.connectAttr(forearm_ctrl+'.'+self.ar.data.lang['c033_autoOrient'], forearm_md+'.input1X')
                     cmds.connectAttr(skin_joints[3]+'.rotateZ', forearm_md+'.input2X')
                     cmds.connectAttr(forearm_md+'.outputX', forearm_grp+'.rotateZ')
-                    ik_extreme_orient_pac = cmds.parentConstraint(forearm_ctrl, ik_extreme_sub_ctrl, fk_joints[-2], extreme_orient_ctrl_zero, skipTranslate=["x", "y", "z"], maintainOffset=True, name=extreme_orient_ctrl_zero+"_PaC")[0]
+                    ik_extreme_orient_pac = cmds.parentConstraint(forearm_ctrl, ik_extreme_sub_ctrl, fk_joints[-2], extreme_orient_ctrl_zero, skipTranslate=['x', 'y', 'z'], maintainOffset=True, name=extreme_orient_ctrl_zero+"_PaC")[0]
                     ik_extreme_orient_pac_w0 = forearm_ctrl+"W0"
                     cmds.pointConstraint(skin_joints[-2], extreme_orient_ctrl_zero, maintainOffset=True, name=extreme_orient_ctrl_zero+"_PoC")
 
@@ -1253,8 +1253,8 @@ class Limb(standard.BaseStandard):
                 cmds.connectAttr(world_ref+"."+attr_name_lower+'Fk_ikFkBlend', to_rf_offset_pac+"."+fk_ctrls[len(fk_ctrls) - 1]+"W1", force=True)
 
                 # work with scalable extrem hand or foot:
-                cmds.addAttr(fk_ctrls[-1], longName=self.ar.data.lang['c040_uniformScale'], attributeType="double", minValue=0.001, defaultValue=1)
-                cmds.addAttr(ik_extreme_ctrl, longName=self.ar.data.lang['c040_uniformScale'], attributeType="double", minValue=0.001, defaultValue=1)
+                cmds.addAttr(fk_ctrls[-1], longName=self.ar.data.lang['c040_uniformScale'], attributeType='double', minValue=0.001, defaultValue=1)
+                cmds.addAttr(ik_extreme_ctrl, longName=self.ar.data.lang['c040_uniformScale'], attributeType='double', minValue=0.001, defaultValue=1)
                 cmds.setAttr(fk_ctrls[-1]+"."+self.ar.data.lang['c040_uniformScale'], edit=True, keyable=True)
                 cmds.setAttr(ik_extreme_ctrl+"."+self.ar.data.lang['c040_uniformScale'], edit=True, keyable=True)
                 # add scale multiplier attribute
@@ -1267,7 +1267,7 @@ class Limb(standard.BaseStandard):
                 cmds.connectAttr(fk_ctrls[-1]+"."+self.ar.data.lang['c040_uniformScale'], fk_scale_md+".input1X", force=True)
                 cmds.connectAttr(fk_ctrls[-1]+"."+self.ar.data.lang['c040_uniformScale']+self.ar.data.lang['c105_multiplier'].capitalize(), fk_scale_md+".input2X", force=True)
                 # integrate uniformScale and scaleMultiplier attributes
-                uni_blend = cmds.createNode("blendColors", name=side+self.number_name+"_"+self.ar.data.lang['c040_uniformScale'][0].capitalize()+self.ar.data.lang['c040_uniformScale'][1:]+"_BC")
+                uni_blend = cmds.createNode('blendColors', name=side+self.number_name+"_"+self.ar.data.lang['c040_uniformScale'][0].capitalize()+self.ar.data.lang['c040_uniformScale'][1:]+"_BC")
                 cmds.connectAttr(uni_blend+".outputR", orig_grp+".scaleX", force=True)
                 cmds.connectAttr(uni_blend+".outputR", orig_grp+".scaleY", force=True)
                 cmds.connectAttr(uni_blend+".outputR", orig_grp+".scaleZ", force=True)
@@ -1315,7 +1315,7 @@ class Limb(standard.BaseStandard):
                 cmds.connectAttr(ik_stretch_clp+".outputR", to_rf_offset_pac+"."+ik_no_stretch_joints[-2]+"W2", force=True)
 
                 # prepare to disable stretch in fk mode
-                cmds.addAttr(ik_extreme_ctrl, longName="disableIkFkRevOutputX", attributeType="double", keyable=False)
+                cmds.addAttr(ik_extreme_ctrl, longName="disableIkFkRevOutputX", attributeType='double', keyable=False)
                 cmds.connectAttr(world_ref+"."+attr_name_lower+"Fk_ikFkBlendRevOutputX", ik_extreme_ctrl+".disableIkFkRevOutputX", force=True)
 
                 # create a masterModuleGrp to be checked if this rig exists:
@@ -1369,8 +1369,8 @@ class Limb(standard.BaseStandard):
                     cmds.delete(loc)
 
                     if self.limb_types == self.arm_name:
-                        ik_extreme_orient_pac = cmds.parentConstraint(bend_grps["extraCtrlList"][-1], ik_extreme_sub_ctrl, fk_joints[-2], extreme_orient_ctrl_zero, maintainOffset=True, skipTranslate=["x", "y", "z"], name=extreme_orient_ctrl_zero+"_PaC")[0]
-                        ik_extreme_orient_pac_w0 = bend_grps["extraCtrlList"][-1]+"W0"
+                        ik_extreme_orient_pac = cmds.parentConstraint(bend_grps['extraCtrlList'][-1], ik_extreme_sub_ctrl, fk_joints[-2], extreme_orient_ctrl_zero, maintainOffset=True, skipTranslate=['x', 'y', 'z'], name=extreme_orient_ctrl_zero+"_PaC")[0]
+                        ik_extreme_orient_pac_w0 = bend_grps['extraCtrlList'][-1]+"W0"
                         cmds.pointConstraint(skin_joints[-2], extreme_orient_ctrl_zero, maintainOffset=False, name=extreme_orient_ctrl_zero+"_PoC")
 
                     cmds.parent(bend_grps['ctrlsGrp'], self.ctrl_hook_grp)
@@ -1394,12 +1394,12 @@ class Limb(standard.BaseStandard):
 
                     # correct joint skin naming:
                     for jnt_index in range(1, len(skin_joints) - 2):
-                        skin_joints[jnt_index] = skin_joints[jnt_index].replace("_Jnt", "_Jxt")
+                        skin_joints[jnt_index] = skin_joints[jnt_index].replace('_Jnt', '_Jxt')
                     
                     # implementing auto rotate twist bones:
                     # check if we have loaded the quatNode.mll Maya plugin in order to create quatToEuler node, also decomposeMatrix from matrixNodes:
-                    loaded_quaternion_plugin = self.ar.config.check_loaded_plugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
-                    loaded_matrix_plugin = self.ar.config.check_loaded_plugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
+                    loaded_quaternion_plugin = self.ar.config.check_loaded_plugin('quatNodes', self.ar.data.lang['e014_cantLoadQuatNode'])
+                    loaded_matrix_plugin = self.ar.config.check_loaded_plugin('matrixNodes', self.ar.data.lang['e002_matrixPluginNotFound'])
                     if loaded_quaternion_plugin and loaded_matrix_plugin:
                         twist_bone_md = bend_grps['twistBoneMD']
                         shoulder_child_loc = cmds.spaceLocator(name=twist_bone_md+"_Child_Loc")[0]
@@ -1421,8 +1421,8 @@ class Limb(standard.BaseStandard):
                 # orient controller nodes
                 if self.limb_types == self.arm_name:
                     cmds.setAttr(ik_extreme_orient_pac+".interpType", 2) #shortest
-                    orient_rev = cmds.createNode("reverse", name=side+self.number_name+"_"+extreme_name+"_Orient_Rev")
-                    orient_md = cmds.createNode("multiplyDivide", name=side+self.number_name+"_"+extreme_name+"_Orient_MD")
+                    orient_rev = cmds.createNode('reverse', name=side+self.number_name+"_"+extreme_name+"_Orient_Rev")
+                    orient_md = cmds.createNode('multiplyDivide', name=side+self.number_name+"_"+extreme_name+"_Orient_MD")
                     self.to_ids.extend([orient_rev, orient_md])
                     cmds.connectAttr(ik_extreme_ctrl+".orient", orient_rev+".inputX")
                     cmds.connectAttr(ik_extreme_ctrl+".orient", orient_md+".input1Y")
@@ -1435,8 +1435,8 @@ class Limb(standard.BaseStandard):
 
                 # auto clavicle:
                 # loading Maya matrix node
-                loaded_quaternion_plugin = self.ar.config.check_loaded_plugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
-                loaded_matrix_plugin = self.ar.config.check_loaded_plugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
+                loaded_quaternion_plugin = self.ar.config.check_loaded_plugin('quatNodes', self.ar.data.lang['e014_cantLoadQuatNode'])
+                loaded_matrix_plugin = self.ar.config.check_loaded_plugin('matrixNodes', self.ar.data.lang['e002_matrixPluginNotFound'])
                 if loaded_quaternion_plugin and loaded_matrix_plugin:
                     # create auto clavicle group:
                     clavicle_ctrl_grp = cmds.group(name=fk_ctrls[0]+"_Grp", empty=True)
@@ -1450,7 +1450,7 @@ class Limb(standard.BaseStandard):
                     cmds.parent(fk_ctrls[0], clavicle_ctrl_grp, relative=True)
                     
                     # create auto clavicle attribute:
-                    cmds.addAttr(fk_ctrls[0], longName=self.ar.data.lang['c032_follow'], attributeType="float", minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                    cmds.addAttr(fk_ctrls[0], longName=self.ar.data.lang['c032_follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                     self.add_follow_attr_name(fk_ctrls[0], self.ar.data.lang['c032_follow'])
                     
                     # ik auto clavicle locators:
@@ -1473,7 +1473,7 @@ class Limb(standard.BaseStandard):
                     cmds.delete(cmds.pointConstraint(fk_ctrls[1], ac_loc_grp, maintainOffset=False))
                     cmds.parent([ac_ref_main_loc, ac_loc_grp], self.scalable_hook_grp)
                     cmds.delete(cmds.pointConstraint(ik_auto_clavicle_joints[1], ac_ref_main_loc, maintainOffset=False))
-                    cmds.parentConstraint(ik_auto_clavicle_joints[1], ac_ref_main_loc, skipTranslate=["x", "y", "z"], maintainOffset=False, name=ac_ref_main_loc+"_PaC")
+                    cmds.parentConstraint(ik_auto_clavicle_joints[1], ac_ref_main_loc, skipTranslate=['x', 'y', 'z'], maintainOffset=False, name=ac_ref_main_loc+"_PaC")
                     self.ar.ctrls.direct_connect(ac_ref_main_loc, ac_ik_main_loc, ['rx', 'ry', 'rz']) #shoulder rotate
                     cmds.matchTransform(ac_ik_corner_loc, fk_ctrls[2], position=True, rotation=True)
                     cmds.parentConstraint(ac_ik_main_loc, ac_ik_up_loc, maintainOffset=True, name=ac_ik_up_loc+"_PaC")
@@ -1481,30 +1481,30 @@ class Limb(standard.BaseStandard):
                     # aim constraint: (edited in order to point to limb corner (elbow/knee) outside of clavicle hierarchy to avoid cycle error).
                     if self.limb_types == self.arm_name:
                         if s == 0: #left
-                            cmds.aimConstraint(ac_ik_corner_loc, ac_ik_aim_loc, maintainOffset=True, weight=1, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="object", worldUpObject=ac_ik_up_loc, name=ac_ik_aim_loc+"_AiC")
+                            cmds.aimConstraint(ac_ik_corner_loc, ac_ik_aim_loc, maintainOffset=True, weight=1, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType='object', worldUpObject=ac_ik_up_loc, name=ac_ik_aim_loc+"_AiC")
                         else: #right
-                            cmds.aimConstraint(ac_ik_corner_loc, ac_ik_aim_loc, maintainOffset=True, weight=1, aimVector=(-1, 0, 0), upVector=(0, 1, 0), worldUpType="object", worldUpObject=ac_ik_up_loc, name=ac_ik_aim_loc+"_AiC")
+                            cmds.aimConstraint(ac_ik_corner_loc, ac_ik_aim_loc, maintainOffset=True, weight=1, aimVector=(-1, 0, 0), upVector=(0, 1, 0), worldUpType='object', worldUpObject=ac_ik_up_loc, name=ac_ik_aim_loc+"_AiC")
                     else: #leg
-                        cmds.aimConstraint(ac_ik_corner_loc, ac_ik_aim_loc, maintainOffset=True, weight=1, aimVector=(0, -1, 0), upVector=(0, 0, 1), worldUpType="object", worldUpObject=ac_ik_up_loc, name=ac_ik_aim_loc+"_AiC")
+                        cmds.aimConstraint(ac_ik_corner_loc, ac_ik_aim_loc, maintainOffset=True, weight=1, aimVector=(0, -1, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=ac_ik_up_loc, name=ac_ik_aim_loc+"_AiC")
                     
                     # fk auto clavicle setup:
                     self.ar.ctrls.direct_connect(fk_ctrls[1], ac_fk_loc, ['rx', 'ry', 'rz'])
                     # auto clavicle matrix rotate extraction:
-                    ac_ik_mm = cmds.createNode("multMatrix", name=side+self.number_name+"_AC_Ik_MM")
-                    ac_ik_dm = cmds.createNode("decomposeMatrix", name=side+self.number_name+"_AC_Ik_DM")
-                    ac_ik_qte = cmds.createNode("quatToEuler", name=side+self.number_name+"_AC_Ik_QtE")
-                    ac_fk_mm = cmds.createNode("multMatrix", name=side+self.number_name+"_AC_Fk_MM")
-                    ac_fk_dm = cmds.createNode("decomposeMatrix", name=side+self.number_name+"_AC_Fk_DM")
-                    ac_fk_qte = cmds.createNode("quatToEuler", name=side+self.number_name+"_AC_Fk_QtE")
-                    ac_bc = cmds.createNode("blendColors", name=side+self.number_name+"_AC_BC")
-                    ac_inv_bc = cmds.createNode("blendColors", name=side+self.number_name+"_AC_Inv_BC")
-                    ac_inv_md = cmds.createNode("multiplyDivide", name=side+self.number_name+"_AC_Inv_MD")
-                    ac_md = cmds.createNode("multiplyDivide", name=side+self.number_name+"_AC_MD")
+                    ac_ik_mm = cmds.createNode('multMatrix', name=side+self.number_name+"_AC_Ik_MM")
+                    ac_ik_dm = cmds.createNode('decomposeMatrix', name=side+self.number_name+"_AC_Ik_DM")
+                    ac_ik_qte = cmds.createNode('quatToEuler', name=side+self.number_name+"_AC_Ik_QtE")
+                    ac_fk_mm = cmds.createNode('multMatrix', name=side+self.number_name+"_AC_Fk_MM")
+                    ac_fk_dm = cmds.createNode('decomposeMatrix', name=side+self.number_name+"_AC_Fk_DM")
+                    ac_fk_qte = cmds.createNode('quatToEuler', name=side+self.number_name+"_AC_Fk_QtE")
+                    ac_bc = cmds.createNode('blendColors', name=side+self.number_name+"_AC_BC")
+                    ac_inv_bc = cmds.createNode('blendColors', name=side+self.number_name+"_AC_Inv_BC")
+                    ac_inv_md = cmds.createNode('multiplyDivide', name=side+self.number_name+"_AC_Inv_MD")
+                    ac_md = cmds.createNode('multiplyDivide', name=side+self.number_name+"_AC_MD")
                     self.to_ids.extend([ac_ik_mm, ac_ik_dm, ac_ik_qte, ac_fk_mm, ac_fk_dm, ac_fk_qte, ac_bc, ac_inv_bc, ac_inv_md, ac_md])
                     cmds.setAttr(ac_fk_qte+".inputRotateOrder", 1) #yzx
                     # add attributes to control inverse value setup to blend ikFk:
-                    for ik_fk_rot_attr in ["ikRotateX", "ikRotateY", "ikRotateZ", "fkRotateX", "fkRotateY", "fkRotateZ"]: #ikFkRotAttrList
-                        cmds.addAttr(fk_ctrls[0], longName=ik_fk_rot_attr, attributeType="float", minValue=-1, defaultValue=1, maxValue=1)
+                    for ik_fk_rot_attr in ['ikRotateX', 'ikRotateY', 'ikRotateZ', 'fkRotateX', 'fkRotateY', 'fkRotateZ']: #ikFkRotAttrList
+                        cmds.addAttr(fk_ctrls[0], longName=ik_fk_rot_attr, attributeType='float', minValue=-1, defaultValue=1, maxValue=1)
                     # set values of ik and fk rotates:
                     if s == 0: #left side
                         if self.limb_types == self.leg_name:
@@ -1579,39 +1579,39 @@ class Limb(standard.BaseStandard):
                 
                 # arrange correct before and extrem skinning joints naming in order to be easy to skinning paint weight UI:
                 # default value for 5 bend joints:
-                before_number  = "00" #clavicle/hips
-                first_number   = "01" #shoulder/leg
-                corner_number  = "07" #elbow/knee
-                corner_b_number = "13" #knee_b
-                extreme_number  = "13" #wrist/ankle
+                before_number  = '00' #clavicle/hips
+                first_number   = '01' #shoulder/leg
+                corner_number  = '07' #elbow/knee
+                corner_b_number = '13' #knee_b
+                extreme_number  = '13' #wrist/ankle
                 if quadruped:
-                    extreme_number = "19" #ankle
+                    extreme_number = '19' #ankle
                 if self.get_guide_attr('hasBend'):
                     if not self.articulation:
-                        extreme_number = "11"
+                        extreme_number = '11'
                         if quadruped:
-                            extreme_number = "16"
+                            extreme_number = '16'
                     bend_joints_number = self.get_guide_attr('numBendJoints')
                     if bend_joints_number == 3:
-                        corner_number = "05"
-                        corner_b_number = "09"
-                        extreme_number = "09"
+                        corner_number = '05'
+                        corner_b_number = '09'
+                        extreme_number = '09'
                         if quadruped:
-                            extreme_number = "13"
+                            extreme_number = '13'
                         if not self.articulation:
-                            extreme_number = "07"
+                            extreme_number = '07'
                             if quadruped:
-                                extreme_number = "10"
+                                extreme_number = '10'
                     elif bend_joints_number == 7:
-                        corner_number = "09"
-                        corner_b_number = "17"
-                        extreme_number = "17"
+                        corner_number = '09'
+                        corner_b_number = '17'
+                        extreme_number = '17'
                         if quadruped:
-                            extreme_number = "25"
+                            extreme_number = '25'
                         if not self.articulation:
-                            extreme_number = "15"
+                            extreme_number = '15'
                             if quadruped:
-                                extreme_number = "22"
+                                extreme_number = '22'
                     skin_joints[0] = cmds.rename(skin_joints[0], side+self.number_name+"_"+before_number+"_"+before_name+suffixes[0]) #clavicle/hips
                     skin_joints[-2] = cmds.rename(skin_joints[-2], side+self.number_name+"_"+extreme_number+"_"+extreme_name+suffixes[0]) #wrist/ankle
                     if self.articulation:
@@ -1697,13 +1697,13 @@ class Limb(standard.BaseStandard):
                 # orient controller setup
                 if self.limb_types == self.arm_name:
                     extreme_old_name = skin_joints[-2]
-                    extreme_new_name = extreme_old_name.replace("_Jnt", "_Jxt")
+                    extreme_new_name = extreme_old_name.replace('_Jnt', '_Jxt')
                     cmds.setAttr(extreme_old_name+".visibility", 0)
                     cmds.rename(extreme_old_name, extreme_new_name)
                     skin_joints[-2] = extreme_new_name
                     cmds.select(clear=True)
                     cmds.joint(name=extreme_old_name)
-                    orient_joint_end = cmds.joint(name=extreme_old_name.replace("Jnt", "Orient_"+self.ar.data.joint_end_attr))
+                    orient_joint_end = cmds.joint(name=extreme_old_name.replace('Jnt', "Orient_"+self.ar.data.joint_end_attr))
                     self.ar.utils.add_joint_end_attr([orient_joint_end])
                     cmds.parentConstraint(extreme_orient_ctrl, extreme_old_name, maintainOffset=False, name=extreme_old_name+"_PaC")
                     cmds.matchTransform(orient_joint_end, skin_joints[-1], position=True, rotation=True)
@@ -1747,7 +1747,7 @@ class Limb(standard.BaseStandard):
 
                 # add hook attributes to be read when rigging integrated modules:
                 cmds.parentConstraint(self.ctrl_hook_grp, self.scalable_hook_grp, maintainOffset=True, name=self.scalable_hook_grp+"_PaC")
-                cmds.parentConstraint(self.ctrl_hook_grp, pv_aim_loc, skipRotate=["x", "y", "z"], maintainOffset=True, name=pv_aim_loc+"_PaC")
+                cmds.parentConstraint(self.ctrl_hook_grp, pv_aim_loc, skipRotate=['x', 'y', 'z'], maintainOffset=True, name=pv_aim_loc+"_PaC")
                 self.scalable_grps.append(self.scalable_hook_grp)
 
                 # add main articulationJoint:
@@ -1805,7 +1805,7 @@ class Limb(standard.BaseStandard):
                             extreme_joints = self.ar.utils.create_articulation_joint(skin_joints[-3], skin_joints[-2], 4, [(0.2*self.radius, 0, 0), (-0.2*self.radius, 0, 0), (0, 0.2*self.radius, 0), (0, -0.2*self.radius, 0)])
                         self.setup_corrective_controllers(extreme_joints, s, self.number_name+"_"+extreme_number+"_"+extreme_name, extreme_corrective_nets, extreme_calibrate_presets, inverts)
                         # fix rotate with 100% of value for the wrist axis - Thanks Andre Ruegger for the help!
-                        extreme_jax = cmds.listRelatives(extreme_joints[0], parent=True, type="joint")[0]
+                        extreme_jax = cmds.listRelatives(extreme_joints[0], parent=True, type='joint')[0]
                         orient_connection = cmds.listConnections(extreme_jax+".rotateZ", destination=False, source=True, plugs=True)[0]
                         cmds.disconnectAttr(orient_connection, extreme_jax+".rotateZ")
                         jax_rot_z_md = cmds.createNode('multiplyDivide', name=side+self.number_name+"_"+extreme_name+"_RotZ_Fix_MD")
@@ -1833,11 +1833,11 @@ class Limb(standard.BaseStandard):
                         if quadruped:
                             self.ar.naming.set_joint_label(corner_b_joints[0], s+self.joint_label_add, 18, self.number_name+"_01_"+corner_b_name)
                             cmds.rename(corner_b_joints[0], side+self.number_name+"_"+corner_b_number+"_"+corner_b_name+"_Jar")
-                        self.ankle_articulations.append([cmds.listRelatives(extreme_joints[0], parent=True, type="joint")[0], extreme_joints[0]+"_OrC", side+self.number_name+"_"+expose_corner_name])
+                        self.ankle_articulations.append([cmds.listRelatives(extreme_joints[0], parent=True, type='joint')[0], extreme_joints[0]+"_OrC", side+self.number_name+"_"+expose_corner_name])
                         self.ankle_correctives.append(None)
                         cmds.setAttr(before_joints[0]+"_OrC.interpType", 1) #average
                     if extreme_joints:
-                        extreme_jax_items = cmds.listRelatives(extreme_joints[0], parent=True, type="joint")
+                        extreme_jax_items = cmds.listRelatives(extreme_joints[0], parent=True, type='joint')
                         if extreme_jax_items:
                             cmds.setAttr(extreme_jax_items[0]+".segmentScaleCompensate", 1)
                     if s == 1:
@@ -1856,9 +1856,9 @@ class Limb(standard.BaseStandard):
                 # add main sub controller
                 if self.articulation and self.get_guide_attr('hasBend') and bend_grps:
                     main_jar = main_joints[0]
-                    main_jax = cmds.listRelatives(main_joints[0], parent=True, type="joint")[0]
-                    main_sub_ctrl = self.ar.ctrls.create_controller("id_095_LimbMainSub", ctrl_name=side+self.number_name+"_"+main_name+"_Sub_Ctrl", r=(self.radius * 0.9), d=self.curve_degree, guide_source=self.name_guide+"_Main", parent_tag=fk_ctrls[0])
-                    self.ar.ctrls.set_lock_hide([main_sub_ctrl], ["sx", "sy", "sz", "v"])
+                    main_jax = cmds.listRelatives(main_joints[0], parent=True, type='joint')[0]
+                    main_sub_ctrl = self.ar.ctrls.create_controller('id_095_LimbMainSub', ctrl_name=side+self.number_name+"_"+main_name+"_Sub_Ctrl", r=(self.radius * 0.9), d=self.curve_degree, guide_source=self.name_guide+"_Main", parent_tag=fk_ctrls[0])
+                    self.ar.ctrls.set_lock_hide([main_sub_ctrl], ['sx', 'sy', 'sz', 'v'])
                     self.ar.ctrls.set_sub_ctrl_display(fk_ctrls[0], main_sub_ctrl, 0)
                     main_sub_ctrl_zero = self.ar.utils.create_zero_out([main_sub_ctrl])[0]
                     cmds.delete(bend_grps['bottomPosPaC'][1])
@@ -1876,16 +1876,16 @@ class Limb(standard.BaseStandard):
                 soft_ik_orient_loc = cmds.spaceLocator(name=side+self.number_name+"_SoftIk_Aim_Loc")[0]
                 cmds.matchTransform(soft_ik_orient_loc, ik_joints[1], position=True, rotation=True)
                 cmds.parent(soft_ik_orient_loc, ik_joints[0])
-                cmds.aimConstraint(ik_extreme_ctrl, soft_ik_orient_loc, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, 1.0, 0.0), worldUpType="object", worldUpObject=ik_corner_ctrl, name=soft_ik_orient_loc+"_AiC")
+                cmds.aimConstraint(ik_extreme_ctrl, soft_ik_orient_loc, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, 1.0, 0.0), worldUpType='object', worldUpObject=ik_corner_ctrl, name=soft_ik_orient_loc+"_AiC")
                 cmds.orientConstraint(soft_ik_orient_loc, ik_handle_extra_grp, maintainOffset=False, name=ik_handle_grp+"_OrC")
                 # leg with softIk on and stretchable equals to zero reverser foot issue fix:
                 if self.limb_type == self.leg_name:
                     rf_dist_bet_items = self.ar.math.create_dist_between(ik_no_stretch_joints[3], ik_extreme_ctrl, name=side+self.number_name+"_"+stretch_names[1]+"_RF_DistBet", keep=True)
                     cmds.delete(rf_dist_bet_items[4])
                     cmds.parent(rf_dist_bet_items[2:4], dist_bet_grp)
-                    rf_soft_ik_cnd = cmds.createNode("condition", name=side+self.number_name+"_RF_SoftIk_Cnd")
-                    rf_stretchable_cnd = cmds.createNode("condition", name=side+self.number_name+"_RF_Stretchable_Cnd")
-                    rf_dist_inv_md = cmds.createNode("multiplyDivide", name=side+self.number_name+"_RF_DistInv_MD")
+                    rf_soft_ik_cnd = cmds.createNode('condition', name=side+self.number_name+"_RF_SoftIk_Cnd")
+                    rf_stretchable_cnd = cmds.createNode('condition', name=side+self.number_name+"_RF_Stretchable_Cnd")
+                    rf_dist_inv_md = cmds.createNode('multiplyDivide', name=side+self.number_name+"_RF_DistInv_MD")
                     self.to_ids.extend([rf_soft_ik_cnd, rf_stretchable_cnd, rf_dist_inv_md])
                     cmds.setAttr(rf_dist_inv_md+".input2X", -1)
                     cmds.setAttr(rf_stretchable_cnd+".colorIfFalseR", 0)
@@ -1915,7 +1915,7 @@ class Limb(standard.BaseStandard):
                     ]
                 fk_extreme_calibrations = [self.ar.data.lang['c040_uniformScale']+self.ar.data.lang['c105_multiplier'].capitalize()]
                 fk_before_calibrations = [self.ar.data.lang['c032_follow']]
-                corner_calibrations = ["calibrateRestTX", "calibrateRestTY", "calibrateRestTZ"]
+                corner_calibrations = ['calibrateRestTX', 'calibrateRestTY', 'calibrateRestTZ']
                 corner_not_mirrors = [self.ar.data.lang['c053_invert']+"X",
                                         self.ar.data.lang['c053_invert']+"Y",
                                         self.ar.data.lang['c053_invert']+"Z"]
@@ -1925,7 +1925,7 @@ class Limb(standard.BaseStandard):
                 self.ar.ctrls.set_string_attr_from_items(fk_ctrls[-1], fk_extreme_calibrations)
                 self.ar.ctrls.set_string_attr_from_items(fk_ctrls[0], fk_before_calibrations)
                 self.ar.ctrls.set_string_attr_from_items(ik_corner_ctrl, corner_calibrations)
-                self.ar.ctrls.set_string_attr_from_items(ik_corner_ctrl, corner_not_mirrors, "notMirrorList") #useful to export calibrationIO and not mirror them
+                self.ar.ctrls.set_string_attr_from_items(ik_corner_ctrl, corner_not_mirrors, 'notMirrorList') #useful to export calibrationIO and not mirror them
 
                 # integrating dics:
                 self.extreme_joints.append(skin_joints[-2])
@@ -1953,29 +1953,29 @@ class Limb(standard.BaseStandard):
         """ This method will create a dictionary with informations about integrations system between modules.
         """
         self.composed = {
-                            "ikCtrlList": self.ik_extreme_ctrls,
-                            "ikCtrlZeroList": self.ik_extreme_ctrl_zeros,
-                            "ikPoleVectorZeroList": self.ik_pole_vector_ctrl_zeros,
-                            "ikHandleGrpList": self.to_rev_foot_ik_handle_grps,
-                            "ikHandleConstList": self.ik_handle_constraints, 
-                            "ikHandleGrpConstList": self.ik_handle_grp_constraints, 
-                            "ikFkBlendGrpToRevFootList": self.to_rf_blend_grps,
-                            "worldRefList": self.world_refs,
-                            "worldRefShapeList": self.world_ref_shapes,
-                            "limbTypeName": self.limb_types,
-                            "extremJntList": self.extreme_joints,
-                            "limbStyle": self.get_limb_style(),
-                            "quadFrontLegList": self.quad_front_legs,
-                            "integrateOrigFromList": self.integrate_orig_from_items,
-                            "ikStretchExtremLoc": self.ik_stretch_extreme_locs,
-                            "limbManualVolume": self.ar.data.lang['m019_limb'].lower()+"Manual_"+self.ar.data.lang['c031_volumeVariation'],
-                            "scalableGrp": self.scalable_grps,
-                            "masterCtrlRefList": self.master_ctrl_ref_items,
-                            "rootCtrlRefList": self.root_ctrl_ref_items,
-                            "softIkCalibrateList": self.soft_ik_calibrate_items,
-                            "correctiveCtrlGrpList": self.corrective_ctrl_grps,
-                            "addArticJoint": self.articulation,
-                            "addCorrective": self.corrective, 
-                            "ankleArticList": self.ankle_articulations,
-                            "ankleCorrectiveList": self.ankle_correctives
+                            'ikCtrlList': self.ik_extreme_ctrls,
+                            'ikCtrlZeroList': self.ik_extreme_ctrl_zeros,
+                            'ikPoleVectorZeroList': self.ik_pole_vector_ctrl_zeros,
+                            'ikHandleGrpList': self.to_rev_foot_ik_handle_grps,
+                            'ikHandleConstList': self.ik_handle_constraints, 
+                            'ikHandleGrpConstList': self.ik_handle_grp_constraints, 
+                            'ikFkBlendGrpToRevFootList': self.to_rf_blend_grps,
+                            'worldRefList': self.world_refs,
+                            'worldRefShapeList': self.world_ref_shapes,
+                            'limbTypeName': self.limb_types,
+                            'extremJntList': self.extreme_joints,
+                            'limbStyle': self.get_limb_style(),
+                            'quadFrontLegList': self.quad_front_legs,
+                            'integrateOrigFromList': self.integrate_orig_from_items,
+                            'ikStretchExtremLoc': self.ik_stretch_extreme_locs,
+                            'limbManualVolume': self.ar.data.lang['m019_limb'].lower()+"Manual_"+self.ar.data.lang['c031_volumeVariation'],
+                            'scalableGrp': self.scalable_grps,
+                            'masterCtrlRefList': self.master_ctrl_ref_items,
+                            'rootCtrlRefList': self.root_ctrl_ref_items,
+                            'softIkCalibrateList': self.soft_ik_calibrate_items,
+                            'correctiveCtrlGrpList': self.corrective_ctrl_grps,
+                            'addArticJoint': self.articulation,
+                            'addCorrective': self.corrective, 
+                            'ankleArticList': self.ankle_articulations,
+                            'ankleCorrectiveList': self.ankle_correctives
                         }

@@ -26,29 +26,29 @@ class BaseTemplate(base.BaseLibrary):
 
     def build_template(self, *args):
         template_data = self.template_data
-        if "_" in self.name:
-            base_name = self.name.split("_")[0]
+        if '_' in self.name:
+            base_name = self.name.split('_')[0]
             names, splitted = self.get_template_variations(base_name)
             if len(names) > 1:
                 user_choice = self.ask_build_detail(base_name.capitalize(), splitted)
                 if user_choice == self.ar.data.lang['i132_cancel']:
                     return
-                template_data = self.ar.data.lib[self.ar.data.template_folder]["content"][f"{base_name}_{user_choice.lower()}"]
-        guide_io = self.ar.config.get_instance("GuideIO", [self.ar.data.setup_folder])
+                template_data = self.ar.data.lib[self.ar.data.template_folder]['content'][f"{base_name}_{user_choice.lower()}"]
+        guide_io = self.ar.config.get_instance('GuideIO', [self.ar.data.setup_folder])
         guide_data = guide_io.parse_repeated_nets(template_data)
         guide_io.import_guide(guide_data, False)
         guide_io.setup_guide_base_parenting(guide_data)
         self.ar.ui_manager.set_progress(end_it=True)
         self.ar.ui_manager.refresh_ui()
         cmds.select(clear=True)
-        print(self.ar.data.lang["m089_createdTemplate"]+self.name)
+        print(self.ar.data.lang['m089_createdTemplate']+self.name)
 
 
     def get_template_variations(self, name):
         names, splitted = [], []
-        for item in self.ar.data.lib[self.ar.data.template_folder]["templates"]:
+        for item in self.ar.data.lib[self.ar.data.template_folder]['templates']:
             if item.startswith(name):
                 names.append(item)
-                splitted.append(item.split("_")[1])
+                splitted.append(item.split('_')[1])
         return names, splitted
     

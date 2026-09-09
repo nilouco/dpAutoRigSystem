@@ -34,8 +34,8 @@ class Start:
         """ Notify the user about the new version update.
         """
         # open dialog to confirm repair it
-        yes_text = "Yes"
-        no_text = "No"
+        yes_text = 'Yes'
+        no_text = 'No'
         result = cmds.confirmDialog(
                                     title='Old version', 
                                     message='This is an old dpAutoRigSystem version.\n' \
@@ -70,18 +70,18 @@ class Start:
 
 class Repair:
     def __init__(self, *args):
-        print("\n----------\ndpAutoRigSystem: start repairing old version...")
-        self.ar_name = "dpAutoRigSystem"
-        self.path = str(os.path.join(os.path.dirname(sys._getframe(1).f_code.co_filename))).replace("\\", "/")
+        print('\n----------\ndpAutoRigSystem: start repairing old version...')
+        self.ar_name = 'dpAutoRigSystem'
+        self.path = str(os.path.join(os.path.dirname(sys._getframe(1).f_code.co_filename))).replace('\\', '/')
 
 
     def reinstall(self):
-        print("Reinstalling...")
+        print('Reinstalling...')
         #
         # TODO change URL to master after 
         #
-        #url = "https://github.com/nilouco/dpAutoRigSystem/zipball/master/"
-        url = "https://github.com/nilouco/dpAutoRigSystem/zipball/699-dev-mode-reload/"
+        #url = 'https://github.com/nilouco/dpAutoRigSystem/zipball/master/'
+        url = 'https://github.com/nilouco/dpAutoRigSystem/zipball/699-dev-mode-reload/'
         
         remote_source = urllib.request.urlopen(url)
         ar_zip = zipfile.ZipFile(io.BytesIO(remote_source.read()))
@@ -92,11 +92,11 @@ class Repair:
         ar_zip.close()
         temp_folder = f"{self.path}/{zip_names[0]}{self.ar_name}"
         for source_folder, folders, files in os.walk(temp_folder):       
-            dest_path = source_folder.replace(temp_folder, self.path, 1).replace("\\", "/")
+            dest_path = source_folder.replace(temp_folder, self.path, 1).replace('\\', '/')
             if not os.path.exists(dest_path):
                 os.makedirs(dest_path)
             for ar_file in files:
-                source_file = os.path.join(source_folder, ar_file).replace("\\", "/")
+                source_file = os.path.join(source_folder, ar_file).replace('\\', '/')
                 shutil.copy2(source_file, dest_path)
         shutil.rmtree(f"{self.path}/{zip_names[0]}")
         from . import version

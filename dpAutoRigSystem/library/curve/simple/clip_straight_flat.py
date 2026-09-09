@@ -1,9 +1,9 @@
 from ...base import curve
 
 # global variables to this module:    
-CLASS_NAME = "ClipStraightFlat"
-TITLE = "m108_clipStraightFlat"
-DESCRIPTION = "m099_cvControlDesc"
+CLASS_NAME = 'ClipStraightFlat'
+TITLE = 'm108_clipStraightFlat'
+DESCRIPTION = 'm099_cvControlDesc'
 
 
 

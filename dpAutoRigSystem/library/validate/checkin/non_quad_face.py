@@ -3,10 +3,10 @@ from maya import OpenMaya, cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "NonQuadFace"
-TITLE = "v119_nonQuadFace"
-DESCRIPTION = "v120_nonQuadFaceDesc"
-WIKI = "07-‐-Validator#-non-quad-face"
+CLASS_NAME = 'NonQuadFace'
+TITLE = 'v119_nonQuadFace'
+DESCRIPTION = 'v120_nonQuadFaceDesc'
+WIKI = '07-‐-Validator#-non-quad-face'
 
 
 
@@ -33,9 +33,9 @@ class NonQuadFace(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if inputs:
-                check_items = cmds.ls(inputs, type="mesh")
+                check_items = cmds.ls(inputs, type='mesh')
             else:
-                check_items = cmds.ls(selection=False, type="mesh")
+                check_items = cmds.ls(selection=False, type='mesh')
             if check_items:
                 self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
                 # declare resulted lists
@@ -61,11 +61,11 @@ class NonQuadFace(action.BaseAction):
                                     if n_vertex > 4:
                                         if not item_name in poly_items:
                                             poly_items.append(item_name)
-                                        poly_faces.append(item_name+'.f['+str(iter_polys.index())+']')
+                                        poly_faces.append(item_name+'.f["+str(iter_polys.index())+"]')
                                     elif n_vertex == 3:
                                         if not item_name in tris_items:
                                             tris_items.append(item_name)
-                                        tris_faces.append(item_name+'.f['+str(iter_polys.index())+']')
+                                        tris_faces.append(item_name+'.f["+str(iter_polys.index())+"]')
                                     # Move to next polygon in the mesh list
                                     iter_polys.next()
                         # Move to the next selected node in the list

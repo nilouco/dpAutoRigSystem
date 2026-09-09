@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "NodeEditorInfo"
-TITLE = "v146_nodeEditorInfo"
-DESCRIPTION = "v147_nodeEditoInfoDesc"
-WIKI = "07-‐-Validator#-node-editor-info-cleaner"
+CLASS_NAME = 'NodeEditorInfo'
+TITLE = 'v146_nodeEditorInfo'
+DESCRIPTION = 'v147_nodeEditoInfoDesc'
+WIKI = '07-‐-Validator#-node-editor-info-cleaner'
 
 
 

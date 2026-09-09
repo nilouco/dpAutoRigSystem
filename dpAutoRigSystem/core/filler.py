@@ -18,45 +18,45 @@ class UIFiller:
     def fill_libraries(self):
         template_base_names = []
         # rigging
-        for item in self.ar.data.lib[self.ar.data.standard_folder]["instances"]:
-            self.populate_library(item, self.ar.data.standard_folder, "rig_guides_standard_fl")
+        for item in self.ar.data.lib[self.ar.data.standard_folder]['instances']:
+            self.populate_library(item, self.ar.data.standard_folder, 'rig_guides_standard_fl')
         # templates
-        for item in self.ar.data.lib[self.ar.data.template_folder]["instances"]:
+        for item in self.ar.data.lib[self.ar.data.template_folder]['instances']:
             if not item.base_name in template_base_names:
-                self.populate_library(item, self.ar.data.template_folder, "rig_guides_template_fl")
+                self.populate_library(item, self.ar.data.template_folder, 'rig_guides_template_fl')
                 template_base_names.append(item.base_name)
         # controllers
-        for item in self.ar.data.lib[self.ar.data.curve_simple_folder]["instances"]:
-            self.populate_library(item, self.ar.data.curve_simple_folder, "ctr_simple_module_gl")
-        for item in self.ar.data.lib[self.ar.data.curve_combined_folder]["instances"]:
-            self.populate_library(item, self.ar.data.curve_combined_folder, "ctr_combined_module_gl")
+        for item in self.ar.data.lib[self.ar.data.curve_simple_folder]['instances']:
+            self.populate_library(item, self.ar.data.curve_simple_folder, 'ctr_simple_module_gl')
+        for item in self.ar.data.lib[self.ar.data.curve_combined_folder]['instances']:
+            self.populate_library(item, self.ar.data.curve_combined_folder, 'ctr_combined_module_gl')
         # tools
-        for item in self.ar.data.lib[self.ar.data.tools_folder]["instances"]:
-            self.populate_library(item, self.ar.data.tools_folder, "tools_module_cl")
+        for item in self.ar.data.lib[self.ar.data.tools_folder]['instances']:
+            self.populate_library(item, self.ar.data.tools_folder, 'tools_module_cl')
         # validators
-        for item in self.ar.data.lib[self.ar.data.checkin_folder]["instances"]:
-            self.populate_library(item, self.ar.data.checkin_folder, "i208_checkin_module_cl")
-        for item in self.ar.data.lib[self.ar.data.checkout_folder]["instances"]:
-            self.populate_library(item, self.ar.data.checkout_folder, "i209_checkout_module_cl")
+        for item in self.ar.data.lib[self.ar.data.checkin_folder]['instances']:
+            self.populate_library(item, self.ar.data.checkin_folder, 'i208_checkin_module_cl')
+        for item in self.ar.data.lib[self.ar.data.checkout_folder]['instances']:
+            self.populate_library(item, self.ar.data.checkout_folder, 'i209_checkout_module_cl')
         if self.ar.data.checkaddon_folder:
-            for item in self.ar.data.lib[self.ar.data.checkaddon_folder]["instances"]:
+            for item in self.ar.data.lib[self.ar.data.checkaddon_folder]['instances']:
                 cmds.frameLayout('i212_addOns_fl', edit=True, visible=True)
-                self.populate_library(item, "", "i212_addOns_module_cl")
+                self.populate_library(item, '', 'i212_addOns_module_cl')
         if self.ar.data.checkfinishing_folder:
-            for item in self.ar.data.lib[self.ar.data.checkfinishing_folder]["instances"]:
+            for item in self.ar.data.lib[self.ar.data.checkfinishing_folder]['instances']:
                 cmds.frameLayout('i354_finishing_fl', edit=True, visible=True)
-                self.populate_library(item, "", "i354_finishing_module_cl")
+                self.populate_library(item, '', 'i354_finishing_module_cl')
         # rebuilders
-        for item in self.ar.data.lib[self.ar.data.start_folder]["instances"]:
-            self.populate_library(item, self.ar.data.start_folder, "rebuilder_start_fl", 6)
-        for item in self.ar.data.lib[self.ar.data.source_folder]["instances"]:
-            self.populate_library(item, self.ar.data.source_folder, "rebuilder_source_fl", 6)
-        for item in self.ar.data.lib[self.ar.data.setup_folder]["instances"]:
-            self.populate_library(item, self.ar.data.setup_folder, "rebuilder_setup_fl", 6)
-        for item in self.ar.data.lib[self.ar.data.deforming_folder]["instances"]:
-            self.populate_library(item, self.ar.data.deforming_folder, "rebuilder_deforming_fl", 6)
-        for item in self.ar.data.lib[self.ar.data.custom_folder]["instances"]:
-            self.populate_library(item, self.ar.data.custom_folder, "rebuilder_custom_fl", 6)
+        for item in self.ar.data.lib[self.ar.data.start_folder]['instances']:
+            self.populate_library(item, self.ar.data.start_folder, 'rebuilder_start_fl', 6)
+        for item in self.ar.data.lib[self.ar.data.source_folder]['instances']:
+            self.populate_library(item, self.ar.data.source_folder, 'rebuilder_source_fl', 6)
+        for item in self.ar.data.lib[self.ar.data.setup_folder]['instances']:
+            self.populate_library(item, self.ar.data.setup_folder, 'rebuilder_setup_fl', 6)
+        for item in self.ar.data.lib[self.ar.data.deforming_folder]['instances']:
+            self.populate_library(item, self.ar.data.deforming_folder, 'rebuilder_deforming_fl', 6)
+        for item in self.ar.data.lib[self.ar.data.custom_folder]['instances']:
+            self.populate_library(item, self.ar.data.custom_folder, 'rebuilder_custom_fl', 6)
 
 
     def populate_library(self, item, folder, layout, columns=5):
@@ -67,7 +67,7 @@ class UIFiller:
                 cmds.iconTextButton(image=self.ar.data.icon[icon_name], label=item.name, annotation=item.name, height=32, width=32, command=partial(item.cv_main, True), parent=layout)
                 return
             # layout and icon
-            module_layout = cmds.rowLayout(item.name+"_rl", numberOfColumns=columns, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 0), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2)], parent=layout)
+            module_layout = cmds.rowLayout(f"{item}.name_rl", numberOfColumns=columns, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 0), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2)], parent=layout)
             cmds.image(item.name+"_img", image=self.ar.data.icon[icon_name], width=32, parent=module_layout)
             # standard
             if folder == self.ar.data.standard_folder:
@@ -75,7 +75,7 @@ class UIFiller:
             # templates
             elif folder == self.ar.data.template_folder:
                 if item.title == self.ar.data.template_default:
-                    cmds.button(item.name+'_bt', label=item.name.capitalize().replace("_", "\n"), height=32, command=item.build_template, parent=module_layout)
+                    cmds.button(item.name+'_bt', label=item.name.capitalize().replace('_', '\n'), height=32, command=item.build_template, parent=module_layout)
                 else:
                     cmds.button(item.name+'_bt', label=self.ar.data.lang[item.title], height=32, command=item.build_template, parent=module_layout)
             # tools
@@ -87,7 +87,7 @@ class UIFiller:
                 item.first_bt = cmds.button(label=item.first_bt_label, width=45, command=partial(item.run_action, True), backgroundColor=(0.5, 0.5, 0.5), enable=item.first_bt_enable, parent=module_layout)
                 item.second_bt = cmds.button(label=item.second_bt_label.capitalize(), width=45, command=partial(item.run_action, False), backgroundColor=(0.5, 0.5, 0.5), enable=item.second_bt_enable, parent=module_layout)
                 # validators
-                if folder == "" or folder in self.validator_folders and item.custom_name:
+                if folder == '' or folder in self.validator_folders and item.custom_name:
                     cmds.checkBox(item.action_cb, edit=True, label=item.custom_name)
                     item.title = item.custom_name
                 # rebuilders
@@ -100,8 +100,8 @@ class UIFiller:
 
 
     def load_pipeline_validator_preset(self):
-        cmds.menuItem(f"{self.ar.data.validator_preset['_preset']}_mi", label=self.ar.data.validator_preset["_preset"], radioButton=False, collection="validator_preset_rbc", parent="validator_preset_menu")
-        cmds.menuItem(f"{self.ar.data.validator_preset['_preset']}_mi", edit=True, radioButton=True, collection="validator_preset_rbc")
+        cmds.menuItem(f"{self.ar.data.validator_preset['_preset']}_mi", label=self.ar.data.validator_preset['_preset'], radioButton=False, collection='validator_preset_rbc', parent='validator_preset_menu')
+        cmds.menuItem(f"{self.ar.data.validator_preset['_preset']}_mi", edit=True, radioButton=True, collection='validator_preset_rbc')
 
 
     def fill_created_guides(self):
@@ -114,7 +114,7 @@ class UIFiller:
         self.ar.data.guide_instances = []
         current_guides = []
         # list all namespaces:
-        cmds.namespace(setNamespace=":")
+        cmds.namespace(setNamespace=':')
         namespaces = cmds.namespaceInfo(listOnlyNamespaces=True)
         # find all module names:
         module_name = self.ar.env.find_module_names_by_folder(self.ar.data.dp_auto_rig_path, self.ar.data.standard_folder)
@@ -123,14 +123,14 @@ class UIFiller:
         
         # check if there is "__" (double undersore) in the namespaces:
         for n in namespaces:
-            n_partitions = n.partition("__")
-            if n_partitions[1] != "":
+            n_partitions = n.partition('__')
+            if n_partitions[1] != '':
                 module = n_partitions[0]
                 userSpecName = n_partitions[2]
                 if module in valid_module_names:
                     index = valid_module_names.index(module)
                     # check if there is this module guide base in the scene:
-                    curGuideName = valid_module_names[index]+"__"+userSpecName+":"+self.ar.data.guide_base_name
+                    curGuideName = valid_module_names[index]+'__'+userSpecName+':'+self.ar.data.guide_base_name
                     if cmds.objExists(curGuideName):
                         current_guides.append([valid_modules[index], userSpecName, curGuideName])
                     else:
@@ -160,15 +160,15 @@ class UIFiller:
         
         # list joints to be populated:
         joints, sorted_joints = [], []
-        all_joints = cmds.ls(selection=False, type="joint")
-        if choose_joint == "allJoints":
+        all_joints = cmds.ls(selection=False, type='joint')
+        if choose_joint == 'allJoints':
             joints = all_joints
             cmds.checkBox('skin_jnt_cb', edit=True, enable=False)
             cmds.checkBox('skin_jar_cb', edit=True, enable=False)
             cmds.checkBox('skin_jad_cb', edit=True, enable=False)
             cmds.checkBox('skin_jcr_cb', edit=True, enable=False)
             cmds.checkBox('skin_jis_cb', edit=True, enable=False)
-        elif choose_joint == "dpARJoints":
+        elif choose_joint == 'dpARJoints':
             cmds.checkBox('skin_jnt_cb', edit=True, enable=True)
             cmds.checkBox('skin_jar_cb', edit=True, enable=True)
             cmds.checkBox('skin_jad_cb', edit=True, enable=True)
@@ -181,22 +181,22 @@ class UIFiller:
             display_jis = cmds.checkBox('skin_jis_cb', query=True, value=True)
             for joint_node in all_joints:
                 if cmds.objExists(joint_node+'.'+self.ar.data.base_name+'joint'):
-                    if display_jnt and joint_node.endswith("_Jnt"):
+                    if display_jnt and joint_node.endswith('_Jnt'):
                         joints.append(joint_node)
-                    if display_jar and joint_node.endswith("_Jar"):
+                    if display_jar and joint_node.endswith('_Jar'):
                         joints.append(joint_node)
-                    if diaplay_jad and joint_node.endswith("_Jad"):
+                    if diaplay_jad and joint_node.endswith('_Jad'):
                         joints.append(joint_node)
-                    if display_jcr and joint_node.endswith("_Jcr"):
+                    if display_jcr and joint_node.endswith('_Jcr'):
                         joints.append(joint_node)
-                    if display_jis and joint_node.endswith("_Jis"):
+                    if display_jis and joint_node.endswith('_Jis'):
                         joints.append(joint_node)
         
         # sort joints by name filter:
         joint_name = cmds.textField('skin_joint_name_tf', query=True, text=True)
         if joints:
             if joint_name:
-                sorted_joints = self.ar.naming.filter_name(joint_name, joints, " ")
+                sorted_joints = self.ar.naming.filter_name(joint_name, joints, ' ')
             else:
                 sorted_joints = joints
         
@@ -220,24 +220,24 @@ class UIFiller:
         geos, same_names, sorted_geos = [], [], []
         
         selecteds = cmds.ls(selection=True, long=True)
-        for geo_type in ["mesh", "nurbsSurface", "subdiv"]:
+        for geo_type in ['mesh', 'nurbsSurface', 'subdiv']:
             all_geos = cmds.ls(selection=False, type=geo_type, long=True)
             if all_geos:
                 for mesh in all_geos:
                     if cmds.getAttr(mesh+".intermediateObject") == 0:
-                        transforms = cmds.listRelatives(mesh, parent=True, fullPath=True, type="transform")
+                        transforms = cmds.listRelatives(mesh, parent=True, fullPath=True, type='transform')
                         # do not add ribbon nurbs plane to the list:
                         if transforms and not cmds.objExists(transforms[0]+"."+self.ar.skin.ignore_skinning_attr) and not transforms[0] in geos:
-                            if choose_geo == "allGeoms":
+                            if choose_geo == 'allGeoms':
                                 geos.append(transforms[0])
                                 cmds.checkBox('skin_geo_long_name_cb', edit=True, value=True, enable=False)
-                            elif choose_geo == "selGeoms":
+                            elif choose_geo == 'selGeoms':
                                 cmds.checkBox('skin_geo_long_name_cb', edit=True, enable=True)
                                 if transforms[0] in selecteds or mesh in selecteds:
                                     if display_long_name:
                                         geos.append(transforms[0])
                                     else:
-                                        geos.append(transforms[0][transforms[0].rfind("|")+1:]) #short name
+                                        geos.append(transforms[0][transforms[0].rfind('|')+1:]) #short name
 
         # check if we have same short name:
         if geos:
@@ -245,9 +245,9 @@ class UIFiller:
                 if geo in geos[:g]:
                     same_names.append(geo)
         if same_names:
-            geos.insert(0, "*")
-            geos.append(" ")
-            geos.append("-------")
+            geos.insert(0, '*')
+            geos.append(' ')
+            geos.append('-------')
             geos.append(self.ar.data.lang['i074_attention'])
             geos.append(self.ar.data.lang['i075_moreOne'])
             geos.append(self.ar.data.lang['i076_sameName'])
@@ -257,7 +257,7 @@ class UIFiller:
         geo_name = cmds.textField('skin_geo_name_tf', query=True, text=True)
         if geos:
             if geo_name:
-                sorted_geos = self.ar.naming.filter_name(geo_name, geos, " ")
+                sorted_geos = self.ar.naming.filter_name(geo_name, geos, ' ')
             else:
                 sorted_geos = geos
         
@@ -282,7 +282,7 @@ class UIFiller:
         namespaces = cmds.namespaceInfo(listOnlyNamespaces=True, recurse=True)
         if namespaces:
             for n, name in enumerate(namespaces):
-                if name != "UI" and name != "shared" and name.count(":") > 0 and name.find("_dpAR_") != -1:
+                if name != 'UI' and name != 'shared' and name.count(':') > 0 and name.find('_dpAR_') != -1:
                     if ask_user and self.ar.data.ui_state:
                         # open dialog to confirm merge namespaces:
                         yes_text = self.ar.data.lang['i071_yes']
@@ -305,12 +305,12 @@ class UIFiller:
                             while old_custom_name in current_custom_names:
                                 old_custom_name = base_name+str(n)
                                 n += 1
-                            cmds.setAttr(name+":Guide_Base.customName", old_custom_name, type="string")
+                            cmds.setAttr(name+":Guide_Base.customName", old_custom_name, type='string')
                             current_custom_names.append(old_custom_name)
                 # remove namespaces
                 for name in imported_namespaces:
-                    if ":" in name and cmds.namespace(exists=name):
-                            namespace_string = name.split(":")[0]
+                    if ':' in name and cmds.namespace(exists=name):
+                            namespace_string = name.split(':')[0]
                             cmds.namespace(removeNamespace=namespace_string, mergeNamespaceWithRoot=True)
                             print(f"{self.ar.data.lang['m206_mergeNamespace']}: {namespace_string}")
                             self.check_imported_guides(False)
@@ -323,14 +323,13 @@ class UIFiller:
         for item in self.ar.utils.get_guides_to_rig():
             if not item.guide_net:
                 item.create_guide_network()
-                print(self.ar.data.lang["v004_fixed"]+" guideNet: "+item.guide_base)
-
+                print(f"{self.ar.data.lang['v004_fixed']} guideNet: {item.guide_base}")
 
     def check_guide_versions(self, *args):
         """ Verify if there are guides with different version of the current dpAutoRig version.
         """
         for item in self.ar.utils.get_guides_to_rig():
-            if self.ar.data.version != cmds.getAttr(item.guide_base + '.dpARVersion'):
+            if self.ar.data.version != cmds.getAttr(f"{item.guide_base}.dpARVersion"):
                 self.check_guide_nets()
-                self.ar.config.get_instance("UpdateGuides", [self.ar.data.tools_folder]).build_tool()
+                self.ar.config.get_instance('UpdateGuides', [self.ar.data.tools_folder]).build_tool()
                 break

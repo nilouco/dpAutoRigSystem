@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "HideJoints"
-TITLE = "v115_hideJoints"
-DESCRIPTION = "v116_hideJointsDesc"
-WIKI = "07-‐-Validator#-hide-all-joints"
+CLASS_NAME = 'HideJoints'
+TITLE = 'v115_hideJoints'
+DESCRIPTION = 'v116_hideJointsDesc'
+WIKI = '07-‐-Validator#-hide-all-joints'
 
 
 

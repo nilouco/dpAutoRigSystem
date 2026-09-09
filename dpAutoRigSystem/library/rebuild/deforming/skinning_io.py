@@ -5,20 +5,20 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "SkinningIO"
-TITLE = "r016_skinningIO"
-DESCRIPTION = "r017_skinningIODesc"
-WIKI = "10-‐-Rebuilder#-skinning"
+CLASS_NAME = 'SkinningIO'
+TITLE = 'r016_skinningIO'
+DESCRIPTION = 'r017_skinningIODesc'
+WIKI = '10-‐-Rebuilder#-skinning'
 
 
 
 class SkinningIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.set_action_type("r000_rebuilder")
-        self.io_folder = "s_skinningIO"
-        self.start_name = "skinning"
-        self.import_ref_name = "dpSkinningIO_Import"
+        self.set_action_type('r000_rebuilder')
+        self.io_folder = 's_skinningIO'
+        self.start_name = 'skinning'
+        self.import_ref_name = 'dpSkinningIO_Import'
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -46,11 +46,11 @@ class SkinningIO(action.BaseAction):
                         if inputs:
                             items = inputs
                         else:
-                            items = self.ar.skin.get_deformed_items(deformer_types=["skinCluster"], ignore_attr=self.ar.skin.ignore_skinning_attr)
+                            items = self.ar.skin.get_deformed_items(deformer_types=['skinCluster'], ignore_attr=self.ar.skin.ignore_skinning_attr)
                         if items:
                             self.export_json_file(self.ar.skin.get_skin_weights_data(items))
                         else:
-                            self.maybe_done_io("Render_Grp")
+                            self.maybe_done_io('Render_Grp')
                     else: #import
                         skin_weight_data = self.import_latest_json_file(self.get_exported_items())
                         if skin_weight_data:
@@ -96,7 +96,7 @@ class SkinningIO(action.BaseAction):
                 ref_node = cmds.file(self.ref_path_name, referenceNode=True, query=True)
                 ref_nodes = cmds.referenceQuery(ref_node, nodes=True)
                 if ref_nodes:
-                    ref_nodes = cmds.ls(ref_nodes, type="transform")
+                    ref_nodes = cmds.ls(ref_nodes, type='transform')
         return ref_nodes
 
 
@@ -114,7 +114,7 @@ class SkinningIO(action.BaseAction):
             if cmds.objExists(item):
                 if ref_nodes: #disable at the momment
                     for ref_node_name in ref_nodes:
-                        if ref_node_name[ref_node_name.rfind(":")+1:] == self.ar.skin.get_io_filename(item):
+                        if ref_node_name[ref_node_name.rfind(':')+1:] == self.ar.skin.get_io_filename(item):
                             if cmds.polyCompare(item, ref_node_name, vertices=True) > 0 or cmds.polyCompare(item, ref_node_name, edges=True) > 0: #check if shape changes
                                 changed_shape_meshes.append(item)
                                 well_imported = False

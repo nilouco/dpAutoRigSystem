@@ -21,7 +21,7 @@ class BaseCurve(base.BaseLibrary):
         self.cv_points = None
         self.cv_knots = None
         self.cv_periodic = None
-        self.cv_suffix = "Ctrl"
+        self.cv_suffix = 'Ctrl'
     
     
     def get_controller_ui_values(self, cv_name=''):
@@ -30,58 +30,58 @@ class BaseCurve(base.BaseLibrary):
             [cv_name, cv_size, cv_degree, cv_direction, cv_action]
         """
         # here we will use all info from UI elements in order to call the correct action to do:
-        custom_name = cmds.textFieldGrp("ctr_name_tfg", query=True, text=True)
+        custom_name = cmds.textFieldGrp('ctr_name_tfg', query=True, text=True)
         self.cv_name = cv_name
         if custom_name:
             self.cv_name = custom_name
         # action
-        self.cv_action = cmds.radioButtonGrp("ctr_action_rgb", query=True, select=True)
+        self.cv_action = cmds.radioButtonGrp('ctr_action_rgb', query=True, select=True)
         # degree
-        degree_rgb_value = cmds.radioButtonGrp("ctr_degree_rgb", query=True, select=True)
+        degree_rgb_value = cmds.radioButtonGrp('ctr_degree_rgb', query=True, select=True)
         self.cv_degree = 1 #linear
         if degree_rgb_value == 2:
             self.cv_degree = 3 #cubic
         # size
-        self.cv_size = cmds.floatSliderGrp("ctr_size_fsg", query=True, value=True)
+        self.cv_size = cmds.floatSliderGrp('ctr_size_fsg', query=True, value=True)
         # direction
-        self.cv_direction = cmds.optionMenuGrp("ctr_direction_omg", query=True, value=True)
+        self.cv_direction = cmds.optionMenuGrp('ctr_direction_omg', query=True, value=True)
         return [self.cv_name, self.cv_size, self.cv_degree, self.cv_direction, self.cv_action]
     
     
     def add_controller_info(self, item, class_name=True, size=True, degree=True, direction=True, rot=True, guide=False):
         """ Add some information in the curve transform node of the control.
         """
-        cmds.addAttr(item, longName="dpControl", attributeType='bool')
+        cmds.addAttr(item, longName='dpControl', attributeType='bool')
         cmds.setAttr(item+".dpControl", 1)
         if guide:
-            cmds.addAttr(item, longName="dpGuide", attributeType='bool')
+            cmds.addAttr(item, longName='dpGuide', attributeType='bool')
             cmds.setAttr(item+".dpGuide", 1)
-        cmds.addAttr(item, longName="version", dataType='string')
-        cmds.setAttr(item+".version", self.ar.data.version, type="string")
+        cmds.addAttr(item, longName='version', dataType='string')
+        cmds.setAttr(item+".version", self.ar.data.version, type='string')
         if self.cv_id:
-            cmds.addAttr(item, longName="controlID", dataType='string')
-            cmds.setAttr(item+".controlID", self.cv_id, type="string")
+            cmds.addAttr(item, longName='controlID', dataType='string')
+            cmds.setAttr(item+".controlID", self.cv_id, type='string')
         if class_name:
-            cmds.addAttr(item, longName="className", dataType='string')
-            cmds.setAttr(item+".className", self.name, type="string")
+            cmds.addAttr(item, longName='className', dataType='string')
+            cmds.setAttr(item+".className", self.name, type='string')
         if size:
-            cmds.addAttr(item, longName="size", attributeType='float')
+            cmds.addAttr(item, longName='size', attributeType='float')
             cmds.setAttr(item+".size", self.cv_size)
         if degree:
-            cmds.addAttr(item, longName="degree", attributeType='short')
+            cmds.addAttr(item, longName='degree', attributeType='short')
             cmds.setAttr(item+".degree", self.cv_degree)
         if direction:
-            cmds.addAttr(item, longName="direction", dataType='string')
-            cmds.setAttr(item+".direction", self.cv_direction, type="string")
+            cmds.addAttr(item, longName='direction', dataType='string')
+            cmds.setAttr(item+".direction", self.cv_direction, type='string')
         if rot:
-            cmds.addAttr(item, longName="cvRotX", attributeType='double')
-            cmds.addAttr(item, longName="cvRotY", attributeType='double')
-            cmds.addAttr(item, longName="cvRotZ", attributeType='double')
+            cmds.addAttr(item, longName='cvRotX', attributeType='double')
+            cmds.addAttr(item, longName='cvRotY', attributeType='double')
+            cmds.addAttr(item, longName='cvRotZ', attributeType='double')
             cmds.setAttr(item+".cvRotX", self.cv_rot[0])
             cmds.setAttr(item+".cvRotY", self.cv_rot[1])
             cmds.setAttr(item+".cvRotZ", self.cv_rot[2])
         if not guide:
-            cmds.addAttr(item, longName="parentTag", attributeType='message')
+            cmds.addAttr(item, longName='parentTag', attributeType='message')
     
     
     def create_curve(self, cv_name, cv_degree, cv_points, cv_knots, cv_periodic, guide):
@@ -102,7 +102,7 @@ class BaseCurve(base.BaseLibrary):
         for item in curves[1:]:
             cmds.makeIdentity(item, translate=True, rotate=True, scale=True, apply=True)
             self.ar.ctrls.transfer_shape(True, False, item, [curves[0]])
-        cmds.setAttr(curves[0]+".className", self.name, type="string")
+        cmds.setAttr(curves[0]+".className", self.name, type='string')
         return curves[0]
 
         
@@ -110,17 +110,17 @@ class BaseCurve(base.BaseLibrary):
     def set_controller_direction(self, item, cv_direction):
         """ Rotate the node given to have the correct direction orientation.
         """
-        if cv_direction == "-X":
+        if cv_direction == '-X':
             cmds.setAttr(item+".rotateX", 90)
             cmds.setAttr(item+".rotateY", -90)
-        elif cv_direction == "+X":
+        elif cv_direction == '+X':
             cmds.setAttr(item+".rotateX", -90)
             cmds.setAttr(item+".rotateY", -90)
-        elif cv_direction == "-Y":
+        elif cv_direction == '-Y':
             cmds.setAttr(item+".rotateZ", 180)
-        elif cv_direction == "-Z":
+        elif cv_direction == '-Z':
             cmds.setAttr(item+".rotateX", -90)
-        elif cv_direction == "+Z":
+        elif cv_direction == '+Z':
             cmds.setAttr(item+".rotateX", 90)
         else:
             pass #default +Y, just pass
@@ -155,7 +155,7 @@ class BaseCurve(base.BaseLibrary):
             Return the transform curve or a list of selected destination items.
         """
         # getting current selection:
-        destinations = cmds.ls(selection=True, type="transform")
+        destinations = cmds.ls(selection=True, type='transform')
         # check if the given name is good or add a sequencial number on it:
         self.cv_name = self.ar.naming.validate_name(cv_name, self.cv_suffix)
         self.cv_id = cv_id

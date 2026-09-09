@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "Ngskintools"
-TITLE = "v026_ngskintools"
-DESCRIPTION = "v027_ngskintoolsDesc"
-WIKI = "07-‐-Validator#-ngskintools-cleaner"
+CLASS_NAME = 'Ngskintools'
+TITLE = 'v026_ngskintools'
+DESCRIPTION = 'v027_ngskintoolsDesc'
+WIKI = '07-‐-Validator#-ngskintools-cleaner'
 
 
 

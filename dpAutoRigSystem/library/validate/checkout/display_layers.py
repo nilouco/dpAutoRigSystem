@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "DisplayLayers"
-TITLE = "v054_displayLayers"
-DESCRIPTION = "v055_displayLayersDesc"
-WIKI = "07-‐-Validator#-display-layers"
+CLASS_NAME = 'DisplayLayers'
+TITLE = 'v054_displayLayers'
+DESCRIPTION = 'v055_displayLayersDesc'
+WIKI = '07-‐-Validator#-display-layers'
 
 
 
@@ -44,12 +44,12 @@ class DisplayLayers(action.BaseAction):
                     if all_geos:
                         ctrl_geo_items = self.all_ctrls + all_geos
             if ctrl_geo_items:
-                self.geo_layer_name = "Geo_Lyr"
-                self.ctrl_layer_name = "Ctrl_Lyr"
-                all_layers = cmds.ls(type="displayLayer")
+                self.geo_layer_name = 'Geo_Lyr'
+                self.ctrl_layer_name = 'Ctrl_Lyr'
+                all_layers = cmds.ls(type='displayLayer')
                 self.to_delete_extra_layers = []
                 for layer in all_layers:
-                    if layer != self.geo_layer_name and layer != self.ctrl_layer_name and layer != "defaultLayer":
+                    if layer != self.geo_layer_name and layer != self.ctrl_layer_name and layer != 'defaultLayer':
                         self.to_delete_extra_layers.append(layer)
                 if not self.to_delete_extra_layers:
                     if cmds.objExists(self.geo_layer_name) and cmds.objExists(self.ctrl_layer_name):
@@ -144,8 +144,8 @@ class DisplayLayers(action.BaseAction):
             If it finds nothing, it will return an empty list.
         """
         exist_grps, all_shapes = [], []
-        mesh_grps = ["Mesh_Grp", "mesh_grp", "Geo_Grp", "geo_grp", "grp_cache", "GES_Grp", "ges_grp"]
-        render_grp = self.ar.utils.get_node_by_message("renderGrp")
+        mesh_grps = ['Mesh_Grp', 'mesh_grp', 'Geo_Grp', 'geo_grp', 'grp_cache', 'GES_Grp', 'ges_grp']
+        render_grp = self.ar.utils.get_node_by_message('renderGrp')
         if render_grp:
             exist_grps.append(render_grp)
         for grp in mesh_grps:
@@ -153,7 +153,7 @@ class DisplayLayers(action.BaseAction):
                 exist_grps.append(grp)
         if exist_grps:
             for mesh_grp in exist_grps:
-                mesh_grp_shapes = cmds.listRelatives(mesh_grp, allDescendents=True, fullPath=True, noIntermediate=True, type="mesh") or []
+                mesh_grp_shapes = cmds.listRelatives(mesh_grp, allDescendents=True, fullPath=True, noIntermediate=True, type='mesh') or []
                 if mesh_grp_shapes:
                     all_shapes = list(set(all_shapes + mesh_grp_shapes))
             all_geos = []

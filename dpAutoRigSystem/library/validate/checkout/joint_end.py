@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "JointEnd"
-TITLE = "v111_jointEnd"
-DESCRIPTION = "v112_jointEndDesc"
-WIKI = "07-‐-Validator#-joint-end-cleaner"
+CLASS_NAME = 'JointEnd'
+TITLE = 'v111_jointEnd'
+DESCRIPTION = 'v112_jointEndDesc'
+WIKI = '07-‐-Validator#-joint-end-cleaner'
 
 
 
@@ -35,12 +35,12 @@ class JointEnd(action.BaseAction):
             if inputs:
                 check_items = inputs
             else:
-                check_items = cmds.ls(selection=False, type="joint")
+                check_items = cmds.ls(selection=False, type='joint')
             if check_items:
                 self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
                 # list joint ends
                 joint_ends = [j for j in check_items if self.ar.data.joint_end_attr in cmds.listAttr(j)] #by attribute
-                joint_ends.extend([j for j in cmds.ls(selection=False, type="joint") if j.endswith(self.ar.data.joint_end_attr)]) #by suffix
+                joint_ends.extend([j for j in cmds.ls(selection=False, type='joint') if j.endswith(self.ar.data.joint_end_attr)]) #by suffix
                 if joint_ends:
                     # check connection with skinCluster to avoid delete it and crash the setup
                     joint_ends = list(set(joint_ends)-set(self.ar.skin.get_skinned_joints())) #remove duplicated and skinned joints

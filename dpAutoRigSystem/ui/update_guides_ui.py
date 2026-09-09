@@ -14,9 +14,9 @@ class UpdateGuidesUI:
         self.ar.ui_manager.close_ui('updateGuidesWindow')
         self.ar.ui_manager.close_ui('update_summary_win')
         if self.ar.data.ui_state:
-            cmds.window('updateGuidesWindow', title="Guides Info")
-            cmds.columnLayout('update_guide_main_cl', adjustableColumn=1, rowSpacing=10, columnOffset=("both", 10), parent='updateGuidesWindow')
-            cmds.text('update_guide_header_txt', label='DPAR '+self.ar.data.lang['m194_currentVersion']+' '+str(self.ar.data.version), height=30, align="center", parent='update_guide_main_cl')
+            cmds.window('updateGuidesWindow', title='Guides Info')
+            cmds.columnLayout('update_guide_main_cl', adjustableColumn=1, rowSpacing=10, columnOffset=('both', 10), parent='updateGuidesWindow')
+            cmds.text('update_guide_header_txt', label='DPAR '+self.ar.data.lang['m194_currentVersion']+' '+str(self.ar.data.version), height=30, align='center', parent='update_guide_main_cl')
             if len(self.app.update_data) > 0:
                 cmds.scrollLayout('update_guide_sl', width=330, height=400, parent='update_guide_main_cl')
                 cmds.rowColumnLayout('update_guide_base_rcl', numberOfColumns=3, columnSpacing=[(1, 0), (2, 20), (3, 20)], adjustableColumn=2, parent='update_guide_sl')
@@ -42,8 +42,8 @@ class UpdateGuidesUI:
         """
         self.ar.ui_manager.close_ui('update_summary_win')
         new_data = self.app.get_new_attr()
-        cmds.window('update_summary_win', title="Update Summary")
-        cmds.columnLayout('summary_cl', adjustableColumn=1, rowSpacing=10, columnOffset=("both", 10), parent='update_summary_win')
+        cmds.window('update_summary_win', title='Update Summary')
+        cmds.columnLayout('summary_cl', adjustableColumn=1, rowSpacing=10, columnOffset=('both', 10), parent='update_summary_win')
         cmds.text('summary_header_txt', label=str(len(self.app.update_data))+' '+self.ar.data.lang['m189_guidesUpdatedSuccess'], align='center', height=30, parent='summary_cl')
         if new_data:
             cmds.text('summary_new_attr_found_txt', label=self.ar.data.lang['m190_newAttrFound'], align='center', parent='summary_cl')

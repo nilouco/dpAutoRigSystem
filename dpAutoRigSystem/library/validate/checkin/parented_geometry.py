@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "ParentedGeometry"
-TITLE = "v140_parentedGeometry"
-DESCRIPTION = "v141_parentedGeometryDesc"
-WIKI = "07-‐-Validator#-parented-geometry"
+CLASS_NAME = 'ParentedGeometry'
+TITLE = 'v140_parentedGeometry'
+DESCRIPTION = 'v141_parentedGeometryDesc'
+WIKI = '07-‐-Validator#-parented-geometry'
 
 
 
@@ -33,9 +33,9 @@ class ParentedGeometry(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if inputs:
-                check_items = cmds.ls(inputs, type="mesh")
+                check_items = cmds.ls(inputs, type='mesh')
             else:
-                check_items = cmds.ls(selection=False, type="mesh") #all meshes in the scene
+                check_items = cmds.ls(selection=False, type='mesh') #all meshes in the scene
             if check_items:
                 mesh_transforms = self.get_mesh_transforms(check_items)
                 if mesh_transforms:

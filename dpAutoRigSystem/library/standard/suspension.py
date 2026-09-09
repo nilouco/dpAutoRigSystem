@@ -3,10 +3,10 @@ from maya import cmds
 from ..base import standard
 
 # global variables to this module:    
-CLASS_NAME = "Suspension"
-TITLE = "m153_suspension"
-DESCRIPTION = "m154_suspensionDesc"
-WIKI = "03-‐-Guides#-suspension"
+CLASS_NAME = 'Suspension'
+TITLE = 'm153_suspension'
+DESCRIPTION = 'm154_suspensionDesc'
+WIKI = '03-‐-Guides#-suspension'
 
 
 
@@ -20,14 +20,14 @@ class Suspension(standard.BaseStandard):
         self.create_guide_custom_attr()
         self.create_guide_elements()
         self.add_node_to_guide_net([self.guide_a_loc, self.guide_b_loc], 
-                                   ["JointLocA", "JointLocB"])
+                                   ['JointLocA', 'JointLocB'])
 
 
     def create_guide_custom_attr(self):
         """ Add guide_base attributes and set them.
         """
-        cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="fatherB", dataType='string')
+        cmds.addAttr(self.guide_base, longName='flip', attributeType='bool')
+        cmds.addAttr(self.guide_base, longName='fatherB', dataType='string')
 
 
     def create_guide_elements(self):
@@ -41,7 +41,7 @@ class Suspension(standard.BaseStandard):
         self.line_b = cmds.joint(name=self.name_guide+"_line_b", radius=0.001)
         # setup
         self.ar.utils.set_template([self.line_a, self.line_b])
-        cmds.setAttr(self.guide_b_loc+".tz", 3)
+        cmds.setAttr(self.guide_b_loc+".translateZ", 3)
         cmds.setAttr(self.guide_b_loc+".rotateX", 180)
         # parenting
         cmds.parent(self.line_a, self.guide_a_loc, self.guide_base, relative=True)
@@ -82,7 +82,7 @@ class Suspension(standard.BaseStandard):
                 # calculate distance between guide and end:
                 self.dist = self.ar.math.create_dist_between(self.guide_a_loc, self.guide_b_loc)[0] * 0.2
                 self.joints, self.main_ctrls, self.zeros, self.controllers, self.aim_locs, self.up_locs = [], [], [], [], [], []
-                for p, letter in enumerate(["A", "B"]):
+                for p, letter in enumerate(['A', 'B']):
                     # create joints:
                     cmds.select(clear=True)
                     jnt = cmds.joint(name=side+self.number_name+"_"+letter+"_1_Jnt", scaleCompensate=False)
@@ -93,9 +93,9 @@ class Suspension(standard.BaseStandard):
                     self.joints.append(jnt)
                     
                     # create a control:
-                    main_ctrl = self.ar.ctrls.create_controller("id_055_SuspensionMain", side+self.number_name+"_"+self.ar.data.lang["c058_main"]+"_"+letter+"_Ctrl", r=self.radius, d=self.curve_degree, guide_source=self.name_guide+"_JointLoc"+letter)
-                    ctrl = self.ar.ctrls.create_controller("id_056_SuspensionAB", side+self.number_name+"_"+letter+"_Ctrl", r=self.radius*0.5, d=self.curve_degree, guide_source=self.name_guide+"_JointLoc"+letter, parent_tag=main_ctrl)
-                    upLocCtrl = self.ar.ctrls.create_controller("id_057_SuspensionUpLoc", side+self.number_name+"_"+letter+"_UpLoc_Ctrl", r=self.radius*0.1, d=self.curve_degree, guide_source=self.name_guide+"_JointLoc"+letter, parent_tag=ctrl)
+                    main_ctrl = self.ar.ctrls.create_controller('id_055_SuspensionMain', side+self.number_name+"_"+self.ar.data.lang['c058_main']+"_"+letter+"_Ctrl", r=self.radius, d=self.curve_degree, guide_source=self.name_guide+"_JointLoc"+letter)
+                    ctrl = self.ar.ctrls.create_controller('id_056_SuspensionAB', side+self.number_name+"_"+letter+"_Ctrl", r=self.radius*0.5, d=self.curve_degree, guide_source=self.name_guide+"_JointLoc"+letter, parent_tag=main_ctrl)
+                    upLocCtrl = self.ar.ctrls.create_controller('id_057_SuspensionUpLoc', side+self.number_name+"_"+letter+"_UpLoc_Ctrl", r=self.radius*0.1, d=self.curve_degree, guide_source=self.name_guide+"_JointLoc"+letter, parent_tag=ctrl)
                     self.ar.ctrls.set_lock_hide([ctrl], ['tx', 'ty', 'tz', 'v'])
                     self.ar.ctrls.set_lock_hide([upLocCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
                     # position and orientation of joint and control:
@@ -124,12 +124,12 @@ class Suspension(standard.BaseStandard):
                         cmds.setAttr(ctrl_zeros[0]+".scaleX", -1)
                         cmds.setAttr(ctrl_zeros[0]+".scaleY", -1)
                         cmds.setAttr(ctrl_zeros[0]+".scaleZ", -1)
-                    cmds.addAttr(ctrl, longName='scaleCompensate', attributeType="short", minValue=0, maxValue=1, defaultValue=1, keyable=False)
+                    cmds.addAttr(ctrl, longName='scaleCompensate', attributeType='short', minValue=0, maxValue=1, defaultValue=1, keyable=False)
                     cmds.setAttr(ctrl+".scaleCompensate", channelBox=True)
                     cmds.connectAttr(ctrl+".scaleCompensate", jnt+".segmentScaleCompensate", force=True)
                     
                     # working with aim setup:
-                    cmds.addAttr(ctrl, longName=self.ar.data.lang['c118_active'], attributeType="short", minValue=0, maxValue=1, defaultValue=1, keyable=True)
+                    cmds.addAttr(ctrl, longName=self.ar.data.lang['c118_active'], attributeType='short', minValue=0, maxValue=1, defaultValue=1, keyable=True)
                     aim_loc = cmds.spaceLocator(name=side+self.number_name+"_"+letter+"_Aim_Loc")[0]
                     up_loc = cmds.spaceLocator(name=side+self.number_name+"_"+letter+"_Up_Loc")[0]
                     loc_grp = cmds.group(aim_loc, up_loc, name=side+self.number_name+"_"+letter+"_Loc_Grp")
@@ -143,10 +143,10 @@ class Suspension(standard.BaseStandard):
 
                 # aim constraints:
                 # B to A:
-                aic_a = cmds.aimConstraint(self.aim_locs[1], self.zeros[0], aimVector=(0, 0, 1), upVector=(1, 0, 0), worldUpType="object", worldUpObject=self.up_locs[0], maintainOffset=True, name=self.zeros[0]+"_AiC")[0]
+                aic_a = cmds.aimConstraint(self.aim_locs[1], self.zeros[0], aimVector=(0, 0, 1), upVector=(1, 0, 0), worldUpType='object', worldUpObject=self.up_locs[0], maintainOffset=True, name=self.zeros[0]+"_AiC")[0]
                 cmds.connectAttr(self.controllers[0]+"."+self.ar.data.lang['c118_active'], aic_a+"."+self.aim_locs[1]+"W0", force=True)
                 # A to B:
-                aic_b = cmds.aimConstraint(self.aim_locs[0], self.zeros[1], aimVector=(0, 0, 1), upVector=(1, 0, 0), worldUpType="object", worldUpObject=self.up_locs[1], maintainOffset=True, name=self.zeros[1]+"_AiC")[0]
+                aic_b = cmds.aimConstraint(self.aim_locs[0], self.zeros[1], aimVector=(0, 0, 1), upVector=(1, 0, 0), worldUpType='object', worldUpObject=self.up_locs[1], maintainOffset=True, name=self.zeros[1]+"_AiC")[0]
                 cmds.connectAttr(self.controllers[1]+"."+self.ar.data.lang['c118_active'], aic_b+"."+self.aim_locs[0]+"W0", force=True)
                 
                 # integrating data:
@@ -175,7 +175,7 @@ class Suspension(standard.BaseStandard):
         """ This method will create a dictionary with informations about integrations system between modules.
         """
         self.composed = {
-                            "suspensionBCtrlGrpList" : self.suspension_b_ctrl_grps,
-                            "fatherBList" : self.father_b_items,
-                            "ctrlHookGrpList" : self.ctrl_hook_grps
+                            'suspensionBCtrlGrpList' : self.suspension_b_ctrl_grps,
+                            'fatherBList' : self.father_b_items,
+                            'ctrlHookGrpList' : self.ctrl_hook_grps
                         }

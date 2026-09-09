@@ -5,10 +5,10 @@ from maya import cmds, mel
 from ..base import base
 
 # global variables to this module:    
-CLASS_NAME = "PrintSelection"
-TITLE = "m053_printSel"
-DESCRIPTION = "m054_printSelDesc"
-WIKI = "06-‐-Tools#-print-selection"
+CLASS_NAME = 'PrintSelection'
+TITLE = 'm053_printSel'
+DESCRIPTION = 'm054_printSelDesc'
+WIKI = '06-‐-Tools#-print-selection'
 
 
 
@@ -42,7 +42,7 @@ class PrintSelection(base.BaseLibrary):
         """
         data = {}
         if selection:
-            text = ""
+            text = ''
             for i, item in enumerate(selection):
                 text = text + str(item)
                 if i < len(selection):
@@ -57,12 +57,12 @@ class PrintSelection(base.BaseLibrary):
         """
         if data:
             # log
-            print("\n-------")
-            print("Print Selection Result:")
-            print("List:")
+            print('\n-------')
+            print('Print Selection Result:')
+            print('List:')
             print(data['list'])
-            print("String:")
+            print('String:')
             print(data['string'])
-            print("-------")
+            print('-------')
         else:
             mel.eval("warning \""+self.ar.data.lang['i042_notSelection']+"\";")

@@ -1,9 +1,9 @@
 from ...base import curve
 
 # global variables to this module:    
-CLASS_NAME = "JawHandle"
-TITLE = "m132_jawHandle"
-DESCRIPTION = "m099_cvControlDesc"
+CLASS_NAME = 'JawHandle'
+TITLE = 'm132_jawHandle'
+DESCRIPTION = 'm099_cvControlDesc'
 
 
 

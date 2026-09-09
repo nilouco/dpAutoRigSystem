@@ -5,10 +5,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "DuplicatedName"
-TITLE = "v024_duplicatedName"
-DESCRIPTION = "v025_duplicatedNameDesc"
-WIKI = "07-‐-Validator#-duplicated-name"
+CLASS_NAME = 'DuplicatedName'
+TITLE = 'v024_duplicatedName'
+DESCRIPTION = 'v025_duplicatedNameDesc'
+WIKI = '07-‐-Validator#-duplicated-name'
 
 
 
@@ -43,7 +43,7 @@ class DuplicatedName(action.BaseAction):
                 # Dictionary {shortName: [Full paths]}
                 names = defaultdict(list)
                 for item in check_items:
-                    short = item.split("|")[-1]
+                    short = item.split('|')[-1]
                     names[short].append(item)
                 # Filter only duplicates
                 duplicates = {k:v for k,v in names.items() if len(v) > 1}
@@ -87,12 +87,12 @@ class DuplicatedName(action.BaseAction):
         """ Rename the given item node and it's children with the given number as suffix.
         """
         if cmds.objExists(item):
-            if cmds.objectType(item) == "transform":
-                children = cmds.listRelatives(item, allDescendents=True, children=True, fullPath=True, type="transform")
+            if cmds.objectType(item) == 'transform':
+                children = cmds.listRelatives(item, allDescendents=True, children=True, fullPath=True, type='transform')
                 if children:
                     children = self.reorder_list(children)
                     for child in children:
                         if cmds.objExists(child):
-                            cmds.rename(child, child[child.rfind("|")+1:]+"_"+str(i))
-                cmds.rename(item, item[item.rfind("|")+1:]+"_"+str(i))
+                            cmds.rename(child, child[child.rfind('|')+1:]+"_"+str(i))
+                cmds.rename(item, item[item.rfind('|')+1:]+"_"+str(i))
             return True

@@ -3,10 +3,10 @@ from maya import cmds, mel
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "UnusedNode"
-TITLE = "v084_unusedNode"
-DESCRIPTION = "v085_unusedNodeDesc"
-WIKI = "07-‐-Validator#-unused-node-cleaner"
+CLASS_NAME = 'UnusedNode'
+TITLE = 'v084_unusedNode'
+DESCRIPTION = 'v085_unusedNodeDesc'
+WIKI = '07-‐-Validator#-unused-node-cleaner'
 
 
 
@@ -47,13 +47,13 @@ class UnusedNode(action.BaseAction):
                         self.ar.ui_manager.set_progress(max=len(all_materials), add_one=False, add_number=False)
                         self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                         issue_materials = sorted(set(all_materials) - set(used_materials))
-                        self.checked_items.append(str(", ".join(issue_materials)))
+                        self.checked_items.append(str(', '.join(issue_materials)))
                         self.found_issues.append(True)
                         if self.first_mode:
                             self.good_results.append(False)
                         else: #fix
                             try:
-                                fix_result = mel.eval("MLdeleteUnused;")
+                                fix_result = mel.eval('MLdeleteUnused;')
                                 self.good_results.append(True)
                                 self.messages.append(self.ar.data.lang['v004_fixed']+": "+str(fix_result)+" nodes = "+str(len(issue_materials))+" materials")
                             except:

@@ -5,10 +5,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "AttributeIO"
-TITLE = "r043_attributeIO"
-DESCRIPTION = "r044_attributeIODesc"
-WIKI = "10-‐-Rebuilder#-new-scene"
+CLASS_NAME = 'AttributeIO'
+TITLE = 'r043_attributeIO'
+DESCRIPTION = 'r044_attributeIODesc'
+WIKI = '10-‐-Rebuilder#-new-scene'
 
 
 
@@ -17,10 +17,10 @@ class AttributeIO(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         if self.ar.dev:
             reload(action)
-        self.set_action_type("r000_rebuilder")
-        self.io_folder = "s_attributeIO"
-        self.start_name = "dpAttribute"
-        self.default_value_types = ["bool", "long",  "short",  "byte",  "char",  "enum",  "'float'",  "double",  "doubleAngle",  "doubleLinear"]
+        self.set_action_type('r000_rebuilder')
+        self.io_folder = 's_attributeIO'
+        self.start_name = 'dpAttribute'
+        self.default_value_types = ['bool', 'long',  'short',  'byte',  'char',  'enum',  'float',  'double',  'doubleAngle',  'doubleLinear']
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -59,7 +59,7 @@ class AttributeIO(action.BaseAction):
                             else:
                                 self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                     else:
-                        self.maybe_done_io("Ctrls_Grp")
+                        self.maybe_done_io('Ctrls_Grp')
                 else:
                     self.fail_io(self.ar.data.lang['r010_notFoundPath'])
             else:
@@ -86,38 +86,38 @@ class AttributeIO(action.BaseAction):
         items = inputs.copy()
         self.ar.ui_manager.set_progress(max=len(items), add_one=False, add_number=False)
         for node in inputs:
-            meshes = cmds.listRelatives(node, allDescendents=True, children=True, type="mesh")
+            meshes = cmds.listRelatives(node, allDescendents=True, children=True, type='mesh')
             if meshes:
                 items.extend([m for m in meshes if not cmds.getAttr(m+".intermediateObject")] or [])
-                items.extend([t for t in cmds.listRelatives(node, allDescendents=True, children=True, type="transform") or [] if cmds.listRelatives(t, children=True, type="mesh")] or [])
+                items.extend([t for t in cmds.listRelatives(node, allDescendents=True, children=True, type='transform') or [] if cmds.listRelatives(t, children=True, type='mesh')] or [])
         items = list(set(items))
         items.sort()
         for item in items:
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             attributes = cmds.listAttr(item, userDefined=True)
             if attributes:
-                data[item] = {"attributes" : {},
-                                "order" : attributes}
+                data[item] = {'attributes' : {},
+                                'order' : attributes}
                 for attr in attributes:
-                    if cmds.getAttr(item + "." + attr, type=True) != "message":
+                    if cmds.getAttr(item + "." + attr, type=True) != 'message':
                         attr_type = cmds.getAttr(item+"."+attr, type=True)
-                        data[item]["attributes"][attr] = {
-                                            "type" : attr_type,
-                                            "value" : cmds.getAttr(item+"."+attr),
-                                            "locked" : cmds.getAttr(item+"."+attr, lock=True),
-                                            "keyable" : cmds.getAttr(item+"."+attr, keyable=True),
-                                            "channelBox" : cmds.getAttr(item+"."+attr, channelBox=True)
+                        data[item]['attributes'][attr] = {
+                                            'type' : attr_type,
+                                            'value' : cmds.getAttr(item+"."+attr),
+                                            'locked' : cmds.getAttr(item+"."+attr, lock=True),
+                                            'keyable' : cmds.getAttr(item+"."+attr, keyable=True),
+                                            'channelBox' : cmds.getAttr(item+"."+attr, channelBox=True)
                                             }
                         if attr_type in self.default_value_types:
-                            if attr_type == "enum":
-                                data[item]["attributes"][attr]["enumName"] = cmds.attributeQuery(attr, node=item, listEnum=True)[0]
-                            data[item]["attributes"][attr]["default"] = cmds.addAttr(item+"."+attr, query=True, defaultValue=True)
-                            data[item]["attributes"][attr]["maxExists"] = cmds.attributeQuery(attr, node=item, maxExists=True) or False
-                            if data[item]["attributes"][attr]["maxExists"]:
-                                data[item]["attributes"][attr]["maximum"] = cmds.attributeQuery(attr, node=item, maximum=True)[0]
-                            data[item]["attributes"][attr]["minExists"] = cmds.attributeQuery(attr, node=item, minExists=True) or False
-                            if data[item]["attributes"][attr]["minExists"]:
-                                data[item]["attributes"][attr]["minimum"] = cmds.attributeQuery(attr, node=item, minimum=True)[0]
+                            if attr_type == 'enum':
+                                data[item]['attributes'][attr]['enumName'] = cmds.attributeQuery(attr, node=item, listEnum=True)[0]
+                            data[item]['attributes'][attr]['default'] = cmds.addAttr(item+"."+attr, query=True, defaultValue=True)
+                            data[item]['attributes'][attr]['maxExists'] = cmds.attributeQuery(attr, node=item, maxExists=True) or False
+                            if data[item]['attributes'][attr]['maxExists']:
+                                data[item]['attributes'][attr]['maximum'] = cmds.attributeQuery(attr, node=item, maximum=True)[0]
+                            data[item]['attributes'][attr]['minExists'] = cmds.attributeQuery(attr, node=item, minExists=True) or False
+                            if data[item]['attributes'][attr]['minExists']:
+                                data[item]['attributes'][attr]['minimum'] = cmds.attributeQuery(attr, node=item, minimum=True)[0]
         return data
 
 
@@ -133,33 +133,33 @@ class AttributeIO(action.BaseAction):
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             # check attributes
             if not cmds.objExists(item):
-                item = item[item.rfind("|")+1:] #short name (after last "|")
+                item = item[item.rfind('|')+1:] #short name (after last '|')
             if cmds.objExists(item):
-                for attr in attr_data[item]["attributes"]:
+                for attr in attr_data[item]['attributes']:
                     if not cmds.objExists(item+"."+attr):
                         try:
                             # add and set attribute value
-                            if attr_data[item]["attributes"][attr]['type'] == "string":
-                                cmds.addAttr(item, longName=attr, dataType="string")
-                                cmds.setAttr(item+"."+attr, attr_data[item]["attributes"][attr]['value'], type="string")
-                            elif attr_data[item]["attributes"][attr]['type'] == "enum":
-                                cmds.addAttr(item, longName=attr, attributeType="enum", enumName=attr_data[item]["attributes"][attr]['enumName'])
+                            if attr_data[item]['attributes'][attr]['type'] == 'string':
+                                cmds.addAttr(item, longName=attr, dataType='string')
+                                cmds.setAttr(item+"."+attr, attr_data[item]['attributes'][attr]['value'], type='string')
+                            elif attr_data[item]['attributes'][attr]['type'] == 'enum':
+                                cmds.addAttr(item, longName=attr, attributeType='enum', enumName=attr_data[item]['attributes'][attr]['enumName'])
                             else:
-                                if attr_data[item]["attributes"][attr]['minExists']:
-                                    if attr_data[item]["attributes"][attr]['maxExists']:
-                                        cmds.addAttr(item, longName=attr, attributeType=attr_data[item]["attributes"][attr]['type'], minValue=attr_data[item]["attributes"][attr]['minimum'], maxValue=attr_data[item]["attributes"][attr]['maximum'], defaultValue=attr_data[item]["attributes"][attr]['default'])
+                                if attr_data[item]['attributes'][attr]['minExists']:
+                                    if attr_data[item]['attributes'][attr]['maxExists']:
+                                        cmds.addAttr(item, longName=attr, attributeType=attr_data[item]['attributes'][attr]['type'], minValue=attr_data[item]['attributes'][attr]['minimum'], maxValue=attr_data[item]['attributes'][attr]['maximum'], defaultValue=attr_data[item]['attributes'][attr]['default'])
                                     else:
-                                        cmds.addAttr(item, longName=attr, attributeType=attr_data[item]["attributes"][attr]['type'], minValue=attr_data[item]["attributes"][attr]['minimum'], defaultValue=attr_data[item]["attributes"][attr]['default'])
-                                elif attr_data[item]["attributes"][attr]['maxExists']:
-                                    cmds.addAttr(item, longName=attr, attributeType=attr_data[item]["attributes"][attr]['type'], maxValue=attr_data[item]["attributes"][attr]['maximum'], defaultValue=attr_data[item]["attributes"][attr]['default'])
+                                        cmds.addAttr(item, longName=attr, attributeType=attr_data[item]['attributes'][attr]['type'], minValue=attr_data[item]['attributes'][attr]['minimum'], defaultValue=attr_data[item]['attributes'][attr]['default'])
+                                elif attr_data[item]['attributes'][attr]['maxExists']:
+                                    cmds.addAttr(item, longName=attr, attributeType=attr_data[item]['attributes'][attr]['type'], maxValue=attr_data[item]['attributes'][attr]['maximum'], defaultValue=attr_data[item]['attributes'][attr]['default'])
                                 else:
-                                    cmds.addAttr(item, longName=attr, attributeType=attr_data[item]["attributes"][attr]['type'], defaultValue=attr_data[item]["attributes"][attr]['default'])
-                            if attr_data[item]["attributes"][attr]['type'] in self.default_value_types:
-                                cmds.setAttr(item+"."+attr, attr_data[item]["attributes"][attr]['value'])
-                                cmds.setAttr(item+"."+attr, keyable=attr_data[item]["attributes"][attr]['keyable'])
-                                if not attr_data[item]["attributes"][attr]['keyable']:
-                                    cmds.setAttr(item+"."+attr, channelBox=attr_data[item]["attributes"][attr]['channelBox'])
-                                cmds.setAttr(item+"."+attr, lock=attr_data[item]["attributes"][attr]['locked'])
+                                    cmds.addAttr(item, longName=attr, attributeType=attr_data[item]['attributes'][attr]['type'], defaultValue=attr_data[item]['attributes'][attr]['default'])
+                            if attr_data[item]['attributes'][attr]['type'] in self.default_value_types:
+                                cmds.setAttr(item+"."+attr, attr_data[item]['attributes'][attr]['value'])
+                                cmds.setAttr(item+"."+attr, keyable=attr_data[item]['attributes'][attr]['keyable'])
+                                if not attr_data[item]['attributes'][attr]['keyable']:
+                                    cmds.setAttr(item+"."+attr, channelBox=attr_data[item]['attributes'][attr]['channelBox'])
+                                cmds.setAttr(item+"."+attr, lock=attr_data[item]['attributes'][attr]['locked'])
                             if not item in well_imported_items:
                                 well_imported_items.append(item)
                         except Exception as e:
@@ -168,7 +168,7 @@ class AttributeIO(action.BaseAction):
                         well_imported_items.append(item)
                         # TODO: should we set the attribute value here?
                 # reorder attr
-                self.ar.maker.reorder_option_attributes([item], attr_data[item]["order"], False)
+                self.ar.maker.reorder_option_attributes([item], attr_data[item]['order'], False)
             else:
                 not_found_nodes.append(item)
         if well_imported_items:

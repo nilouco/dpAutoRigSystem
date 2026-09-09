@@ -5,10 +5,10 @@ from maya import cmds
 from ..base import base
 
 # global variables to this module:
-CLASS_NAME = "JointDisplay"
-TITLE = "m233_jointDisplay"
-DESCRIPTION = "m234_jointDisplayDesc"
-WIKI = "06-‐-Tools#-joint-display"
+CLASS_NAME = 'JointDisplay'
+TITLE = 'm233_jointDisplay'
+DESCRIPTION = 'm234_jointDisplayDesc'
+WIKI = '06-‐-Tools#-joint-display'
 
 
 
@@ -39,8 +39,8 @@ class JointDisplay(base.BaseLibrary):
         self.joints = cmds.ls(selection=False, type='joint')
         if self.ar.data.ui_state:
             written_value = cmds.textFieldGrp('joint_display_filter_tfg', query=True, text=True)
-            if written_value != "" and written_value != " ":
-                self.joints = self.ar.naming.filter_name(written_value, cmds.ls(selection=False, type='joint'), " ")
+            if written_value != '' and written_value != ' ':
+                self.joints = self.ar.naming.filter_name(written_value, cmds.ls(selection=False, type='joint'), ' ')
 
 
     def update_labels(self, *args):

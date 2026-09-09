@@ -3,9 +3,9 @@ from maya import cmds, mel
 from ...base import curve
 
 # global variables to this module:    
-CLASS_NAME = "OvalDisc"
-TITLE = "m123_ovalDisc"
-DESCRIPTION = "m099_cvControlDesc"
+CLASS_NAME = 'OvalDisc'
+TITLE = 'm123_ovalDisc'
+DESCRIPTION = 'm099_cvControlDesc'
 
 
 
@@ -32,7 +32,7 @@ class OvalDisc(curve.BaseCurve):
     def create_combined_curves(self, cv_id, cv_name, cv_size, cv_degree):
         """ Combine controllers in order to return it.
         """
-        ellipse = self.ar.config.get_instance("Ellipse", [self.ar.data.curve_simple_folder])
+        ellipse = self.ar.config.get_instance('Ellipse', [self.ar.data.curve_simple_folder])
         curve1 = ellipse.cv_main(False, cv_id, cv_name, cv_size, cv_degree)
         curve2 = ellipse.cv_main(False, cv_id, cv_name, cv_size, cv_degree)
         cmds.setAttr(curve2+".rotateZ", 90)

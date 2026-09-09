@@ -1,9 +1,9 @@
 from ...base import curve
 
 # global variables to this module:    
-CLASS_NAME = "Quadrigram"
-TITLE = "m120_quadrigram"
-DESCRIPTION = "m099_cvControlDesc"
+CLASS_NAME = 'Quadrigram'
+TITLE = 'm120_quadrigram'
+DESCRIPTION = 'm099_cvControlDesc'
 
 
 

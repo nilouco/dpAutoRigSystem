@@ -3,19 +3,19 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "CalibrationIO"
-TITLE = "r041_calibrationIO"
-DESCRIPTION = "r042_calibrationIODesc"
-WIKI = "10-‐-Rebuilder#-calibration"
+CLASS_NAME = 'CalibrationIO'
+TITLE = 'r041_calibrationIO'
+DESCRIPTION = 'r042_calibrationIODesc'
+WIKI = '10-‐-Rebuilder#-calibration'
 
 
 
 class CalibrationIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.set_action_type("r000_rebuilder")
-        self.io_folder = "s_calibrationIO"
-        self.start_name = "dpCalibration"
+        self.set_action_type('r000_rebuilder')
+        self.io_folder = 's_calibrationIO'
+        self.start_name = 'dpCalibration'
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -53,7 +53,7 @@ class CalibrationIO(action.BaseAction):
                             else:
                                 self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                     else:
-                        self.maybe_done_io("Ctrls_Grp")
+                        self.maybe_done_io('Ctrls_Grp')
                 else:
                     self.fail_io(self.ar.data.lang['r010_notFoundPath'])
             else:
@@ -98,7 +98,7 @@ class CalibrationIO(action.BaseAction):
             not_found_nodes = []
             # check transformations
             if not cmds.objExists(item):
-                item = item[item.rfind("|")+1:] #short name (after last "|")
+                item = item[item.rfind('|')+1:] #short name (after last '|')
             if cmds.objExists(item):
                 for attr in calibration_data[item]:
                     if not cmds.listConnections(item+"."+attr, destination=False, source=True):

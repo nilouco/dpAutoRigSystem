@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "GeometryHistory"
-TITLE = "v071_geometryHistory"
-DESCRIPTION = "v072_geometryHistoryDesc"
-WIKI = "07-‐-Validator#-geometry-history"
+CLASS_NAME = 'GeometryHistory'
+TITLE = 'v071_geometryHistory'
+DESCRIPTION = 'v072_geometryHistoryDesc'
+WIKI = '07-‐-Validator#-geometry-history'
 
 
 
@@ -32,9 +32,9 @@ class GeometryHistory(action.BaseAction):
         # ---
         # --- validator code --- beginning
         if not self.ar.utils.get_all_grp():
-            if not self.ar.utils.get_network_by_attr("dpGuideNet"):
+            if not self.ar.utils.get_network_by_attr('dpGuideNet'):
                 if not cmds.file(query=True, reference=True):
-                    ignore_types = ["tweak", "file", "place2dTexture"]
+                    ignore_types = ['tweak', 'file', 'place2dTexture']
                     if inputs:
                         to_clean_geos = inputs
                     else:
@@ -47,7 +47,7 @@ class GeometryHistory(action.BaseAction):
                                 if histories:
                                     for history in histories:
                                         # Pass through tweak and initialShading nodes
-                                        if not cmds.nodeType(history) in ignore_types and history != "initialShadingGroup":
+                                        if not cmds.nodeType(history) in ignore_types and history != 'initialShadingGroup':
                                             geos.append(transform)
                         # Merge duplicated names
                         to_clean_geo_fullpaths = list(set(geos))

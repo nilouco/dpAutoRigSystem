@@ -8,10 +8,10 @@ from maya.api import OpenMaya
 from ..base import base
 
 # global variables to this module:    
-CLASS_NAME = "OneSkeleton"
-TITLE = "m254_oneSkeleton"
-DESCRIPTION = "m255_oneSkeletonDesc"
-WIKI = "06-‐-Tools#-one-skeleton"
+CLASS_NAME = 'OneSkeleton'
+TITLE = 'm254_oneSkeleton'
+DESCRIPTION = 'm255_oneSkeletonDesc'
+WIKI = '06-‐-Tools#-one-skeleton'
 
 
 
@@ -20,9 +20,9 @@ class OneSkeleton(base.BaseLibrary):
         base.BaseLibrary.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         if self.ar.dev:
             reload(base)
-        self.prefix = "Engine_"
-        self.root_name = "Root"
-        self.suffix = "_Joint"
+        self.prefix = 'Engine_'
+        self.root_name = 'Root'
+        self.suffix = '_Joint'
         self.sides = [f"{self.ar.data.lang['p002_left']}_", f"{self.ar.data.lang['p003_right']}_", ""]
 
 
@@ -85,7 +85,7 @@ class OneSkeleton(base.BaseLibrary):
             self.ar.ctrls.set_controller_scale_compensate(False)
             self.ar.ui_manager.set_progress(end_it=True)
         else:
-            mel.eval('warning \"'+self.ar.data.lang["v014_notFoundNodes"]+'\";')
+            mel.eval('warning \"'+self.ar.data.lang['v014_notFoundNodes']+'\";')
 
 
     def grouper(self, iterable, n, fill_value=None, *args):
@@ -109,7 +109,7 @@ class OneSkeleton(base.BaseLibrary):
             new_joint = cmds.joint(name=self.prefix+sourceNode+self.suffix, scaleCompensate=False)
             new_joints.append(new_joint)
             # Match joint orient
-            for attr in ["jointOrientX", "jointOrientY", "jointOrientZ"]:
+            for attr in ['jointOrientX', 'jointOrientY', 'jointOrientZ']:
                 value = cmds.getAttr(f"{sourceNode}.{attr}")
                 cmds.setAttr(f"{new_joint}.{attr}", value)
             # Constraint to the original
@@ -147,9 +147,9 @@ class OneSkeleton(base.BaseLibrary):
 
 
     def bind_pre_matrix_node(self, new_joint):
-        destinations = cmds.listConnections(new_joint+".worldMatrix", source=False, destination=True, plugs=True, type="skinCluster") or []
+        destinations = cmds.listConnections(new_joint+".worldMatrix", source=False, destination=True, plugs=True, type='skinCluster') or []
         for destination in destinations:
-            skin, attr = destination.split(".", 1)
+            skin, attr = destination.split('.', 1)
             match = re.search(r"^matrix\[(\d+)\]$", attr)
             if not match:
                 continue
@@ -163,19 +163,19 @@ class OneSkeleton(base.BaseLibrary):
                 bind_prematrix = cmds.xform(new_joint, query=True, worldSpace=True, matrix=True)
                 bind_prematrix = OpenMaya.MMatrix(bind_prematrix).inverse()
             # set bindPreMatrix
-            cmds.setAttr(bind_prematrix_plug, bind_prematrix, type="matrix")
+            cmds.setAttr(bind_prematrix_plug, bind_prematrix, type='matrix')
 
 
     def get_meshes(self):
         """ Returns the Render_Grp meshes or all meshes in the scene.
         """
         if self.ar.utils.get_all_grp():
-            render_grp = self.ar.utils.get_node_by_message("renderGrp")
+            render_grp = self.ar.utils.get_node_by_message('renderGrp')
             if render_grp:
-                meshes = cmds.listRelatives(render_grp, children=True, allDescendents=True, type="mesh")
+                meshes = cmds.listRelatives(render_grp, children=True, allDescendents=True, type='mesh')
                 if meshes:
                     return meshes
-        return cmds.ls(type="mesh")
+        return cmds.ls(type='mesh')
     
     
     def get_inf_items(self, meshes):
@@ -183,10 +183,10 @@ class OneSkeleton(base.BaseLibrary):
         """
         unique_inf_items = []
         skinclusters = []
-        if not cmds.listRelatives(meshes, type="transform", parent=True, fullPath=True):
+        if not cmds.listRelatives(meshes, type='transform', parent=True, fullPath=True):
             mel.eval('warning \"'+self.ar.data.lang['i041_meshConnEmpty']+'\";')
             return
-        for transform_node in list(set(cmds.listRelatives(meshes, type="transform", parent=True, fullPath=True))):
+        for transform_node in list(set(cmds.listRelatives(meshes, type='transform', parent=True, fullPath=True))):
             skinclusters.extend(self.ar.skin.check_existing_deformer_node(transform_node)[2] or [])
         if skinclusters:
             for skincluster_node in skinclusters:
@@ -203,7 +203,7 @@ class OneSkeleton(base.BaseLibrary):
         """
         cmds.select(clear=True)
         cmds.joint(name=root, scaleCompensate=False)
-        cmds.addAttr(root, longName="dpRootJoint", attributeType="bool", defaultValue=1)
+        cmds.addAttr(root, longName='dpRootJoint', attributeType='bool', defaultValue=1)
         cmds.setAttr(root+".visibility", 0)
         self.ar.ctrls.set_lock_hide([root], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'dpRootJoint'], cb=True)
         try:
@@ -1044,46 +1044,46 @@ class OneSkeleton(base.BaseLibrary):
                 f"{tweaks}_{holder}_{main}_Jnt" : [f"{head}_01_{head}_Jnt"],
 
                 # to be integrated after
-                f"{leg}_{hip}_Jnt" : [""],
-                f"{leg}{back}_{hip}_Jnt" : [""],
-                f"{leg}{front}_{hip}_Jnt" : [""],
-                f"{arm}_{clavicle}_Jnt" : [""],
-                f"{leg}_00_{hip}_Jnt" : [""],
-                f"{leg}{back}_00_{hip}_Jnt" : [""],
-                f"{leg}{front}_00_{hip}_Jnt" : [""],
-                f"{arm}_00_{clavicle}_Jnt" : [""],
+                f"{leg}_{hip}_Jnt" : [''],
+                f"{leg}{back}_{hip}_Jnt" : [''],
+                f"{leg}{front}_{hip}_Jnt" : [''],
+                f"{arm}_{clavicle}_Jnt" : [''],
+                f"{leg}_00_{hip}_Jnt" : [''],
+                f"{leg}{back}_00_{hip}_Jnt" : [''],
+                f"{leg}{front}_00_{hip}_Jnt" : [''],
+                f"{arm}_00_{clavicle}_Jnt" : [''],
                 f"{ear}_00_Jnt" : [f"{ear}{base}_00_Jnt"],
-                f"{ear}{base}_00_Jnt" : [""],
-                f"{upper_teeth}Side_00_Jnt" : [""],
-                f"{lower_teeth}Side_00_Jnt" : [""],
-                f"{eye}_1_Jnt" : [""],
-                f"{tweaks}_{squint}_{main}_Jnt" : [""],
-                f"{tweaks}_{cheek}_01_Jnt" : [""],
-                f"{tweaks}_{cheek}_02_Jnt" : [""],
-                f"{tweaks}_{eyebrow}_{main}_Jnt" : [""],
-                f"{tweaks}_{lip}_{main}_Jnt" : [""],
-                f"{tweaks}_{upper}_{lip}_00_Jnt" : [""],
-                f"{tweaks}_{upper}_{lip}_01_Jnt" : [""],
-                f"{tweaks}_{upper}_{lip}_02_Jnt" : [""],
-                f"{tweaks}_{corner}_{lip}_Jnt" : [""],
-                f"{tweaks}_{lower}_{lip}_00_Jnt" : [""],
-                f"{tweaks}_{lower}_{lip}_01_Jnt" : [""],
-                f"{tweaks}_{lower}_{lip}_02_Jnt" : [""],
+                f"{ear}{base}_00_Jnt" : [''],
+                f"{upper_teeth}Side_00_Jnt" : [''],
+                f"{lower_teeth}Side_00_Jnt" : [''],
+                f"{eye}_1_Jnt" : [''],
+                f"{tweaks}_{squint}_{main}_Jnt" : [''],
+                f"{tweaks}_{cheek}_01_Jnt" : [''],
+                f"{tweaks}_{cheek}_02_Jnt" : [''],
+                f"{tweaks}_{eyebrow}_{main}_Jnt" : [''],
+                f"{tweaks}_{lip}_{main}_Jnt" : [''],
+                f"{tweaks}_{upper}_{lip}_00_Jnt" : [''],
+                f"{tweaks}_{upper}_{lip}_01_Jnt" : [''],
+                f"{tweaks}_{upper}_{lip}_02_Jnt" : [''],
+                f"{tweaks}_{corner}_{lip}_Jnt" : [''],
+                f"{tweaks}_{lower}_{lip}_00_Jnt" : [''],
+                f"{tweaks}_{lower}_{lip}_01_Jnt" : [''],
+                f"{tweaks}_{lower}_{lip}_02_Jnt" : [''],
                 # tooth
-                f"{upper_tooth}_1_00_Jnt" : [""],
-                f"{upper_tooth}_2_00_Jnt" : [""],
-                f"{upper_tooth}_3_00_Jnt" : [""],
-                f"{upper_tooth}_4_00_Jnt" : [""],
-                f"{upper_tooth}_5_00_Jnt" : [""],
-                f"{upper_tooth}_6_00_Jnt" : [""],
-                f"{upper_tooth}_7_00_Jnt" : [""],
-                f"{lower_tooth}_1_00_Jnt" : [""],
-                f"{lower_tooth}_2_00_Jnt" : [""],
-                f"{lower_tooth}_3_00_Jnt" : [""],
-                f"{lower_tooth}_4_00_Jnt" : [""],
-                f"{lower_tooth}_5_00_Jnt" : [""],
-                f"{lower_tooth}_6_00_Jnt" : [""],
-                f"{lower_tooth}_7_00_Jnt" : [""],
+                f"{upper_tooth}_1_00_Jnt" : [''],
+                f"{upper_tooth}_2_00_Jnt" : [''],
+                f"{upper_tooth}_3_00_Jnt" : [''],
+                f"{upper_tooth}_4_00_Jnt" : [''],
+                f"{upper_tooth}_5_00_Jnt" : [''],
+                f"{upper_tooth}_6_00_Jnt" : [''],
+                f"{upper_tooth}_7_00_Jnt" : [''],
+                f"{lower_tooth}_1_00_Jnt" : [''],
+                f"{lower_tooth}_2_00_Jnt" : [''],
+                f"{lower_tooth}_3_00_Jnt" : [''],
+                f"{lower_tooth}_4_00_Jnt" : [''],
+                f"{lower_tooth}_5_00_Jnt" : [''],
+                f"{lower_tooth}_6_00_Jnt" : [''],
+                f"{lower_tooth}_7_00_Jnt" : [''],
         }
         return data
 

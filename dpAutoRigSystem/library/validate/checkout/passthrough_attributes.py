@@ -9,10 +9,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "PassthroughAttributes"
-TITLE = "v107_passthroughAttributes"
-DESCRIPTION = "v108_passthroughAttributesDesc"
-WIKI = "07-‐-Validator#-pasthrough-attributes"
+CLASS_NAME = 'PassthroughAttributes'
+TITLE = 'v107_passthroughAttributes'
+DESCRIPTION = 'v108_passthroughAttributesDesc'
+WIKI = '07-‐-Validator#-pasthrough-attributes'
 
 
 
@@ -53,8 +53,8 @@ class PassthroughAttributes(action.BaseAction):
                     self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                     # check optimization
                     for plug, connections in self.get_connection_data(item).items():
-                        sources = connections["sources"]
-                        destinations = connections["destinations"]
+                        sources = connections['sources']
+                        destinations = connections['destinations']
                         if not sources or not destinations:
                             continue
                         if len(sources) == 1:
@@ -65,7 +65,7 @@ class PassthroughAttributes(action.BaseAction):
                 if to_optimize_items:
                     self.found_issues.append(True)
                     if self.first_mode:
-                        self.checked_items.append("\n".join(to_optimize_items))
+                        self.checked_items.append('\n'.join(to_optimize_items))
                         self.good_results.append(False)
                     else: #fix
                         self.checked_items.append(self.ar.data.lang[self.title])
@@ -75,8 +75,8 @@ class PassthroughAttributes(action.BaseAction):
                                 optimized_items = []
                                 for i in range(self.iter_number):
                                     for plug, connections in self.get_connection_data(item).items():
-                                        sources = connections["sources"]
-                                        destinations = connections["destinations"]
+                                        sources = connections['sources']
+                                        destinations = connections['destinations']
                                         if not sources or not destinations:
                                             continue
                                         if len(sources) == 1:
@@ -87,7 +87,7 @@ class PassthroughAttributes(action.BaseAction):
                                             # If the plug is a user defined attribute then we assume
                                             # it's a plug that is not used for computation at all.
                                             # And thus we can disconnect the input safely
-                                            node, attr = plug.split(".", 1)
+                                            node, attr = plug.split('.', 1)
                                             user_defined = set(cmds.listAttr(node, userDefined=True) or [])
                                             if attr in user_defined:
                                                 self.disconnect_inputs(plug)
@@ -173,7 +173,7 @@ class PassthroughAttributes(action.BaseAction):
         result_data = {}
         for plug in plugs:
             result_data[plug] = {
-                "sources": sources_by_plug_data.get(plug, []),
-                "destinations": destinations_by_plug_data.get(plug, [])
+                'sources': sources_by_plug_data.get(plug, []),
+                'destinations': destinations_by_plug_data.get(plug, [])
             }
         return result_data

@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "ColorSet"
-TITLE = "v030_colorSet"
-DESCRIPTION = "v031_colorSetDesc"
-WIKI = "07-‐-Validator#-colorset-cleaner"
+CLASS_NAME = 'ColorSet'
+TITLE = 'v030_colorSet'
+DESCRIPTION = 'v031_colorSetDesc'
+WIKI = '07-‐-Validator#-colorset-cleaner'
 
 
 
@@ -41,7 +41,7 @@ class ColorSet(action.BaseAction):
                 for item in check_items:
                     self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                     # conditional to check here
-                    if cmds.objectType(item) == "createColorSet":
+                    if cmds.objectType(item) == 'createColorSet':
                         self.checked_items.append(item)
                         self.found_issues.append(True)
                         if self.first_mode:

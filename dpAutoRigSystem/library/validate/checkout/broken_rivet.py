@@ -8,10 +8,10 @@ from ....library.base import action
 from ....library.tool import rivet
 
 # global variables to this module:
-CLASS_NAME = "BrokenRivet"
-TITLE = "v126_brokenRivet"
-DESCRIPTION = "v127_brokenRivetDesc"
-WIKI = "07-‐-Validator#-broken-rivets"
+CLASS_NAME = 'BrokenRivet'
+TITLE = 'v126_brokenRivet'
+DESCRIPTION = 'v127_brokenRivetDesc'
+WIKI = '07-‐-Validator#-broken-rivets'
 
 
 
@@ -122,7 +122,7 @@ class BrokenRivet(action.BaseAction):
         if not vertices:
             raise ValueError("Vertex list is empty.")
         # Extract mesh name from the first element
-        mesh_name = vertices[0].split(".")[0]
+        mesh_name = vertices[0].split('.')[0]
         # Get MDagPath from mesh name
         selection_list = OpenMaya.MSelectionList()
         selection_list.add(mesh_name)
@@ -133,7 +133,7 @@ class BrokenRivet(action.BaseAction):
         vertex_indices = [int(v.split("[")[1].strip("]")) for v in vertices]
         # Find closest vertex
         closest_vertex_index = -1
-        min_distance = float("inf")
+        min_distance = float('inf')
         for i in vertex_indices:
             vtx_pos = fn_mesh.getPoint(i, OpenMaya.MSpace.kWorld)
             distance = (vtx_pos - target_point).length()
@@ -187,12 +187,12 @@ class BrokenRivet(action.BaseAction):
         :return: Normalized MVector.
         """
         if not vectors:
-            raise ValueError("Vector list is empty")
+            raise ValueError('Vector list is empty')
         total = OpenMaya.MVector(0.0, 0.0, 0.0)
         for vec in vectors:
             total += OpenMaya.MVector(vec)
         if total.length() == 0.0:
-            raise ValueError("Sum of vectors is zero, cannot normalize")
+            raise ValueError('Sum of vectors is zero, cannot normalize')
         return total.normal()
 
 
@@ -203,7 +203,7 @@ class BrokenRivet(action.BaseAction):
         vertex_list = cmds.ls(selection=True, flatten=True)
         vertex_vectors = []
         for vertex in vertex_list:
-            if ".vtx[" in vertex:  # Ensure it's a vertex selection
+            if '.vtx[' in vertex:  # Ensure it's a vertex selection
                 vtx_vector = cmds.pointPosition(vertex)
                 vertex_vectors.append(vtx_vector)
         normalized_vectors = self.normalize_vector_sum(vertex_vectors)
@@ -259,14 +259,14 @@ class BrokenRivet(action.BaseAction):
             rivet_controller = cmds.listConnections(f"{rivet_net}.itemNode", source=True, destination=False)[0]
             pac = cmds.listConnections(f"{rivet_net}.pacNode", source=True, destination=False)[0]
             transform_attached = cmds.listConnections(f"{rivet_net}.rivet", source=True, destination=False)[0]
-            has_inv_translate = cmds.listConnections(f"{rivet_net}.invTGrp", source=True, destination=False) or "multiplyDivide" in [cmds.nodeType(node) for node in cmds.listConnections(f"{rivet_controller}.translateX", source=False, destination=True) or [None]]
-            has_inv_rotate = cmds.listConnections(f"{rivet_net}.invRGrp", source=True, destination=False) or "multiplyDivide" in [cmds.nodeType(node) for node in cmds.listConnections(f"{rivet_controller}.rotateX", source=False, destination=True) or [None]]
+            has_inv_translate = cmds.listConnections(f"{rivet_net}.invTGrp", source=True, destination=False) or 'multiplyDivide' in [cmds.nodeType(node) for node in cmds.listConnections(f"{rivet_controller}.translateX", source=False, destination=True) or [None]]
+            has_inv_rotate = cmds.listConnections(f"{rivet_net}.invRGrp", source=True, destination=False) or 'multiplyDivide' in [cmds.nodeType(node) for node in cmds.listConnections(f"{rivet_controller}.rotateX", source=False, destination=True) or [None]]
             add_invet = has_inv_translate or has_inv_rotate
             connections = cmds.listConnections(pac, source=True, destination=True, plugs=True) or []
             found_attrs = [conn.split('.')[-1] for conn in connections]
             translate_connected = all(attr in found_attrs for attr in ['translateX', 'translateY', 'translateZ'])
             rotate_connected = all(attr in found_attrs for attr in ['rotateX', 'rotateY', 'rotateZ'])
-            has_parent_group = transform_attached.endswith("_Grp")
+            has_parent_group = transform_attached.endswith('_Grp')
             rivet_controller_options_data[rivet_controller] = [translate_connected, rotate_connected, has_parent_group, add_invet, has_inv_translate, has_inv_rotate, False]
         return rivet_controller_options_data
 
@@ -275,10 +275,10 @@ class BrokenRivet(action.BaseAction):
         for idx, controller in enumerate(rivet_controllers):
             uv_set = cmds.polyUVSet(attach_geos[idx], query=True, allUVSets=True)[0]
             self.rivet.create_rivet(attach_geos[idx], uv_set, [controller], *self.rivet_options_data[controller])
-            connected_joints = cmds.listConnections(controller, source=False, type="joint")
+            connected_joints = cmds.listConnections(controller, source=False, type='joint')
             if connected_joints:
                 suffix = connected_joints[0][connected_joints[0].rfind('_'):]
-                if suffix != "_Jis":
+                if suffix != '_Jis':
                     pac_connected_attr = cmds.listConnections(f"{controller}.rotatePivot", source=False, plugs=True, type="pac")[0]
                     if pac_connected_attr:
                         # If it is not an indirect skinning joint, disregard the new pivot adjusted in the parent constraint.

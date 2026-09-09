@@ -3,10 +3,10 @@ from maya import cmds, mel
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "Envelope"
-TITLE = "v094_envelope"
-DESCRIPTION = "v095_envelopeDesc"
-WIKI = "07-‐-Validator#-envelope-checker"
+CLASS_NAME = 'Envelope'
+TITLE = 'v094_envelope'
+DESCRIPTION = 'v095_envelopeDesc'
+WIKI = '07-‐-Validator#-envelope-checker'
 
 
 

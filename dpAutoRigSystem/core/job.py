@@ -9,7 +9,7 @@ class Job:
 
 
     def garbage_collector(self):
-        self.delete_old_job("dpAutoRigSystem")
+        self.delete_old_job('dpAutoRigSystem')
 
 
     def delete_old_job(self, item, *args):
@@ -17,7 +17,7 @@ class Job:
         """
         for job in cmds.scriptJob(listJobs=True):
             if item in job:
-                cmds.scriptJob(kill=int(job[:job.find(":")]), force=True)
+                cmds.scriptJob(kill=int(job[:job.find(':')]), force=True)
 
 
     def start_jobs(self):
@@ -63,7 +63,7 @@ class Job:
             need_update_select = False
             for selected_item in selected_nodes:
                 if self.ar.data.guide_base_attr in cmds.listAttr(selected_item) and cmds.getAttr(selected_item+"."+self.ar.data.guide_base_attr) == 1:
-                    if not ":" in selected_item[selected_item.rfind("|"):]:
+                    if not ':' in selected_item[selected_item.rfind('|'):]:
                         updated_guide_nodes.append(self.ar.maker.setup_duplicated_guide(selected_item))
                         need_update_select = True
                     else:
@@ -96,7 +96,7 @@ class Job:
     def corrective_edit_mode(self, item):
         """ Edit mode to corrective control by scriptJob.
         """
-        if "editMode" in cmds.listAttr(item):
+        if 'editMode' in cmds.listAttr(item):
             if cmds.getAttr(item+".editMode"):
                 self.ar.ctrls.color_shape([item], 'bonina', rgb=True)
             else:
@@ -111,10 +111,10 @@ class Job:
         """ Reload editMode job for existing corrective controllers.
         """
         if not items:
-            items = cmds.ls(selection=False, type="transform")
+            items = cmds.ls(selection=False, type='transform')
         if items:
             for item in items:
-                if "editMode" in cmds.listAttr(item):
+                if 'editMode' in cmds.listAttr(item):
                     self.create_corrective_edit_mode(item)
 
 
@@ -125,10 +125,10 @@ class Job:
         if cmds.objExists(item):
             duplicated_temp = cmds.duplicate(item, name=item+"_TEMP")[0]
             cmds.parent(duplicated_temp, item+"_Zero_1_Grp")
-            for attr in ["T", "R", "S"]:
+            for attr in ['T', 'R', 'S']:
                 for axis in self.ar.data.axes:
                     new_value = cmds.getAttr(duplicated_temp+"."+attr.lower()+axis.lower())
-                    if attr == "S":
+                    if attr == 'S':
                         cmds.setAttr(item+"."+attr.lower()+axis.lower(), 1) #scale
                     else:
                         cmds.setAttr(item+"."+attr.lower()+axis.lower(), 0) #translate, rotate
@@ -141,18 +141,18 @@ class Job:
         """ Add pinGuide attribute if it doesn't exist yet.
             Create a scriptJob to read this attribute change.
         """
-        if not item.endswith("_JointEnd") and not item.endswith("_RadiusCtrl"):
-            if not "pinGuide" in cmds.listAttr(item):
-                cmds.addAttr(item, longName="pinGuide", attributeType="bool")
+        if not item.endswith('_JointEnd') and not item.endswith('_RadiusCtrl'):
+            if not 'pinGuide' in cmds.listAttr(item):
+                cmds.addAttr(item, longName='pinGuide', attributeType='bool')
                 cmds.setAttr(item+".pinGuide", channelBox=True)
-                cmds.addAttr(item, longName="pinGuideConstraint", attributeType="message")
-                cmds.addAttr(item, longName="lockedList", dataType="string")
+                cmds.addAttr(item, longName='pinGuideConstraint', attributeType='message')
+                cmds.addAttr(item, longName='lockedList', dataType='string')
             self.delete_old_job(item)
             cmds.scriptJob(attributeChange=[str(item+".pinGuide"), lambda node=item: self.pin_guide(node)], killWithScene=False, compressUndo=True)
             self.pin_guide(item) # just forcing pinGuide setup run before wait for the job be trigger by the attribute
 
 
-    def set_pinned_guide_color(self, item, status, color="red"):
+    def set_pinned_guide_color(self, item, status, color='red'):
         """ Set the color override for pinned guide shapes.
         """
         cmds.setAttr(item+".overrideEnabled", status)
@@ -169,15 +169,15 @@ class Job:
     def pin_guide(self, item):
         """ Pin temporally the guide by scriptJob.
         """
-        if "pinGuide" in cmds.listAttr(item):
+        if 'pinGuide' in cmds.listAttr(item):
             # extracting namespace... need to find an ellegant way using message or stored attribute instead:
             namespace_name = None
-            cmds.namespace(set=":")
-            if ":" in item:
-                if "|" in item:
-                    namespace_name = item[item.rfind("|")+1:item.rfind(":")]
+            cmds.namespace(set=':')
+            if ':' in item:
+                if '|' in item:
+                    namespace_name = item[item.rfind('|')+1:item.rfind(':')]
                 else:
-                    namespace_name = item[:item.rfind(":")]
+                    namespace_name = item[:item.rfind(':')]
             # work with locked attributes
             pin_value = cmds.getAttr(item+".pinGuide")
             pac = item+"_PinGuide_PaC"
@@ -192,7 +192,7 @@ class Job:
                     cmds.connectAttr(pc+".message", item+".pinGuideConstraint")
                     for attr in self.ar.data.transform_attrs:
                         cmds.setAttr(item+"."+attr, lock=True)
-                    if "worldSize" in cmds.listAttr(item):
+                    if 'worldSize' in cmds.listAttr(item):
                         cmds.setAttr(item+".worldSize", lock=True)
             else:
                 pacs = cmds.listConnections(item+".pinGuideConstraint", destination=False, source=True)
@@ -204,19 +204,19 @@ class Job:
                     if "worldSize" in cmds.listAttr(item):
                         cmds.setAttr(item+".worldSize", lock=False)
             self.set_pinned_guide_color(item, pin_value)
-            cmds.namespace(set=":")
+            cmds.namespace(set=':')
 
 
     def start_pin_guide(self, item):
         """ Reload pinGuide job for already created guide.
         """
         if cmds.objExists(item):
-            children = cmds.listRelatives(item, children=True, allDescendents=True, fullPath=True, type="transform")
+            children = cmds.listRelatives(item, children=True, allDescendents=True, fullPath=True, type='transform')
             if children:
                 for child in children:
-                    if "pinGuide" in cmds.listAttr(child):
+                    if 'pinGuide' in cmds.listAttr(child):
                         self.create_pin_guide(child)
-            if "pinGuide" in cmds.listAttr(item):
+            if 'pinGuide' in cmds.listAttr(item):
                 self.create_pin_guide(item)
 
 
@@ -225,7 +225,7 @@ class Job:
             We expect to have the scriptJob running here to clean-up the pin setup, or just force it to run.
         """
         if not items:
-            items = [guide for guide in cmds.ls(selection=False, type="transform") if "pinGuide" in cmds.listAttr(guide)]
+            items = [guide for guide in cmds.ls(selection=False, type='transform') if 'pinGuide' in cmds.listAttr(guide)]
         if items:
             for guide in items:
                 cmds.setAttr(guide+".pinGuide", 0)
@@ -236,22 +236,22 @@ class Job:
     def store_lockeds(self, item):
         """ Store a string of a list of found locked attributes.
         """
-        locked_attr = ""
-        if not "lockedList" in cmds.listAttr(item):
-            cmds.addAttr(item, longName="lockedList", dataType="string")
+        locked_attr = ''
+        if not 'lockedList' in cmds.listAttr(item):
+            cmds.addAttr(item, longName='lockedList', dataType='string')
         locked_attrs = cmds.listAttr(item, locked=True)
         if locked_attrs:
             locked_attr = ';'.join(str(e) for e in locked_attrs)
-        cmds.setAttr(item+".lockedList", locked_attr, type="string")
+        cmds.setAttr(item+".lockedList", locked_attr, type='string')
 
 
     def restore_lockeds(self, item):
         """ Lock again the stored attributes.
         """
-        if "lockedList" in cmds.listAttr(item):
+        if 'lockedList' in cmds.listAttr(item):
             locked_attr = cmds.getAttr(item+".lockedList")
             if locked_attr:
-                locked_attrs = locked_attr.split(";")
+                locked_attrs = locked_attr.split(';')
                 if locked_attrs:
                     for attr in locked_attrs:
                         cmds.setAttr(item+"."+attr, lock=True)

@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "UnusedSkin"
-TITLE = "v082_unusedSkin"
-DESCRIPTION = "v083_unusedSkinDesc"
-WIKI = "07-‐-Validator#-unused-skin-cleaner"
+CLASS_NAME = 'UnusedSkin'
+TITLE = 'v082_unusedSkin'
+DESCRIPTION = 'v083_unusedSkinDesc'
+WIKI = '07-‐-Validator#-unused-skin-cleaner'
 
 
 
@@ -35,7 +35,7 @@ class UnusedSkin(action.BaseAction):
             if inputs:
                 check_items = inputs
             else:
-                check_items = cmds.ls(selection=False, type="skinCluster")
+                check_items = cmds.ls(selection=False, type='skinCluster')
             if check_items:
                 self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
                 for item in check_items:

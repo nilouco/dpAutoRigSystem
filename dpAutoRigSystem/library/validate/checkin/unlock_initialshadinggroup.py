@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "UnlockInitialshadinggroup"
-TITLE = "v048_unlockIniShadGrp"
-DESCRIPTION = "v049_unlockIniShadGrpDesc"
-WIKI = "07-‐-Validator#-unlock-initialshadinggroup"
+CLASS_NAME = 'UnlockInitialshadinggroup'
+TITLE = 'v048_unlockIniShadGrp'
+DESCRIPTION = 'v049_unlockIniShadGrpDesc'
+WIKI = '07-‐-Validator#-unlock-initialshadinggroup'
 
 
 
@@ -35,12 +35,12 @@ class UnlockInitialshadinggroup(action.BaseAction):
             if inputs:
                 check_items = inputs
             else:
-                check_items = ["initialShadingGroup"]
+                check_items = ['initialShadingGroup']
             if check_items:
                 self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
                 for item in check_items:
                     self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
-                    if cmds.objExists(item) and item == "initialShadingGroup" and cmds.lockNode(item, query=True, lockUnpublished=True) and cmds.getAttr(item+".nodeState", lock=True):
+                    if cmds.objExists(item) and item == 'initialShadingGroup' and cmds.lockNode(item, query=True, lockUnpublished=True) and cmds.getAttr(item+".nodeState", lock=True):
                         self.checked_items.append(item)
                         self.found_issues.append(True)
                         if self.first_mode:

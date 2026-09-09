@@ -1,9 +1,9 @@
 from ...base import curve
 
 # global variables to this module:    
-CLASS_NAME = "WheelShape"
-TITLE = "m162_wheelShape"
-DESCRIPTION = "m099_cvControlDesc"
+CLASS_NAME = 'WheelShape'
+TITLE = 'm162_wheelShape'
+DESCRIPTION = 'm099_cvControlDesc'
 
 
 class WheelShape(curve.BaseCurve):

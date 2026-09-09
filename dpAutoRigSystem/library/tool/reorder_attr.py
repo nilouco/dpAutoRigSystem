@@ -5,10 +5,10 @@ from maya import cmds, mel
 from ..base import base
 
 # global variables to this module:
-CLASS_NAME = "ReorderAttr"
-TITLE = "m087_reorderAttr"
-DESCRIPTION = "m088_reoderAttrDesc"
-WIKI = "06-‐-Tools#-reorder-attributes"
+CLASS_NAME = 'ReorderAttr'
+TITLE = 'm087_reorderAttr'
+DESCRIPTION = 'm088_reoderAttrDesc'
+WIKI = '06-‐-Tools#-reorder-attributes'
 
 
 
@@ -17,7 +17,7 @@ class ReorderAttr(base.BaseLibrary):
         base.BaseLibrary.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         if self.ar.dev:
             reload(base)
-        self.next_attr_types = ["message", "typed"]
+        self.next_attr_types = ['message', 'typed']
         
 
     def build_tool(self, *args):
@@ -44,7 +44,7 @@ class ReorderAttr(base.BaseLibrary):
                     if user_def_attrs:
                         if not attributes[0] in user_def_attrs:
                             if verbose:
-                                mel.eval("warning \""+self.ar.data.lang["m235_selectedStaticAttr"]+"\";")
+                                mel.eval("warning \""+self.ar.data.lang['m235_selectedStaticAttr']+"\";")
                         else:
                             cmds.scriptEditorInfo(suppressInfo=True)
                             # unlock all user defined attibutes before start the changing position:
@@ -96,13 +96,13 @@ class ReorderAttr(base.BaseLibrary):
                                     cmds.setAttr(item+"."+lock_attr, lock=True)
                     else:
                         if verbose:
-                            mel.eval("warning \""+self.ar.data.lang["m236_canReorderUserDefAttr"]+"\";")
+                            mel.eval("warning \""+self.ar.data.lang['m236_canReorderUserDefAttr']+"\";")
             else:
                 if verbose:
-                    mel.eval("warning \""+self.ar.data.lang["m237_selectChannelBoxAttr"]+"\";")
+                    mel.eval("warning \""+self.ar.data.lang['m237_selectChannelBoxAttr']+"\";")
         else:
             if verbose:
-                mel.eval("warning \""+self.ar.data.lang["m238_selectTransform"]+"\";")
+                mel.eval("warning \""+self.ar.data.lang['m238_selectTransform']+"\";")
         # back ScritpEditor to show info:
         cmds.scriptEditorInfo(suppressInfo=True)
  

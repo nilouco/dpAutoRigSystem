@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "SideCalibration"
-TITLE = "v044_sideCalibration"
-DESCRIPTION = "v045_sideCalibrationDesc"
-WIKI = "07-‐-Validator#-side-calibration"
+CLASS_NAME = 'SideCalibration'
+TITLE = 'v044_sideCalibration'
+DESCRIPTION = 'v045_sideCalibrationDesc'
+WIKI = '07-‐-Validator#-side-calibration'
 
 
 
@@ -42,7 +42,7 @@ class SideCalibration(action.BaseAction):
                 for item in check_items:
                     self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                     # conditional to check here
-                    if "calibrations" in cmds.listAttr(item) and item[1] == "_": #side: because L_CtrlName or R_CtrlName have "_" as second letter.
+                    if 'calibrations' in cmds.listAttr(item) and item[1] == '_': #side: because L_CtrlName or R_CtrlName have '_' as second letter.
                         found_other_side = False
                         for node in check_items:
                             if node[2:] == item[2:]: #other side found
@@ -52,7 +52,7 @@ class SideCalibration(action.BaseAction):
                         if found_other_side:
                             calibrations = self.ar.ctrls.get_items_from_string_attr(item)
                             if calibrations:
-                                not_mirror_attrs = self.ar.ctrls.get_items_from_string_attr(item, "notMirrorList")
+                                not_mirror_attrs = self.ar.ctrls.get_items_from_string_attr(item, 'notMirrorList')
                                 if not_mirror_attrs:
                                     calibrations = list(set(calibrations) - set(not_mirror_attrs))
                                 for attr in calibrations:

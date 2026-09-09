@@ -3,19 +3,19 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "InputOrderIO"
-TITLE = "r035_inputOrderIO"
-DESCRIPTION = "r036_inputOrderIODesc"
-WIKI = "10-‐-Rebuilder#-input-order"
+CLASS_NAME = 'InputOrderIO'
+TITLE = 'r035_inputOrderIO'
+DESCRIPTION = 'r036_inputOrderIODesc'
+WIKI = '10-‐-Rebuilder#-input-order'
 
 
 
 class InputOrderIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.set_action_type("r000_rebuilder")
-        self.io_folder = "s_inputOrderIO"
-        self.start_name = "dpInputOrder"
+        self.set_action_type('r000_rebuilder')
+        self.io_folder = 's_inputOrderIO'
+        self.start_name = 'dpInputOrder'
     
 
     def run_action(self, first_mode=True, inputs=None, *args):

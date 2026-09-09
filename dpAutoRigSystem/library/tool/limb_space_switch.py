@@ -5,10 +5,10 @@ from maya import cmds
 from ..base import base
 
 # global variables to this module:    
-CLASS_NAME = "LimbSpaceSwitch"
-TITLE = "m059_limbSpaceSwitch"
-DESCRIPTION = "m060_limbSpaceSwitchDesc"
-WIKI = "06-‐-Tools#-limb-space-switch"
+CLASS_NAME = 'LimbSpaceSwitch'
+TITLE = 'm059_limbSpaceSwitch'
+DESCRIPTION = 'm060_limbSpaceSwitchDesc'
+WIKI = '06-‐-Tools#-limb-space-switch'
 
 
 
@@ -23,12 +23,12 @@ class LimbSpaceSwitch(base.BaseLibrary):
         # find nodes
         all_grp = self.ar.utils.get_all_grp()
         if all_grp:
-            self.root_ctrl = self.ar.utils.get_node_by_message("ctrlsVisibilityGrp", all_grp)
-            self.global_ctrl = self.ar.utils.get_node_by_message("globalCtrl", all_grp)
+            self.root_ctrl = self.ar.utils.get_node_by_message('ctrlsVisibilityGrp', all_grp)
+            self.global_ctrl = self.ar.utils.get_node_by_message('globalCtrl', all_grp)
             self.to_ids = []
 
-            self.global_name = "Global"
-            self.root_name = "Root"
+            self.global_name = 'Global'
+            self.root_name = 'Root'
 
             self.spine_name = self.ar.data.lang['m011_spine']
             self.hips_name = self.ar.data.lang['c027_hips']
@@ -102,7 +102,7 @@ class LimbSpaceSwitch(base.BaseLibrary):
                         else: #leg
                             follow_value = 1 #root
 
-                        cmds.addAttr(ik_ctrl, ln=self.follow_attr, at="enum", en=self.global_name+":"+self.root_name+":"+self.hips_name+"A:"+self.hips_name+"B:"+self.chest_name+"A:"+self.chest_name+"B:"+self.head_name+":", defaultValue=follow_value)
+                        cmds.addAttr(ik_ctrl, ln=self.follow_attr, at='enum', en=self.global_name+":"+self.root_name+":"+self.hips_name+"A:"+self.hips_name+"B:"+self.chest_name+"A:"+self.chest_name+"B:"+self.head_name+":", defaultValue=follow_value)
                         cmds.setAttr(ik_ctrl+"."+self.follow_attr, edit=True, keyable=True)
                         
                         self.pac = cmds.parentConstraint(self.global_ctrl, self.root_ctrl, self.spine_hips_a_ctrl, self.spine_hips_b_ctrl, self.spine_chest_a_ctrl, self.spine_chest_b_ctrl, self.head_sub_ctrl, ik_ctrl+"_Orient_Grp", maintainOffset=True, name=ik_ctrl+"_Orient_Grp_PaC")[0]

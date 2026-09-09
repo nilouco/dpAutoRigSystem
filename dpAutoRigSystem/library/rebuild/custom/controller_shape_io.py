@@ -3,19 +3,19 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "ControllerShapeIO"
-TITLE = "r014_controllerShapeIO"
-DESCRIPTION = "r015_controllerShapeIODesc"
-WIKI = "10-‐-Rebuilder#-controller-shape"
+CLASS_NAME = 'ControllerShapeIO'
+TITLE = 'r014_controllerShapeIO'
+DESCRIPTION = 'r015_controllerShapeIODesc'
+WIKI = '10-‐-Rebuilder#-controller-shape'
 
 
 
 class ControllerShapeIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.set_action_type("r000_rebuilder")
-        self.io_folder = "s_controlShapeIO"
-        self.start_name = "dpControlShape"
+        self.set_action_type('r000_rebuilder')
+        self.io_folder = 's_controlShapeIO'
+        self.start_name = 'dpControlShape'
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -66,7 +66,7 @@ class ControllerShapeIO(action.BaseAction):
                             else:
                                 self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                     else:
-                        self.maybe_done_io("Ctrls_Grp")
+                        self.maybe_done_io('Ctrls_Grp')
                 else:
                     self.fail_io(self.ar.data.lang['r010_notFoundPath'])
             else:

@@ -3,9 +3,9 @@ from maya import cmds, mel
 from ...base import curve
 
 # global variables to this module:    
-CLASS_NAME = "Smile"
-TITLE = "m101_smile"
-DESCRIPTION = "m099_cvControlDesc"
+CLASS_NAME = 'Smile'
+TITLE = 'm101_smile'
+DESCRIPTION = 'm099_cvControlDesc'
 
 
 
@@ -32,8 +32,8 @@ class Smile(curve.BaseCurve):
     def create_combined_curves(self, cv_id, cv_name, cv_size, cv_degree):
         """ Combine controllers in order to return it.
         """
-        circle = self.ar.config.get_instance("Circle", [self.ar.data.curve_simple_folder])
-        mouth = self.ar.config.get_instance("CurvedCircleUp", [self.ar.data.curve_simple_folder])
+        circle = self.ar.config.get_instance('Circle', [self.ar.data.curve_simple_folder])
+        mouth = self.ar.config.get_instance('CurvedCircleUp', [self.ar.data.curve_simple_folder])
         curve1 = circle.cv_main(False, cv_id, cv_name, cv_size, cv_degree)
         curve2 = circle.cv_main(False, cv_id, cv_name, cv_size*0.3, cv_degree)
         curve3 = circle.cv_main(False, cv_id, cv_name, cv_size*0.3, cv_degree)

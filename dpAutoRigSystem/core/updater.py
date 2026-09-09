@@ -15,7 +15,7 @@ class Updater:
         self.ar = ar
         self.version_start_length = 20 #__version__: str = "
         self.version_end_length = -2 #"
-        self.download_extension = "zip"
+        self.download_extension = 'zip'
         self.installer = maya_installer.MayaInstaller()
         self.installer.define_paths()
 
@@ -85,7 +85,7 @@ class Updater:
             remote_contents = TextIOWrapper(remote_source, encoding='utf-8')
             # find the line with the version and compare them:
             for line in remote_contents:
-                if "__version__" in line:
+                if '__version__' in line:
                     got_remote_file = True
                     remote_version = line[self.version_start_length:self.version_end_length] #these magic numbers filter only the version XX.YY.ZZ
                     if remote_version == self.ar.data.version:
@@ -94,7 +94,7 @@ class Updater:
                     else:
                         # 1 - there's a new version
                         for extra_line in remote_contents:
-                            if "_update_log" in extra_line:
+                            if '_update_log' in extra_line:
                                 remote_log = extra_line[self.version_start_length:self.version_end_length] #these magic numbers filter only the log string sentence
                                 return [1, remote_version, remote_log]
                         return [1, remote_version, None]
@@ -108,7 +108,7 @@ class Updater:
         return [4, None, None]
 
 
-    def download(self, url, ext="zip", *args):
+    def download(self, url, ext='zip', *args):
         """ Download the file from given url and ask user to choose a folder and a file name to save it.
         """
         ext_filter = "*."+ext
@@ -119,7 +119,7 @@ class Updater:
                 urllib.request.urlretrieve(url, folder[0])
                 button_label = self.ar.data.lang['c108_open']+" "+self.ar.data.lang['i298_folder']
                 button_command = self.ar.packager.open_folder
-                button_argument = folder[0][:folder[0].rfind("/")]
+                button_argument = folder[0][:folder[0].rfind('/')]
                 self.ar.logger.infoWin('i094_downloadUpdate', 'i096_downloaded', folder[0]+'\n\n'+self.ar.data.lang['i018_thanks'], 'center', 205, 270, buttonList=[button_label, button_command, button_argument])
                 self.ar.ui_manager.close_ui('dpUpdateWindow')
             except:
@@ -138,7 +138,7 @@ class Updater:
         if confirm_auto_install == continue_bt:
             print(self.ar.data.lang['i098_installing'])
             # declaring variables:
-            ar_name = "dpAutoRigSystem"
+            ar_name = 'dpAutoRigSystem'
             dest_folder = self.ar.data.dp_auto_rig_path
             self.ar.ui_manager.set_progress('Installing: 0%', self.ar.data.lang['i098_installing'])
             
@@ -163,13 +163,13 @@ class Updater:
                 temp_folder = dest_folder+"/"+zip_names[0]+ar_name
                 
                 # store custom presets in order to avoid overwrite them when installing the update:
-                self.keep_files_when_update(dest_folder+"/"+self.ar.data.language_folder.replace(".", "/"), temp_folder+"/"+self.ar.data.language_folder.replace(".", "/"))
-                self.keep_files_when_update(dest_folder+"/"+self.ar.data.curve_preset_folder.replace(".", "/"), temp_folder+"/"+self.ar.data.curve_preset_folder.replace(".", "/"))
-                self.keep_files_when_update(dest_folder+"/"+self.ar.data.template_folder.replace(".", "/"), temp_folder+"/"+self.ar.data.template_folder.replace(".", "/"))
+                self.keep_files_when_update(dest_folder+"/"+self.ar.data.language_folder.replace('.', '/'), temp_folder+"/"+self.ar.data.language_folder.replace('.', '/'))
+                self.keep_files_when_update(dest_folder+"/"+self.ar.data.curve_preset_folder.replace('.', '/'), temp_folder+"/"+self.ar.data.curve_preset_folder.replace('.', '/'))
+                self.keep_files_when_update(dest_folder+"/"+self.ar.data.template_folder.replace('.', '/'), temp_folder+"/"+self.ar.data.template_folder.replace('.', '/'))
                 
                 # keep pipeline_info data
-                if os.path.exists(dest_folder+"/"+self.ar.data.pipeline_folder.replace(".", "/")+"/pipeline_settings.json"):
-                    shutil.copy2(os.path.join(dest_folder, self.ar.data.pipeline_folder.replace(".", "/")+"/pipeline_settings.json"), temp_folder+"/"+self.ar.data.pipeline_folder.replace(".", "/"))
+                if os.path.exists(dest_folder+"/"+self.ar.data.pipeline_folder.replace('.', '/')+"/pipeline_settings.json"):
+                    shutil.copy2(os.path.join(dest_folder, self.ar.data.pipeline_folder.replace('.', '/')+"/pipeline_settings.json"), temp_folder+"/"+self.ar.data.pipeline_folder.replace('.', '/'))
                 if os.path.exists(dest_folder+"/pipeline_info.json"):
                     shutil.copy2(os.path.join(dest_folder, "pipeline_info.json"), temp_folder)
                 # remove all old live files and folders for this current version, that means delete myself, OMG!
@@ -181,13 +181,13 @@ class Updater:
                 # pass in all files to copy them (doing the simple installation):
                 for source_folder, folders, files in os.walk(temp_folder):       
                     # declare destination directory:
-                    dest_path = source_folder.replace(temp_folder, dest_folder, 1).replace("\\", "/")
+                    dest_path = source_folder.replace(temp_folder, dest_folder, 1).replace('\\', '/')
                     self.ar.ui_manager.set_progress('Installing')
                     # make sure we have all folders needed, otherwise, create them in the dest_path directory:
                     self.create_folder(dest_path)
                     for ar_file in files:
-                        source_file = os.path.join(source_folder, ar_file).replace("\\", "/")
-                        dest_file = os.path.join(dest_path, ar_file).replace("\\", "/")
+                        source_file = os.path.join(source_folder, ar_file).replace('\\', '/')
+                        dest_file = os.path.join(dest_path, ar_file).replace('\\', '/')
                         # if the file exists (we expect that yes) then delete it:
                         self.ar.utils.delete_file(dest_file)
                         # copy the ar_file:
@@ -208,7 +208,7 @@ class Updater:
                 self.ar.logger.infoWin('i095_installUpdate', 'i099_installed', '\n\n'+new_version+'\n\n'+self.ar.data.lang['i173_reloadScript']+'\n\n'+self.ar.data.lang['i018_thanks'], 'center', 205, 270, buttonList=[button_label, button_command, button_argument])
             except Exception as e:
                 # report fail update installation:
-                print(self.ar.data.lang["i141_error"]+": "+str(e))
+                print(self.ar.data.lang['i141_error']+": "+str(e))
                 button_label = 'Download'
                 button_command = self.ar.web.visit_website
                 button_argument = self.ar.data.master_url
@@ -218,7 +218,7 @@ class Updater:
             print(self.ar.data.lang['i038_canceled'])
 
 
-    def keep_files_when_update(self, folder, temp_folder, ext="json", *args):
+    def keep_files_when_update(self, folder, temp_folder, ext='json', *args):
         """ Check in given folder if we have custom json files and keep then when we install a new update.
             It will just check if there are user created json files, and copy them to temporarily extracted update folder.
             So when the install overwrite all files, they will be copied (restored) again.

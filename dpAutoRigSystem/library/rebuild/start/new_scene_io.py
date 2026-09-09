@@ -5,10 +5,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "NewSceneIO"
-TITLE = "r025_newSceneIO"
-DESCRIPTION = "r026_newSceneIODesc"
-WIKI = "10-‐-Rebuilder#-new-scene"
+CLASS_NAME = 'NewSceneIO'
+TITLE = 'r025_newSceneIO'
+DESCRIPTION = 'r026_newSceneIODesc'
+WIKI = '10-‐-Rebuilder#-new-scene'
 
 
 
@@ -17,11 +17,11 @@ class NewSceneIO(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         if self.ar.dev:
             reload(action)
-        self.start_name = "dpNewScene"
+        self.start_name = 'dpNewScene'
         self.first_bt_enable = False
         self.first_bt_custom_label = self.ar.data.lang['i305_none']
         self.second_bt_custom_label = self.ar.data.lang['i306_run']
-        self.set_action_type("r000_rebuilder")
+        self.set_action_type('r000_rebuilder')
 
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -47,7 +47,7 @@ class NewSceneIO(action.BaseAction):
                 try:
                     # start a new clean scene and keep the same asset context
                     cmds.file(newFile=True, force=True)
-                    self.well_done_io(self.ar.pipeliner.pipe_data["assetName"])
+                    self.well_done_io(self.ar.pipeliner.pipe_data['assetName'])
                 except Exception as e:
                     self.fail_io(str(e))
         else:

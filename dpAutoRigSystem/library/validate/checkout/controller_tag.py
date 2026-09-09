@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "ControllerTag"
-TITLE = "v073_controllerTag"
-DESCRIPTION = "v074_controllerTagDesc"
-WIKI = "07-‐-Validator#-controller-tag"
+CLASS_NAME = 'ControllerTag'
+TITLE = 'v073_controllerTag'
+DESCRIPTION = 'v074_controllerTagDesc'
+WIKI = '07-‐-Validator#-controller-tag'
 
 
 
@@ -40,9 +40,9 @@ class ControllerTag(action.BaseAction):
                 self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
                 for item in check_items:
                     self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
-                    if not "controlID" in cmds.listAttr(item):
+                    if not 'controlID' in cmds.listAttr(item):
                         continue
-                    if cmds.getAttr(item + ".controlID") != "id_092_Correctives":
+                    if cmds.getAttr(item + ".controlID") != 'id_092_Correctives':
                         if self.first_mode:
                             # conditional to check here
                             if not cmds.controller(item, query=True, isController=True):
@@ -81,7 +81,7 @@ class ControllerTag(action.BaseAction):
     def add_parent_controller_tag(self, item):
         """ Add parent controller tag to the given item.
         """
-        if "parentTag" in cmds.listAttr(item):
+        if 'parentTag' in cmds.listAttr(item):
             parent_tag_items = cmds.listConnections(item+".parentTag", source=True, destination=False)
             if parent_tag_items:
                 cmds.controller(item, parent_tag_items[0], parent=True)

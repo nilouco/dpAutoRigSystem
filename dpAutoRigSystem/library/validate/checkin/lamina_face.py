@@ -3,10 +3,10 @@ from maya import OpenMaya, cmds, mel
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "LaminaFace"
-TITLE = "v124_laminaFace"
-DESCRIPTION = "v125_laminaFaceDesc"
-WIKI = "07-‐-Validator#-lamina-face-cleaner"
+CLASS_NAME = 'LaminaFace'
+TITLE = 'v124_laminaFace'
+DESCRIPTION = 'v125_laminaFaceDesc'
+WIKI = '07-‐-Validator#-lamina-face-cleaner'
 
 
 
@@ -33,9 +33,9 @@ class LaminaFace(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if inputs:
-                check_items = cmds.ls(inputs, type="mesh")
+                check_items = cmds.ls(inputs, type='mesh')
             else:
-                check_items = cmds.ls(selection=False, type="mesh")
+                check_items = cmds.ls(selection=False, type='mesh')
             if check_items:
                 self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
                 # declare resulted lists
@@ -78,7 +78,7 @@ class LaminaFace(action.BaseAction):
                                             # found laminaFaces
                                             if not item_name in lamina_items:
                                                 lamina_items.append(item_name)
-                                            lamina_faces.append(item_name+'.f['+str(iter_face.index())+']')
+                                            lamina_faces.append(item_name+'.f["+str(iter_face.index())+"]')
                                     iter_face.next()
                         # Move to the next selected node in the list
                         iter.next()

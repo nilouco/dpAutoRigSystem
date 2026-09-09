@@ -9,7 +9,7 @@ class Math:
         self.ar = ar
 
 
-    def create_dist_between(self, a, b, name="temp_DistBet", keep=False):
+    def create_dist_between(self, a, b, name='temp_DistBet', keep=False):
         """ Creates a distance between node for 2 objects a and b.
             Keeps them in the scene or delete.
             Returns the distance value only in case of not keeping dist_bet node or
@@ -25,15 +25,15 @@ class Math:
             cmds.delete(cmds.pointConstraint(b, null_c, maintainOffset=False))
             poc = cmds.pointConstraint(b, null_c, null_b, maintainOffset=False, name=null_b+"_PoC")[0]
             # create distanceBetween node:
-            dist_bet = cmds.createNode("distanceBetween", n=name)
+            dist_bet = cmds.createNode('distanceBetween', n=name)
             # connect aPos to the distance between point1:
-            cmds.connectAttr(null_a+".tx", dist_bet+".point1X")
-            cmds.connectAttr(null_a+".ty", dist_bet+".point1Y")
-            cmds.connectAttr(null_a+".tz", dist_bet+".point1Z")
+            cmds.connectAttr(null_a+".translateX", dist_bet+".point1X")
+            cmds.connectAttr(null_a+".translateY", dist_bet+".point1Y")
+            cmds.connectAttr(null_a+".translateZ", dist_bet+".point1Z")
             # connect bPos to the distance between point2:
-            cmds.connectAttr(null_b+".tx", dist_bet+".point2X")
-            cmds.connectAttr(null_b+".ty", dist_bet+".point2Y")
-            cmds.connectAttr(null_b+".tz", dist_bet+".point2Z")
+            cmds.connectAttr(null_b+".translateX", dist_bet+".point2X")
+            cmds.connectAttr(null_b+".translateY", dist_bet+".point2Y")
+            cmds.connectAttr(null_b+".translateZ", dist_bet+".point2Z")
             dist = cmds.getAttr(dist_bet+".distance")
             if keep:
                 self.ar.utils.add_attr_to_items([null_a, null_b, null_c], self.ar.utils.ignore_transform_io_attr)
@@ -52,9 +52,9 @@ class Math:
             Reference:
             https://bindpose.com/maya-matrix-nodes-part-2-node-based-matrix-twist-calculator/
         """
-        twist_bone_mm = cmds.createNode("multMatrix", name=twist_bone_name+"_ExtractAngle_MM")
-        twist_bone_dm = cmds.createNode("decomposeMatrix", name=twist_bone_name+"_ExtractAngle_DM")
-        twist_bone_qte = cmds.createNode("quatToEuler", name=twist_bone_name+"_ExtractAngle_QtE")
+        twist_bone_mm = cmds.createNode('multMatrix', name=twist_bone_name+"_ExtractAngle_MM")
+        twist_bone_dm = cmds.createNode('decomposeMatrix', name=twist_bone_name+"_ExtractAngle_DM")
+        twist_bone_qte = cmds.createNode('quatToEuler', name=twist_bone_name+"_ExtractAngle_QtE")
         cmds.connectAttr(node_b+".worldMatrix[0]", twist_bone_mm+".matrixIn[0]", force=True)
         if inverse:
             cmds.connectAttr(node_a+".worldInverseMatrix[0]", twist_bone_mm+".matrixIn[1]", force=True)
@@ -66,7 +66,7 @@ class Math:
         if twist_bone_md:
             cmds.connectAttr(twist_bone_qte+".outputRotate.outputRotate"+axis, twist_bone_md+".input2"+axis, force=True)
         else:
-            twist_bone_md = cmds.createNode("multiplyDivide", name=twist_bone_name+"_MD")
+            twist_bone_md = cmds.createNode('multiplyDivide', name=twist_bone_name+"_MD")
             cmds.connectAttr(twist_bone_qte+".outputRotate.outputRotate"+axis, twist_bone_md+".input2"+axis, force=True)
         self.ar.custom_attr.add_attr(0, [twist_bone_mm, twist_bone_dm, twist_bone_qte, twist_bone_md]) #dpID
         return twist_bone_md
@@ -102,7 +102,7 @@ class Math:
     def get_decomposed_ids(self, id):
         """ Returns a list with prefix, name and date from decomposed given dpID.
         """
-        word, now = id.split(".")
+        word, now = id.split('.')
         info = bytes.fromhex(word).decode('utf-8')
         prefix = info[0:2]
         name = info[2:]
@@ -124,7 +124,7 @@ class Math:
         """
         if cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True):
             decomposed_id_items = self.decompose_id(item)
-            if "dp" == decomposed_id_items[0] and item == decomposed_id_items[1]:
+            if 'dp' == decomposed_id_items[0] and item == decomposed_id_items[1]:
                 return True
 
 

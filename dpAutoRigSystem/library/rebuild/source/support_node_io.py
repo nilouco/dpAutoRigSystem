@@ -3,19 +3,19 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "SupportNodeIO"
-TITLE = "r023_supportNodeIO"
-DESCRIPTION = "r024_supportNodeIODesc"
-WIKI = "10-‐-Rebuilder#-support-node"
+CLASS_NAME = 'SupportNodeIO'
+TITLE = 'r023_supportNodeIO'
+DESCRIPTION = 'r024_supportNodeIODesc'
+WIKI = '10-‐-Rebuilder#-support-node'
 
 
 
 class SupportNodeIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.set_action_type("r000_rebuilder")
-        self.io_folder = "s_supportNodeIO"
-        self.start_name = "dpSupportNode"
+        self.set_action_type('r000_rebuilder')
+        self.io_folder = 's_supportNodeIO'
+        self.start_name = 'dpSupportNode'
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -37,7 +37,7 @@ class SupportNodeIO(action.BaseAction):
         if not cmds.file(query=True, reference=True):
             if self.ar.pipeliner.check_asset_context():
                 # load alembic plugin
-                if self.ar.config.check_loaded_plugin("AbcExport") and self.ar.config.check_loaded_plugin("AbcImport"):
+                if self.ar.config.check_loaded_plugin('AbcExport') and self.ar.config.check_loaded_plugin('AbcImport'):
                     self.io_path = self.get_io_path(self.io_folder)
                     if self.io_path:
                         if self.first_mode: #export
@@ -50,7 +50,7 @@ class SupportNodeIO(action.BaseAction):
                                 self.ar.ui_manager.set_progress(self.ar.data.lang[self.title], add_one=False, add_number=False)
                                 self.export_alembic_file(items, attr=False, curve=True)
                             else:
-                                self.maybe_done_io("Geometries")
+                                self.maybe_done_io('Geometries')
                         else: #import
                             self.import_latest_alembic_file(self.get_exported_items())
                     else:
@@ -76,14 +76,14 @@ class SupportNodeIO(action.BaseAction):
         """ Returns a list of the first children node in base groups.
         """
         geos = []
-        geo_grps = ["supportGrp", "blendShapesGrp", "wipGrp", "fxGrp"]
+        geo_grps = ['supportGrp', 'blendShapesGrp', 'wipGrp', 'fxGrp']
         for geo_grp in geo_grps:
             grp = self.ar.utils.get_node_by_message(geo_grp)
             if grp:
-                items = cmds.listRelatives(grp, allDescendents=True, fullPath=True, noIntermediate=True, type="mesh") or []
-                items.extend(cmds.listRelatives(grp, allDescendents=True, fullPath=True, noIntermediate=True, type="nurbsCurve") or []) #include curves to export hair guides
+                items = cmds.listRelatives(grp, allDescendents=True, fullPath=True, noIntermediate=True, type='mesh') or []
+                items.extend(cmds.listRelatives(grp, allDescendents=True, fullPath=True, noIntermediate=True, type='nurbsCurve') or []) #include curves to export hair guides
                 if items:
-                    geos.extend([n for n in cmds.listRelatives(grp, children=True, type="transform") if not "dpID" in cmds.listAttr(n) and not self.ar.naming.get_suffix_numbers(n)[1].endswith("Base")] or [])
-        if cmds.objExists("Zipper_Curves_Grp"):
-            geos.extend(cmds.listRelatives("Zipper_Curves_Grp", children=True))
+                    geos.extend([n for n in cmds.listRelatives(grp, children=True, type='transform') if not 'dpID' in cmds.listAttr(n) and not self.ar.naming.get_suffix_numbers(n)[1].endswith('Base')] or [])
+        if cmds.objExists('Zipper_Curves_Grp'):
+            geos.extend(cmds.listRelatives('Zipper_Curves_Grp', children=True))
         return geos

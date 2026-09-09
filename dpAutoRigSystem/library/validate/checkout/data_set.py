@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "DataSet"
-TITLE = "v144_dataSet"
-DESCRIPTION = "v145_dataSetDesc"
-WIKI = "07-‐-Validator#-data_grp-set-cleaner"
+CLASS_NAME = 'DataSet'
+TITLE = 'v144_dataSet'
+DESCRIPTION = 'v145_dataSetDesc'
+WIKI = '07-‐-Validator#-data_grp-set-cleaner'
 
 
 
@@ -35,9 +35,9 @@ class DataSet(action.BaseAction):
             if inputs:
                 data_grp = inputs[0]
             else:
-                data_grp = self.ar.utils.get_node_by_message("data_grp")
-                if not data_grp and cmds.objExists("Data_Grp"):
-                    data_grp = "Data_Grp"
+                data_grp = self.ar.utils.get_node_by_message('data_grp')
+                if not data_grp and cmds.objExists('Data_Grp'):
+                    data_grp = 'Data_Grp'
             if data_grp:
                 check_items = cmds.listRelatives(data_grp, children=True, allDescendents=True)
                 if check_items:
@@ -47,7 +47,7 @@ class DataSet(action.BaseAction):
                         plugs = cmds.listConnections(item+".instObjGroups[0]", source=False, destination=True, plugs=True)
                         if plugs:
                             for plug in plugs:
-                                if cmds.objectType(plug.split(".")[0]) == "objectSet":
+                                if cmds.objectType(plug.split('.')[0]) == 'objectSet':
                                     item_done = False
                                     if item in self.checked_items:
                                         item_done = True

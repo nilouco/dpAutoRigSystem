@@ -3,10 +3,10 @@ from maya import cmds
 from ..base import standard
 
 # global variables to this module:    
-CLASS_NAME = "Single"
-TITLE = "m073_single"
-DESCRIPTION = "m074_singleDesc"
-WIKI = "03-‐-Guides#-single"
+CLASS_NAME = 'Single'
+TITLE = 'm073_single'
+DESCRIPTION = 'm074_singleDesc'
+WIKI = '03-‐-Guides#-single'
 
 
 
@@ -23,17 +23,17 @@ class Single(standard.BaseStandard):
         self.create_guide_base()
         self.create_guide_custom_attr()
         self.create_guide_elements()
-        self.add_node_to_guide_net([self.guide_loc, self.guide_end_loc], ["JointLoc1", "JointEnd"])
+        self.add_node_to_guide_net([self.guide_loc, self.guide_end_loc], ['JointLoc1', 'JointEnd'])
 
 
     def create_guide_custom_attr(self):
         """ Add guide_base attributes and set them.
         """
-        cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="indirectSkin", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName='flip', attributeType='bool')
+        cmds.addAttr(self.guide_base, longName='indirectSkin', attributeType='bool')
         cmds.addAttr(self.guide_base, longName='holder', attributeType='bool')
         cmds.addAttr(self.guide_base, longName='sdkLocator', attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="deformedBy", minValue=0, defaultValue=0, maxValue=3, attributeType='long')
+        cmds.addAttr(self.guide_base, longName='deformedBy', minValue=0, defaultValue=0, maxValue=3, attributeType='long')
 
 
     def create_guide_elements(self):
@@ -47,7 +47,7 @@ class Single(standard.BaseStandard):
         self.line_end = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
         # setup
         self.ar.utils.set_template([self.line, self.line_end])
-        cmds.setAttr(self.guide_end_loc+".tz", 1.3)
+        cmds.setAttr(self.guide_end_loc+".translateZ", 1.3)
         # parenting
         cmds.parent(self.line, self.guide_loc, self.guide_base, relative=True)
         cmds.parent(self.guide_end_loc, self.guide_loc)
@@ -93,18 +93,18 @@ class Single(standard.BaseStandard):
                 # work with curve shape and rotation cases:
                 indirectskin_rot = (0, 0, 0)
                 if self.ar.data.lang['c058_main'] in self.number_name:
-                    ctrl_type_id = "id_054_SingleMain"
+                    ctrl_type_id = 'id_054_SingleMain'
                     if len(self.sides) > 1:
                         if self.ar.data.lang['c041_eyebrow'] in self.number_name:
                             indirectskin_rot = (0, 0, -90)
                         else:
                             indirectskin_rot = (0, 0, 90)
                 else:
-                    ctrl_type_id = "id_029_SingleIndSkin"
+                    ctrl_type_id = 'id_029_SingleIndSkin'
                     if self.ar.data.lang['c045_lower'] in self.number_name:
                         indirectskin_rot=(0, 0, 180)
                     elif self.ar.data.lang['c043_corner'] in self.number_name:
-                        if "00" in self.number_name:
+                        if '00' in self.number_name:
                             indirectskin_rot=(0, 0, 90)
                         else:
                             indirectskin_rot=(0, 0, -90)
@@ -123,13 +123,13 @@ class Single(standard.BaseStandard):
                     cmds.setAttr(single_ctrl_zero+".scaleY", -1)
                     cmds.setAttr(single_ctrl_zero+".scaleZ", -1)
                 if not self.get_guide_attr('indirectSkin'):
-                    cmds.addAttr(single_ctrl, longName='scaleCompensate', attributeType="short", minValue=0, maxValue=1, defaultValue=1, keyable=False)
+                    cmds.addAttr(single_ctrl, longName='scaleCompensate', attributeType='short', minValue=0, maxValue=1, defaultValue=1, keyable=False)
                     cmds.setAttr(single_ctrl+".scaleCompensate", channelBox=True)
                     cmds.connectAttr(single_ctrl+".scaleCompensate", jnt+".segmentScaleCompensate", force=True)
                 if self.get_guide_attr('indirectSkin'):
                     # create fatherJoints in order to create_zero_out the skinning joint:
                     cmds.select(clear=True)
-                    jxt_name = jnt.replace("_Jnt", "_Jxt")
+                    jxt_name = jnt.replace('_Jnt', '_Jxt')
                     jxt = cmds.duplicate(jnt, name=jxt_name)[0]
                     self.ar.utils.clear_dpar_attr([jxt])
                     cmds.makeIdentity(jnt, apply=True, jointOrient=False)
@@ -138,7 +138,7 @@ class Single(standard.BaseStandard):
                         cmds.connectAttr(single_ctrl+'.'+attr, jnt+'.'+attr, force=True)
                     # fix mirror issue: Maya 2026 release bug
                     if s == 1 and cmds.getAttr(self.guide_base+".flip") == 1:
-                        inv_md = cmds.createNode("multiplyDivide", name=jxt_name.replace("_Jxt", "_Inv_MD"))
+                        inv_md = cmds.createNode('multiplyDivide', name=jxt_name.replace('_Jxt', '_Inv_MD'))
                         for axis in self.ar.data.axes:
                             cmds.setAttr(inv_md+".input2"+axis, -1)
                             cmds.connectAttr(single_ctrl+'.translate'+axis, inv_md+'.input1'+axis, force=True)
@@ -149,23 +149,23 @@ class Single(standard.BaseStandard):
                         self.ar.utils.remove_user_defined_attr(single_ctrl, True)
                         self.ar.utils.add_attr_to_items([single_ctrl], "dpHolder")
                         self.ar.ctrls.set_lock_hide([single_ctrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
-                        jnt = cmds.rename(jnt, jnt.replace("_Jnt", "_"+self.ar.data.lang['c046_holder']+"_Jis"))
+                        jnt = cmds.rename(jnt, jnt.replace('_Jnt', "_"+self.ar.data.lang['c046_holder']+"_Jis"))
                         self.ar.ctrls.set_lock_hide([jnt], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'], True, True)
                     else:
                         if self.get_guide_attr('sdkLocator') and not self.ar.data.lang['c058_main'] in self.number_name:
                             # this one will be used to receive inputs from sdk locator:
-                            sdk_jis_name = jnt.replace("_Jnt", "_SDK_Jis")
+                            sdk_jis_name = jnt.replace('_Jnt', '_SDK_Jis')
                             sdk_jis = cmds.duplicate(jnt, name=sdk_jis_name)[0]
                             # sdk locator:
-                            sdk_loc = cmds.spaceLocator(name=sdk_jis.replace("_Jis", "_Loc"))[0]
+                            sdk_loc = cmds.spaceLocator(name=sdk_jis.replace('_Jis', '_Loc'))[0]
                             sdk_loc_grp = cmds.group(sdk_loc, name=sdk_loc+"_Grp")
                             cmds.matchTransform(sdk_loc_grp, single_ctrl, position=True, rotation=True)
                             cmds.parent(sdk_loc_grp, single_ctrl, relative=True)
-                            sdk_loc_md = cmds.createNode("multiplyDivide", name=sdk_loc+"_MD")
+                            sdk_loc_md = cmds.createNode('multiplyDivide', name=sdk_loc+"_MD")
                             self.to_ids.append(sdk_loc_md)
-                            cmds.addAttr(sdk_loc, longName="intensityX", attributeType="float", defaultValue=-1, keyable=False)
-                            cmds.addAttr(sdk_loc, longName="intensityY", attributeType="float", defaultValue=-1, keyable=False)
-                            cmds.addAttr(sdk_loc, longName="intensityZ", attributeType="float", defaultValue=-1, keyable=False)
+                            cmds.addAttr(sdk_loc, longName="intensityX", attributeType='float', defaultValue=-1, keyable=False)
+                            cmds.addAttr(sdk_loc, longName="intensityY", attributeType='float', defaultValue=-1, keyable=False)
+                            cmds.addAttr(sdk_loc, longName="intensityZ", attributeType='float', defaultValue=-1, keyable=False)
                             cmds.connectAttr(sdk_loc+".translateX", sdk_loc_md+".input1X", force=True)
                             cmds.connectAttr(sdk_loc+".translateY", sdk_loc_md+".input1Y", force=True)
                             cmds.connectAttr(sdk_loc+".translateZ", sdk_loc_md+".input1Z", force=True)
@@ -175,7 +175,7 @@ class Single(standard.BaseStandard):
                             cmds.connectAttr(sdk_loc_md+".outputX", sdk_loc_grp+".translateX", force=True)
                             cmds.connectAttr(sdk_loc_md+".outputY", sdk_loc_grp+".translateY", force=True)
                             cmds.connectAttr(sdk_loc_md+".outputZ", sdk_loc_grp+".translateZ", force=True)
-                            cmds.addAttr(single_ctrl, longName="displayLocator", attributeType="bool", keyable=False)
+                            cmds.addAttr(single_ctrl, longName="displayLocator", attributeType='bool', keyable=False)
                             cmds.setAttr(single_ctrl+".displayLocator", 0, channelBox=True)
                             cmds.connectAttr(single_ctrl+".displayLocator", sdk_loc+".visibility", force=True)
                             cmds.setAttr(sdk_loc+".visibility", lock=True)
@@ -185,7 +185,7 @@ class Single(standard.BaseStandard):
                             cmds.setAttr(sdk_loc_grp+".rotateY", 0)
                             cmds.setAttr(sdk_loc_grp+".rotateZ", 0)
                         # rename indirectSkinning joint from Jnt to Jis:
-                        jnt = cmds.rename(jnt, jnt.replace("_Jnt", "_Jis"))
+                        jnt = cmds.rename(jnt, jnt.replace('_Jnt', '_Jis'))
                 else: # like a fkLine
                     # create parentConstraint from ctrl to jnt:
                     cmds.parentConstraint(single_ctrl, jnt, maintainOffset=False, name=jnt+"_PaC")
@@ -219,7 +219,7 @@ class Single(standard.BaseStandard):
         """ This method will create a dictionary with informations about integrations system between modules.
         """
         self.composed = {
-                            "mainJisList"   : self.main_jis_items,
-                            "staticGrpList" : self.static_grps,
-                            "ctrlGrpList"   : self.ctrl_grps,
+                            'mainJisList'   : self.main_jis_items,
+                            'staticGrpList' : self.static_grps,
+                            'ctrlGrpList'   : self.ctrl_grps,
                         }

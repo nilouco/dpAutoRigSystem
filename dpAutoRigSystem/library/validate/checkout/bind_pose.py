@@ -3,17 +3,17 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "BindPose"
-TITLE = "v113_bindPose"
-DESCRIPTION = "v114_bindPoseDesc"
-WIKI = "07-‐-Validator#-bindpose-cleaner"
+CLASS_NAME = 'BindPose'
+TITLE = 'v113_bindPose'
+DESCRIPTION = 'v114_bindPoseDesc'
+WIKI = '07-‐-Validator#-bindpose-cleaner'
 
 
 
 class BindPose(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.bind_pose_name = "dpAR_BP"
+        self.bind_pose_name = 'dpAR_BP'
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -34,9 +34,9 @@ class BindPose(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if inputs:
-                check_items = cmds.ls(inputs, type="dagPose")
+                check_items = cmds.ls(inputs, type='dagPose')
             else:
-                check_items = cmds.ls(selection=False, type="dagPose") #bindPose nodes
+                check_items = cmds.ls(selection=False, type='dagPose') #bindPose nodes
             if check_items:
                 self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
                 # conditional to check here

@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "UnknownNodes"
-TITLE = "v058_unknownNodes"
-DESCRIPTION = "v059_unknownNodesDesc"
-WIKI = "07-‐-Validator#-unknown-nodes-cleaner"
+CLASS_NAME = 'UnknownNodes'
+TITLE = 'v058_unknownNodes'
+DESCRIPTION = 'v059_unknownNodesDesc'
+WIKI = '07-‐-Validator#-unknown-nodes-cleaner'
 
 
 

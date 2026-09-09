@@ -7,7 +7,7 @@ from maya import cmds
 class Opening:
     def create_opening_ui(self, version):
         loading_message = f"Loading dpAutoRigSystem v{version} ... "
-        print("\n----------")
+        print('\n----------')
         print(loading_message)
         # generating random image
         path = os.path.dirname(__file__).replace('\\', '/')

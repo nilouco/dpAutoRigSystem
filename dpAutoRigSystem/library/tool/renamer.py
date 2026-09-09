@@ -5,10 +5,10 @@ from maya import cmds, mel
 from ..base import base
 
 # global variables to this module:
-CLASS_NAME = "Renamer"
-TITLE = "m214_renamer"
-DESCRIPTION = "m215_renamerDesc"
-WIKI = "06-‐-Tools#-renamer"
+CLASS_NAME = 'Renamer'
+TITLE = 'm214_renamer'
+DESCRIPTION = 'm215_renamerDesc'
+WIKI = '06-‐-Tools#-renamer'
 
 
 
@@ -53,8 +53,8 @@ class Renamer(base.BaseLibrary):
                 if cmds.objExists(item):
                     # new:
                     new_name = item
-                    if "|" in item:
-                        new_name = item[item.rfind("|")+1:]
+                    if '|' in item:
+                        new_name = item[item.rfind('|')+1:]
                     preview_data[item] = new_name
                     # sequence
                     if self.add_sequence:

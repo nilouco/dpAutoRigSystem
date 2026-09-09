@@ -4,10 +4,10 @@ import os
 
 from maya import cmds, mel
 
-DPCONTROL = "dpControl"
-SNAPSHOT_SUFFIX = "_Snapshot_Crv"
-HEADDEFINFLUENCE = "dpHeadDeformerInfluence"
-JAWDEFINFLUENCE = "dpJawDeformerInfluence"
+DPCONTROL = 'dpControl'
+SNAPSHOT_SUFFIX = '_Snapshot_Crv'
+HEADDEFINFLUENCE = 'dpHeadDeformerInfluence'
+JAWDEFINFLUENCE = 'dpJawDeformerInfluence'
 
 
 
@@ -24,7 +24,7 @@ class Controllers:
         """ Just load class variables here.
         """
         self.attr_value_data = {}
-        self.ignore_default_value_attrs = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility", "rotateOrder", "scaleCompensate"]
+        self.ignore_default_value_attrs = ['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ', 'visibility', 'rotateOrder', 'scaleCompensate']
         self.shape_types = ['nurbsCurve', 'nurbsSurface', 'mesh', 'subdiv']
         self.long_attr_data = {'tx': 'translateX',
                                 'ty': 'translateY',
@@ -91,39 +91,39 @@ class Controllers:
         """
         self.colors = self.get_colors()
         self.colors_data = {
-                            "none": 0,
-                            "yellow": 17,
-                            "red": 13,
-                            "blue": 6,
-                            "cyan": 18,
-                            "green": 7,
-                            "darkRed": 4,
-                            "darkBlue": 15,
-                            "white": 16,
-                            "black": 1,
-                            "gray": 3,
-                            "bonina": [0.38, 0, 0.15]
+                            'none': 0,
+                            'yellow': 17,
+                            'red': 13,
+                            'blue': 6,
+                            'cyan': 18,
+                            'green': 7,
+                            'darkRed': 4,
+                            'darkBlue': 15,
+                            'white': 16,
+                            'black': 1,
+                            'gray': 3,
+                            'bonina': [0.38, 0, 0.15]
                         }
     
 
     def get_colors(self):
         """ Return a list of Maya's colors.
         """
-        #Manually add the "none" color
+        #Manually add the 'none' color
         colors = [[0.627, 0.627, 0.627]]
         #WARNING --> color index in maya start to 1
         colors += [cmds.colorIndex(iColor, q=True) for iColor in range(1,32)]
         return colors
 
 
-    def get_guides_by_attr(self, item, attr="guideColorIndex"):
+    def get_guides_by_attr(self, item, attr='guideColorIndex'):
         """ Return the guide children list if it is a guide node.
         """
         guides = []
         if attr in cmds.listAttr(item):
             guides.append(item)
-            if "__" in item and ":" in item and item.endswith("Guide_Base"):
-                space_name = item.split(":")[0]
+            if '__' in item and ':' in item and item.endswith('Guide_Base'):
+                space_name = item.split(':')[0]
                 children = cmds.listRelatives(item, children=True, allDescendents=True, noIntermediate=True, type=self.shape_types)
                 if children:
                     for child in children:
@@ -156,7 +156,7 @@ class Controllers:
                     if item_type in self.shape_types:
                         self.set_color_override(item, color, color_index, rgb, instance=instance)
                     # verify if the object is a transform type:
-                    elif item_type == "transform":
+                    elif item_type == 'transform':
                         # try get guide shape list
                         items = self.get_guides_by_attr(item)
                         if items:
@@ -224,14 +224,14 @@ class Controllers:
                             items.append(guide)
             for item in items:
                 is_guide = False
-                if "Guide" in item:
-                    self.color_shape([item], "blue")
+                if 'Guide' in item:
+                    self.color_shape([item], 'blue')
                     is_guide = True
-                if "Guide_Base" in item:
-                    self.color_shape([item], "yellow")
+                if 'Guide_Base' in item:
+                    self.color_shape([item], 'yellow')
                     is_guide = True
-                if "Guide_Base_RadiusCtrl" in item:
-                    self.color_shape([item], "cyan")
+                if 'Guide_Base_RadiusCtrl' in item:
+                    self.color_shape([item], 'cyan')
                     is_guide = True
                 if not is_guide or not cmds.objectType(item) in self.shape_types:
                     remove_items = [item]
@@ -240,7 +240,7 @@ class Controllers:
                         cmds.setAttr(node+".overrideEnabled", 0)
                         cmds.setAttr(node+".overrideRGBColors", 0)
                         cmds.setAttr(node+".useOutlinerColor", 0)
-                if "guideColorIndex" in cmds.listAttr(item):
+                if 'guideColorIndex' in cmds.listAttr(item):
                     cmds.setAttr(item+".guideColorIndex", 0)
                     cmds.setAttr(item+".guideColorR", self.colors[0][0])
                     cmds.setAttr(item+".guideColorG", self.colors[0][1])
@@ -300,7 +300,7 @@ class Controllers:
                     results.append(shape)
                 cmds.select(clear=True)
             else:
-                print("There are not children shape to rename inside of:", transform)
+                print('There are not children shape to rename inside of:', transform)
         return results
 
 
@@ -315,7 +315,7 @@ class Controllers:
                     # connect attributes:
                     cmds.connectAttr(from_item+"."+attr, to_item+"."+attr, force=f)
                 except:
-                    print("Error: Cannot connect", to_item, ".", attr, "directely.")
+                    print('Error: Cannot connect', to_item, '.', attr, 'directely.')
 
 
     def set_lock_hide(self, items, attributes, l=True, k=False, cb=False):
@@ -349,7 +349,7 @@ class Controllers:
         """Receive a list of objects, find its shapes if necessary and set all as not renderable.
         """
         # declare a list of attributes for render:
-        render_attrs = ["castsShadows", "receiveShadows", "motionBlur", "primaryVisibility", "smoothShading", "visibleInReflections", "visibleInRefractions", "doubleSided", "miTransparencyCast", "miTransparencyReceive", "miReflectionReceive", "miRefractionReceive", "miFinalGatherCast", "miFinalGatherReceive"]
+        render_attrs = ['castsShadows', 'receiveShadows', 'motionBlur', 'primaryVisibility', 'smoothShading', 'visibleInReflections', 'visibleInRefractions', 'doubleSided', 'miTransparencyCast', 'miTransparencyReceive', 'miReflectionReceive', 'miRefractionReceive', 'miFinalGatherCast', 'miFinalGatherReceive']
         # find all children shapes:
         if items:
             for item in items:
@@ -364,7 +364,7 @@ class Controllers:
                             #print("Error: Cannot set not renderable ", attr, "as zero for", item)
                             pass
                 # verify if the object is a transform type:
-                elif item_type == "transform":
+                elif item_type == 'transform':
                     # find all shapes children of the transform object:
                     shapes = cmds.listRelatives(item, shapes=True, children=True)
                     if shapes:
@@ -378,7 +378,7 @@ class Controllers:
                                     pass
 
 
-    def create_simple_ribbon(self, name='ribbon', total_joints=6, joint_label_number=0, joint_label_name="SimpleRibbon"):
+    def create_simple_ribbon(self, name='ribbon', total_joints=6, joint_label_number=0, joint_label_name='SimpleRibbon'):
         """ Creates a Ribbon system.
             Receives the total number of joints to create.
             Returns the ribbon nurbs plane, the joints groups and joints created.
@@ -416,7 +416,7 @@ class Controllers:
             cmds.connectAttr(infor_node+".tangentV", aim_grp+".translate", force=True)
             # create joint:
             cmds.select(clear=True)
-            joint = cmds.joint(name=name+"_%02d_Jnt"%(j+1))
+            joint = cmds.joint(name=f"{name}_{(j+1):02d}_Jnt")
             joints.append(joint)
             cmds.addAttr(joint, longName='dpAR_joint', attributeType='float', keyable=False)
             # parent the joint to the groups:
@@ -424,11 +424,11 @@ class Controllers:
             joint_grp = cmds.group(joint, name=name+"Joint"+str(j+1)+"_Grp")
             joint_grps.append(joint_grp)
             # create aimConstraint from aim_grp to joint_grp:
-            cmds.aimConstraint(aim_grp, joint_grp, offset=(0, 0, 0), weight=1, aimVector=(0, 1, 0), upVector=(0, 0, 1), worldUpType="object", worldUpObject=up_grp, n=name+"Ribbon"+str(j)+"_AiC" )
+            cmds.aimConstraint(aim_grp, joint_grp, offset=(0, 0, 0), weight=1, aimVector=(0, 1, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=up_grp, n=name+"Ribbon"+str(j)+"_AiC" )
             # parent this ribbonPos to the ribbon_grp:
             cmds.parent(pos_grp, ribbon_grp, absolute=True)
             # joint labelling:
-            self.ar.naming.set_joint_label(joint, joint_label_number, 18, joint_label_name+"_%02d"%(j+1))
+            self.ar.naming.set_joint_label(joint, joint_label_number, 18, f"{joint_label_name}_{(j+1):02d}")
             self.ar.utils.add_attr_to_items([pos_grp, up_grp, aim_grp, joint_grp], self.ar.utils.ignore_transform_io_attr)
         self.ar.utils.add_attr_to_items([ribbon_grp, ribbon_nurbs_plane], self.ar.utils.ignore_transform_io_attr)
         return [ribbon_nurbs_plane, ribbon_nurbs_plane_shape, joint_grps, joints]
@@ -438,9 +438,9 @@ class Controllers:
         """ Find and return node list with ctrl_type in its attribute.
         """
         controllers = []
-        transforms = cmds.ls(selection=False, type="transform")
+        transforms = cmds.ls(selection=False, type='transform')
         for item in transforms:
-            if "controlID" in cmds.listAttr(item) and cmds.getAttr(item+".controlID") == ctrl_type:
+            if 'controlID' in cmds.listAttr(item) and cmds.getAttr(item+".controlID") == ctrl_type:
                 controllers.append(item)
         return controllers
 
@@ -467,7 +467,7 @@ class Controllers:
             Otherwise, check if ctrl_type is a valid control curve object in order to create it.
         """
         # get control module:
-        if ctrl_type.startswith("id_"):
+        if ctrl_type.startswith('id_'):
             ctrl_module = self.get_controller_module_by_id(ctrl_type)
             # get degree:
             if d == 0:
@@ -487,8 +487,8 @@ class Controllers:
             if head_def != 0:
                 self.add_def_influence_attrs(curve, head_def)
             if guide_source:
-                cmds.addAttr(curve, longName="guide_source", dataType="string")
-                cmds.setAttr(curve+".guide_source", guide_source, type="string")
+                cmds.addAttr(curve, longName='guide_source', dataType='string')
+                cmds.setAttr(curve+".guide_source", guide_source, type='string')
             if parent_tag:
                 cmds.connectAttr(parent_tag+".message", curve+".parentTag", force=True)
             return curve
@@ -502,12 +502,12 @@ class Controllers:
         """
         if curve:
             if def_influence_type == 1 or def_influence_type == 3:
-                cmds.addAttr(curve, longName=HEADDEFINFLUENCE, attributeType="bool", defaultValue=1)
+                cmds.addAttr(curve, longName=HEADDEFINFLUENCE, attributeType='bool', defaultValue=1)
             if def_influence_type == 2 or def_influence_type == 3:
-                cmds.addAttr(curve, longName=JAWDEFINFLUENCE, attributeType="bool", defaultValue=1)
+                cmds.addAttr(curve, longName=JAWDEFINFLUENCE, attributeType='bool', defaultValue=1)
 
 
-    def create_curve_locator(self, ctrl_name, r=1, d=1, guide=False, rot=(0, 0, 0), color="blue", cvType="Locator", pin=True):
+    def create_curve_locator(self, ctrl_name, r=1, d=1, guide=False, rot=(0, 0, 0), color='blue', cvType="Locator", pin=True):
         """ Create and return a create_curve_locator curve to be usually used in the guideSystem.
         """
         curve_instance = self.ar.config.get_instance(cvType, [self.ar.data.curve_simple_folder, self.ar.data.curve_combined_folder])
@@ -534,7 +534,7 @@ class Controllers:
         curves = [cv_loc, cv_arrow_1, cv_arrow_2, cv_arrow_3, cv_arrow_4, cv_arrow_5, cv_arrow_6]
         self.rename_shape(curves)
         # create ball curve:
-        cv_template_ball = self.create_controller("Ball", ctrl_name+"_CvBall", r=0.7*r, d=3)
+        cv_template_ball = self.create_controller('Ball', ctrl_name+"_CvBall", r=0.7*r, d=3)
         # parent shapes to transform:
         ctrl_loc = cmds.group(name=ctrl_name, empty=True)
         children_ball = cmds.listRelatives(cv_template_ball, shapes=True, children=True)
@@ -554,20 +554,20 @@ class Controllers:
         return ctrl_loc
 
 
-    def create_character_ctrl(self, ctrl_type, ctrl_name, r=1, d=1, dir="+Y", rot=(0, 0, 0)):
+    def create_character_ctrl(self, ctrl_type, ctrl_name, r=1, d=1, dir='+Y', rot=(0, 0, 0)):
         """ Create and return a curve to be used as a control.
         """
         # get radius by checking linear unit
         #r = self.dpCheckLinearUnit(r)
         curve = self.create_controller(ctrl_type, ctrl_name, r, d, dir, rot)
         # edit a minime curve:
-        cmds.addAttr(curve, longName="rigScale", attributeType='float', defaultValue=1, keyable=True, minValue=0.001)
-        cmds.addAttr(curve, longName="rigScaleMultiplier", attributeType='float', defaultValue=1, keyable=False)
+        cmds.addAttr(curve, longName='rigScale', attributeType='float', defaultValue=1, keyable=True, minValue=0.001)
+        cmds.addAttr(curve, longName='rigScaleMultiplier', attributeType='float', defaultValue=1, keyable=False)
         
         # create Option_Ctrl Text:
         try:
-            option_ctrl_txt = cmds.group(name="Option_Ctrl_Txt", empty=True)
-            cv_text = cmds.textCurves(name="Option_Ctrl_Txt_TEMP_Grp", text="OPTIONS", constructionHistory=False)[0]
+            option_ctrl_txt = cmds.group(name='Option_Ctrl_Txt', empty=True)
+            cv_text = cmds.textCurves(name='Option_Ctrl_Txt_TEMP_Grp', text='OPTIONS', constructionHistory=False)[0]
             for attr in self.ar.data.axes:
                 cmds.setAttr(cv_text+".scale"+attr, 0.3*r)
             text_shapes = cmds.listRelatives(cv_text, allDescendents=True, type='nurbsCurve')
@@ -588,8 +588,8 @@ class Controllers:
             cmds.delete(cv_text)
             cmds.parent(option_ctrl_txt, curve)
             cmds.setAttr(option_ctrl_txt+".template", 1)
-            cmds.setAttr(option_ctrl_txt+".tx", -0.61*r)
-            cmds.setAttr(option_ctrl_txt+".ty", 1.1*r)
+            cmds.setAttr(option_ctrl_txt+".translateX", -0.61*r)
+            cmds.setAttr(option_ctrl_txt+".translateY", 1.1*r)
             self.ar.custom_attr.add_attr(0, [option_ctrl_txt]) #dpID
         except:
             # it will pass if we don't able to find the font to create the text
@@ -632,7 +632,7 @@ class Controllers:
         radius_ctrl_history = histories[1]
         # rename and make a connection for circle:
         circle_history = cmds.rename(circle_history, circle+"_makeNurbCircle")
-        cmds.connectAttr(radius_ctrl+".tx", circle_history+".radius", force=True)
+        cmds.connectAttr(radius_ctrl+".translateX", circle_history+".radius", force=True)
         radius_ctrl_history = cmds.rename(radius_ctrl_history, radius_ctrl+"_makeNurbCircle")
         # create a mutiplyDivide in order to automatisation the radius of the radius_ctrl:
         radius_ctrl_md = cmds.createNode('multiplyDivide', name=radius_ctrl+'_MD')
@@ -659,7 +659,7 @@ class Controllers:
             if selection:
                 source_item = selection[0]
             else:
-                print(self.ar.data.lang["e015_selectToCopyAttr"])
+                print(self.ar.data.lang['e015_selectToCopyAttr'])
         if cmds.objExists(source_item):
             if not attributes:
                 # getting channelBox selected attributes:
@@ -678,7 +678,7 @@ class Controllers:
                         value = cmds.getAttr(source_item+'.'+attr)
                         self.attr_value_data[attr] = value
                 if verbose:
-                    print(self.ar.data.lang["i125_copiedAttr"])
+                    print(self.ar.data.lang['i125_copiedAttr'])
         return self.attr_value_data
 
 
@@ -699,9 +699,9 @@ class Controllers:
                             cmds.setAttr(dest_item+'.'+attr, self.attr_value_data[attr], type='string')
                         except:
                             if verbose:
-                                print(self.ar.data.lang["e016_notPastedAttr"], attr)
+                                print(self.ar.data.lang['e016_notPastedAttr'], attr)
             if verbose:
-                print(self.ar.data.lang["i126_pastedAttr"])
+                print(self.ar.data.lang['i126_pastedAttr'])
 
 
     def copy_and_paste_attr(self, verbose=False, *args):
@@ -729,14 +729,14 @@ class Controllers:
         """ Transfer control shape from source_item to destination list
         """
         if not source_item:
-            selection = cmds.ls(selection=True, type="transform")
+            selection = cmds.ls(selection=True, type='transform')
             if selection and len(selection) > 1:
                 # get first selected item
                 source_item = selection[0]
                 # get other selected items
                 destinations = selection[1:]
         if source_item:
-            source_shapes = cmds.listRelatives(source_item, shapes=True, type="nurbsCurve", fullPath=True)
+            source_shapes = cmds.listRelatives(source_item, shapes=True, type='nurbsCurve', fullPath=True)
             if source_shapes and destinations:
                 for dest_transform in destinations:
                     need_keep_vis = False
@@ -746,7 +746,7 @@ class Controllers:
                     self.ar.utils.delete_orig_shape(dup_source_item)
                     if keep_color:
                         self.set_source_color_override(dup_source_item, [dest_transform])
-                    dest_shapes = cmds.listRelatives(dest_transform, shapes=True, type="nurbsCurve", fullPath=True)
+                    dest_shapes = cmds.listRelatives(dest_transform, shapes=True, type='nurbsCurve', fullPath=True)
                     if dest_shapes:
                         for dest_shape in dest_shapes:
                             # keep visibility connections if exists:
@@ -765,16 +765,16 @@ class Controllers:
                         if clear_dest_shapes:
                             cmds.delete(dest_shapes)
                     # hack: unparent destination children in order to get a good shape hierarchy order as index 0:
-                    dest_children = cmds.listRelatives(dest_transform, shapes=False, type="transform", fullPath=True)
+                    dest_children = cmds.listRelatives(dest_transform, shapes=False, type='transform', fullPath=True)
                     if dest_children:
-                        self.destChildrenGrp = cmds.group(dest_children, name="dpTemp_DestChildren_Grp")
+                        self.destChildrenGrp = cmds.group(dest_children, name='dpTemp_DestChildren_Grp')
                         cmds.parent(self.destChildrenGrp, world=True)
                     if defs:
                         self.ar.utils.reapply_deformers(dup_source_item, defs)
-                    dup_source_shapes = cmds.listRelatives(dup_source_item, shapes=True, type="nurbsCurve", fullPath=True)
+                    dup_source_shapes = cmds.listRelatives(dup_source_item, shapes=True, type='nurbsCurve', fullPath=True)
                     for d, dup_source_shape in enumerate(dup_source_shapes):
                         if need_keep_vis:
-                            if "Global" in dest_transform or "Master" in dest_transform or "Root" in dest_transform: #directionDisplay attribute exception
+                            if 'Global' in dest_transform or 'Master' in dest_transform or 'Root' in dest_transform: #directionDisplay attribute exception
                                 if d != 0:
                                     cmds.connectAttr(source_vis, dup_source_shape+".visibility", force=True)
                             else:
@@ -784,12 +784,12 @@ class Controllers:
                         elif cmds.objExists(dup_source_shape):
                             # make sure we use the current shape of a froze transform, usefull to mirror control shapes
                             forced_shape = cmds.parent(dup_source_shape, dest_transform, absolute=True, shape=True)[0]
-                            forced_transform = cmds.listRelatives(forced_shape, parent=True, type="transform", fullPath=True)
+                            forced_transform = cmds.listRelatives(forced_shape, parent=True, type='transform', fullPath=True)
                             history = cmds.listHistory(forced_shape)
                             # workaround to avoid undesirable warning about tweak nodes
                             cmds.delete(forced_shape, constructionHistory=True)
                             for x in history:
-                                if "tweak" in x and cmds.objExists(x):
+                                if 'tweak' in x and cmds.objExists(x):
                                     cmds.delete(x)
                             cmds.makeIdentity(forced_transform, apply=True, translate=True, rotate=True, scale=True)
                             cmds.parent(forced_shape, dest_transform, relative=True, shape=True)
@@ -801,11 +801,11 @@ class Controllers:
                     self.rename_shape([dest_transform])
                     # restore children transforms to correct parent hierarchy:
                     if dest_children:
-                        cmds.parent((cmds.listRelatives(self.destChildrenGrp, shapes=False, type="transform", fullPath=True)), dest_transform)
+                        cmds.parent((cmds.listRelatives(self.destChildrenGrp, shapes=False, type='transform', fullPath=True)), dest_transform)
                         cmds.delete(self.destChildrenGrp)
                 if delete_source:
                     # update cvControls attributes:
-                    self.transfer_attr(source_item, destinations, ["className", "size", "degree", "cvRotX", "cvRotY", "cvRotZ"])
+                    self.transfer_attr(source_item, destinations, ['className', 'size', 'degree', 'cvRotX', 'cvRotY', 'cvRotZ'])
                     cmds.delete(source_item)
                 self.ar.custom_attr.add_attr(0, destinations, shapes=True) #dpID
 
@@ -837,7 +837,7 @@ class Controllers:
         """
         colors = []
         for item in destinations:
-            children_shapes = cmds.listRelatives(item, shapes=True, type="nurbsCurve", fullPath=True)
+            children_shapes = cmds.listRelatives(item, shapes=True, type='nurbsCurve', fullPath=True)
             if children_shapes:
                 for childShape in children_shapes:
                     if cmds.getAttr(childShape+".overrideEnabled") == 1:
@@ -859,7 +859,7 @@ class Controllers:
             3 to 1.
         """
         if not transforms:
-            transforms = cmds.ls(selection=True, type="transform")
+            transforms = cmds.ls(selection=True, type='transform')
         if transforms:
             for item in transforms:
                 if DPCONTROL in cmds.listAttr(item) and cmds.getAttr(item+"."+DPCONTROL) == 1:
@@ -878,7 +878,7 @@ class Controllers:
                         else: #cubic
                             current_degree = 1 #linear
                         cmds.setAttr(item+".degree", current_degree)
-                    curve = self.create_controller(current_type, "Temp_Ctrl", current_size, current_degree, current_dir, (current_rot_x, current_rot_y, current_rot_z), 1)
+                    curve = self.create_controller(current_type, 'Temp_Ctrl', current_size, current_degree, current_dir, (current_rot_x, current_rot_y, current_rot_z), 1)
                     self.transfer_shape(delete_source=True, clear_dest_shapes=True, source_item=curve, destinations=[item], keep_color=True)
             cmds.select(transforms)
 
@@ -925,14 +925,14 @@ class Controllers:
                     date = str(datetime.datetime.now().date())
                     result_string = '{"_preset":"'+result_name+'","_author":"'+author+'","_date":"'+date+'","_updated":"'+date+'"'
                     # add default keys to dict:
-                    ctrl_ids.append("_preset")
-                    ctrl_ids.append("_author")
-                    ctrl_ids.append("_date")
-                    ctrl_ids.append("_updated")
+                    ctrl_ids.append('_preset')
+                    ctrl_ids.append('_author')
+                    ctrl_ids.append('_date')
+                    ctrl_ids.append('_updated')
                     # get all existing controls info
                     for ctrl_node in controllers:
                         ctrl_id = cmds.getAttr(ctrl_node+".controlID")
-                        if ctrl_id.startswith("id_") and not ctrl_id in ctrl_ids:
+                        if ctrl_id.startswith('id_') and not ctrl_id in ctrl_ids:
                             ctrl_ids.append(ctrl_id)
                             ctrl_type = cmds.getAttr(ctrl_node+".className")
                             ctrl_degree = cmds.getAttr(ctrl_node+".degree")
@@ -941,7 +941,7 @@ class Controllers:
                     for j, p_id in enumerate(self.ar.data.curve_preset):
                         if not p_id in ctrl_ids:
                             # get missing controlIDs from current preset:
-                            result_string += ',"'+p_id+'":{"type":"'+self.ar.data.curve_preset[p_id]["type"]+'","degree":'+str(self.ar.data.curve_preset[p_id]["degree"])+'}'
+                            result_string += ',"'+p_id+'":{"type":"'+self.ar.data.curve_preset[p_id]['type']+'","degree":'+str(self.ar.data.curve_preset[p_id]['degree'])+'}'
                     result_string += "}"
         return result_string
 
@@ -972,12 +972,12 @@ class Controllers:
     #        newRadius = origRadius*0.010936
         # adapt radius to geometry meshes size
         if boundingBox:
-            meshes = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh")
+            meshes = cmds.ls(selection=False, noIntermediate=True, long=True, type='mesh')
             if meshes:
                 tempList = []
                 for item in meshes:
-                    if not "_DeformerCube_Geo" in item:
-                        fatherNode = item[:item[1:].find("|")+1]
+                    if not '_DeformerCube_Geo' in item:
+                        fatherNode = item[:item[1:].find('|')+1]
                         if fatherNode and not fatherNode in tempList:
                             tempList.append(fatherNode)
                 if tempList:
@@ -998,15 +998,15 @@ class Controllers:
         cluster_handle = None
         children_shapes = cmds.listRelatives(transform_node, shapes=True, children=True)
         if children_shapes:
-            this_namespace = children_shapes[0].split(":")[0]
+            this_namespace = children_shapes[0].split(':')[0]
             cmds.namespace(set=this_namespace, force=True)
-            cluster_name = transform_node.split(":")[1]+"_ShapeSizeCH"
+            cluster_name = transform_node.split(':')[1]+"_ShapeSizeCH"
             cluster_handle = cmds.cluster(children_shapes, name=cluster_name)[1]
             cmds.setAttr(cluster_handle+".visibility", 0)
             cmds.xform(cluster_handle, scalePivot=(0, 0, 0), worldSpace=True)
-            cmds.namespace(set=":")
+            cmds.namespace(set=':')
         else:
-            print("There are not children shape to create shapeSize setup of:", transform_node)
+            print('There are not children shape to create shapeSize setup of:', transform_node)
         if cluster_handle:
             self.connect_shape_size(cluster_handle)
 
@@ -1014,7 +1014,7 @@ class Controllers:
     def connect_shape_size(self, cluster_handle):
         """ Connect shapeSize attribute from guide main control to shapeSizeClusterHandle scale XYZ.
         """
-        main = cluster_handle[:cluster_handle.rfind("Guide_")+6]+"Base" #hack to get main name by string TODO: change to find by instance
+        main = cluster_handle[:cluster_handle.rfind('Guide_')+6]+"Base" #hack to get main name by string TODO: change to find by instance
         cmds.connectAttr(main+".shapeSize", cluster_handle+".scaleX", force=True)
         cmds.connectAttr(main+".shapeSize", cluster_handle+".scaleY", force=True)
         cmds.connectAttr(main+".shapeSize", cluster_handle+".scaleZ", force=True)
@@ -1022,11 +1022,11 @@ class Controllers:
         cmds.parent(cluster_handle, self.ar.data.temp_grp)
 
 
-    def add_guide_attrs(self, ctrl_name, color="blue", pin=True):
+    def add_guide_attrs(self, ctrl_name, color='blue', pin=True):
         """ Add and set attributes to this control curve be used as a guide.
         """
         # create an attribute to be used as guide by module:
-        cmds.addAttr(ctrl_name, longName="nJoint", attributeType='long')
+        cmds.addAttr(ctrl_name, longName='nJoint', attributeType='long')
         cmds.setAttr(ctrl_name+".nJoint", 1)
         # colorize curveShapes:
         self.color_shape([ctrl_name], color)
@@ -1041,7 +1041,7 @@ class Controllers:
         """ Import calibration from a referenced file.
             Transfer calibration for same nodes by name using calibrationList attribute.
         """
-        import_calib_namespace = "dpImportCalibration"
+        import_calib_namespace = 'dpImportCalibration'
         source_ref_nodes = []
         # get user file to import calibration from
         import_calib_path = cmds.fileDialog2(fileMode=1, caption=self.ar.data.lang['i196_import']+" "+self.ar.data.lang['i193_calibration'])
@@ -1057,11 +1057,11 @@ class Controllers:
             for item in ref_nodes:
                 self.ar.ui_manager.set_progress(max=len(ref_nodes), add_one=False, add_number=False)
                 self.ar.ui_manager.set_progress(self.ar.data.lang['i215_setAttr'], add_one=True)
-                if "calibrationList" in cmds.listAttr(item):
+                if 'calibrationList' in cmds.listAttr(item):
                     source_ref_nodes.append(item)
         if source_ref_nodes:
             for source_ref_node in source_ref_nodes:
-                destination_node = source_ref_node[source_ref_node.rfind(":")+1:]
+                destination_node = source_ref_node[source_ref_node.rfind(':')+1:]
                 if cmds.objExists(destination_node):
                     self.transfer_calibration(source_ref_node, [destination_node], verbose=False)
         # remove referenced file:
@@ -1075,11 +1075,11 @@ class Controllers:
             Ask to mirror calibration of all controls if nothing is selected.
         """
         if not from_prefix:
-            from_prefix = cmds.textField("ctr_mirror_calibration_from_prefix_tf", query=True, text=True)
-            to_prefix = cmds.textField("ctr_mirror_calibration_to_prefix_tf", query=True, text=True)
+            from_prefix = cmds.textField('ctr_mirror_calibration_from_prefix_tf', query=True, text=True)
+            to_prefix = cmds.textField('ctr_mirror_calibration_to_prefix_tf', query=True, text=True)
         if from_prefix and to_prefix:
             if not node_name:
-                current_selection = cmds.ls(selection=True, type="transform")
+                current_selection = cmds.ls(selection=True, type='transform')
                 if current_selection:
                     for selected_node in current_selection:
                         if selected_node.startswith(from_prefix):
@@ -1087,7 +1087,7 @@ class Controllers:
                 else:
                     # ask to run for all nodes:
                     if self.confirm_ask_user(self.ar.data.lang['m010_mirror']+" "+self.ar.data.lang['i193_calibration'], self.ar.data.lang['i042_notSelection']+"\n"+self.ar.data.lang['i197_mirrorAll']):
-                        all_nodes = cmds.ls(from_prefix+"*", selection=False, type="transform")
+                        all_nodes = cmds.ls(from_prefix+"*", selection=False, type='transform')
                         if all_nodes:
                             for node in all_nodes:
                                 self.mirror_calibration(node, from_prefix, to_prefix)
@@ -1109,7 +1109,7 @@ class Controllers:
         """
         if not source_item:
             # check current selection:
-            current_selection = cmds.ls(selection=True, type="transform")
+            current_selection = cmds.ls(selection=True, type='transform')
             if current_selection and len(current_selection) > 1:
                 source_item = current_selection[0]
                 destinations = current_selection[1:]
@@ -1124,7 +1124,7 @@ class Controllers:
             print(self.ar.data.lang['i042_notSelection'])
 
 
-    def set_string_attr_from_items(self, node_name, attributes, attr_name="calibrationList"):
+    def set_string_attr_from_items(self, node_name, attributes, attr_name='calibrationList'):
         """ Set the given attribute that contains a list of the given list.
             Add a string attribute if it doesn't exists.
             Useful for calibrationList attribute.
@@ -1132,16 +1132,16 @@ class Controllers:
         if cmds.objExists(node_name) and attributes:
             calib_attr = ';'.join(attributes)
             if not attr_name in cmds.listAttr(node_name):
-                cmds.addAttr(node_name, longName=attr_name, dataType="string")
-            cmds.setAttr(node_name+"."+attr_name, calib_attr, type="string")
+                cmds.addAttr(node_name, longName=attr_name, dataType='string')
+            cmds.setAttr(node_name+"."+attr_name, calib_attr, type='string')
 
 
-    def get_items_from_string_attr(self, node_name, attr_name="calibrationList"):
+    def get_items_from_string_attr(self, node_name, attr_name='calibrationList'):
         """ Return the list from a string if it exists in the given node_name.
             Useful to ready calibrationList attributes by default.
         """
         if attr_name in cmds.listAttr(node_name):
-            return list(cmds.getAttr(node_name+"."+attr_name).split(";"))
+            return list(cmds.getAttr(node_name+"."+attr_name).split(';'))
 
 
     def get_controllers(self, attr=None):
@@ -1150,7 +1150,7 @@ class Controllers:
             Returns a list of them.
         """
         nodes = []
-        all_items = cmds.ls(selection=False, type="transform")
+        all_items = cmds.ls(selection=False, type='transform')
         if all_items:
             if attr:
                 for item in all_items:
@@ -1163,7 +1163,7 @@ class Controllers:
         return nodes
 
 
-    def export_shape(self, nodes=None, path=None, io=False, snapshot_grp="dpSnapshot_Grp", keep_snapshot=False, override_existing=True, ui=True, verbose=False, dir="dpControlShape", *args):
+    def export_shape(self, nodes=None, path=None, io=False, snapshot_grp='dpSnapshot_Grp', keep_snapshot=False, override_existing=True, ui=True, verbose=False, dir='dpControlShape', *args):
         """ Export control shapes from a given list or all found dpControl transforms in the scene.
             It will save a Maya ASCII file with the control shapes snapshots.
             If there is no given path, it will ask user where to save the file.
@@ -1173,8 +1173,8 @@ class Controllers:
         """
         current_path = cmds.file(query=True, sceneName=True)
         if not current_path:
-            if path and "dpData" in path:
-                current_path = path.split("dpData")[0]
+            if path and 'dpData' in path:
+                current_path = path.split('dpData')[0]
             else:
                 mel.eval('warning \"'+self.ar.data.lang['i201_saveScene']+'\";')
                 return
@@ -1183,20 +1183,20 @@ class Controllers:
         if nodes:
             if not path:
                 if io:
-                    folder = current_path[:current_path.rfind("/")+1]+self.ar.dpData+"/"+dir
+                    folder = current_path[:current_path.rfind('/')+1]+self.ar.dpData+"/"+dir
                     if not os.path.exists(folder):
                         os.makedirs(folder)
-                    path = folder+"/"+dir+"_"+current_path[current_path.rfind("/")+1:]
+                    path = folder+"/"+dir+"_"+current_path[current_path.rfind('/')+1:]
                 else:
-                    paths = cmds.fileDialog2(fileMode=0, caption="Export Shapes")
+                    paths = cmds.fileDialog2(fileMode=0, caption='Export Shapes')
                     if paths:
                         path = paths[0] 
             if path:
                 if ui:
                     self.ar.ui_manager.set_progress(self.ar.data.lang['m094_doing']+': '+self.ar.data.lang['c110_start'], self.ar.data.lang['i164_export'], len(nodes), add_one=False, add_number=False)
                 # make sure we save the file as mayaAscii
-                if not path.endswith(".ma"):
-                    path = path.replace(".*", ".ma")
+                if not path.endswith('.ma'):
+                    path = path.replace('.*', '.ma')
                 cmds.undoInfo(openChunk=True)
                 if not cmds.objExists(snapshot_grp):
                     cmds.group(name=snapshot_grp, empty=True)
@@ -1212,19 +1212,19 @@ class Controllers:
                     if dup_children:
                         to_delete_items = []
                         for child in dup_children:
-                            if cmds.objectType(child) != "nurbsCurve":
+                            if cmds.objectType(child) != 'nurbsCurve':
                                 to_delete_items.append(child)
                         if to_delete_items:
                             cmds.delete(to_delete_items)
                     cmds.parent(dup, snapshot_grp)
                 # export shapes
-                if cmds.listRelatives(snapshot_grp, allDescendents=True, children=True, type="nurbsCurve"):
+                if cmds.listRelatives(snapshot_grp, allDescendents=True, children=True, type='nurbsCurve'):
                     cmds.select(snapshot_grp)
                     cmds.file(rename=path)
                     cmds.file(exportSelected=True, type='mayaAscii', prompt=False, force=True)
                     cmds.file(rename=current_path)
                     # DEV helper keep_snapshot
-                    wip_grp = self.ar.utils.get_node_by_message("wipGrp")
+                    wip_grp = self.ar.utils.get_node_by_message('wipGrp')
                     if not cmds.objExists(wip_grp):
                         keep_snapshot = False
                     if keep_snapshot:
@@ -1238,7 +1238,7 @@ class Controllers:
                             pass
                     else:
                         cmds.delete(snapshot_grp)
-                    print(f'Exported shapes to: {path}')
+                    print(f"Exported shapes to: {path}")
                 cmds.undoInfo(closeChunk=True)
         else:
             mel.eval('warning \"'+self.ar.data.lang['i202_noControls']+'\";')
@@ -1247,31 +1247,31 @@ class Controllers:
             self.ar.ui_manager.set_progress(end_it=True)
 
 
-    def import_shape(self, nodes=None, path=None, io=False, ui=True, verbose=False, dir="dpControlShape", *args):
+    def import_shape(self, nodes=None, path=None, io=False, ui=True, verbose=False, dir='dpControlShape', *args):
         """ Import control shapes from an external loaded Maya file.
             If not get an user defined parameter for a node list, it will import all shapes.
             If the io parameter is True, it will use the default path as current location inside dpControlShapeIO directory.
         """
-        importShapeNamespace = "dpImportShape"
+        importShapeNamespace = 'dpImportShape'
         if not nodes:
             nodes = self.get_controllers()
         if nodes:
             if io:
                 current_path = cmds.file(query=True, sceneName=True)
                 if not current_path:
-                    if path and "dpData" in path:
-                        current_path = path.split("dpData")[0]
+                    if path and 'dpData' in path:
+                        current_path = path.split('dpData')[0]
                     else:
                         print(self.ar.data.lang['i201_saveScene'])
                         return
-                folder = current_path[:current_path.rfind("/")+1]+self.ar.dpData+"/"+dir
-                ctrl_shape = "/"+dir+"_"+current_path[current_path.rfind("/")+1:]
+                folder = current_path[:current_path.rfind('/')+1]+self.ar.dpData+"/"+dir
+                ctrl_shape = "/"+dir+"_"+current_path[current_path.rfind('/')+1:]
                 path = folder+ctrl_shape
                 if not os.path.exists(path):
                     print (self.ar.data.lang['i202_noControls'])
                     return
             elif not path:
-                paths = cmds.fileDialog2(fileMode=1, caption="Import Shapes")
+                paths = cmds.fileDialog2(fileMode=1, caption='Import Shapes')
                 if paths:
                     path = paths[0]
             if path:
@@ -1288,8 +1288,8 @@ class Controllers:
                         for source_ref_node in ref_nodes:
                             if ui or verbose:
                                 self.ar.ui_manager.set_progress(self.ar.data.lang['m094_doing']+': Shape')
-                            if cmds.objectType(source_ref_node) == "transform":
-                                destination_node = source_ref_node[source_ref_node.rfind(":")+1:-len(SNAPSHOT_SUFFIX)] #removed namespace before ":"" and the suffix _Snapshot_Crv (-13)
+                            if cmds.objectType(source_ref_node) == 'transform':
+                                destination_node = source_ref_node[source_ref_node.rfind(':')+1:-len(SNAPSHOT_SUFFIX)] #removed namespace before ":"" and the suffix _Snapshot_Crv (-13)
                                 if cmds.objExists(destination_node):
                                     self.transfer_shape(delete_source=False, clear_dest_shapes=True, source_item=source_ref_node, destinations=[destination_node], keep_color=False)
                     # remove referenced file:
@@ -1308,23 +1308,23 @@ class Controllers:
             Returns the corrective controller and its highest zero out group.
         """
         to_ids = []
-        calib_attrs = ["T", "R", "S"]
+        calib_attrs = ['T', 'R', 'S']
         to_calibration_items = []
-        jcr_ctrl = self.create_controller(type, jcr_name.replace("_Jcr", "_Ctrl"), r=radius, d=degree, corrective=True)
+        jcr_ctrl = self.create_controller(type, jcr_name.replace('_Jcr', '_Ctrl'), r=radius, d=degree, corrective=True)
         jcr_grp_0 = self.ar.utils.create_zero_out([jcr_ctrl])[0]
         jcr_grp_1 = self.ar.utils.create_zero_out([jcr_grp_0])[0]
         cmds.matchTransform(jcr_grp_1, jcr_name, position=True, rotation=True)
         cmds.parentConstraint(cmds.listRelatives(jcr_name, parent=True)[0], jcr_grp_1, maintainOffset=True, name=jcr_grp_1+"_PaC")
         cmds.parentConstraint(jcr_ctrl, jcr_name, maintainOffset=True, name=jcr_ctrl+"_PaC")
         cmds.scaleConstraint(jcr_ctrl, jcr_name, maintainOffset=True, name=jcr_ctrl+"_ScC")
-        cmds.addAttr(jcr_ctrl, longName="correctiveNetwork", attributeType="message")
-        cmds.addAttr(jcr_ctrl, longName="inputValue", attributeType="float", defaultValue=0)
+        cmds.addAttr(jcr_ctrl, longName='correctiveNetwork', attributeType='message')
+        cmds.addAttr(jcr_ctrl, longName='inputValue', attributeType='float', defaultValue=0)
         cmds.connectAttr(corrective_net+".message", jcr_ctrl+".correctiveNetwork", force=True)
         cmds.connectAttr(corrective_net+".outputValue", jcr_ctrl+".inputValue", force=True)
         for attr in calib_attrs:
             for axis in self.ar.data.axes:
-                rmv = cmds.createNode("remapValue", name=jcr_name.replace("_Jcr", "_"+attr+axis+"_RmV"))
-                intensity_md = cmds.createNode("multiplyDivide", name=jcr_name.replace("_Jcr", "_"+attr+axis+"_Intensity_MD"))
+                rmv = cmds.createNode('remapValue', name=jcr_name.replace('_Jcr', '_"+attr+axis+"_RmV'))
+                intensity_md = cmds.createNode('multiplyDivide', name=jcr_name.replace('_Jcr', "_"+attr+axis+"_Intensity_MD"))
                 to_ids.extend([rmv, intensity_md])
                 cmds.connectAttr(corrective_net+".outputStart", rmv+".inputMin", force=True)
                 cmds.connectAttr(corrective_net+".outputEnd", rmv+".inputMax", force=True)
@@ -1332,23 +1332,23 @@ class Controllers:
                 cmds.connectAttr(jcr_ctrl+".intensity", intensity_md+".input1X", force=True)
                 cmds.connectAttr(rmv+".outValue", intensity_md+".input2X", force=True)
                 # add calibrate attributes:
-                if attr == "S":
-                    scale_clp = cmds.createNode("clamp", name=jcr_name.replace("_Jcr", "_"+attr+axis+"_ScaleIntensity_Clp"))
+                if attr == 'S':
+                    scale_clp = cmds.createNode('clamp', name=jcr_name.replace('_Jcr', "_"+attr+axis+"_ScaleIntensity_Clp"))
                     to_ids.append(scale_clp)
-                    cmds.addAttr(jcr_ctrl, longName="calibrate"+attr+axis, attributeType="float", defaultValue=1)
+                    cmds.addAttr(jcr_ctrl, longName="calibrate"+attr+axis, attributeType='float', defaultValue=1)
                     cmds.setAttr(rmv+".outputMin", 1)
                     cmds.setAttr(scale_clp+".minR", 1)
                     cmds.setAttr(scale_clp+".maxR", 1000)
                     cmds.connectAttr(intensity_md+".outputX", scale_clp+".inputR", force=True)
                     cmds.connectAttr(scale_clp+".outputR", jcr_grp_0+"."+attr.lower()+axis.lower(), force=True)
                 else:
-                    invert_md = cmds.createNode("multiplyDivide", name=jcr_name.replace("_Jcr", "_"+attr+axis+"_Invert_MD"))
-                    invert_cnd = cmds.createNode("condition", name=jcr_name.replace("_Jcr", "_"+attr+axis+"_Invert_Cnd"))
+                    invert_md = cmds.createNode('multiplyDivide', name=jcr_name.replace('_Jcr', "_"+attr+axis+"_Invert_MD"))
+                    invert_cnd = cmds.createNode('condition', name=jcr_name.replace('_Jcr', "_"+attr+axis+"_Invert_Cnd"))
                     to_ids.extend([invert_md, invert_cnd])
                     cmds.setAttr(invert_cnd+".secondTerm", 1)
                     cmds.setAttr(invert_cnd+".colorIfTrueR", -1)
-                    cmds.addAttr(jcr_ctrl, longName="calibrate"+attr+axis, attributeType="float", defaultValue=0)
-                    cmds.addAttr(jcr_ctrl, longName="invert"+attr+axis, attributeType="bool", defaultValue=0)
+                    cmds.addAttr(jcr_ctrl, longName="calibrate"+attr+axis, attributeType='float', defaultValue=0)
+                    cmds.addAttr(jcr_ctrl, longName="invert"+attr+axis, attributeType='bool', defaultValue=0)
                     cmds.connectAttr(intensity_md+".outputX", invert_md+".input1X", force=True)
                     cmds.connectAttr(invert_cnd+".outColorR", invert_md+".input2X", force=True)
                     cmds.connectAttr(jcr_ctrl+".invert"+attr+axis, invert_cnd+".firstTerm", force=True)
@@ -1363,9 +1363,9 @@ class Controllers:
     def add_corrective_attrs(self, ctrl_name):
         """ Add and set attributes to this control curve be used as a corrective controller.
         """
-        cmds.addAttr(ctrl_name, longName="intensity", attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
+        cmds.addAttr(ctrl_name, longName='intensity', attributeType='float', minValue=0, defaultValue=1, maxValue=1, keyable=True)
         # create an attribute to be used as editMode by module:
-        cmds.addAttr(ctrl_name, longName="editMode", attributeType="bool", keyable=False)
+        cmds.addAttr(ctrl_name, longName='editMode', attributeType='bool', keyable=False)
         cmds.setAttr(ctrl_name+".editMode", channelBox=True)
 
 
@@ -1374,17 +1374,17 @@ class Controllers:
         """
         if controllers:
             for ctrl in controllers:
-                if "rotateOrder" in cmds.listAttr(ctrl):
+                if 'rotateOrder' in cmds.listAttr(ctrl):
                     cmds.setAttr(ctrl+".rotateOrder", keyable=False, channelBox=True)
 
 
     def set_sub_ctrl_display(self, ctrl, sub_ctrl, def_value):
         """ Set the shapes visibility of sub control.
         """
-        if not "subControlDisplay" in cmds.listAttr(ctrl):
-            cmds.addAttr(ctrl, longName="subControlDisplay", attributeType="short", minValue=0, maxValue=1, defaultValue=def_value)
+        if not 'subControlDisplay' in cmds.listAttr(ctrl):
+            cmds.addAttr(ctrl, longName='subControlDisplay', attributeType='short', minValue=0, maxValue=1, defaultValue=def_value)
             cmds.setAttr(ctrl+".subControlDisplay", channelBox=True)
-        sub_shapes = cmds.listRelatives(sub_ctrl, children=True, type="shape")
+        sub_shapes = cmds.listRelatives(sub_ctrl, children=True, type='shape')
         if sub_shapes:
             for sub_shape in sub_shapes:
                 cmds.connectAttr(ctrl+".subControlDisplay", sub_shape+".visibility", force=True)
@@ -1397,12 +1397,12 @@ class Controllers:
             Ask to mirror control shape of all controls if nothing is selected.
         """
         if not from_prefix:
-            from_prefix = cmds.textField("ctr_mirror_shape_from_prefix_tf", query=True, text=True)
-            to_prefix = cmds.textField("ctr_mirror_shape_to_prefix_tf", query=True, text=True)
-            axis = cmds.optionMenu("ctr_mirror_shape_axis_om", query=True, value=True)
+            from_prefix = cmds.textField('ctr_mirror_shape_from_prefix_tf', query=True, text=True)
+            to_prefix = cmds.textField('ctr_mirror_shape_to_prefix_tf', query=True, text=True)
+            axis = cmds.optionMenu('ctr_mirror_shape_axis_om', query=True, value=True)
         if from_prefix and to_prefix:
             if not node_name:
-                current_selection = cmds.ls(selection=True, type="transform")
+                current_selection = cmds.ls(selection=True, type='transform')
                 if current_selection:
                     for selected_node in current_selection:
                         if selected_node.startswith(from_prefix):
@@ -1410,7 +1410,7 @@ class Controllers:
                 else:
                     # ask to run for all nodes:
                     if self.confirm_ask_user(self.ar.data.lang['m010_mirror']+" "+self.ar.data.lang['m067_shape'], self.ar.data.lang['i042_notSelection']+"\n"+self.ar.data.lang['i265_mirrorShapeAll']):
-                        all_nodes = cmds.ls(from_prefix+"*", selection=False, type="transform")
+                        all_nodes = cmds.ls(from_prefix+"*", selection=False, type='transform')
                         allControlList = self.get_controllers()
                         if all_nodes and allControlList:
                             self.ar.ui_manager.set_progress(self.ar.data.lang['m067_shape'], self.ar.data.lang['m010_mirror'], len(all_nodes), add_one=False, add_number=False)
@@ -1468,7 +1468,7 @@ class Controllers:
     def get_selected_controllers(self):
         """ Return the intersection of all controllers in the scene and the selected items.
         """
-        return list(set(self.get_controllers()) & set(cmds.ls(selection=True, type="transform")))
+        return list(set(self.get_controllers()) & set(cmds.ls(selection=True, type='transform')))
 
 
     def select_controller(self, ctrl, refresh_ui=False, *args):
@@ -1524,12 +1524,12 @@ class Controllers:
     def create_ground_direction_shape(self, ctrl, radius, translate, value, *args):
         """ Create and add groundDirection shape control.
         """
-        ground_direction_ctrl = self.create_controller("id_102_GroundDirection", "ground_direction_ctrl", r=self.dpCheckLinearUnit(radius), dir="+X", rot=(0, -90, 0))
-        cmds.setAttr(ground_direction_ctrl+'.tz', self.dpCheckLinearUnit(translate))
+        ground_direction_ctrl = self.create_controller('id_102_GroundDirection', 'ground_direction_ctrl', r=self.dpCheckLinearUnit(radius), dir='+X', rot=(0, -90, 0))
+        cmds.setAttr(ground_direction_ctrl+'.translateZ', self.dpCheckLinearUnit(translate))
         cmds.makeIdentity(ground_direction_ctrl, apply=True)
         self.transfer_shape(delete_source=True, clear_dest_shapes=False, source_item=ground_direction_ctrl, destinations=[ctrl], keep_color=True, force=False)
         # Add ground direction visibility attribute and connect
-        cmds.addAttr(ctrl, longName="directionDisplay", attributeType="long", defaultValue=value, minValue=0, maxValue=1, keyable=False)
+        cmds.addAttr(ctrl, longName='directionDisplay', attributeType='long', defaultValue=value, minValue=0, maxValue=1, keyable=False)
         cmds.setAttr(ctrl+".directionDisplay", channelBox=True)
         direction_shapes = cmds.listRelatives(ctrl, shapes=True)
         cmds.connectAttr(ctrl+".directionDisplay", direction_shapes[-1]+".visibility")
@@ -1545,6 +1545,6 @@ class Controllers:
         if (parents):
             for parent in parents:
                 radius *= cmds.getAttr(parent+'.scaleX')
-                if "worldSize" in cmds.listAttr(parent):
+                if 'worldSize' in cmds.listAttr(parent):
                     radius *= cmds.getAttr(parent+".worldSize")
         return radius

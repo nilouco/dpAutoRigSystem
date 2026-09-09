@@ -25,10 +25,10 @@ class Logger:
         self.info_winHeight   = height
         self.info_align       = align
         # creating Info Window:
-        self.ar.ui_manager.close_ui("dpInfoWindow")
+        self.ar.ui_manager.close_ui('dpInfoWindow')
         cmds.window('dpInfoWindow', title='dpAutoRig - v'+self.ar.data.version+' - '+self.lang['i013_info']+' - '+self.lang[self.info_title], iconName='dpInfo', widthHeight=(self.info_winWidth, self.info_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
         # creating text layout:
-        infoColumnLayout = cmds.columnLayout('infoColumnLayout', adjustableColumn=True, columnOffset=['both', 20], parent="dpInfoWindow")
+        infoColumnLayout = cmds.columnLayout('infoColumnLayout', adjustableColumn=True, columnOffset=['both', 20], parent='dpInfoWindow')
         cmds.separator(style='none', height=10, parent=infoColumnLayout)
         infoLayout = cmds.scrollLayout('infoLayout', parent=infoColumnLayout)
         if self.info_description:
@@ -36,15 +36,15 @@ class Logger:
         if self.info_text:
             cmds.text(self.info_text, align=self.info_align, parent=infoLayout) #info_text
             if buttonList:
-                if buttonList[0] != "None":
+                if buttonList[0] != 'None':
                     cmds.button(label=buttonList[0], command=partial(buttonList[1], buttonList[2]), parent=infoLayout)
                 else:
                     cmds.text(self.lang['i305_none'], align=self.info_align, parent=infoLayout) #noneText
         if wiki:
             cmds.separator(style='none', height=20, parent=infoLayout)
-            cmds.button(label="Wiki", command=partial(self.ar.web.visit_website, self.ar.data.wiki_url+wiki), backgroundColor=[1, 1, 1], align=self.info_align, parent=infoLayout)
+            cmds.button(label='Wiki', command=partial(self.ar.web.visit_website, self.ar.data.wiki_url+wiki), backgroundColor=[1, 1, 1], align=self.info_align, parent=infoLayout)
         # call Info Window:
-        cmds.showWindow("dpInfoWindow")
+        cmds.showWindow('dpInfoWindow')
 
 
     def logWin(self, *args):

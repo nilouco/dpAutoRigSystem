@@ -3,19 +3,19 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "ModelIO"
-TITLE = "r003_modelIO"
-DESCRIPTION = "r004_modelIODesc"
-WIKI = "10-‐-Rebuilder#-model"
+CLASS_NAME = 'ModelIO'
+TITLE = 'r003_modelIO'
+DESCRIPTION = 'r004_modelIODesc'
+WIKI = '10-‐-Rebuilder#-model'
 
 
 
 class ModelIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.set_action_type("r000_rebuilder")
-        self.io_folder = "s_modelIO"
-        self.start_name = "dpModel"
+        self.set_action_type('r000_rebuilder')
+        self.io_folder = 's_modelIO'
+        self.start_name = 'dpModel'
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -37,7 +37,7 @@ class ModelIO(action.BaseAction):
         if not cmds.file(query=True, reference=True):
             if self.ar.pipeliner.check_asset_context():
                 # load alembic plugin
-                if self.ar.config.check_loaded_plugin("AbcExport") and self.ar.config.check_loaded_plugin("AbcImport"):
+                if self.ar.config.check_loaded_plugin('AbcExport') and self.ar.config.check_loaded_plugin('AbcImport'):
                     self.io_path = self.get_io_path(self.io_folder)
                     if self.io_path:
                         if self.first_mode: #export
@@ -53,7 +53,7 @@ class ModelIO(action.BaseAction):
                                 if constraint_data:
                                     self.import_constraint_data(constraint_data, False)
                             else:
-                                self.maybe_done_io("Render_Grp")
+                                self.maybe_done_io('Render_Grp')
                         else: #import
                             self.import_latest_alembic_file(self.get_exported_items())
                     else:

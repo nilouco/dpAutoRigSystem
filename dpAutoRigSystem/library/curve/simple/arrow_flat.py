@@ -3,9 +3,9 @@ from importlib import reload
 from ...base import curve
 
 # global variables to this module:    
-CLASS_NAME = "ArrowFlat"
-TITLE = "m112_arrowFlat"
-DESCRIPTION = "m099_cvControlDesc"
+CLASS_NAME = 'ArrowFlat'
+TITLE = 'm112_arrowFlat'
+DESCRIPTION = 'm099_cvControlDesc'
 
 
 

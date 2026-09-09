@@ -5,10 +5,10 @@ from maya import OpenMaya, cmds, mel
 from ..base import base
 
 # global variables to this module:
-CLASS_NAME = "MatchMesh"
-TITLE = "m049_matchMesh"
-DESCRIPTION = "m050_matchMeshDesc"
-WIKI = "06-‐-Tools#-match-mesh"
+CLASS_NAME = 'MatchMesh'
+TITLE = 'm049_matchMesh'
+DESCRIPTION = 'm050_matchMeshDesc'
+WIKI = '06-‐-Tools#-match-mesh'
 
 
 
@@ -44,29 +44,29 @@ class MatchMesh(base.BaseLibrary):
             got_meshes = True
             
             # getting transforms
-            if cmds.objectType(selection[0]) != "transform":
-                parents = cmds.listRelatives(selection[0], allParents=True, type="transform")
+            if cmds.objectType(selection[0]) != 'transform':
+                parents = cmds.listRelatives(selection[0], allParents=True, type='transform')
                 if parents:
                     from_transform = parents[0]
-            if cmds.objectType(selection[1]) != "transform":
-                parents = cmds.listRelatives(selection[1], allParents=True, type="transform")
+            if cmds.objectType(selection[1]) != 'transform':
+                parents = cmds.listRelatives(selection[1], allParents=True, type='transform')
                 if parents:
                     to_transform = parents
             
             # getting from_transform father
-            from_fathers = cmds.listRelatives(from_transform, allParents=True, type="transform")
+            from_fathers = cmds.listRelatives(from_transform, allParents=True, type='transform')
             if from_fathers:
                 from_father = from_fathers[0]
 
             # getting meshes
-            if cmds.objectType(selection[0]) != "mesh":
-                children = cmds.listRelatives(selection[0], children=True, type="mesh")
+            if cmds.objectType(selection[0]) != 'mesh':
+                children = cmds.listRelatives(selection[0], children=True, type='mesh')
                 if children:
                     from_mesh = children[0]
                 else:
                     got_meshes = False
-            if cmds.objectType(selection[1]) != "mesh":
-                children = cmds.listRelatives(selection[1], children=True, type="mesh")
+            if cmds.objectType(selection[1]) != 'mesh':
+                children = cmds.listRelatives(selection[1], children=True, type='mesh')
                 if children:
                     to_mesh = children[0]
                 else:
@@ -108,7 +108,7 @@ class MatchMesh(base.BaseLibrary):
                     for attr in self.ar.data.transform_attrs[:-1]:
                         cmds.setAttr(from_transform+"."+attr, lock=False)
                         cmds.setAttr(to_transform+"."+attr, lock=False)
-                        if "scale" in attr:
+                        if 'scale' in attr:
                             cmds.setAttr(from_transform+"."+attr, 1)
                             cmds.setAttr(to_transform+"."+attr, 1)
                         else:
@@ -146,8 +146,8 @@ class MatchMesh(base.BaseLibrary):
                     if not cancelled:
                         cmds.select(selection)
                         if self.ar.data.ui_state:
-                            self.ar.logger.infoWin('m049_matchMesh', 'm049_matchMesh', " -> ".join(selection), "center", 300, 200)
-                        print(self.ar.data.lang['i035_transfData'], self.ar.data.lang['i036_from'].upper(), ":", from_mesh, ",", self.ar.data.lang['i037_to'].upper(), ":", to_mesh)
+                            self.ar.logger.infoWin('m049_matchMesh', 'm049_matchMesh', ' -> '.join(selection), 'center', 300, 200)
+                        print(self.ar.data.lang['i035_transfData'], self.ar.data.lang['i036_from'].upper(), ':', from_mesh, ',', self.ar.data.lang['i037_to'].upper(), ':', to_mesh)
                     else:
                         print(self.ar.data.lang['i038_canceled'])
                 else:

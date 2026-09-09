@@ -3,9 +3,9 @@ from maya import cmds, mel
 from ...base import curve
 
 # global variables to this module:    
-CLASS_NAME = "EyeFlat"
-TITLE = "m211_eyeFlat"
-DESCRIPTION = "m099_cvControlDesc"
+CLASS_NAME = 'EyeFlat'
+TITLE = 'm211_eyeFlat'
+DESCRIPTION = 'm099_cvControlDesc'
 
 
 
@@ -32,8 +32,8 @@ class EyeFlat(curve.BaseCurve):
     def create_combined_curves(self, cv_id, cv_name, cv_size, cv_degree):
         """ Combine controllers in order to return it.
         """
-        lens = self.ar.config.get_instance("Lens", [self.ar.data.curve_simple_folder])
-        circle = self.ar.config.get_instance("Circle", [self.ar.data.curve_simple_folder])
+        lens = self.ar.config.get_instance('Lens', [self.ar.data.curve_simple_folder])
+        circle = self.ar.config.get_instance('Circle', [self.ar.data.curve_simple_folder])
         curve1 = lens.cv_main(False, cv_id, cv_name, cv_size, cv_degree)
         curve2 = circle.cv_main(False, cv_id, cv_name, cv_size, cv_degree)
         cmds.setAttr(curve1+".rotateZ", 90)

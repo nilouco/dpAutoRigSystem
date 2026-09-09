@@ -6,7 +6,7 @@ from ....library.base import action
 CLASS_NAME = 'FreezeTransform'
 TITLE = 'v015_freezeTransform'
 DESCRIPTION = 'v016_freezeTranformDesc'
-WIKI = "07-‐-Validator#-freeze-transform"
+WIKI = '07-‐-Validator#-freeze-transform'
 
 
 
@@ -32,7 +32,7 @@ class FreezeTransform(action.BaseAction):
         # ---
         # --- validator code --- beginning
         if not self.ar.utils.get_all_grp():
-            if not self.ar.utils.get_network_by_attr("dpGuideNet"):
+            if not self.ar.utils.get_network_by_attr('dpGuideNet'):
                 if not cmds.file(query=True, reference=True):
                     transforms, to_fix_items = [], []
                     if inputs:

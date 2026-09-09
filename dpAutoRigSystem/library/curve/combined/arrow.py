@@ -5,9 +5,9 @@ from maya import cmds, mel
 from ...base import curve
 
 # global variables to this module:    
-CLASS_NAME = "Arrow"
-TITLE = "m113_arrow"
-DESCRIPTION = "m099_cvControlDesc"
+CLASS_NAME = 'Arrow'
+TITLE = 'm113_arrow'
+DESCRIPTION = 'm099_cvControlDesc'
 
 
 
@@ -36,7 +36,7 @@ class Arrow(curve.BaseCurve):
     def create_combined_curves(self, cv_id, cv_name, cv_size, cv_degree):
         """ Combine controllers in order to return it.
         """
-        arrow_flat = self.ar.config.get_instance("ArrowFlat", [self.ar.data.curve_simple_folder])
+        arrow_flat = self.ar.config.get_instance('ArrowFlat', [self.ar.data.curve_simple_folder])
         # creating curve shapes:
         curve1 = arrow_flat.cv_main(False, cv_id, cv_name, cv_size, cv_degree)
         curve2 = arrow_flat.cv_main(False, cv_id, cv_name, cv_size, cv_degree)

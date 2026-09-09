@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "EmptyTransform"
-TITLE = "v138_emptyTransform"
-DESCRIPTION = "v139_emptyTransformDesc"
-WIKI = "07-‐-Validator#-empty-transform-cleaner"
+CLASS_NAME = 'EmptyTransform'
+TITLE = 'v138_emptyTransform'
+DESCRIPTION = 'v139_emptyTransformDesc'
+WIKI = '07-‐-Validator#-empty-transform-cleaner'
 
 
 
@@ -36,7 +36,7 @@ class EmptyTransform(action.BaseAction):
             if inputs:
                 check_items = inputs
             else:
-                check_items = cmds.ls(selection=False, long=True, type="transform") #list all transforms in the scene
+                check_items = cmds.ls(selection=False, long=True, type='transform') #list all transforms in the scene
             if check_items:
                 self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
                 empty_transforms = self.filter_empty_transforms(check_items)
@@ -88,7 +88,7 @@ class EmptyTransform(action.BaseAction):
             else:
                 has_connection = cmds.listConnections(transform)
                 if has_connection:
-                    node_graphs = cmds.listConnections(transform, type="nodeGraphEditorInfo") or []
+                    node_graphs = cmds.listConnections(transform, type='nodeGraphEditorInfo') or []
                     has_connection = set(has_connection)-set(node_graphs)
             if not has_connection:
                 children = cmds.listRelatives(transform, children=True, fullPath=True)
@@ -100,7 +100,7 @@ class EmptyTransform(action.BaseAction):
     def get_ignore_connected(self, *args):
         """ Ignore dpAr default nodes
         """
-        ignored_items = ["supportGrp", "renderGrp", "proxyGrp", "fxGrp", "blendShapesGrp", "wipGrp"]
+        ignored_items = ['supportGrp', 'renderGrp', 'proxyGrp', 'fxGrp', 'blendShapesGrp', 'wipGrp']
         nodes = []
         for item in ignored_items:
             got_node = self.ar.utils.get_node_by_message(item)

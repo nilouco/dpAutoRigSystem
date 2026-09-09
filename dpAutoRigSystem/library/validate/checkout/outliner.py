@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "Outliner"
-TITLE = "v076_outliner"
-DESCRIPTION = "v077_outlinerDesc"
-WIKI = "07-‐-Validator#-outliner-cleaner"
+CLASS_NAME = 'Outliner'
+TITLE = 'v076_outliner'
+DESCRIPTION = 'v077_outlinerDesc'
+WIKI = '07-‐-Validator#-outliner-cleaner'
 
 
 
@@ -34,7 +34,7 @@ class Outliner(action.BaseAction):
         if not cmds.file(query=True, reference=True):
             hidden_grps = [self.ar.data.temp_grp, self.ar.data.guide_mirror_grp]
             if not inputs:
-                inputs = cmds.ls(selection=False, type="transform")
+                inputs = cmds.ls(selection=False, type='transform')
             if inputs:
                 self.ar.ui_manager.set_progress(max=len(hidden_grps), add_one=False, add_number=False)
                 for item in hidden_grps:

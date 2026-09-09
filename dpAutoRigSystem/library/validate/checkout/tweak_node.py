@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "TweakNode"
-TITLE = "v130_tweakNode"
-DESCRIPTION = "v131_tweakNodeDesc"
-WIKI = "07-‐-Validator#-tweak-node-cleaner"
+CLASS_NAME = 'TweakNode'
+TITLE = 'v130_tweakNode'
+DESCRIPTION = 'v131_tweakNodeDesc'
+WIKI = '07-‐-Validator#-tweak-node-cleaner'
 
 
 

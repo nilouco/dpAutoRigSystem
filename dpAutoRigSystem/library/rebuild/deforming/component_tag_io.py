@@ -3,19 +3,19 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "ComponentTagIO"
-TITLE = "r048_componentTagIO"
-DESCRIPTION = "r049_componentTagIODesc"
-WIKI = "10-‐-Rebuilder#-componenttag"
+CLASS_NAME = 'ComponentTagIO'
+TITLE = 'r048_componentTagIO'
+DESCRIPTION = 'r049_componentTagIODesc'
+WIKI = '10-‐-Rebuilder#-componenttag'
 
 
 
 class ComponentTagIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.set_action_type("r000_rebuilder")
-        self.io_folder = "s_componentTagIO"
-        self.start_name = "dpComponentTag"
+        self.set_action_type('r000_rebuilder')
+        self.io_folder = 's_componentTagIO'
+        self.start_name = 'dpComponentTag'
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -42,7 +42,7 @@ class ComponentTagIO(action.BaseAction):
                     if inputs:
                         nodes = inputs
                     else:
-                        nodes = cmds.listRelatives(cmds.ls(selection=False, type=["mesh", "lattice"]), parent=True)
+                        nodes = cmds.listRelatives(cmds.ls(selection=False, type=['mesh', 'lattice']), parent=True)
                     if self.first_mode: #export
                         if nodes:
                             # finding tags
@@ -53,9 +53,9 @@ class ComponentTagIO(action.BaseAction):
                                     break
                             if has_tag:
                                 # Declaring the data dictionary to export it
-                                self.tag_data = { "tagged"     : self.ar.skin.get_component_tag_info(nodes),
-                                                    "influencer" : self.ar.skin.get_component_tag_influencer(),
-                                                    "falloff"    : self.ar.skin.get_component_tag_falloff()
+                                self.tag_data = { 'tagged'     : self.ar.skin.get_component_tag_info(nodes),
+                                                    'influencer' : self.ar.skin.get_component_tag_influencer(),
+                                                    'falloff'    : self.ar.skin.get_component_tag_falloff()
                                                 }
                                 self.export_json_file(self.tag_data)
                             else:
@@ -91,15 +91,15 @@ class ComponentTagIO(action.BaseAction):
         """
         fail = False
         # import tagged (tag info into the received deformed mesh)
-        if tag_data["tagged"] and not self.ar.skin.import_component_tag_info(tag_data["tagged"], nodes):
+        if tag_data['tagged'] and not self.ar.skin.import_component_tag_info(tag_data['tagged'], nodes):
             self.fail_io(self.latest_data_file+": tagged - "+", ".join(self.ar.skin.notWorkWellInfoList))
             fail = True
         # import influencers (tag info into the deformer node)
-        if tag_data["influencer"] and not self.ar.skin.import_component_tag_influencer(tag_data["influencer"]):
+        if tag_data['influencer'] and not self.ar.skin.import_component_tag_influencer(tag_data['influencer']):
             self.fail_io(self.latest_data_file+": influencer - "+", ".join(self.ar.skin.notWorkWellInfoList))
             fail = True
         # import falloffs
-        if tag_data["falloff"] and not self.ar.skin.import_component_tag__falloff(tag_data["falloff"]):
+        if tag_data['falloff'] and not self.ar.skin.import_component_tag__falloff(tag_data['falloff']):
             self.fail_io(self.latest_data_file+": falloff - "+", ".join(self.ar.skin.notWorkWellInfoList))
             fail = True
         if not fail:

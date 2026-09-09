@@ -3,12 +3,12 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "BlendshapeTarget"
-TITLE = "v012_blendshapeTarget"
-DESCRIPTION = "v013_blendshapeTargetDesc"
-WIKI = "07-‐-Validator#-blendshape-target-cleaner"
+CLASS_NAME = 'BlendshapeTarget'
+TITLE = 'v012_blendshapeTarget'
+DESCRIPTION = 'v013_blendshapeTargetDesc'
+WIKI = '07-‐-Validator#-blendshape-target-cleaner'
 
-DPKEEPITATTR = "dpKeepIt"
+DPKEEPITATTR = 'dpKeepIt'
 
 
 
@@ -40,18 +40,18 @@ class BlendshapeTarget(action.BaseAction):
                 check_items = None
                 meshes = cmds.ls(selection=False, type='mesh')
                 if meshes:
-                    check_items = list(set(cmds.listRelatives(meshes, type="transform", parent=True, fullPath=False)))
+                    check_items = list(set(cmds.listRelatives(meshes, type='transform', parent=True, fullPath=False)))
             if check_items:
                 self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
                 # get exception list to keep nodes in the scene
-                to_keep_deformers = ["skinCluster", "blendShape", "wrap", "cluster", "ffd", "wire", "shrinkWrap", "sculpt", "morph"]
-                exceptions = self.get_children_nodes(["supportGrp", "renderGrp", "proxyGrp"])
+                to_keep_deformers = ['skinCluster', 'blendShape', 'wrap', 'cluster', 'ffd', 'wire', 'shrinkWrap', 'sculpt', 'morph']
+                exceptions = self.get_children_nodes(['supportGrp', 'renderGrp', 'proxyGrp'])
                 for item in check_items:
                     if cmds.objExists(item):
                         if cmds.objExists(item+"."+DPKEEPITATTR) and cmds.getAttr(item+"."+DPKEEPITATTR):
                             if not item in exceptions:
                                 exceptions.append(item)
-                        elif self.ar.naming.get_suffix_numbers(item)[1].endswith("Base"):
+                        elif self.ar.naming.get_suffix_numbers(item)[1].endswith('Base'):
                             exceptions.append(item)
                         else:
                             try:
@@ -64,8 +64,8 @@ class BlendshapeTarget(action.BaseAction):
                                     if cmds.objectType(deformer_node) in to_keep_deformers:
                                         if not item in exceptions:
                                             exceptions.append(item)
-                                        if cmds.objectType(deformer_node) == "wrap":
-                                            wrap_attrs = ["basePoints", "driverPoints"]
+                                        if cmds.objectType(deformer_node) == 'wrap':
+                                            wrap_attrs = ['basePoints', 'driverPoints']
                                             for wrap_attr in wrap_attrs:
                                                 wrap_connections = cmds.listConnections(deformer_node+"."+wrap_attr, source=True, destination=False)
                                                 if wrap_connections:
@@ -82,7 +82,7 @@ class BlendshapeTarget(action.BaseAction):
                                 self.good_results.append(False)
                             else: #fix        
                                 try:
-                                    father_items = cmds.listRelatives(item, parent=True, type="transform")
+                                    father_items = cmds.listRelatives(item, parent=True, type='transform')
                                     cmds.delete(item)
                                     if father_items:
                                         brother_items = cmds.listRelatives(father_items[0], allDescendents=True, children=True)
@@ -118,7 +118,7 @@ class BlendshapeTarget(action.BaseAction):
             for item in grps:
                 node_grp = self.ar.utils.get_node_by_message(item)
                 if node_grp:
-                    nodes = cmds.listRelatives(node_grp, allDescendents=True, children=True, type="transform", fullPath=False)
+                    nodes = cmds.listRelatives(node_grp, allDescendents=True, children=True, type='transform', fullPath=False)
                     if nodes:
                         results.extend(nodes)
         return results

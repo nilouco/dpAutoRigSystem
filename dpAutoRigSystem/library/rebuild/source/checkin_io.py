@@ -1,21 +1,21 @@
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "CheckinIO"
-TITLE = "r021_checkinIO"
-DESCRIPTION = "r022_checkinIODesc"
-WIKI = "10-‐-Rebuilder#-checkin"
+CLASS_NAME = 'CheckinIO'
+TITLE = 'r021_checkinIO'
+DESCRIPTION = 'r022_checkinIODesc'
+WIKI = '10-‐-Rebuilder#-checkin'
 
 
 
 class CheckinIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.start_name = "dpCheckin"
+        self.start_name = 'dpCheckin'
         self.first_bt_enable = False
         self.first_bt_custom_label = self.ar.data.lang['i305_none']
         self.second_bt_custom_label = self.ar.data.lang['i306_run']
-        self.set_action_type("r000_rebuilder")
+        self.set_action_type('r000_rebuilder')
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -40,9 +40,9 @@ class CheckinIO(action.BaseAction):
             else: #import
                 try:
                     # clean up geometries
-                    validators = ["dpUnlockNormals", "dpFreezeTransform", "dpGeometryHistory"]
-                    self.run_actions_in_silence(validators, self.ar.data.lib[self.ar.data.checkin_folder]["instances"], False, inputs) #fix
-                    self.well_done_io(", ".join(validators))
+                    validators = ['dpUnlockNormals', 'dpFreezeTransform', 'dpGeometryHistory']
+                    self.run_actions_in_silence(validators, self.ar.data.lib[self.ar.data.checkin_folder]['instances'], False, inputs) #fix
+                    self.well_done_io(', '.join(validators))
                 except Exception as e:
                     self.fail_io(str(e))
         else:

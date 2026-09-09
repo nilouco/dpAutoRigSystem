@@ -3,17 +3,17 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "Cleanup"
-TITLE = "v096_cleanup"
-DESCRIPTION = "v097_cleanupDesc"
-WIKI = "07-‐-Validator#-cleanup"
+CLASS_NAME = 'Cleanup'
+TITLE = 'v096_cleanup'
+DESCRIPTION = 'v097_cleanupDesc'
+WIKI = '07-‐-Validator#-cleanup'
 
 
 
 class Cleanup(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.cleanup_attr = "dpDeleteIt"
+        self.cleanup_attr = 'dpDeleteIt'
     
 
     def run_action(self, first_mode=True, inputs=None, *args):

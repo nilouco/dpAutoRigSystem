@@ -13,7 +13,7 @@ class Utils:
         """
         # define variables
         self.ar = ar
-        self.ignore_transform_io_attr = "dpNotTransformIO"
+        self.ignore_transform_io_attr = 'dpNotTransformIO'
         self.load_variables()
 
 
@@ -26,44 +26,44 @@ class Utils:
                                 'defaultColorMgtGlobals', 'hardwareRenderGlobals', 'characterPartition', 'defaultHardwareRenderGlobals', 'ikSystem', 'hyperGraphInfo', 'hyperGraphLayout', 'globalCacheControl', 
                                 'strokeGlobals', 'dynController1', 'lightLinker1', 'persp', 'perspShape', 'top', 'topShape', 'front', 'frontShape', 'side', 'sideShape', 'shapeEditorManager', 'poseInterpolatorManager', 
                                 'layerManager', 'defaultLayer', 'renderLayerManager', 'defaultRenderLayer', 'ikSCsolver', 'ikRPsolver', 'ikSplineSolver', 'hikSolver', 'MayaNodeEditorSavedTabsInfo']
-        self.utility_types = ["blendColors", "blendWeighted", "choice", "chooser", "clamp", "condition", "multiplyDivide", "plusMinusAverage", "remapValue", "reverse"]
+        self.utility_types = ['blendColors', 'blendWeighted', 'choice', 'chooser', 'clamp', 'condition', 'multiplyDivide', 'plusMinusAverage', 'remapValue', 'reverse']
         self.type_attr_data = {
-                                "blendColors"      : ["blender", "color1R", "color1G", "color1B", "color2R", "color2G", "color2B"],
-                                "blendWeighted"    : ["current"],
-                                "choice"           : ["selector"],
-                                "clamp"            : ["minR", "minG", "minB", "maxR", "maxG", "maxB", "inputR", "inputG", "inputB"],
-                                "condition"        : ["operation", "firstTerm", "secondTerm", "colorIfTrueR", "colorIfTrueG", "colorIfTrueB", "colorIfFalseR", "colorIfFalseG", "colorIfFalseB"],
-                                "multiplyDivide"   : ["operation", "input1X", "input1Y", "input1Z", "input2X", "input2Y", "input2Z"],
-                                "plusMinusAverage" : ["operation"],
-                                "remapValue"       : ["inputValue", "inputMin", "inputMax", "outputMin", "outputMax"],
-                                "reverse"          : ["inputX", "inputY", "inputZ"]
+                                'blendColors'      : ['blender', 'color1R', 'color1G', 'color1B', 'color2R', 'color2G', 'color2B'],
+                                'blendWeighted'    : ['current'],
+                                'choice'           : ['selector'],
+                                'clamp'            : ['minR', 'minG', 'minB', 'maxR', 'maxG', 'maxB', 'inputR', 'inputG', 'inputB'],
+                                'condition'        : ['operation', 'firstTerm', 'secondTerm', 'colorIfTrueR', 'colorIfTrueG', 'colorIfTrueB', 'colorIfFalseR', 'colorIfFalseG', 'colorIfFalseB'],
+                                'multiplyDivide'   : ['operation', 'input1X', 'input1Y', 'input1Z', 'input2X', 'input2Y', 'input2Z'],
+                                'plusMinusAverage' : ['operation'],
+                                'remapValue'       : ['inputValue', 'inputMin', 'inputMax', 'outputMin', 'outputMax'],
+                                'reverse'          : ['inputX', 'inputY', 'inputZ']
                             }
         self.type_out_attr_data = {
-                                "blendColors"      : ["outputR", "outputG", "outputB"],
-                                "blendWeighted"    : ["output"],
-                                "choice"           : ["output"],
-                                "clamp"            : ["outputR", "outputG", "outputB"],
-                                "condition"        : ["outColorR", "outColorG", "outColorB"],
-                                "multiplyDivide"   : ["outputX", "outputY", "outputZ"],
-                                "plusMinusAverage" : ["output1D", "output2Dx", "output2Dy", "output3Dx", "output3Dy", "output3Dz"],
-                                "remapValue"       : ["outColorR", "outColorG", "outColorB", "outValue"],
-                                "reverse"          : ["outputX", "outputY", "outputZ"]
+                                'blendColors'      : ['outputR', 'outputG', 'outputB'],
+                                'blendWeighted'    : ['output'],
+                                'choice'           : ['output'],
+                                'clamp'            : ['outputR', 'outputG', 'outputB'],
+                                'condition'        : ['outColorR', 'outColorG', 'outColorB'],
+                                'multiplyDivide'   : ['outputX', 'outputY', 'outputZ'],
+                                'plusMinusAverage' : ['output1D', 'output2Dx', 'output2Dy', 'output3Dx', 'output3Dy', 'output3Dz'],
+                                'remapValue'       : ['outColorR', 'outColorG', 'outColorB', 'outValue'],
+                                'reverse'          : ['outputX', 'outputY', 'outputZ']
                             }
         self.type_multi_attr_data = {
-                                    "blendWeighted"    : {"input"   : [],
-                                                        "weight" : []},
-                                    "choice"           : {"input" : []},
-                                    "chooser"          : {"inLevel"      : [],
-                                                        "displayLevel" : []},
-                                    "plusMinusAverage" : {"input1D" : [],
-                                                        "input2D" : ["input2Dx", "input2Dy"],
-                                                        "input3D" : ["input3Dx", "input3Dy", "input3Dz"]
+                                    'blendWeighted'    : {'input'   : [],
+                                                        'weight' : []},
+                                    'choice'           : {'input' : []},
+                                    'chooser'          : {'inLevel'      : [],
+                                                        'displayLevel' : []},
+                                    'plusMinusAverage' : {'input1D' : [],
+                                                        'input2D' : ['input2Dx', 'input2Dy'],
+                                                        'input3D' : ['input3Dx', 'input3Dy', 'input3Dz']
                                                             },
-                                    "remapValue"       : {"value" : ["value_Position", "value_FloatValue", "value_Interp"],
-                                                        "color" : ["color_Position", "color_Color", "color_ColorR", "color_ColorG", "color_ColorB", "color_Position"]
+                                    'remapValue'       : {'value' : ['value_Position', 'value_FloatValue', 'value_Interp'],
+                                                        'color' : ['color_Position', 'color_Color', 'color_ColorR', 'color_ColorG', 'color_ColorB', 'color_Position']
                                                             }
                                 }
-        self.type_out_multi_attr_data = {"chooser" : {"output" : []}}
+        self.type_out_multi_attr_data = {'chooser' : {'output' : []}}
 
 
     def remove_user_defined_attr(self, node, keep_origined_from=False):
@@ -73,7 +73,7 @@ class Utils:
         if user_def_attrs:
             for user_def_attr in user_def_attrs:
                 del_it = True
-                if keep_origined_from and ("originedFrom" in user_def_attr or "guide_source" in user_def_attr):
+                if keep_origined_from and ('originedFrom' in user_def_attr or 'guide_source' in user_def_attr):
                     del_it = False
                 if del_it:
                     try:
@@ -94,16 +94,16 @@ class Utils:
             transforms = cmds.ls(selection=True)
         if transforms:
             for transform in transforms:
-                suffix = "_Zero_0_Grp"
+                suffix = '_Zero_0_Grp'
                 transform_name = transform
-                if transform_name.endswith("_Grp"):
+                if transform_name.endswith('_Grp'):
                     transform_name = self.ar.naming.extract_suffix(transform_name)
-                    if "_Zero_" in transform_name:
+                    if '_Zero_' in transform_name:
                         need_add_number = True
                         while need_add_number:
-                            node_number = str(int(transform_name[transform_name.rfind("_")+1:])+1)
-                            transform_name = (transform_name[:transform_name.rfind("_")+1])+node_number
-                            suffix = "_Grp"
+                            node_number = str(int(transform_name[transform_name.rfind('_')+1:])+1)
+                            transform_name = (transform_name[:transform_name.rfind('_')+1])+node_number
+                            suffix = '_Grp'
                             if not cmds.objExists(transform_name+suffix):
                                 need_add_number = False
                 zero_grp = cmds.duplicate(transform, name=transform_name+suffix)[0]
@@ -127,7 +127,7 @@ class Utils:
         return zeros
 
 
-    def add_attr_to_items(self, items, attr_name, attr_type="bool", keyable_attr=True, default_value_attr=True):
+    def add_attr_to_items(self, items, attr_name, attr_type='bool', keyable_attr=True, default_value_attr=True):
         """ Useful method to add the same attribute and values to a list of given items.
         """
         if items and attr_name:
@@ -141,7 +141,7 @@ class Utils:
         """
         if item != "" and attr != "":
             if not cmds.objExists(item+".originedFrom"):
-                cmds.addAttr(item, longName="originedFrom", dataType='string')
+                cmds.addAttr(item, longName='originedFrom', dataType='string')
             cmds.setAttr(item+".originedFrom", attr, type='string')
 
 
@@ -150,25 +150,25 @@ class Utils:
             Return a dictionary with originedFrom string as keys and transform nodes as values of these keys.
         """
         origined_from_data = {}
-        transforms = cmds.ls(selection=False, type="transform")
+        transforms = cmds.ls(selection=False, type='transform')
         if transforms:
             for transform in transforms:
                 if cmds.objExists(transform+".originedFrom"):
                     temp_origined_from = cmds.getAttr(transform+".originedFrom")
                     if temp_origined_from:
-                        if not ";" in temp_origined_from:
+                        if not ';' in temp_origined_from:
                             origined_from_data[temp_origined_from] = transform
                         else:
-                            temp_origined_from_items = temp_origined_from.split(";")
+                            temp_origined_from_items = temp_origined_from.split(';')
                             for item in temp_origined_from_items:
                                 origined_from_data[item] = transform
         return origined_from_data
 
 
-    def add_hook(self, item="", hook_type="staticHook", add_not_transform_io=True):
+    def add_hook(self, item='', hook_type='staticHook', add_not_transform_io=True):
         """ Add attribute as boolean and set it as True = 1.
         """
-        if item != "" and cmds.objExists(item):
+        if item != '' and cmds.objExists(item):
             if not hook_type in cmds.listAttr(item):
                 cmds.addAttr(item, longName=hook_type, attributeType='bool')
                 cmds.setAttr(item+"."+hook_type, 1)
@@ -184,11 +184,11 @@ class Utils:
         hook = {}
         transforms = cmds.ls(type='transform')
         for item in transforms:
-            if "guideBase" in cmds.listAttr(item) and cmds.getAttr(item+".guideBase") == 1:
+            if 'guideBase' in cmds.listAttr(item) and cmds.getAttr(item+".guideBase") == 1:
                 # module info:
-                guide_module_namespace = item[:item.find(":")]
-                name = item[:item.find("__")]
-                guide_instance = item[item.rfind("__")+2:item.find(":")]
+                guide_module_namespace = item[:item.find(':')]
+                name = item[:item.find('__')]
+                guide_instance = item[item.rfind('__')+2:item.find(':')]
                 guide_custom_name = cmds.getAttr(item+".customName")
                 guide_mirror_axis = cmds.getAttr(item+".mirrorAxis")
                 current_mirror_name = cmds.getAttr(item+".mirrorName")
@@ -203,7 +203,7 @@ class Utils:
                 # get father:
                 guide_parents = []
                 father_nodes = []
-                parent_node = ""
+                parent_node = ''
                 parents = cmds.listRelatives(item, parent=True, type='transform')
                 if parents:
                     next_loop = True
@@ -222,34 +222,34 @@ class Utils:
                     if guide_parents:
                         # father info:
                         guide_parent      = guide_parents[0]
-                        father_module     = guide_parent[:guide_parent.find("__")]
-                        father_instance   = guide_parent[guide_parent.rfind("__")+2:guide_parent.find(":")]
+                        father_module     = guide_parent[:guide_parent.find('__')]
+                        father_instance   = guide_parent[guide_parent.rfind('__')+2:guide_parent.find(':')]
                         father_custom_name = cmds.getAttr(guide_parent+".customName")
                         father_mirror_axis = cmds.getAttr(guide_parent+".mirrorAxis")
                         current_father_mirror_name  = cmds.getAttr(guide_parent+".mirrorName")
                         father_mirror_name = [current_father_mirror_name[0]+"_" , current_father_mirror_name[len(current_father_mirror_name)-1:]+"_"]
                         if father_nodes:
-                            father_guide_loc = father_nodes[0][father_nodes[0].find("Guide_")+6:]
+                            father_guide_loc = father_nodes[0][father_nodes[0].find('Guide_')+6:]
                         else:
                             guide_parent_children = cmds.listRelatives(guide_parent, children=True, type='transform')
                             if guide_parent_children:
                                 for guide_parent_child in guide_parent_children:
-                                    if cmds.objExists(guide_parent_child+'.nJoint') and cmds.getAttr(guide_parent_child+'.nJoint') == 1 and guide_parent[:guide_parent.rfind(":")] in guide_parent_child:
+                                    if cmds.objExists(guide_parent_child+'.nJoint') and cmds.getAttr(guide_parent_child+'.nJoint') == 1 and guide_parent[:guide_parent.rfind(':')] in guide_parent_child:
                                         father_nodes = [guide_parent_child]
-                                        father_guide_loc = guide_parent_child[guide_parent_child.find("Guide_")+6:]
+                                        father_guide_loc = guide_parent_child[guide_parent_child.find('Guide_')+6:]
                     
                     # parent_node info:
                     parent_node = cmds.listRelatives(item, parent=True, type='transform')[0]
                 
                 # mounting dictionary:
                 if guide_parents and guide_children:
-                    hook[item]={"guideModuleNamespace":guide_module_namespace, "name":name, "guideInstance":guide_instance, "guideCustomName":guide_custom_name, "guideMirrorAxis":guide_mirror_axis, "guideMirrorName":guide_mirror_name, "fatherGuide":guide_parent, "fatherNode":father_nodes[0], "fatherModule":father_module, "fatherInstance":father_instance, "fatherCustomName":father_custom_name, "fatherMirrorAxis":father_mirror_axis, "fatherMirrorName":father_mirror_name, "fatherGuideLoc":father_guide_loc, "parentNode":parent_node, "children":guide_children}
+                    hook[item]={'guideModuleNamespace':guide_module_namespace, 'name':name, 'guideInstance':guide_instance, 'guideCustomName':guide_custom_name, 'guideMirrorAxis':guide_mirror_axis, 'guideMirrorName':guide_mirror_name, 'fatherGuide':guide_parent, 'fatherNode':father_nodes[0], 'fatherModule':father_module, 'fatherInstance':father_instance, 'fatherCustomName':father_custom_name, 'fatherMirrorAxis':father_mirror_axis, 'fatherMirrorName':father_mirror_name, 'fatherGuideLoc':father_guide_loc, 'parentNode':parent_node, 'children':guide_children}
                 elif guide_parents:
-                    hook[item]={"guideModuleNamespace":guide_module_namespace, "name":name, "guideInstance":guide_instance, "guideCustomName":guide_custom_name, "guideMirrorAxis":guide_mirror_axis, "guideMirrorName":guide_mirror_name, "fatherGuide":guide_parent, "fatherNode":father_nodes[0], "fatherModule":father_module, "fatherInstance":father_instance, "fatherCustomName":father_custom_name, "fatherMirrorAxis":father_mirror_axis, "fatherMirrorName":father_mirror_name, "fatherGuideLoc":father_guide_loc, "parentNode":parent_node, "children":[]}
+                    hook[item]={'guideModuleNamespace':guide_module_namespace, 'name':name, 'guideInstance':guide_instance, 'guideCustomName':guide_custom_name, 'guideMirrorAxis':guide_mirror_axis, 'guideMirrorName':guide_mirror_name, 'fatherGuide':guide_parent, 'fatherNode':father_nodes[0], 'fatherModule':father_module, 'fatherInstance':father_instance, 'fatherCustomName':father_custom_name, 'fatherMirrorAxis':father_mirror_axis, 'fatherMirrorName':father_mirror_name, 'fatherGuideLoc':father_guide_loc, 'parentNode':parent_node, 'children':[]}
                 elif guide_children:
-                    hook[item]={"guideModuleNamespace":guide_module_namespace, "name":name, "guideInstance":guide_instance, "guideCustomName":guide_custom_name, "guideMirrorAxis":guide_mirror_axis, "guideMirrorName":guide_mirror_name, "fatherGuide":"", "fatherNode":"", "fatherModule":"", "fatherInstance":"", "fatherCustomName":"", "fatherMirrorAxis":"", "fatherMirrorName":"", "fatherGuideLoc":"", "parentNode":parent_node, "children":guide_children}
+                    hook[item]={'guideModuleNamespace':guide_module_namespace, 'name':name, 'guideInstance':guide_instance, 'guideCustomName':guide_custom_name, 'guideMirrorAxis':guide_mirror_axis, 'guideMirrorName':guide_mirror_name, 'fatherGuide':"", 'fatherNode':"", 'fatherModule':"", 'fatherInstance':"", 'fatherCustomName':"", 'fatherMirrorAxis':"", 'fatherMirrorName':"", 'fatherGuideLoc':"", 'parentNode':parent_node, 'children':guide_children}
                 else:
-                    hook[item]={"guideModuleNamespace":guide_module_namespace, "name":name, "guideInstance":guide_instance, "guideCustomName":guide_custom_name, "guideMirrorAxis":guide_mirror_axis, "guideMirrorName":guide_mirror_name, "fatherGuide":"", "fatherNode":"", "fatherModule":"", "fatherInstance":"", "fatherCustomName":"", "fatherMirrorAxis":"", "fatherMirrorName":"", "fatherGuideLoc":"", "parentNode":parent_node, "children":[]}
+                    hook[item]={'guideModuleNamespace':guide_module_namespace, 'name':name, 'guideInstance':guide_instance, 'guideCustomName':guide_custom_name, 'guideMirrorAxis':guide_mirror_axis, 'guideMirrorName':guide_mirror_name, 'fatherGuide':"", 'fatherNode':"", 'fatherModule':"", 'fatherInstance':"", 'fatherCustomName':"", 'fatherMirrorAxis':"", 'fatherMirrorName':"", 'fatherGuideLoc':"", 'parentNode':parent_node, 'children':[]}
         return hook
 
 
@@ -257,12 +257,12 @@ class Utils:
         """ Check if there is any node with the attribute attr in the item and then unparent its children and delete it.
         """
         if cmds.objExists(item):
-            if cmds.listRelatives(item, children=True, allDescendents=True, type="transform"):
-                children = [child for child in cmds.listRelatives(item, children=True, allDescendents=True, type="transform") if attr in cmds.listAttr(child) and cmds.getAttr(child+"."+attr) == 1]
+            if cmds.listRelatives(item, children=True, allDescendents=True, type='transform'):
+                children = [child for child in cmds.listRelatives(item, children=True, allDescendents=True, type='transform') if attr in cmds.listAttr(child) and cmds.getAttr(child+"."+attr) == 1]
                 if unparent and children:
                     fathers = cmds.listRelatives(item, parent=True)
                     for child in children:
-                        if item.split(":")[0] in cmds.listRelatives(child, parent=True)[0]:
+                        if item.split(':')[0] in cmds.listRelatives(child, parent=True)[0]:
                             if fathers:
                                 cmds.parent(child, fathers[0])
                             else:
@@ -298,7 +298,7 @@ class Utils:
         if parents:
             next_loop = True
             while next_loop:
-                if cmds.objExists(parents[0]+".guideBase") and cmds.getAttr(parents[0]+".guideBase") == 1 and cmds.getAttr(parents[0]+".mirrorEnable") == 1 and cmds.getAttr(parents[0]+".mirrorAxis") != "off":
+                if cmds.objExists(parents[0]+".guideBase") and cmds.getAttr(parents[0]+".guideBase") == 1 and cmds.getAttr(parents[0]+".mirrorEnable") == 1 and cmds.getAttr(parents[0]+".mirrorAxis") != 'off':
                     next_loop = False
                     return parents[0]
                 else:
@@ -339,7 +339,7 @@ class Utils:
                 if guide_namespace in cmds.namespaceInfo(listOnlyNamespaces=True):
                     number_name = guide_module.number_name
                     if not cmds.objExists(number_name+'_Static_Grp'):
-                        if not "dpHead" in str(guide_module):
+                        if not 'dpHead' in str(guide_module):
                             guides_to_rig.append(guide_module)
                         else:
                             # store Head guides to rig it later
@@ -355,11 +355,11 @@ class Utils:
             Returns the father joints (zeroOuted).
         """
         results = []
-        suffix = "_Jzt"
+        suffix = '_Jzt'
         if joints:
             for jnt in joints:
                 if cmds.objExists(jnt):
-                    jxt_name = jnt.replace("_Jnt", "").replace("_"+suffix, "")
+                    jxt_name = jnt.replace('_Jnt', '').replace("_"+suffix, '')
                     if not suffix in jxt_name:
                         jxt_name += suffix
                     dup = cmds.duplicate(jnt, name=jxt_name)[0]
@@ -403,8 +403,8 @@ class Utils:
         """
         joints = []
         if father and brother and cmds.objExists(father) and cmds.objExists(brother):
-            jax_name = brother[:brother.rfind("_")]+"_Jax"
-            jar_name = brother[:brother.rfind("_")]+"_Jar"
+            jax_name = brother[:brother.rfind('_')]+"_Jax"
+            jar_name = brother[:brother.rfind('_')]+"_Jar"
             cmds.select(clear=True)
             jax = cmds.joint(name=jax_name, radius=0.5*jar_radius)
             jar = cmds.joint(name=jar_name, radius=jar_radius)
@@ -417,7 +417,7 @@ class Utils:
             joints.append(jar)
             for i in range(jcr_number):
                 cmds.select(jar)
-                jcr = cmds.joint(name=brother[:brother.rfind("_")+1]+str(i)+"_Jcr")
+                jcr = cmds.joint(name=brother[:brother.rfind('_')+1]+str(i)+"_Jcr")
                 cmds.setAttr(jcr+".segmentScaleCompensate", 0)
                 cmds.addAttr(jcr, longName='dpAR_joint', attributeType='float', keyable=False)
                 if jcr_pos:
@@ -445,7 +445,7 @@ class Utils:
         """
         if not master_attr:
             master_attr = self.ar.data.master_attr
-        transform_nodes = [n for n in cmds.ls(selection=False, type="transform") if master_attr in cmds.listAttr(n)]
+        transform_nodes = [n for n in cmds.ls(selection=False, type='transform') if master_attr in cmds.listAttr(n)]
         if transform_nodes:
             for item in transform_nodes:
                 if not cmds.referenceQuery(item, isNodeReferenced=True) and self.validate_master_grp(item):
@@ -455,8 +455,8 @@ class Utils:
     def validate_master_grp(self, item):
         """ Check if the current item is a valid masterGrp (All_Grp) verifying it's message attribute connections.
         """
-        master_grp_attrs = ["supportGrp", "ctrlsGrp", "ctrlsVisibilityGrp", "dataGrp", "renderGrp", "proxyGrp", "fxGrp", "staticGrp", "scalableGrp", "blendShapesGrp", "wipGrp"]
-        old_attrs = ["modelsGrp", None, None, None, None, None, None, None, None, None, None]
+        master_grp_attrs = ['supportGrp', 'ctrlsGrp', 'ctrlsVisibilityGrp', 'dataGrp', 'renderGrp', 'proxyGrp', 'fxGrp', 'staticGrp', 'scalableGrp', 'blendShapesGrp', 'wipGrp']
+        old_attrs = ['modelsGrp', None, None, None, None, None, None, None, None, None, None]
         for m, master_attr in enumerate(master_grp_attrs):
             if not master_attr in cmds.listAttr(item) and (not old_attrs[m] or not old_attrs[m] in cmds.listAttr(item)):
                 cmds.setAttr(item+"."+self.ar.data.master_attr, 0)
@@ -545,18 +545,18 @@ class Utils:
         if not path:
             path = cmds.file(query=True, sceneName=True)
         if path:
-            dp_folder = path[:path.rfind("/")]
+            dp_folder = path[:path.rfind('/')]
             if sub_folder:
                 dp_folder = dp_folder+"/"+sub_folder
             if not os.path.exists(dp_folder):
                 os.makedirs(dp_folder)
             if not name:
-                name = path[path.rfind("/")+1:path.rfind(".")]
+                name = path[path.rfind('/')+1:path.rfind('.')]
             path_file = dp_folder+"/dpLog_"+name+"_"+current_time+".json"
         else:
             return False
-        print("Log file", path_file)
-        out_file = open(path_file, "w")
+        print('Log file', path_file)
+        out_file = open(path_file, 'w')
         json.dump(data, out_file, indent=4)
         out_file.close()
         return path_file
@@ -578,7 +578,7 @@ class Utils:
             if cmds.objExists(jnt):
                 cmds.setAttr(jnt+".side", 3) #None
                 cmds.setAttr(jnt+".type", 0) #None
-                cmds.setAttr(jnt+".otherType", "", type="string")
+                cmds.setAttr(jnt+".otherType", "", type='string')
 
 
     def create_joint_blend(self, joints_a, joints_b, joints_c, attr_name, start_attr, world_ref, store_name=True):
@@ -593,10 +593,10 @@ class Utils:
                 rev = cmds.createNode('reverse', name=joints_c[n]+"_"+attr_name+"_Rev")
                 self.ar.custom_attr.add_attr(0, [rev]) #dpID
                 cmds.addAttr(world_ref, longName=attr_comp_name, attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
-                cmds.addAttr(world_ref, longName=attr_comp_name+"RevOutputX", attributeType="float", keyable=False)
+                cmds.addAttr(world_ref, longName=attr_comp_name+"RevOutputX", attributeType='float', keyable=False)
                 if store_name:
-                    cmds.addAttr(world_ref, longName="ikFkBlendAttrName", dataType="string")
-                    cmds.setAttr(world_ref+".ikFkBlendAttrName", attr_comp_name, type="string")
+                    cmds.addAttr(world_ref, longName='ikFkBlendAttrName', dataType='string')
+                    cmds.setAttr(world_ref+".ikFkBlendAttrName", attr_comp_name, type='string')
                 cmds.connectAttr(world_ref+"."+attr_comp_name, rev+".inputX", force=True)
                 cmds.connectAttr(rev+".outputX", world_ref+"."+attr_comp_name+"RevOutputX", force=True)
             # connecting ikFkBlend using the reverse node:
@@ -620,10 +620,10 @@ class Utils:
         """ Returns a list of network nodes with the boolean given net attribute active.
         """
         nets = []
-        all_nets = cmds.ls(selection=False, type="network")
+        all_nets = cmds.ls(selection=False, type='network')
         if all_nets:
             for item in all_nets:
-                if "dpNetwork" in cmds.listAttr(item) and cmds.getAttr(item+".dpNetwork") == 1 and net_attr in cmds.listAttr(item) and cmds.getAttr(item+"."+net_attr) == 1:
+                if 'dpNetwork' in cmds.listAttr(item) and cmds.getAttr(item+".dpNetwork") == 1 and net_attr in cmds.listAttr(item) and cmds.getAttr(item+"."+net_attr) == 1:
                     nets.append(item)
         return nets
 
@@ -632,8 +632,8 @@ class Utils:
         """ Remove camera, constraints, follicles, etc from the given list and return it.
         """
         if items:
-            cameras = ["|persp", "|top", "|side", "|front"]
-            constraints = ["parentConstraint", "pointConstraint", "orientConstraint", "scaleConstraint", "aimConstraint", "poleVectorConstraint"]
+            cameras = ['|persp', '|top', '|side', '|front']
+            constraints = ['parentConstraint', 'pointConstraint', 'orientConstraint', 'scaleConstraint', 'aimConstraint', 'poleVectorConstraint']
             to_remove_items = []
             for item in items:
                 if verbose:
@@ -645,29 +645,29 @@ class Utils:
                             to_remove_items.append(item)
                 if filter_constraint and item_type in constraints:
                     to_remove_items.append(item)
-                if filter_follicle and cmds.listRelatives(item, children=True, type="follicle"):
+                if filter_follicle and cmds.listRelatives(item, children=True, type='follicle'):
                     to_remove_items.append(item)
-                if filter_joint and cmds.listRelatives(item, children=True, type="joint") or item_type == "joint":
+                if filter_joint and cmds.listRelatives(item, children=True, type='joint') or item_type == 'joint':
                     to_remove_items.append(item)
-                if filter_locator and cmds.listRelatives(item, children=True, type="locator"):
+                if filter_locator and cmds.listRelatives(item, children=True, type='locator'):
                     to_remove_items.append(item)
                 if filter_handle:
-                    if cmds.listRelatives(item, children=True, type="ikHandle") or item_type == "ikHandle":
+                    if cmds.listRelatives(item, children=True, type='ikHandle') or item_type == 'ikHandle':
                         to_remove_items.append(item)
-                    if cmds.listRelatives(item, children=True, type="clusterHandle") or item_type == "clusterHandle":
+                    if cmds.listRelatives(item, children=True, type='clusterHandle') or item_type == 'clusterHandle':
                         to_remove_items.append(item)
                 if filter_linear_deform:
-                    for def_name in ["deformBend", "deformTwist", "deformSquash", "deformFlare", "deformSine", "deformWave"]:
+                    for def_name in ['deformBend', 'deformTwist', 'deformSquash', 'deformFlare', 'deformSine', 'deformWave']:
                         if cmds.listRelatives(item, children=True, type=def_name) or item_type == def_name:
                             to_remove_items.append(item)
-                if filter_effector and cmds.listRelatives(item, children=True, type="ikEffector") or item_type == "ikEffector":
+                if filter_effector and cmds.listRelatives(item, children=True, type='ikEffector') or item_type == 'ikEffector':
                     to_remove_items.append(item)
                 if filter_basenode and item in self.maya_base_nodes:
                     to_remove_items.append(item)
-                if filter_basename and self.get_suffix_numbers(item)[1].endswith("Base"):
+                if filter_basename and self.get_suffix_numbers(item)[1].endswith('Base'):
                     to_remove_items.append(item)
                 if filter_lattice:
-                    for def_name in ["lattice", "baseLattice"]:
+                    for def_name in ['lattice', 'baseLattice']:
                         if cmds.listRelatives(item, children=True, type=def_name) or item_type == def_name:
                             to_remove_items.append(item)
             if to_remove_items:
@@ -682,8 +682,8 @@ class Utils:
         #cmds.deformableShape(item, originalGeometry=True)
         if item:
             for child in cmds.listRelatives(item, children=True, allDescendents=True, fullPath=True):
-                #if "Orig" in child:
-                if child.endswith("Orig"):
+                #if 'Orig' in child:
+                if child.endswith('Orig'):
                     cmds.delete(child)
                 elif cmds.getAttr(child+".intermediateObject") == 1:
                     if delete_intermediate:
@@ -697,7 +697,7 @@ class Utils:
         """
         if cmds.objExists(item):
             for deformer_node in defs:
-                if cmds.objExists(deformer_node) and cmds.objectType(deformer_node) != "tweak":
+                if cmds.objExists(deformer_node) and cmds.objectType(deformer_node) != 'tweak':
                     cmds.deformer(deformer_node, edit=True, geometry=item)
 
 
@@ -707,11 +707,11 @@ class Utils:
         result_data = {}
         if item and cmds.objExists(item):
             if t:
-                result_data["translation"] = cmds.xform(item, query=True, translation=t, worldSpace=user_world_space)
+                result_data['translation'] = cmds.xform(item, query=True, translation=t, worldSpace=user_world_space)
             if r:
-                result_data["rotation"] = cmds.xform(item, query=True, rotation=r, worldSpace=user_world_space)
+                result_data['rotation'] = cmds.xform(item, query=True, rotation=r, worldSpace=user_world_space)
             if s:
-                result_data["scale"] = cmds.xform(item, query=True, scale=s, worldSpace=user_world_space)
+                result_data['scale'] = cmds.xform(item, query=True, scale=s, worldSpace=user_world_space)
         return result_data
 
 
@@ -733,7 +733,7 @@ class Utils:
         if items:
             for item in items:
                 if not self.ar.data.joint_end_attr in cmds.listAttr(item):
-                    cmds.addAttr(item, longName=self.ar.data.joint_end_attr, attributeType="bool", defaultValue=1)
+                    cmds.addAttr(item, longName=self.ar.data.joint_end_attr, attributeType='bool', defaultValue=1)
         
 
     def create_locator_in_item_position(self, item):
@@ -773,10 +773,10 @@ class Utils:
         """ Return found replaced item suffix in the given dictionary.
         """
         if not suffixes:
-            suffixes = ["_JointLoc1", "_Head", "Neck0", "Main", "_cvTopLoc1", "_Foot", "_CenterLoc", "_JointLocA", "_JointLocB"]
+            suffixes = ['_JointLoc1', '_Head', 'Neck0', 'Main', '_cvTopLoc1', '_Foot', '_CenterLoc', '_JointLocA', '_JointLocB']
         for end_name in suffixes:
-            if item.replace("_Base", end_name) in source_data:
-                return item.replace("_Base", end_name)
+            if item.replace('_Base', end_name) in source_data:
+                return item.replace('_Base', end_name)
 
 
     def check_geometry(self, item):
@@ -788,7 +788,7 @@ class Utils:
                 children = cmds.listRelatives(item, children=True)
                 if children:
                     self.item_type = cmds.objectType(children[0])
-                    if self.item_type == "mesh" or self.item_type == "nurbsSurface":
+                    if self.item_type == 'mesh' or self.item_type == 'nurbsSurface':
                         return True
                     else:
                         mel.eval("warning \""+item+" is not a geometry.\";")
@@ -814,5 +814,5 @@ class Utils:
         """
         not_connected =  not cmds.listConnections(node+".envelope", source=True, destination=False)
         node_state_normal = cmds.getAttr(node+".nodeState") == 0
-        not_user_defined = not "envelope" in (cmds.listAttr(node, userDefined=True) or [])
+        not_user_defined = not 'envelope' in (cmds.listAttr(node, userDefined=True) or [])
         return not_connected and node_state_normal and not_user_defined

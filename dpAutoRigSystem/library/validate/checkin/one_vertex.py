@@ -3,10 +3,10 @@ from maya import cmds, mel
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "OneVertex"
-TITLE = "v132_oneVertex"
-DESCRIPTION = "v133_oneVertexDesc"
-WIKI = "07-‐-Validator#-one-vertex"
+CLASS_NAME = 'OneVertex'
+TITLE = 'v132_oneVertex'
+DESCRIPTION = 'v133_oneVertexDesc'
+WIKI = '07-‐-Validator#-one-vertex'
 
 
 
@@ -32,12 +32,12 @@ class OneVertex(action.BaseAction):
         # ---
         # --- validator code --- beginning
         if not self.ar.utils.get_all_grp():
-            if not self.ar.utils.get_network_by_attr("dpGuideNet"):
+            if not self.ar.utils.get_network_by_attr('dpGuideNet'):
                 if not cmds.file(query=True, reference=True):
                     if inputs:
-                        check_items = cmds.ls(inputs, type="mesh")
+                        check_items = cmds.ls(inputs, type='mesh')
                     else:
-                        check_items = cmds.ls(selection=False, type="mesh")
+                        check_items = cmds.ls(selection=False, type='mesh')
                     if check_items:
                         self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
                         one_vertices = self.check_non_manifold_vertex(check_items)
@@ -81,7 +81,7 @@ class OneVertex(action.BaseAction):
             found_items.extend(mel.eval('polyCleanupArgList 4 { "0","2","0","0","0","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","1","0","0" };'))
         if found_items:
             for sel in found_items:
-                if ".vtx[" in sel:
+                if '.vtx[' in sel:
                     nm_vertices.append(sel)
         cmds.select(nm_vertices)
         return nm_vertices

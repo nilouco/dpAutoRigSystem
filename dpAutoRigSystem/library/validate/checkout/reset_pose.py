@@ -3,25 +3,25 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "ResetPose"
-TITLE = "v032_resetPose"
-DESCRIPTION = "v033_resetPoseDesc"
-WIKI = "07-‐-Validator#-reset-pose"
+CLASS_NAME = 'ResetPose'
+TITLE = 'v032_resetPose'
+DESCRIPTION = 'v033_resetPoseDesc'
+WIKI = '07-‐-Validator#-reset-pose'
 
-TO_IGNORE = ["rotateOrder", "pinGuide", "editMode"]
+TO_IGNORE = ['rotateOrder', 'pinGuide', 'editMode']
 ATTR_TYPE = {
                 # boolean
-                "bool" : 0,
+                'bool' : 0,
                 # integer
-                "long" : 1,
-                "short" : 1,
-                "byte" : 1,
-                "enum" : 1,
+                'long' : 1,
+                'short' : 1,
+                'byte' : 1,
+                'enum' : 1,
                 # float
-                "float" : 2,
-                "double" : 2,
-                "doubleAngle" : 2,
-                "doubleLinear" : 2
+                'float' : 2,
+                'double' : 2,
+                'doubleAngle' : 2,
+                'doubleLinear' : 2
             }
 
 
@@ -29,8 +29,8 @@ ATTR_TYPE = {
 class ResetPose(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.non_dyn_zero_attrs = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ"]
-        self.non_dyn_one_attrs = ["scaleX", "scaleY", "scaleZ", "visibility"]
+        self.non_dyn_zero_attrs = ['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ']
+        self.non_dyn_one_attrs = ['scaleX', 'scaleY', 'scaleZ', 'visibility']
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -79,9 +79,9 @@ class ResetPose(action.BaseAction):
                             self.found_issues.append(True)
                             for a, attr in enumerate(edited_attrs):
                                 if a == 0:
-                                    attr_string = "."
+                                    attr_string = '.'
                                 else:
-                                    attr_string += "/"
+                                    attr_string += '/'
                                 attr_string += attr
                             self.checked_items[-1] = item+attr_string
                         else:
@@ -127,7 +127,7 @@ class ResetPose(action.BaseAction):
             attributes = []
         if attributes:
             for attr_name in attributes:
-                if cmds.attributeQuery(attr_name, node=item, attributeType=True) != "bool":
+                if cmds.attributeQuery(attr_name, node=item, attributeType=True) != 'bool':
                     clean_attrs.append(attr_name)
         all_attrs = cmds.listAttr(item)
         anim_attrs = cmds.listAnimatable(item)

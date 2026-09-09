@@ -3,10 +3,10 @@ from maya import cmds
 from ..base import standard
 
 # global variables to this module:    
-CLASS_NAME = "Steering"
-TITLE = "m158_steering"
-DESCRIPTION = "m159_steeringDesc"
-WIKI = "03-‐-Guides#-steering"
+CLASS_NAME = 'Steering'
+TITLE = 'm158_steering'
+DESCRIPTION = 'm159_steeringDesc'
+WIKI = '03-‐-Guides#-steering'
 
 
 
@@ -21,13 +21,13 @@ class Steering(standard.BaseStandard):
         self.create_guide_elements()
         self.set_guide_base_initial_position()
         self.add_node_to_guide_net([self.guide_loc, self.guide_end_loc], 
-                                   ["JointLoc1", "JointEnd"])
+                                   ['JointLoc1', 'JointEnd'])
     
 
     def create_guide_custom_attr(self):
         """ Add guide_base attributes and set them.
         """
-        cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName='flip', attributeType='bool')
 
 
     def create_guide_elements(self):
@@ -41,7 +41,7 @@ class Steering(standard.BaseStandard):
         self.line_end = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
         # setup
         self.ar.utils.set_template([self.line, self.line_end])
-        cmds.setAttr(self.guide_end_loc+".tz", 3)
+        cmds.setAttr(self.guide_end_loc+".translateZ", 3)
         # parenting
         cmds.parent(self.line, self.guide_loc, self.guide_base, relative=True)
         cmds.parent(self.guide_end_loc, self.guide_loc)
@@ -79,8 +79,8 @@ class Steering(standard.BaseStandard):
                 # joint labelling:
                 self.ar.naming.set_joint_label(self.jnt, s+self.joint_label_add, 18, self.number_name+"_1")
                 # create a control:
-                steering_ctrl = self.ar.ctrls.create_controller("id_065_SteeringWheel", side+self.number_name+"_"+self.ar.data.lang['m158_steering']+"_Ctrl", r=self.radius, d=self.curve_degree, guide_source=self.name_guide+"_JointLoc1")
-                main_ctrl = self.ar.ctrls.create_controller("id_066_SteeringMain", side+self.number_name+"_"+self.ar.data.lang['c058_main']+"_Ctrl", r=self.radius, d=self.curve_degree, guide_source=self.name_guide+"_JointEnd", parent_tag=steering_ctrl)
+                steering_ctrl = self.ar.ctrls.create_controller('id_065_SteeringWheel', side+self.number_name+"_"+self.ar.data.lang['m158_steering']+"_Ctrl", r=self.radius, d=self.curve_degree, guide_source=self.name_guide+"_JointLoc1")
+                main_ctrl = self.ar.ctrls.create_controller('id_066_SteeringMain', side+self.number_name+"_"+self.ar.data.lang['c058_main']+"_Ctrl", r=self.radius, d=self.curve_degree, guide_source=self.name_guide+"_JointEnd", parent_tag=steering_ctrl)
                 self.ar.utils.set_origined_from_attr(steering_ctrl, self.guide)
                 self.ar.utils.set_origined_from_attr(main_ctrl, self.base+";"+self.guide_end_loc+";"+self.guide_radius)
                 self.steering_ctrls.append(steering_ctrl)
@@ -97,13 +97,13 @@ class Steering(standard.BaseStandard):
                     cmds.setAttr(zeros[0]+".scaleX", -1)
                     cmds.setAttr(zeros[0]+".scaleY", -1)
                     cmds.setAttr(zeros[0]+".scaleZ", -1)
-                cmds.addAttr(steering_ctrl, longName='scaleCompensate', attributeType="short", minValue=0, maxValue=1, defaultValue=1, keyable=False)
+                cmds.addAttr(steering_ctrl, longName='scaleCompensate', attributeType='short', minValue=0, maxValue=1, defaultValue=1, keyable=False)
                 cmds.setAttr(steering_ctrl+".scaleCompensate", channelBox=True)
                 cmds.connectAttr(steering_ctrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
                 # integrating setup:
-                cmds.addAttr(steering_ctrl, longName=self.ar.data.lang['c071_limit'], defaultValue=500, attributeType="float", keyable=False)
-                cmds.addAttr(steering_ctrl, longName=self.ar.data.lang['c049_intensity'], min=0, defaultValue=0.8, attributeType="float", keyable=False)
-                cmds.addAttr(steering_ctrl, longName=self.ar.data.lang['c070_steering'], attributeType="float", keyable=False)
+                cmds.addAttr(steering_ctrl, longName=self.ar.data.lang['c071_limit'], defaultValue=500, attributeType='float', keyable=False)
+                cmds.addAttr(steering_ctrl, longName=self.ar.data.lang['c049_intensity'], min=0, defaultValue=0.8, attributeType='float', keyable=False)
+                cmds.addAttr(steering_ctrl, longName=self.ar.data.lang['c070_steering'], attributeType='float', keyable=False)
                 cmds.setAttr(steering_ctrl+"."+self.ar.data.lang['c071_limit'], 500, channelBox=True)
                 cmds.setAttr(steering_ctrl+"."+self.ar.data.lang['c049_intensity'], 0.8, channelBox=True)
                 unit_md = cmds.createNode('multiplyDivide', name=side+self.number_name+"_Unit_MD")
@@ -154,5 +154,5 @@ class Steering(standard.BaseStandard):
         """ This method will create a dictionary with informations about integrations system between modules.
         """
         self.composed = {
-                            "steeringCtrlList"   : self.steering_ctrls,
+                            'steeringCtrlList'   : self.steering_ctrls,
                         }

@@ -41,7 +41,7 @@ class BaseAction(base.BaseLibrary):
         self.io_folder = None
         self.maybe_done = False
         self.info_text = self.ar.data.lang['i305_none']
-        self.constraint_types = ["parentConstraint", "pointConstraint", "orientConstraint", "scaleConstraint", "aimConstraint", "pointOnPolyConstraint", "geometryConstraint", "normalConstraint", "poleVectorConstraint", "tangentConstraint"]
+        self.constraint_types = ['parentConstraint', 'pointConstraint', 'orientConstraint', 'scaleConstraint', 'aimConstraint', 'pointOnPolyConstraint', 'geometryConstraint', 'normalConstraint', 'poleVectorConstraint', 'tangentConstraint']
         self.custom_name = ''
         # returned lists
         self.checked_items = []
@@ -57,7 +57,7 @@ class BaseAction(base.BaseLibrary):
         """ Define the button label texts.
         """
         self.action_type = value
-        if self.action_type == "v000_validator":
+        if self.action_type == 'v000_validator':
             self.first_bt_label = self.ar.data.lang['i210_verify']
             self.second_bt_label = self.ar.data.lang['c052_fix']
         else: #r000_rebuilder
@@ -133,7 +133,7 @@ class BaseAction(base.BaseLibrary):
                 if self.first_mode: #verify/export
                     if True in self.found_issues:
                         cmds.button(self.first_bt, edit=True, backgroundColor=ISSUE_COLOR)
-                        if self.action_type == "v000_validator":
+                        if self.action_type == 'v000_validator':
                             cmds.button(self.second_bt, edit=True, backgroundColor=WARNING_COLOR)
                         else:
                             cmds.button(self.second_bt, edit=True, backgroundColor=DEFAULT_COLOR)
@@ -142,7 +142,7 @@ class BaseAction(base.BaseLibrary):
                         cmds.button(self.second_bt, edit=True, backgroundColor=DEFAULT_COLOR)
                 else: #fix/import
                     if False in self.good_results:
-                        if self.action_type == "v000_validator":
+                        if self.action_type == 'v000_validator':
                             cmds.button(self.first_bt, edit=True, backgroundColor=WARNING_COLOR)
                         else:
                             cmds.button(self.first_bt, edit=True, backgroundColor=DEFAULT_COLOR)
@@ -188,7 +188,7 @@ class BaseAction(base.BaseLibrary):
         """
         if color:
             self.update_button_colors(running)
-        if self.action_type == "r000_rebuilder":
+        if self.action_type == 'r000_rebuilder':
             self.update_delete_data_button()
             self.update_info_data_button()
 
@@ -221,31 +221,31 @@ class BaseAction(base.BaseLibrary):
                 if item == True:
                     log_text += self.checked_items[i]
                     if i != len(self.checked_items)-1:
-                        log_text += "\n"
+                        log_text += '\n'
         else:
             log_text += self.ar.data.lang['v007_allOk']
         # messages
         if self.messages:
             for msg in self.messages:
                 log_text += "\n"+msg
-        log_text += "\n"
+        log_text += '\n'
         # dataLog
-        self.log_data["log"] = self.ar.data.lang[self.action_type]
-        self.log_data["user"] = getpass.getuser()
-        self.log_data["time"] = self.ar.pipeliner.get_today(True)
-        self.log_data["dpARVersion"] = self.ar.data.version
-        self.log_data["module"] = self.name
-        self.log_data["name"] = self.title
-        self.log_data["mode"] = action_text
-        self.log_data["checked_items"] = self.checked_items
-        self.log_data["found_issues"] = self.found_issues
-        self.log_data["good_results"] = self.good_results
-        self.log_data["messages"] = self.messages
-        self.log_data["log_text"] = log_text
+        self.log_data['log'] = self.ar.data.lang[self.action_type]
+        self.log_data['user'] = getpass.getuser()
+        self.log_data['time'] = self.ar.pipeliner.get_today(True)
+        self.log_data['dpARVersion'] = self.ar.data.version
+        self.log_data['module'] = self.name
+        self.log_data['name'] = self.title
+        self.log_data['mode'] = action_text
+        self.log_data['checked_items'] = self.checked_items
+        self.log_data['found_issues'] = self.found_issues
+        self.log_data['good_results'] = self.good_results
+        self.log_data['messages'] = self.messages
+        self.log_data['log_text'] = log_text
         # verbose call info window
         if self.verbose:
-            self.ar.logger.infoWin('i019_log', self.action_type, self.log_data["time"]+"\n\n"+log_text, "left", 250, 250)
-            print("\n-------------\n"+self.ar.data.lang[self.action_type]+"\n"+self.log_data["time"]+"\n\n"+log_text)
+            self.ar.logger.infoWin('i019_log', self.action_type, self.log_data['time']+"\n\n"+log_text, 'left', 250, 250)
+            print("\n-------------\n"+self.ar.data.lang[self.action_type]+"\n"+self.log_data['time']+"\n\n"+log_text)
             if not self.ar.utils.export_log_dic_to_json(self.log_data, sub_folder=self.ar.data.dp_data+"/"+self.ar.data.dp_log):
                 print(self.ar.data.lang['i201_saveScene'])
 
@@ -268,7 +268,7 @@ class BaseAction(base.BaseLibrary):
         self.messages.append(self.ar.data.lang['r005_notWorkedWell'])
 
 
-    def well_done_io(self, item="", text="r006_wellDone"):
+    def well_done_io(self, item='', text='r006_wellDone'):
         """ Set dataLog when rebuilder IO worked well.
         """
         self.checked_items.append(item)
@@ -290,7 +290,7 @@ class BaseAction(base.BaseLibrary):
     def get_io_path(self, io_folder):
         """ Returns the IO path for the current scene.
         """
-        if "assetPath" in self.ar.pipeliner.pipe_data and io_folder:
+        if 'assetPath' in self.ar.pipeliner.pipe_data and io_folder:
             return self.ar.pipeliner.pipe_data['assetPath']+"/"+self.ar.pipeliner.pipe_data[io_folder]
 
 
@@ -316,7 +316,7 @@ class BaseAction(base.BaseLibrary):
             if exported_items:
                 if sub_folder or get_any:
                     return exported_items
-                asset_name = self.ar.pipeliner.pipe_data["assetName"]
+                asset_name = self.ar.pipeliner.pipe_data['assetName']
                 for item in exported_items:
                     if asset_name in item:
                         result.append(item)
@@ -340,7 +340,7 @@ class BaseAction(base.BaseLibrary):
         """
         cmds.refresh()
         cmds.viewFit(allObjects=True, animate=True)
-        mel.eval("flushUndo;")
+        mel.eval('flushUndo;')
         cmds.select(clear=True)
 
 
@@ -395,22 +395,22 @@ class BaseAction(base.BaseLibrary):
         """
         data = {"BrokenID" : {}}
         if not check_items:
-            check_items = cmds.ls(selection=False, long=True, type="transform", noIntermediate=True)
+            check_items = cmds.ls(selection=False, long=True, type='transform', noIntermediate=True)
         if check_items:
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title], self.ar.data.lang[self.action_type], add_one=False, add_number=False)
             self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
             filtered_items = self.ar.utils.filter_transforms(check_items, verbose=self.verbose, title=self.ar.data.lang[self.title]+" "+self.ar.data.lang['i329_broken'])
             if filtered_items:
                 for item in filtered_items:
-                    short_name = item[item.rfind("|")+1:]
+                    short_name = item[item.rfind('|')+1:]
                     if not self.ar.utils.validate_id(short_name):
                         item_type = cmds.objectType(item)
-                        if not item_type in data["BrokenID"]:
-                            data["BrokenID"][item_type] = {}
-                        data["BrokenID"][item_type][short_name] = None
+                        if not item_type in data['BrokenID']:
+                            data['BrokenID'][item_type] = {}
+                        data['BrokenID'][item_type][short_name] = None
                         fathers = cmds.listRelatives(item, parent=True, fullPath=True)
                         if fathers:
-                            data["BrokenID"][item_type][short_name] = fathers[0]
+                            data['BrokenID'][item_type][short_name] = fathers[0]
         return data
 
 
@@ -457,9 +457,9 @@ class BaseAction(base.BaseLibrary):
             io_items = ' -root '.join(items)
             attributes = ""
             if attr:
-                items.extend(cmds.listRelatives(items, type="mesh", children=True, allDescendents=True, noIntermediate=True) or [])
+                items.extend(cmds.listRelatives(items, type='mesh', children=True, allDescendents=True, noIntermediate=True) or [])
                 if curve:
-                    items.extend(cmds.listRelatives(items, type="nurbsCurve", children=True, allDescendents=True, noIntermediate=True) or [])
+                    items.extend(cmds.listRelatives(items, type='nurbsCurve', children=True, allDescendents=True, noIntermediate=True) or [])
                 for mesh in items:
                     self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                     user_defined_attributes = cmds.listAttr(mesh, userDefined=True)
@@ -523,7 +523,7 @@ class BaseAction(base.BaseLibrary):
         """ Confirm if the user really want to delete the rebuilding exported data, then delete its folder.
         """
         # to confirm before delete data
-        confirm = cmds.confirmDialog(title=self.ar.data.lang[self.title], icon="question", message=self.ar.data.lang['r059_deleteData'], button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no']], defaultButton=self.ar.data.lang['i072_no'], cancelButton=self.ar.data.lang['i072_no'], dismissString=self.ar.data.lang['i072_no'])
+        confirm = cmds.confirmDialog(title=self.ar.data.lang[self.title], icon='question', message=self.ar.data.lang['r059_deleteData'], button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no']], defaultButton=self.ar.data.lang['i072_no'], cancelButton=self.ar.data.lang['i072_no'], dismissString=self.ar.data.lang['i072_no'])
         if confirm == self.ar.data.lang['i071_yes']:
             old_first_bt_label = self.first_bt_label
             self.first_mode = True
@@ -547,7 +547,7 @@ class BaseAction(base.BaseLibrary):
         for shading_engine in cmds.ls(type='shadingEngine'):
             # if an shadingEngine has 'sets' members, it is used in the scene
             if cmds.sets(shading_engine, query=True):
-                materials = cmds.listConnections(f'{shading_engine}.surfaceShader')
+                materials = cmds.listConnections(f"{shading_engine}.surfaceShader")
                 if materials:
                     used_materials.extend(materials)
         used_materials = list(set(used_materials))
@@ -559,27 +559,27 @@ class BaseAction(base.BaseLibrary):
         """ Returns a list of higher father mesh node list or the children nodes in Render_Grp.
         """
         meshes, temps = [], []
-        render_grp = self.ar.utils.get_node_by_message("renderGrp")
+        render_grp = self.ar.utils.get_node_by_message('renderGrp')
         if render_grp:
-            meshes = cmds.listRelatives(render_grp, allDescendents=True, fullPath=True, noIntermediate=True, type="mesh") or []
+            meshes = cmds.listRelatives(render_grp, allDescendents=True, fullPath=True, noIntermediate=True, type='mesh') or []
             if meshes:
-                return cmds.listRelatives(render_grp, children=True, type="transform")
+                return cmds.listRelatives(render_grp, children=True, type='transform')
         if not meshes:
-            unparented_meshes = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh")
+            unparented_meshes = cmds.ls(selection=False, noIntermediate=True, long=True, type='mesh')
             if unparented_meshes:
                 for item in unparented_meshes:
                     if not self.ar.data.master_attr in cmds.listAttr(item):
-                        father = item[:item[1:].find("|")+1]
+                        father = item[:item[1:].find('|')+1]
                         if father and not self.ar.data.master_attr in cmds.listAttr(father) and not father in temps:
                             temps.append(father)
         if temps:
             for node in temps:
                 is_cleaned = True
-                if not "guideBase" in cmds.listAttr(node) and not "dpGuide" in cmds.listAttr(node):
+                if not 'guideBase' in cmds.listAttr(node) and not 'dpGuide' in cmds.listAttr(node):
                     children = cmds.listRelatives(node, children=True, allDescendents=True)
                     if children:
                         for child in children:
-                            if "guideBase" in cmds.listAttr(child) or "dpGuide" in cmds.listAttr(child):
+                            if 'guideBase' in cmds.listAttr(child) or 'dpGuide' in cmds.listAttr(child):
                                 is_cleaned = False
                 else:
                     is_cleaned = False
@@ -595,13 +595,13 @@ class BaseAction(base.BaseLibrary):
             shapes = cmds.ls(selection=False, type='mesh')
         if shapes:
             # Get only transform nodes
-            return list(set(cmds.listRelatives(shapes, type="transform", parent=True, fullPath=True)))
+            return list(set(cmds.listRelatives(shapes, type='transform', parent=True, fullPath=True)))
 
 
     def reorder_list(self, items):
         """ Returns a list with high to low counting of '|' in the item list given. That means a descending order.
         """
-        return sorted(items, key = lambda x: x.count("|"), reverse=True)
+        return sorted(items, key = lambda x: x.count('|'), reverse=True)
 
 
     def get_constraint_data(self, constraints):
@@ -609,33 +609,33 @@ class BaseAction(base.BaseLibrary):
             Returns the dictionary to export.
         """
         data = {}
-        attributes = ["interpType", "constraintOffsetPolarity", "aimVectorX", "aimVectorY", "aimVectorZ", "upVectorX", "upVectorY", "upVectorZ", "worldUpType", "worldUpVectorX", "worldUpVectorY", "worldUpVectorZ"]
-        output_attributes = ["constraintTranslateX", "constraintTranslateY",  "constraintTranslateZ",  "constraintRotateX",  "constraintRotateY",  "constraintRotateZ",  "constraintScaleX",  "constraintScaleY",  "constraintScaleZ"]
+        attributes = ['interpType', 'constraintOffsetPolarity', 'aimVectorX', 'aimVectorY', 'aimVectorZ', 'upVectorX', 'upVectorY', 'upVectorZ', 'worldUpType', 'worldUpVectorX', 'worldUpVectorY', 'worldUpVectorZ']
+        output_attributes = ['constraintTranslateX', 'constraintTranslateY',  'constraintTranslateZ',  'constraintRotateX',  'constraintRotateY',  'constraintRotateZ',  'constraintScaleX',  'constraintScaleY',  'constraintScaleZ']
         #type_attr_data = {
-        #                "parentConstraint" : ["interpType"],
-        #                "orientConstraint" : ["interpType"],
-        #                "pointConstraint"  : ["constraintOffsetPolarity"],
-        #                "normalConstraint" : ["aimVectorX", "aimVectorY", "aimVectorZ", "upVectorX", "upVectorY", "upVectorZ", "worldUpType", "worldUpVectorX", "worldUpVectorY", "worldUpVectorZ"],
-        #                "aimConstraint"    : ["aimVectorX", "aimVectorY", "aimVectorZ", "upVectorX", "upVectorY", "upVectorZ", "worldUpType", "worldUpVectorX", "worldUpVectorY", "worldUpVectorZ"]
+        #                'parentConstraint' : ['interpType'],
+        #                'orientConstraint' : ['interpType'],
+        #                'pointConstraint'  : ['constraintOffsetPolarity'],
+        #                'normalConstraint' : ['aimVectorX', 'aimVectorY', 'aimVectorZ', 'upVectorX', 'upVectorY', 'upVectorZ', 'worldUpType', 'worldUpVectorX', 'worldUpVectorY', 'worldUpVectorZ'],
+        #                'aimConstraint'    : ['aimVectorX', 'aimVectorY', 'aimVectorZ', 'upVectorX', 'upVectorY', 'upVectorZ', 'worldUpType', 'worldUpVectorX', 'worldUpVectorY', 'worldUpVectorZ']
         #            }
         self.ar.ui_manager.set_progress(max=len(constraints), add_one=False, add_number=False)
         for const in constraints:
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             if not cmds.attributeQuery(self.ar.data.dp_id, node=const, exists=True):
                 # getting attributes if they exists
-                data[const] = {"attributes" : {},
-                              "output"     : {},
-                              "type"       : cmds.objectType(const)
+                data[const] = {'attributes' : {},
+                              'output'     : {},
+                              'type'       : cmds.objectType(const)
                             }
                 for attr in attributes:
                     if attr in cmds.listAttr(const):
-                        data[const]["attributes"][attr] = cmds.getAttr(const+"."+attr)
-                data[const]["worldUpMatrix"] = []
-                if "worldUpMatrix" in cmds.listAttr(const):
-                    data[const]["worldUpMatrix"] = cmds.listConnections(const+".worldUpMatrix", source=True, destination=False)
-                data[const]["constraintParentInverseMatrix"] = cmds.listConnections(const+".constraintParentInverseMatrix", source=True, destination=False)
-                data[const]["target"] = {}
-                if "target" in cmds.listAttr(const):
+                        data[const]['attributes'][attr] = cmds.getAttr(const+"."+attr)
+                data[const]['worldUpMatrix'] = []
+                if 'worldUpMatrix' in cmds.listAttr(const):
+                    data[const]['worldUpMatrix'] = cmds.listConnections(const+".worldUpMatrix", source=True, destination=False)
+                data[const]['constraintParentInverseMatrix'] = cmds.listConnections(const+".constraintParentInverseMatrix", source=True, destination=False)
+                data[const]['target'] = {}
+                if 'target' in cmds.listAttr(const):
                     target_attr = None
                     if cmds.objExists(const+".target[0].targetParentMatrix"):
                         target_attr = "targetParentMatrix"
@@ -644,17 +644,17 @@ class BaseAction(base.BaseLibrary):
                     elif cmds.objExists(const+".target[0].targetMesh"):
                         target_attr = "targetMesh"
                     if target_attr:
-                        data[const]["target"][target_attr] = {}
+                        data[const]['target'][target_attr] = {}
                         for target in cmds.getAttr(const+".target", multiIndices=True):
-                            data[const]["target"][target_attr][target] = [cmds.listConnections(const+".target["+str(target)+"]."+target_attr, source=True, destination=False)[0], cmds.getAttr(const+".target["+str(target)+"].targetWeight")]
+                            data[const]['target'][target_attr][target] = [cmds.listConnections(const+".target["+str(target)+"]."+target_attr, source=True, destination=False)[0], cmds.getAttr(const+".target["+str(target)+"].targetWeight")]
                 # store connection info to disconnect when import if need to skip the constraint driving
                 for output_attr in output_attributes:
-                    data[const]["output"][output_attr] = None
+                    data[const]['output'][output_attr] = None
                     if output_attr in cmds.listAttr(const):
                         if cmds.listConnections(const+"."+output_attr, source=False, destination=True):
-                            data[const]["output"][output_attr] = True
+                            data[const]['output'][output_attr] = True
                         else:
-                            data[const]["output"][output_attr] = False
+                            data[const]['output'][output_attr] = False
         return data
 
 
@@ -670,16 +670,16 @@ class BaseAction(base.BaseLibrary):
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             # create constraint node if it needs
             if not cmds.objExists(item):
-                constraint_type = constraint_data[item]["type"]
+                constraint_type = constraint_data[item]['type']
                 targets, values = [], []
-                if constraint_data[item]["target"]:
-                    target_attr = next(iter(constraint_data[item]["target"].keys()))
-                    keys = list(constraint_data[item]["target"][target_attr].keys())
+                if constraint_data[item]['target']:
+                    target_attr = next(iter(constraint_data[item]['target'].keys()))
+                    keys = list(constraint_data[item]['target'][target_attr].keys())
                     keys.sort()
                     for k in keys:
-                        targets.append(constraint_data[item]["target"][target_attr][k][0])
-                        values.append(constraint_data[item]["target"][target_attr][k][1])
-                to_nodes = constraint_data[item]["constraintParentInverseMatrix"]
+                        targets.append(constraint_data[item]['target'][target_attr][k][0])
+                        values.append(constraint_data[item]['target'][target_attr][k][1])
+                to_nodes = constraint_data[item]['constraintParentInverseMatrix']
                 # create the missing constraint
                 if targets and to_nodes:
                     if cmds.objExists(to_nodes[0]) and not [tgt for tgt in targets if not cmds.objExists(tgt)]:
@@ -704,17 +704,17 @@ class BaseAction(base.BaseLibrary):
                         elif constraint_type == "tangentConstraint":
                             const = cmds.tangentConstraint(targets, to_nodes[0], name=item)[0]
                         # set attribute values
-                        if constraint_data[item]["attributes"]:
-                            for attr in constraint_data[item]["attributes"]:
-                                cmds.setAttr(const+"."+attr, constraint_data[item]["attributes"][attr])
+                        if constraint_data[item]['attributes']:
+                            for attr in constraint_data[item]['attributes']:
+                                cmds.setAttr(const+"."+attr, constraint_data[item]['attributes'][attr])
                         # set weight values
                         for v, value in enumerate(values):
                             cmds.setAttr(item+"."+targets[v]+"W"+str(v), value)
-                        if constraint_data[item]["worldUpMatrix"]:
-                            cmds.connectAttr(constraint_data[item]["worldUpMatrix"][0]+".worldMatrix", const+".worldUpMatrix", force=True)
+                        if constraint_data[item]['worldUpMatrix']:
+                            cmds.connectAttr(constraint_data[item]['worldUpMatrix'][0]+".worldMatrix", const+".worldUpMatrix", force=True)
                         # disconnect to keep the same exported skip option
-                        for output_attr in constraint_data[item]["output"]:
-                            if output_attr in cmds.listAttr(const) and not constraint_data[item]["output"][output_attr]:
+                        for output_attr in constraint_data[item]['output']:
+                            if output_attr in cmds.listAttr(const) and not constraint_data[item]['output'][output_attr]:
                                 connected_items = cmds.listConnections(const+"."+output_attr, source=False, destination=True, plugs=True)
                                 if connected_items:
                                     cmds.disconnectAttr(const+"."+output_attr, connected_items[0])

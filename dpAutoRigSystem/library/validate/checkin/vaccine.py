@@ -6,10 +6,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "Vaccine"
-TITLE = "v052_vaccine"
-DESCRIPTION = "v053_vaccineDesc"
-WIKI = "07-‐-Validator#-vaccine-cleaner"
+CLASS_NAME = 'Vaccine'
+TITLE = 'v052_vaccine'
+DESCRIPTION = 'v053_vaccineDesc'
+WIKI = '07-‐-Validator#-vaccine-cleaner'
 
 
 
@@ -47,8 +47,8 @@ class Vaccine(action.BaseAction):
                     self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                     # conditional to check here
                     script_data = cmds.scriptNode(item, beforeScript=True, query=True)
-                    #if "fuck_All_U" in script_data:
-                    if "_gene" in script_data:
+                    #if 'fuck_All_U' in script_data:
+                    if '_gene' in script_data:
                         self.checked_items.append(item)
                         self.found_issues.append(True)
                         if self.first_mode:
@@ -57,7 +57,7 @@ class Vaccine(action.BaseAction):
                             try:
                                 cmds.delete(item)
                                 path = cmds.internalVar(userAppDir=True)+"/scripts/"
-                                vaccine_items = ["vaccine.py", "vaccine.pyc"]
+                                vaccine_items = ['vaccine.py', 'vaccine.pyc']
                                 for vaccine in vaccine_items:
                                     if os.path.exists(path+vaccine):
                                         os.remove(path+vaccine)

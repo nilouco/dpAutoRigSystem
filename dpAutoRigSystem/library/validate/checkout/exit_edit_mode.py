@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "ExitEditMode"
-TITLE = "v034_exitEditMode"
-DESCRIPTION = "v035_exitEditModeDesc"
-WIKI = "07-‐-Validator#-exit-edit-mode"
+CLASS_NAME = 'ExitEditMode'
+TITLE = 'v034_exitEditMode'
+DESCRIPTION = 'v035_exitEditModeDesc'
+WIKI = '07-‐-Validator#-exit-edit-mode'
 
 
 
@@ -41,7 +41,7 @@ class ExitEditMode(action.BaseAction):
                 for item in check_items:
                     self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                     # conditional to check here
-                    if "editMode" in cmds.listAttr(item) and cmds.getAttr(item+".editMode") == 1:
+                    if 'editMode' in cmds.listAttr(item) and cmds.getAttr(item+".editMode") == 1:
                         self.checked_items.append(item)
                         self.found_issues.append(True)
                         if self.first_mode:

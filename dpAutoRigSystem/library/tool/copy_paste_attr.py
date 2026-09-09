@@ -3,10 +3,10 @@ from importlib import reload
 from ..base import base
 
 # global variables to this module:    
-CLASS_NAME = "CopyPasteAttr"
-TITLE = "m135_copyPasteAttr"
-DESCRIPTION = "m136_copyPasteAttrDesc"
-WIKI = "06-‐-Tools#-copy-paste-attribute"
+CLASS_NAME = 'CopyPasteAttr'
+TITLE = 'm135_copyPasteAttr'
+DESCRIPTION = 'm136_copyPasteAttrDesc'
+WIKI = '06-‐-Tools#-copy-paste-attribute'
 
 
 

@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "BrokenNet"
-TITLE = "v046_brokenNet"
-DESCRIPTION = "v047_brokenNetDesc"
-WIKI = "07-‐-Validator#-broken-network-cleaner"
+CLASS_NAME = 'BrokenNet'
+TITLE = 'v046_brokenNet'
+DESCRIPTION = 'v047_brokenNetDesc'
+WIKI = '07-‐-Validator#-broken-network-cleaner'
 
 
 

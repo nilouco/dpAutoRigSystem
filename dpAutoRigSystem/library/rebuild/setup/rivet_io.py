@@ -7,10 +7,10 @@ from ....library.base import action
 from ....library.tool import rivet
 
 # global variables to this module:
-CLASS_NAME = "RivetIO"
-TITLE = "r039_rivetIO"
-DESCRIPTION = "r040_rivetIODesc"
-WIKI = "10-‐-Rebuilder#-rivet"
+CLASS_NAME = 'RivetIO'
+TITLE = 'r039_rivetIO'
+DESCRIPTION = 'r040_rivetIODesc'
+WIKI = '10-‐-Rebuilder#-rivet'
 
 
 
@@ -20,9 +20,9 @@ class RivetIO(action.BaseAction):
         if self.ar.dev:
             reload(rivet)
         self.rivet = rivet.Rivet(self.ar)
-        self.set_action_type("r000_rebuilder")
-        self.io_folder = "s_rivetIO"
-        self.start_name = "dpRivet"
+        self.set_action_type('r000_rebuilder')
+        self.io_folder = 's_rivetIO'
+        self.start_name = 'dpRivet'
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -50,7 +50,7 @@ class RivetIO(action.BaseAction):
                         if inputs:
                             nets = inputs
                         else:
-                            nets = self.ar.utils.get_network_by_attr("dpRivetNet")
+                            nets = self.ar.utils.get_network_by_attr('dpRivetNet')
                         if nets:
                             self.export_json_file(self.get_rivet_data(nets))
                         else:
@@ -96,7 +96,7 @@ class RivetIO(action.BaseAction):
                 add_it = True
                 if n > 0:
                     for x in range(i):
-                        if data["itemNode"] in result_data[x]["itemList"]:
+                        if data['itemNode'] in result_data[x]['itemList']:
                             add_it = False
                             break
                 if add_it:

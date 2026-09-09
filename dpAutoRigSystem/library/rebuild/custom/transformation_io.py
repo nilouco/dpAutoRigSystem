@@ -3,19 +3,19 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "TransformationIO"
-TITLE = "r037_transformationIO"
-DESCRIPTION = "r038_transformationIODesc"
-WIKI = "10-‐-Rebuilder#-transformation"
+CLASS_NAME = 'TransformationIO'
+TITLE = 'r037_transformationIO'
+DESCRIPTION = 'r038_transformationIODesc'
+WIKI = '10-‐-Rebuilder#-transformation'
 
 
 
 class TransformationIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.set_action_type("r000_rebuilder")
-        self.io_folder = "s_transformationIO"
-        self.start_name = "dpTransformation"
+        self.set_action_type('r000_rebuilder')
+        self.io_folder = 's_transformationIO'
+        self.start_name = 'dpTransformation'
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -43,7 +43,7 @@ class TransformationIO(action.BaseAction):
                         if inputs:
                             items = inputs
                         else:
-                            items = cmds.ls(selection=False, long=True, type="transform")
+                            items = cmds.ls(selection=False, long=True, type='transform')
                         if items:
                             self.export_json_file(self.get_transform_data(items))
                         else:
@@ -96,16 +96,16 @@ class TransformationIO(action.BaseAction):
         """
         data = {}
         need_run_get = True
-        for attr, default in zip(["tx", "ty",  "tz",  "rx",  "ry",  "rz",  "sx",  "sy",  "sz"], [0, 0, 0, 0, 0, 0, 1, 1, 1]):
+        for attr, default in zip(['tx', 'ty',  'tz',  'rx',  'ry',  'rz',  'sx',  'sy',  'sz'], [0, 0, 0, 0, 0, 0, 1, 1, 1]):
             value = cmds.getAttr(item+"."+attr)
             if value != default and not cmds.listConnections(item+"."+attr, destination=False, source=True):
                 if need_run_get:
                     data = { 
-                            "transform" : {},
-                            "matrix" : cmds.xform(item, query=True, worldSpace=False, matrix=True)
+                            'transform' : {},
+                            'matrix' : cmds.xform(item, query=True, worldSpace=False, matrix=True)
                             }
                     need_run_get = False
-                data["transform"][attr] = cmds.getAttr(item+"."+attr)
+                data['transform'][attr] = cmds.getAttr(item+"."+attr)
         return data
 
 
@@ -114,7 +114,7 @@ class TransformationIO(action.BaseAction):
         """
         data = {}
         enables = []
-        enable_attributes = ["enableTranslationX", "enableTranslationY", "enableTranslationZ", "enableRotationX", "enableRotationY", "enableRotationZ", "enableScaleX", "enableScaleY", "enableScaleZ"]
+        enable_attributes = ['enableTranslationX', 'enableTranslationY', 'enableTranslationZ', 'enableRotationX', 'enableRotationY', 'enableRotationZ', 'enableScaleX', 'enableScaleY', 'enableScaleZ']
         enables.append(cmds.transformLimits(item, enableTranslationX=True, query=True))
         enables.append(cmds.transformLimits(item, enableTranslationY=True, query=True))
         enables.append(cmds.transformLimits(item, enableTranslationZ=True, query=True))
@@ -127,7 +127,7 @@ class TransformationIO(action.BaseAction):
         has_true = [i for i in enables if True in i]
         if has_true:
             limits = []
-            #limitAttrList = ["translationX", "translationY", "translationZ", "rotationX", "rotationY", "rotationZ", "scaleX", "scaleY", "scaleZ"]
+            #limitAttrList = ['translationX', 'translationY', 'translationZ', 'rotationX', 'rotationY', 'rotationZ', 'scaleX', 'scaleY', 'scaleZ']
             limits.append(cmds.transformLimits(item, translationX=True, query=True))
             limits.append(cmds.transformLimits(item, translationY=True, query=True))
             limits.append(cmds.transformLimits(item, translationZ=True, query=True))
@@ -137,10 +137,10 @@ class TransformationIO(action.BaseAction):
             limits.append(cmds.transformLimits(item, scaleX=True, query=True))
             limits.append(cmds.transformLimits(item, scaleY=True, query=True))
             limits.append(cmds.transformLimits(item, scaleZ=True, query=True))
-            data = {"limit" : {}}
+            data = {'limit' : {}}
             for e, enable_attr in enumerate(enable_attributes):
                 if True in enables[e]:
-                    data["limit"][enable_attr] = [
+                    data['limit'][enable_attr] = [
                                                 int(enables[e][0]), #minEnable
                                                 int(enables[e][1]), #maxEnable
                                                 limits[e][0], #minValue
@@ -160,48 +160,48 @@ class TransformationIO(action.BaseAction):
             not_found_nodes = []
             # check transform
             #if not cmds.objExists(item):
-            #    item = item[item.rfind("|")+1:] #short name (after last "|")
+            #    item = item[item.rfind('|')+1:] #short name (after last '|')
             if cmds.objExists(item):
                 ran = False
-                if "transform" in transform_data[item]:
+                if 'transform' in transform_data[item]:
                     ran = True
-                    for attr in transform_data[item]["transform"]:
+                    for attr in transform_data[item]['transform']:
                         if not cmds.listConnections(item+"."+attr, destination=False, source=True):
                             # unlock attribute
                             was_locked = cmds.getAttr(item+"."+attr, lock=True)
                             cmds.setAttr(item+"."+attr, lock=False)
                             try:
                                 # set transformation value
-                                cmds.setAttr(item+"."+attr, transform_data[item]["transform"][attr])
+                                cmds.setAttr(item+"."+attr, transform_data[item]['transform'][attr])
                                 # lock attribute again if it was locked
                                 cmds.setAttr(item+"."+attr, lock=was_locked)
                                 if not item in well_imported_items:
                                     well_imported_items.append(item)
                             except Exception as e:
                                 self.fail_io(item+" - "+str(e))
-                    cmds.xform(item, worldSpace=False, matrix=transform_data[item]["matrix"])
-                if "limit" in transform_data[item]:
+                    cmds.xform(item, worldSpace=False, matrix=transform_data[item]['matrix'])
+                if 'limit' in transform_data[item]:
                     ran = True
-                    for limit_attr in transform_data[item]["limit"]:
+                    for limit_attr in transform_data[item]['limit']:
                         try:
-                            if limit_attr == "enableTranslationX":
-                                cmds.transformLimits(item, enableTranslationX=[transform_data[item]["limit"][limit_attr][0], transform_data[item]["limit"][limit_attr][1]], translationX=[transform_data[item]["limit"][limit_attr][2], transform_data[item]["limit"][limit_attr][3]])
-                            elif limit_attr == "enableTranslationY":
-                                cmds.transformLimits(item, enableTranslationY=[transform_data[item]["limit"][limit_attr][0], transform_data[item]["limit"][limit_attr][1]], translationY=[transform_data[item]["limit"][limit_attr][2], transform_data[item]["limit"][limit_attr][3]])
-                            elif limit_attr == "enableTranslationZ":
-                                cmds.transformLimits(item, enableTranslationZ=[transform_data[item]["limit"][limit_attr][0], transform_data[item]["limit"][limit_attr][1]], translationZ=[transform_data[item]["limit"][limit_attr][2], transform_data[item]["limit"][limit_attr][3]])
-                            elif limit_attr == "enableRotationX":
-                                cmds.transformLimits(item, enableRotationX=[transform_data[item]["limit"][limit_attr][0], transform_data[item]["limit"][limit_attr][1]], rotationX=[transform_data[item]["limit"][limit_attr][2], transform_data[item]["limit"][limit_attr][3]])
-                            elif limit_attr == "enableRotationY":
-                                cmds.transformLimits(item, enableRotationY=[transform_data[item]["limit"][limit_attr][0], transform_data[item]["limit"][limit_attr][1]], rotationY=[transform_data[item]["limit"][limit_attr][2], transform_data[item]["limit"][limit_attr][3]])
-                            elif limit_attr == "enableRotationZ":
-                                cmds.transformLimits(item, enableRotationZ=[transform_data[item]["limit"][limit_attr][0], transform_data[item]["limit"][limit_attr][1]], rotationZ=[transform_data[item]["limit"][limit_attr][2], transform_data[item]["limit"][limit_attr][3]])
-                            elif limit_attr == "enableScaleX":
-                                cmds.transformLimits(item, enableScaleX=[transform_data[item]["limit"][limit_attr][0], transform_data[item]["limit"][limit_attr][1]], scaleX=[transform_data[item]["limit"][limit_attr][2], transform_data[item]["limit"][limit_attr][3]])
-                            elif limit_attr == "enableScaleY":
-                                cmds.transformLimits(item, enableScaleY=[transform_data[item]["limit"][limit_attr][0], transform_data[item]["limit"][limit_attr][1]], scaleY=[transform_data[item]["limit"][limit_attr][2], transform_data[item]["limit"][limit_attr][3]])
-                            elif limit_attr == "enableScaleZ":
-                                cmds.transformLimits(item, enableScaleZ=[transform_data[item]["limit"][limit_attr][0], transform_data[item]["limit"][limit_attr][1]], scaleZ=[transform_data[item]["limit"][limit_attr][2], transform_data[item]["limit"][limit_attr][3]])
+                            if limit_attr == 'enableTranslationX':
+                                cmds.transformLimits(item, enableTranslationX=[transform_data[item]['limit'][limit_attr][0], transform_data[item]['limit'][limit_attr][1]], translationX=[transform_data[item]['limit'][limit_attr][2], transform_data[item]['limit'][limit_attr][3]])
+                            elif limit_attr == 'enableTranslationY':
+                                cmds.transformLimits(item, enableTranslationY=[transform_data[item]['limit'][limit_attr][0], transform_data[item]['limit'][limit_attr][1]], translationY=[transform_data[item]['limit'][limit_attr][2], transform_data[item]['limit'][limit_attr][3]])
+                            elif limit_attr == 'enableTranslationZ':
+                                cmds.transformLimits(item, enableTranslationZ=[transform_data[item]['limit'][limit_attr][0], transform_data[item]['limit'][limit_attr][1]], translationZ=[transform_data[item]['limit'][limit_attr][2], transform_data[item]['limit'][limit_attr][3]])
+                            elif limit_attr == 'enableRotationX':
+                                cmds.transformLimits(item, enableRotationX=[transform_data[item]['limit'][limit_attr][0], transform_data[item]['limit'][limit_attr][1]], rotationX=[transform_data[item]['limit'][limit_attr][2], transform_data[item]['limit'][limit_attr][3]])
+                            elif limit_attr == 'enableRotationY':
+                                cmds.transformLimits(item, enableRotationY=[transform_data[item]['limit'][limit_attr][0], transform_data[item]['limit'][limit_attr][1]], rotationY=[transform_data[item]['limit'][limit_attr][2], transform_data[item]['limit'][limit_attr][3]])
+                            elif limit_attr == 'enableRotationZ':
+                                cmds.transformLimits(item, enableRotationZ=[transform_data[item]['limit'][limit_attr][0], transform_data[item]['limit'][limit_attr][1]], rotationZ=[transform_data[item]['limit'][limit_attr][2], transform_data[item]['limit'][limit_attr][3]])
+                            elif limit_attr == 'enableScaleX':
+                                cmds.transformLimits(item, enableScaleX=[transform_data[item]['limit'][limit_attr][0], transform_data[item]['limit'][limit_attr][1]], scaleX=[transform_data[item]['limit'][limit_attr][2], transform_data[item]['limit'][limit_attr][3]])
+                            elif limit_attr == 'enableScaleY':
+                                cmds.transformLimits(item, enableScaleY=[transform_data[item]['limit'][limit_attr][0], transform_data[item]['limit'][limit_attr][1]], scaleY=[transform_data[item]['limit'][limit_attr][2], transform_data[item]['limit'][limit_attr][3]])
+                            elif limit_attr == 'enableScaleZ':
+                                cmds.transformLimits(item, enableScaleZ=[transform_data[item]['limit'][limit_attr][0], transform_data[item]['limit'][limit_attr][1]], scaleZ=[transform_data[item]['limit'][limit_attr][2], transform_data[item]['limit'][limit_attr][3]])
                         except Exception as e:
                             self.fail_io(item+" - "+str(e))
                 if not ran:

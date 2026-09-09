@@ -22,9 +22,9 @@ class UIManager:
         if cmds.menuItem('dev_mode_mi', query=True, exists=True):
             value = cmds.menuItem('dev_mode_mi', query=True, checkBox=True)
         if value:
-            cmds.evalDeferred("from importlib import reload; reload(dpAutoRigSystem); ar = main.Start(dev=True, intro=False); ar.ui();", lowestPriority=True)
+            cmds.evalDeferred('from importlib import reload; reload(dpAutoRigSystem); ar = main.Start(dev=True, intro=False); ar.ui();', lowestPriority=True)
         else:
-            cmds.evalDeferred("ar = main.Start(); ar.ui();", lowestPriority=True)
+            cmds.evalDeferred('ar = main.Start(); ar.ui();', lowestPriority=True)
 
 
     def refresh_ui(self, saved_scene=False, reset_buttons=True, clear_selection=False):
@@ -67,15 +67,15 @@ class UIManager:
     def clear_guide_layout(self):
         if self.ar.data.ui_state:
             cmds.frameLayout('rig_edit_selected_module_fl', edit=True, label=self.ar.data.lang['i011_editSelected'], collapsable=True, collapse=False, parent='rigging_tab')
-            if cmds.columnLayout("rig_guides_inst_cl", query=True, exists=True):
+            if cmds.columnLayout('rig_guides_inst_cl', query=True, exists=True):
                 cmds.deleteUI('rig_guides_inst_cl')
-            if cmds.columnLayout("rig_selected_module_cl", query=True, exists=True):
+            if cmds.columnLayout('rig_selected_module_cl', query=True, exists=True):
                 cmds.deleteUI('rig_selected_module_cl')
             cmds.columnLayout('rig_guides_inst_cl', adjustableColumn=True, width=200, parent='rig_guides_inst_sl')
             cmds.columnLayout('rig_selected_module_cl', adjustableColumn=True, parent='rig_edit_selected_module_fl')
 
 
-    def update_guide_footer(self, text_name="rig_footer_txt",  message_id="i005_footerRigging", quantity=0):
+    def update_guide_footer(self, text_name='rig_footer_txt',  message_id='i005_footerRigging', quantity=0):
         if not quantity:
             quantity = len(self.ar.data.guide_instances)
             if quantity == 0:
@@ -114,15 +114,15 @@ class UIManager:
         """
         if cmds.workspaceControl(self.ar.data.workspace_control_name, query=True, exists=True):
             cmds.workspaceControl(self.ar.data.workspace_control_name, edit=True, close=True)
-            #cmds.deleteUI("dpAutoRigSystemWC", control=True)
+            #cmds.deleteUI('dpAutoRigSystemWC', control=True)
         win_names = [
-                        "dpARLoadWin", 
-                        "dpInfoWindow", 
-                        "dpNewAssetWindow", 
+                        'dpARLoadWin', 
+                        'dpInfoWindow', 
+                        'dpNewAssetWindow', 
                         'dpReplaceDPDataWindow', 
-                        "dpSelectAssetWindow", 
-                        "dpSaveVersionWindow", 
-                        "dpTermsCondWindow", 
+                        'dpSelectAssetWindow', 
+                        'dpSaveVersionWindow', 
+                        'dpTermsCondWindow', 
                         'dpUpdateWindow',
                         'dpDonateWindow',
                         self.ar.data.plus_info_win_name, 
@@ -137,7 +137,7 @@ class UIManager:
         self.ar.data.ui_state = value
 
 
-    def collapse_all_fl(self, iconTB="rig_tri_collapse_guides_itb", layout=0, *args):
+    def collapse_all_fl(self, iconTB='rig_tri_collapse_guides_itb', layout=0, *args):
         """ Edit the current module frame layout collapse and icon.
             Layout number:
             0 = guide module frame layouts
@@ -166,22 +166,22 @@ class UIManager:
         cmds.iconTextButton(iconTB, edit=True, image=icon)
 
 
-    def get_icon_name(self, item, alternative="add_on"):
-        icon_name = "ar"
-        if hasattr(item, "name"):
+    def get_icon_name(self, item, alternative='add_on'):
+        icon_name = 'ar'
+        if hasattr(item, 'name'):
             if item.name in self.ar.data.icon:
                 icon_name = item.name
             else:
                 icon_name = self.ar.naming.to_snake_case(item.name)
         if not icon_name in self.ar.data.icon:
-            if icon_name.split("_")[0] in self.ar.data.icon:
-                icon_name = icon_name.split("_")[0]
+            if icon_name.split('_')[0] in self.ar.data.icon:
+                icon_name = icon_name.split('_')[0]
             else:
                 icon_name = alternative
         return icon_name
 
 
-    def ask_prompt_dialog(self, title, message, text="", buttons=None, *args):
+    def ask_prompt_dialog(self, title, message, text='', buttons=None, *args):
         """ Prompt dialog to get the name of the root joint to receive all the web joints as children.
         """
         if not buttons:
@@ -220,20 +220,20 @@ class UIManager:
                 item.change_active(value)
 
     
-    def run_selected_actions(self, action_instances, first_mode, verbose=True, stop_if_found_block=False, publish_log=None, action_type="v000_validator", *args):
+    def run_selected_actions(self, action_instances, first_mode, verbose=True, stop_if_found_block=False, publish_log=None, action_type='v000_validator', *args):
         """ Run the code for each active validator/rebuilder instance.
             first_mode = True for verify/export
                        = False for fix/import
         """
-        if first_mode and action_type == "r000_rebuilder" and self.ar.naming.get_duplicated_names(): #splitData
-            confirm = cmds.confirmDialog(title=self.ar.data.lang['v024_duplicatedName'], icon="question", message=self.ar.data.lang['i355_uniqueNameDependence'], button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no']], defaultButton=self.ar.data.lang['i072_no'], cancelButton=self.ar.data.lang['i072_no'], dismissString=self.ar.data.lang['i072_no'])
+        if first_mode and action_type == 'r000_rebuilder' and self.ar.naming.get_duplicated_names(): #splitData
+            confirm = cmds.confirmDialog(title=self.ar.data.lang['v024_duplicatedName'], icon='question', message=self.ar.data.lang['i355_uniqueNameDependence'], button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no']], defaultButton=self.ar.data.lang['i072_no'], cancelButton=self.ar.data.lang['i072_no'], dismissString=self.ar.data.lang['i072_no'])
             if confirm == self.ar.data.lang['i072_no']:
                 return
         self.reset_button_colors()
         action_result_data = {}
         log_text = ""
         if publish_log:
-            log_text = "\nPublisher"
+            log_text = '\nPublisher'
             log_text += f"\nScene: {publish_log['scene']}"
             log_text += f"\nPublished: {publish_log['published']}"
             log_text += f"\nExported: {publish_log['exportPath']}"
@@ -252,19 +252,19 @@ class UIManager:
             action_result_keys = list(action_result_data.keys())
             action_result_keys.sort()
             for i, item_data in enumerate(action_result_keys):
-                log_text += action_result_data[item_data]["log_text"]
+                log_text += action_result_data[item_data]['log_text']
                 if i != len(action_result_keys)-1:
-                    log_text += "\n"
+                    log_text += '\n'
             height_size = len(action_result_keys)
         else:
             log_text += "\n"+self.ar.data.lang['i207_notMarked']
             height_size = 2
         log_text = self.ar.pipeliner.get_today(True)+"\n\n"+log_text+"\n"
         if verbose:
-            self.ar.logger.infoWin('i019_log', action_type, log_text, "left", 250, (150+(height_size)*13))
+            self.ar.logger.infoWin('i019_log', action_type, log_text, 'left', 250, (150+(height_size)*13))
             print("\n-------------\n"+self.ar.data.lang[action_type]+"\n"+log_text)
             if publish_log:
-                action_result_data["Publisher"] = publish_log
+                action_result_data['Publisher'] = publish_log
             if not self.ar.utils.export_log_dic_to_json(action_result_data, sub_folder=self.ar.data.dp_data+"/"+self.ar.data.dp_log):
                 print(self.ar.data.lang['i201_saveScene'])
         self.ar.ui_manager.set_progress(end_it=True)
@@ -278,7 +278,7 @@ class UIManager:
             cmds.deleteUI(win_name, window=True)
 
 
-    def set_progress(self, message="Rigging...", header="dpAutoRigSystem", max=100, amount=0, add_one=True, add_number=True, end_it=False, is_interruptable=False, *args):
+    def set_progress(self, message='Rigging...', header='dpAutoRigSystem', max=100, amount=0, add_one=True, add_number=True, end_it=False, is_interruptable=False, *args):
         """ Centralize the progressWindow calling in one method.
             Try to use the cmds.progressWindow as a more automate process.
             
@@ -309,7 +309,7 @@ class UIManager:
                     self.current_amount += 1
                 else:
                     self.current_amount = amount
-                if message == "Rigging...":
+                if message == 'Rigging...':
                     if max > 0:
                         cmds.progressWindow(edit=True, maxValue=max, progress=0)
                 else:

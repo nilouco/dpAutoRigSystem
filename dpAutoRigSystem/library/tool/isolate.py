@@ -5,10 +5,10 @@ from maya import cmds
 from ..base import base
 
 # global variables to this module:    
-CLASS_NAME = "Isolate"
-TITLE = "m095_isolate"
-DESCRIPTION = "m096_isolateDesc"
-WIKI = "06-‐-Tools#-isolate"
+CLASS_NAME = 'Isolate'
+TITLE = 'm095_isolate'
+DESCRIPTION = 'm096_isolateDesc'
+WIKI = '06-‐-Tools#-isolate'
 
 
 
@@ -43,9 +43,9 @@ class Isolate(base.BaseLibrary):
         """ Get grandfather node from selected item
             Return grandfather node found
         """
-        fathers = cmds.listRelatives(self.selected, allParents=True, type="transform")
+        fathers = cmds.listRelatives(self.selected, allParents=True, type='transform')
         if fathers:
-            grandfathers = cmds.listRelatives(fathers[0], allParents=True, type="transform")
+            grandfathers = cmds.listRelatives(fathers[0], allParents=True, type='transform')
             if grandfathers:
                 return grandfathers[0]
         
@@ -58,7 +58,7 @@ class Isolate(base.BaseLibrary):
             # nodes[2] = Selected item (control)
         """
         # declaring nodes to create the isolate setup:
-        nodes = [self.ar.utils.get_node_by_message("rootCtrl"), self.grandfather, self.selected]
+        nodes = [self.ar.utils.get_node_by_message('rootCtrl'), self.grandfather, self.selected]
         if len(nodes) == 3:
             for node in nodes:
                 if not cmds.objExists(node):
@@ -72,9 +72,9 @@ class Isolate(base.BaseLibrary):
         """ Function to run isolate setup.
         """
         # get father zero out transform node
-        zero_grp = cmds.listRelatives(nodes[2], allParents=True, type="transform")[0]
+        zero_grp = cmds.listRelatives(nodes[2], allParents=True, type='transform')[0]
         # create parent constraint
-        pac = cmds.parentConstraint(nodes[0], nodes[1], zero_grp, maintainOffset=True, skipTranslate=["x", "y", "z"], name=zero_grp+"_PaC")[0]
+        pac = cmds.parentConstraint(nodes[0], nodes[1], zero_grp, maintainOffset=True, skipTranslate=['x', 'y', 'z'], name=zero_grp+"_PaC")[0]
         cmds.setAttr(pac+".interpType", 0) #noFlip
         # add isolate attribute to selected control
         cmds.addAttr(nodes[2], longName=attr_name, defaultValue=1.0, minValue=0, maxValue=1, keyable=True) 

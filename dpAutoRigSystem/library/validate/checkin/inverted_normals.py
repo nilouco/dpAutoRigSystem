@@ -3,10 +3,10 @@ from maya import OpenMaya, cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "InvertedNormals"
-TITLE = "v086_invertedNormals"
-DESCRIPTION = "v087_invertedNormalsDesc"
-WIKI = "07-‐-Validator#-inverted-normals"
+CLASS_NAME = 'InvertedNormals'
+TITLE = 'v086_invertedNormals'
+DESCRIPTION = 'v087_invertedNormalsDesc'
+WIKI = '07-‐-Validator#-inverted-normals'
 
 
 

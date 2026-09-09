@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "Showbp"
-TITLE = "v050_showBP"
-DESCRIPTION = "v051_showBPDesc"
-WIKI = "07-‐-Validator#-showbp-cleaner"
+CLASS_NAME = 'Showbp'
+TITLE = 'v050_showBP'
+DESCRIPTION = 'v051_showBPDesc'
+WIKI = '07-‐-Validator#-showbp-cleaner'
 
 
 
@@ -41,7 +41,7 @@ class Showbp(action.BaseAction):
                 for item in check_items:
                     self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                     # conditional to check here
-                    if "ShowBP" in item:
+                    if 'ShowBP' in item:
                         self.checked_items.append(item)
                         self.found_issues.append(True)
                         if self.first_mode:

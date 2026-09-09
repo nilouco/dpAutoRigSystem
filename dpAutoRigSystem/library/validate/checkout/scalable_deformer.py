@@ -3,17 +3,17 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "ScalableDeformer"
-TITLE = "v109_scalableDeformer"
-DESCRIPTION = "v110_scalableDeformerDesc"
-WIKI = "07-‐-Validator#-scalable-deformer-checker"
+CLASS_NAME = 'ScalableDeformer'
+TITLE = 'v109_scalableDeformer'
+DESCRIPTION = 'v110_scalableDeformerDesc'
+WIKI = '07-‐-Validator#-scalable-deformer-checker'
 
 
 
 class ScalableDeformer(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.rig_scale_output_attr = "rig_scale_output"
+        self.rig_scale_output_attr = 'rig_scale_output'
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -38,7 +38,7 @@ class ScalableDeformer(action.BaseAction):
             else:
                 check_items = cmds.ls(selection=False, type=['skinCluster', 'deltaMush'])
             if check_items:
-                option_ctrl = self.ar.utils.get_node_by_message("optionCtrl")
+                option_ctrl = self.ar.utils.get_node_by_message('optionCtrl')
                 if option_ctrl:
                     self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
                     rig_scale_output = [option_ctrl+"."+self.rig_scale_output_attr]
@@ -47,17 +47,17 @@ class ScalableDeformer(action.BaseAction):
                         self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                         node_type = cmds.objectType(node)
                         # check skinCluster nodes and connections
-                        if node_type == "skinCluster":
+                        if node_type == 'skinCluster':
                             if cmds.getAttr(node+".skinningMethod") != 0: # If it's not "Classic Linear"
                                 if cmds.getAttr(node+".dqsSupportNonRigid") == False:
                                     to_fix_item_attrs.append(node+".dqsSupportNonRigid")
-                                for dqs_attr in ["dqsScaleX", "dqsScaleY", "dqsScaleZ"]:
+                                for dqs_attr in ['dqsScaleX', 'dqsScaleY', 'dqsScaleZ']:
                                     sc_connections = cmds.listConnections(node+"."+dqs_attr, source=True, destination=True, plugs=True)
                                     if sc_connections != rig_scale_output:
                                         to_fix_item_attrs.append(node+"."+dqs_attr)
                         # check deltaMush nodes and connections
-                        elif node_type == "deltaMush":
-                            for attr in ["scaleX", "scaleY", "scaleZ"]:
+                        elif node_type == 'deltaMush':
+                            for attr in ['scaleX', 'scaleY', 'scaleZ']:
                                 dm_connection = cmds.listConnections(node+"."+attr, source=True, destination=True, plugs=True)
                                 if dm_connection != rig_scale_output:
                                     to_fix_item_attrs.append(node+"."+attr)
@@ -69,7 +69,7 @@ class ScalableDeformer(action.BaseAction):
                                 self.good_results.append(False)
                             else: #fix
                                 try:
-                                    if item_attr.endswith("dqsSupportNonRigid"):
+                                    if item_attr.endswith('dqsSupportNonRigid'):
                                         # check non-rigid support attribute
                                         cmds.setAttr(item_attr, True)
                                     else:
@@ -82,7 +82,7 @@ class ScalableDeformer(action.BaseAction):
                                     self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item_attr)
                                 cmds.select(clear=True)
                 else:
-                    self.not_found_node("Option_Ctrl")
+                    self.not_found_node('Option_Ctrl')
             else:
                 self.not_found_node()
         else:

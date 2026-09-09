@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "HideCorrectives"
-TITLE = "v036_hideCorrectives"
-DESCRIPTION = "v037_hideCorrectivesDesc"
-WIKI = "07-‐-Validator#-hide-correctives"
+CLASS_NAME = 'HideCorrectives'
+TITLE = 'v036_hideCorrectives'
+DESCRIPTION = 'v037_hideCorrectivesDesc'
+WIKI = '07-‐-Validator#-hide-correctives'
 
 
 
@@ -32,7 +32,7 @@ class HideCorrectives(action.BaseAction):
         # ---
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
-            option_ctrl = self.ar.utils.get_node_by_message("optionCtrl")
+            option_ctrl = self.ar.utils.get_node_by_message('optionCtrl')
             if option_ctrl:
                 if inputs:
                     check_items = cmds.attributeQuery('correctiveCtrls', node=inputs[0], exists=True)

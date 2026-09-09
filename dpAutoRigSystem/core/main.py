@@ -86,7 +86,7 @@ class Start:
         """ Dev reloading modules.
         """ 
         if self.dev:
-            print("Dev mode = True")
+            print('Dev mode = True')
             reload(utils)
             reload(math)
             reload(naming)
@@ -131,7 +131,7 @@ class Start:
             reload(update_guides_ui)
             reload(zipper_ui)
             reload(value_editor_ui)
-            print("Reloaded imported modules")
+            print('Reloaded imported modules')
 
 
     def load_variables(self):

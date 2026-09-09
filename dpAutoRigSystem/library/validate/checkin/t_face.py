@@ -3,10 +3,10 @@ from maya import OpenMaya, cmds, mel
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "TFace"
-TITLE = "v128_tFace"
-DESCRIPTION = "v129_tFaceDesc"
-WIKI = "07-‐-Validator#-t-face-cleaner"
+CLASS_NAME = 'TFace'
+TITLE = 'v128_tFace'
+DESCRIPTION = 'v129_tFaceDesc'
+WIKI = '07-‐-Validator#-t-face-cleaner'
 
 
 
@@ -33,9 +33,9 @@ class TFace(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if inputs:
-                check_items = cmds.ls(inputs, type="mesh")
+                check_items = cmds.ls(inputs, type='mesh')
             else:
-                check_items = cmds.ls(selection=False, type="mesh")
+                check_items = cmds.ls(selection=False, type='mesh')
             if check_items:
                 self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
                 # declare resulted lists

@@ -6,7 +6,7 @@ from ....library.base import action
 CLASS_NAME = 'Override'
 TITLE = 'v090_override'
 DESCRIPTION = 'v091_overrideDesc'
-WIKI = "07-‐-Validator#-override-cleaner"
+WIKI = '07-‐-Validator#-override-cleaner'
 
 
 
@@ -32,7 +32,7 @@ class Override(action.BaseAction):
         # ---
         # --- validator code --- beginning
         if not self.ar.utils.get_all_grp():
-            if not self.ar.utils.get_network_by_attr("dpGuideNet"):
+            if not self.ar.utils.get_network_by_attr('dpGuideNet'):
                 if not cmds.file(query=True, reference=True):
                     nodes = cmds.ls(selection=False)
                     if inputs:

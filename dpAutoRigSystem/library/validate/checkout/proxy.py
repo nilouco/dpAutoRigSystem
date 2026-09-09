@@ -3,13 +3,13 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "Proxy"
-TITLE = "m230_proxy"
-DESCRIPTION = "m231_proxyDesc"
-WIKI = "07-‐-Validator#-proxy-creator"
+CLASS_NAME = 'Proxy'
+TITLE = 'm230_proxy'
+DESCRIPTION = 'm231_proxyDesc'
+WIKI = '07-‐-Validator#-proxy-creator'
 
-PROXIED = "dpProxied"
-NO_PROXY = "dpDoNotProxyIt"
+PROXIED = 'dpProxied'
+NO_PROXY = 'dpDoNotProxyIt'
 
 
 
@@ -41,24 +41,24 @@ class Proxy(action.BaseAction):
             if inputs:
                 proxy_grp = inputs[0]
             else:
-                proxy_grp = self.ar.utils.get_node_by_message("proxyGrp")
-                if not proxy_grp and cmds.objExists("Proxy_Grp"):
-                    proxy_grp = "Proxy_Grp"
+                proxy_grp = self.ar.utils.get_node_by_message('proxyGrp')
+                if not proxy_grp and cmds.objExists('Proxy_Grp'):
+                    proxy_grp = 'Proxy_Grp'
             if proxy_grp:
                 if not PROXIED in cmds.listAttr(proxy_grp):
-                    meshes = cmds.listRelatives(proxy_grp, children=True, allDescendents=True, type="mesh")
+                    meshes = cmds.listRelatives(proxy_grp, children=True, allDescendents=True, type='mesh')
                     if not meshes:
-                        render_grp = self.ar.utils.get_node_by_message("renderGrp")
-                        if not render_grp and cmds.objExists("Render_Grp"):
-                            render_grp = "Render_Grp"
+                        render_grp = self.ar.utils.get_node_by_message('renderGrp')
+                        if not render_grp and cmds.objExists('Render_Grp'):
+                            render_grp = 'Render_Grp'
                         if render_grp:
-                            meshes = cmds.listRelatives(render_grp, children=True, allDescendents=True, fullPath=True, type="mesh")
+                            meshes = cmds.listRelatives(render_grp, children=True, allDescendents=True, fullPath=True, type='mesh')
                     if meshes:
                         # find meshes to generate proxy
                         to_proxy_items = []
                         for mesh in meshes:
                             if len(cmds.ls(mesh)) == 1:
-                                mesh_transforms = cmds.listRelatives(mesh, parent=True, fullPath=True, type="transform")
+                                mesh_transforms = cmds.listRelatives(mesh, parent=True, fullPath=True, type='transform')
                                 if mesh_transforms and not mesh_transforms[0] in to_proxy_items and not NO_PROXY in cmds.listAttr(mesh_transforms) and not PROXIED in cmds.listAttr(mesh_transforms):
                                     to_proxy_items.append(mesh_transforms[0])
                         if to_proxy_items:
@@ -110,7 +110,7 @@ class Proxy(action.BaseAction):
         skincluster_node = None
         if input_deformers:
             for deformer_node in input_deformers:
-                if cmds.objectType(deformer_node) == "skinCluster":
+                if cmds.objectType(deformer_node) == 'skinCluster':
                     skincluster_node = deformer_node
                     break
         if skincluster_node:
@@ -138,8 +138,8 @@ class Proxy(action.BaseAction):
                             skinned_faces.append(j)
                     if skinned_faces:
                         # filter lists
-                        faces = [w.replace(source+".f[", "") for w in source_faces]
-                        faces = [int(w.replace("]", "")) for w in faces]
+                        faces = [w.replace(source+".f[", '') for w in source_faces]
+                        faces = [int(w.replace(']', '')) for w in faces]
                         if faces:
                             for v in reversed(skinned_faces):
                                 faces.pop(v)
@@ -173,8 +173,8 @@ class Proxy(action.BaseAction):
                         cmds.setAttr(dup+".overrideEnabled", 1)
                         cmds.setAttr(dup+".overrideDisplayType", 2) #reference
                         self.reconnect_visibility(source, dup)
-            cmds.addAttr(source, longName=PROXIED, attributeType="bool", defaultValue=1)
-        source_parent = cmds.listRelatives(source, parent=True, fullPath=True, type="transform")
+            cmds.addAttr(source, longName=PROXIED, attributeType='bool', defaultValue=1)
+        source_parent = cmds.listRelatives(source, parent=True, fullPath=True, type='transform')
         if source_parent and source_parent[0] == grp:
             cmds.delete(source)
 
@@ -183,17 +183,17 @@ class Proxy(action.BaseAction):
         """ Add attributes, connect to deformer nodeState if possible to disable them in order to get performance.
         """
         if not PROXIED in cmds.listAttr(grp):
-            cmds.addAttr(grp, longName=PROXIED, attributeType="bool", defaultValue=1)
-        option_ctrl = self.ar.utils.get_node_by_message("optionCtrl")
+            cmds.addAttr(grp, longName=PROXIED, attributeType='bool', defaultValue=1)
+        option_ctrl = self.ar.utils.get_node_by_message('optionCtrl')
         if option_ctrl:
             # prepare option_ctrl to deformers connections
             cmds.setAttr(option_ctrl+".proxy", channelBox=True)
-            cmds.addAttr(option_ctrl, longName="proxyRevOutput", attributeType="bool")
-            proxy_rev = cmds.createNode("reverse", name="Proxy_Rev")
+            cmds.addAttr(option_ctrl, longName='proxyRevOutput', attributeType='bool')
+            proxy_rev = cmds.createNode('reverse', name='Proxy_Rev')
             cmds.connectAttr(option_ctrl+".proxy", proxy_rev+".inputX", force=True)
             cmds.connectAttr(proxy_rev+".outputX", option_ctrl+".proxyRevOutput", force=True)
             deformers = self.skinclusters
-            defs = ["blendShape", "wrap", "ffd", "wire", "shrinkWrap", "sculpt", "morph"]
+            defs = ['blendShape', 'wrap', 'ffd', 'wire', 'shrinkWrap', 'sculpt', 'morph']
             for deform in defs:
                 deformers.extend(cmds.ls(type=deform) or [])
             if deformers:
@@ -203,11 +203,11 @@ class Proxy(action.BaseAction):
                     except:
                         pass #maybe it already has a connection from another node
             # hide controllers and meshes
-            self.connect_proxy_vis(option_ctrl, "mesh")
-            self.connect_proxy_vis(option_ctrl, "tweaks")
-            self.connect_proxy_vis(option_ctrl, "Tweaks") #fixed camelCase for earlier rig versions v4.03.32
-            self.connect_proxy_vis(option_ctrl, suffix="Facial_Ctrls_Grp")
-            self.connect_proxy_vis(option_ctrl, suffix="Deformer_Ctrl_Grp")
+            self.connect_proxy_vis(option_ctrl, 'mesh')
+            self.connect_proxy_vis(option_ctrl, 'tweaks')
+            self.connect_proxy_vis(option_ctrl, 'Tweaks') #fixed camelCase for earlier rig versions v4.03.32
+            self.connect_proxy_vis(option_ctrl, suffix='Facial_Ctrls_Grp')
+            self.connect_proxy_vis(option_ctrl, suffix='Deformer_Ctrl_Grp')
         self.ar.ctrls.color_shape([grp], [1, 0.5, 0.5], outliner=True) #red
 
 
@@ -218,7 +218,7 @@ class Proxy(action.BaseAction):
             if attr:
                 if attr in cmds.listAttr(ctrl):
                     connections = cmds.listConnections(ctrl+"."+attr, source=False, destination=True, plugs=True) #list before connect on it
-                    vis_md = cmds.createNode("multiplyDivide", name="Proxy_"+(attr[0].upper()+attr[1:])+"_Vis_MD")
+                    vis_md = cmds.createNode('multiplyDivide', name="Proxy_"+(attr[0].upper()+attr[1:])+"_Vis_MD")
                     cmds.connectAttr(ctrl+".proxyRevOutput", vis_md+".input1X", force=True)
                     cmds.connectAttr(ctrl+"."+attr, vis_md+".input2X", force=True)
                     if connections:

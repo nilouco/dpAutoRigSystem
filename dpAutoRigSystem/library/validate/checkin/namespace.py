@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "Namespace"
-TITLE = "v038_namespace"
-DESCRIPTION = "v039_namespaceDesc"
-WIKI = "07-‐-Validator#-namespace-cleaner"
+CLASS_NAME = 'Namespace'
+TITLE = 'v038_namespace'
+DESCRIPTION = 'v039_namespaceDesc'
+WIKI = '07-‐-Validator#-namespace-cleaner'
 
 
 
@@ -41,12 +41,12 @@ class Namespace(action.BaseAction):
                 main_namespaces = cmds.namespaceInfo(listOnlyNamespaces=True)
                 if main_namespaces:
                     for namespace in main_namespaces:
-                        if namespace != "UI" and namespace != "shared":
+                        if namespace != 'UI' and namespace != 'shared':
                             # check if there's dpGuides in the list members
                             types = cmds.namespaceInfo(namespace, listNamespace=True)
                             for type in types:
                                 # if dpGuides, append to list with Guides, else append to withouGuides
-                                if type.find("_dpAR_") != -1:
+                                if type.find('_dpAR_') != -1:
                                     with_guide_main_namespaces.append(namespace)
                                 else:
                                     without_guide_main_namespaces.append(namespace)
@@ -55,7 +55,7 @@ class Namespace(action.BaseAction):
                     # append to new list in order to remove the namespace guide base
                     for namespace in with_guide_main_namespaces:
                         # it will only add to namespaceWithGuideList if it's not a guide base
-                        if "_dpAR_" not in namespace:
+                        if '_dpAR_' not in namespace:
                             with_guide_namespaces.append(namespace)
                     # append to a new list if not find the item from with guides in without guides
                     for item in without_guide_main_namespaces:
@@ -105,7 +105,7 @@ class Namespace(action.BaseAction):
         cmds.namespace(setNamespace=':')
         namespaces = cmds.namespaceInfo(listOnlyNamespaces=True, recurse=True)
         for name in namespaces:
-            if name != "UI" and name != "shared" and name.find("_dpAR_") == -1:
+            if name != 'UI' and name != 'shared' and name.find('_dpAR_') == -1:
                 cmds.namespace(removeNamespace=name, mergeNamespaceWithRoot=True)
                 self.remove_namespace()
                 break

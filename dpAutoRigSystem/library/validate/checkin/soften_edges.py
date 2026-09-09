@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "SoftenEdges"
-TITLE = "v088_softenEdges"
-DESCRIPTION = "v089_softenEdgesDesc"
-WIKI = "07-‐-Validator#-soften-edges"
+CLASS_NAME = 'SoftenEdges'
+TITLE = 'v088_softenEdges'
+DESCRIPTION = 'v089_softenEdgesDesc'
+WIKI = '07-‐-Validator#-soften-edges'
 
 
 
@@ -35,7 +35,7 @@ class SoftenEdges(action.BaseAction):
             if inputs:
                 meshes = inputs
             else:
-                meshes = cmds.ls(selection=False, type="mesh")
+                meshes = cmds.ls(selection=False, type='mesh')
             if meshes:
                 self.ar.ui_manager.set_progress(max=len(meshes), add_one=False, add_number=False)
                 for mesh in meshes:

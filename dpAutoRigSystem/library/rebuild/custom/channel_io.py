@@ -3,19 +3,19 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "ChannelIO"
-TITLE = "r064_channelIO"
-DESCRIPTION = "r065_channelIODesc"
-WIKI = "10-‐-Rebuilder#-channel"
+CLASS_NAME = 'ChannelIO'
+TITLE = 'r064_channelIO'
+DESCRIPTION = 'r065_channelIODesc'
+WIKI = '10-‐-Rebuilder#-channel'
 
 
 
 class ChannelIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.set_action_type("r000_rebuilder")
-        self.io_folder = "s_channelIO"
-        self.start_name = "dpChannel"
+        self.set_action_type('r000_rebuilder')
+        self.io_folder = 's_channelIO'
+        self.start_name = 'dpChannel'
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -42,7 +42,7 @@ class ChannelIO(action.BaseAction):
                     if inputs:
                         items = inputs
                     else:
-                        items = cmds.ls(selection=False, type="transform")
+                        items = cmds.ls(selection=False, type='transform')
                     if items:
                         if self.first_mode: #export
                             self.export_json_file(self.get_channel_data(items))
@@ -53,7 +53,7 @@ class ChannelIO(action.BaseAction):
                             else:
                                 self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                     else:
-                        self.maybe_done_io("Ctrls_Grp")
+                        self.maybe_done_io('Ctrls_Grp')
                 else:
                     self.fail_io(self.ar.data.lang['r010_notFoundPath'])
             else:
@@ -83,9 +83,9 @@ class ChannelIO(action.BaseAction):
                 data[item] = {}
                 for attr in self.ar.data.transform_attrs:
                     data[item][attr] = {
-                                        "locked" : cmds.getAttr(item+"."+attr, lock=True),
-                                        "keyable" : cmds.getAttr(item+"."+attr, keyable=True),
-                                        "channelBox" : cmds.getAttr(item+"."+attr, channelBox=True)
+                                        'locked' : cmds.getAttr(item+"."+attr, lock=True),
+                                        'keyable' : cmds.getAttr(item+"."+attr, keyable=True),
+                                        'channelBox' : cmds.getAttr(item+"."+attr, channelBox=True)
                                         }
         return data
 
@@ -102,7 +102,7 @@ class ChannelIO(action.BaseAction):
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             # check attributes
             if not cmds.objExists(item):
-                item = item[item.rfind("|")+1:] #short name (after last "|")
+                item = item[item.rfind('|')+1:] #short name (after last '|')
             if cmds.objExists(item):
                 for attr in self.ar.data.transform_attrs:
                     try:

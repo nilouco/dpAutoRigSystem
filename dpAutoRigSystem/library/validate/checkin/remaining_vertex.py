@@ -3,10 +3,10 @@ from maya import OpenMaya, cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "RemainingVertex"
-TITLE = "v134_remainingVertex"
-DESCRIPTION = "v135_remainingVertexDesc"
-WIKI = "07-‐-Validator#-remaining-vertex-cleaner"
+CLASS_NAME = 'RemainingVertex'
+TITLE = 'v134_remainingVertex'
+DESCRIPTION = 'v135_remainingVertexDesc'
+WIKI = '07-‐-Validator#-remaining-vertex-cleaner'
 
 
 
@@ -33,9 +33,9 @@ class RemainingVertex(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if inputs:
-                check_items = cmds.ls(inputs, type="mesh")
+                check_items = cmds.ls(inputs, type='mesh')
             else:
-                check_items = cmds.ls(selection=False, type="mesh")
+                check_items = cmds.ls(selection=False, type='mesh')
             if check_items:
                 self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
                 # declare resulted lists
@@ -74,9 +74,9 @@ class RemainingVertex(action.BaseAction):
                                     if len(index_con_edges) < 3:
                                         if border_edge_indexes:
                                             if not set(index_con_edges).intersection(border_edge_indexes):
-                                                remaining_vertices.append(item_name+'.vtx['+str(iter_vertex.index())+']')
+                                                remaining_vertices.append(item_name+'.vtx["+str(iter_vertex.index())+"]')
                                         else:
-                                            remaining_vertices.append(item_name+'.vtx['+str(iter_vertex.index())+']')
+                                            remaining_vertices.append(item_name+'.vtx["+str(iter_vertex.index())+"]')
                                     # Move to next vertex in the mesh list
                                     iter_vertex.next()
                         # Move to the next selected node in the list

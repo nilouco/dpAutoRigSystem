@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "HideDataGrp"
-TITLE = "v028_hideDataGrp"
-DESCRIPTION = "v029_hideDataGrpDesc"
-WIKI = "07-‐-Validator#-hide-data_grp"
+CLASS_NAME = 'HideDataGrp'
+TITLE = 'v028_hideDataGrp'
+DESCRIPTION = 'v029_hideDataGrpDesc'
+WIKI = '07-‐-Validator#-hide-data_grp'
 
 
 
@@ -36,9 +36,9 @@ class HideDataGrp(action.BaseAction):
             if inputs:
                 data_grp = inputs[0]
             else:
-                data_grp = self.ar.utils.get_node_by_message("dataGrp")
-                if not data_grp and cmds.objExists("Data_Grp"):
-                    data_grp = "Data_Grp"
+                data_grp = self.ar.utils.get_node_by_message('dataGrp')
+                if not data_grp and cmds.objExists('Data_Grp'):
+                    data_grp = 'Data_Grp'
             if data_grp:
                 self.ar.ui_manager.set_progress(max=1)
                 self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])

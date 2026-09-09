@@ -5,10 +5,10 @@ from maya import cmds, mel
 from ..base import base
 
 # global variables to this module:    
-CLASS_NAME = "UpdateGuides"
-TITLE = "m186_updateGuides"
-DESCRIPTION = "m187_updateGuidesDesc"
-WIKI = "06-‐-Tools#-update-guides"
+CLASS_NAME = 'UpdateGuides'
+TITLE = 'm186_updateGuides'
+DESCRIPTION = 'm187_updateGuidesDesc'
+WIKI = '06-‐-Tools#-update-guides'
 
 
 
@@ -217,7 +217,7 @@ class UpdateGuides(base.BaseLibrary):
             else:
                 self.set_attr_value(guide, attr, value)
             if lock:
-                cmds.setAttr(f'{guide}.{attr}', lock=True)
+                cmds.setAttr(f"{guide}.{attr}", lock=True)
             if self.ar.data.ui_state:
                 cmds.refresh()
     
@@ -274,7 +274,7 @@ class UpdateGuides(base.BaseLibrary):
             if guide_version != self.ar.data.version:
                 # Create the database holder where the key is the base_guide
                 self.update_data[base_guide] = {}
-                self.update_data[base_guide]["name"] = self.guides_directory[base_guide]["name"]
+                self.update_data[base_guide]['name'] = self.guides_directory[base_guide]['name']
                 guide_attrs = self.get_key_user_attr(base_guide)
                 # Create de attributes dictionary for each base_guide
                 self.update_data[base_guide]['attributes'], self.update_data[base_guide]['transformAttributes'] = self.split_tranform_attr_values(base_guide, guide_attrs)
@@ -434,8 +434,8 @@ class UpdateGuides(base.BaseLibrary):
     def patch_foot_rff(self):
         """ Patching RfF new Foot pivot.
         """
-        reverse_foot_e = "Guide_RfE"
-        reverse_foot_f = "Guide_RfF"
+        reverse_foot_e = 'Guide_RfE'
+        reverse_foot_f = 'Guide_RfF'
         reverse_foot_e_items = cmds.ls("*:"+reverse_foot_e)
         reverse_foot_f_items = cmds.ls("*:"+reverse_foot_f)
         if reverse_foot_f_items:
@@ -443,19 +443,19 @@ class UpdateGuides(base.BaseLibrary):
             if reverse_foot_e_items:
                 for rf_e in reverse_foot_e_items:
                     guide_version = cmds.getAttr(rf_e+".version")
-                    if int(guide_version.split(".")[0]) == 4 and float(guide_version.split(".")[1]+"."+guide_version.split(".")[2]) < 4.25:
+                    if int(guide_version.split('.')[0]) == 4 and float(guide_version.split('.')[1]+"."+guide_version.split('.')[2]) < 4.25:
                         need_patch = True
                         break
             if need_patch:
                 for f in reverse_foot_f_items:
                     e = f.replace(reverse_foot_f, reverse_foot_e)
-                    for attr in ["tx", "ty", "tz"]:
+                    for attr in ['tx', 'ty', 'tz']:
                         cmds.setAttr(f+"."+attr, cmds.getAttr(e+"."+attr))
-                    toes = cmds.listRelatives(e, children=True, type="transform")
+                    toes = cmds.listRelatives(e, children=True, type='transform')
                     if toes:
                         cmds.matchTransform(e, f, position=True, rotation=True)
                         cmds.parent(toes, f)
-                    for attr in ["tx", "ty", "tz"]:
+                    for attr in ['tx', 'ty', 'tz']:
                         cmds.setAttr(e+"."+attr, 0)
 
 

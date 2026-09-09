@@ -5,13 +5,13 @@ from maya import cmds, mel
 from ..base import base
 
 # global variables to this module:    
-CLASS_NAME = "CorrectionManager"
-TITLE = "m068_correctionManager"
-DESCRIPTION = "m069_correctionManagerDesc"
-WIKI = "06-‐-Tools#-correction-manager"
+CLASS_NAME = 'CorrectionManager'
+TITLE = 'm068_correctionManager'
+DESCRIPTION = 'm069_correctionManagerDesc'
+WIKI = '06-‐-Tools#-correction-manager'
 
-ANGLE = "Angle"
-DISTANCE = "Distance"
+ANGLE = 'Angle'
+DISTANCE = 'Distance'
 
 
 
@@ -22,8 +22,8 @@ class CorrectionManager(base.BaseLibrary):
             reload(base)
         self.angle_name = ANGLE
         self.distance_name = DISTANCE
-        self.net_suffix = "Net"
-        self.cm_data_grp = "CorrectionManager_Data_Grp"
+        self.net_suffix = 'Net'
+        self.cm_data_grp = 'CorrectionManager_Data_Grp'
         self.nets = []
         self.net = None
 
@@ -40,7 +40,7 @@ class CorrectionManager(base.BaseLibrary):
         message_attrs = []
         attributes = cmds.listAttr(self.net)
         for attr in attributes:
-            if cmds.getAttr(self.net+"."+attr, type=True) == "message":
+            if cmds.getAttr(self.net+"."+attr, type=True) == 'message':
                 message_attrs.append(attr)
         if message_attrs:
             for message_attr in message_attrs:
@@ -74,17 +74,17 @@ class CorrectionManager(base.BaseLibrary):
         """
         old_name = cmds.getAttr(self.net+".name")
         if not name and self.ar.data.ui_state:
-            name = cmds.textFieldGrp("correction_name_tfg", query=True, text=True)
+            name = cmds.textFieldGrp('correction_name_tfg', query=True, text=True)
         if name:
             name = self.ar.naming.resolve_name(name, self.net_suffix)[0]
             self.rename_linked_nodes(old_name, name)
-            cmds.setAttr(self.net+".name", name, type="string")
+            cmds.setAttr(self.net+".name", name, type='string')
             self.net = cmds.rename(self.net, self.net.replace(old_name, name))
             if self.ar.data.ui_state:
                 self.ar.correction_manager_ui.populate_net_ui()
                 #self.ar.correction_manager_ui.update_edit_net_layout() #Bug: if we call this method here it will crash Maya! Error report: 322305477
-                if cmds.textFieldGrp("correction_name_tfg", query=True, exists=True):
-                    cmds.textFieldGrp("correction_name_tfg", label=self.ar.data.lang['m006_name'], edit=True, text=name)
+                if cmds.textFieldGrp('correction_name_tfg', query=True, exists=True):
+                    cmds.textFieldGrp('correction_name_tfg', label=self.ar.data.lang['m006_name'], edit=True, text=name)
         return name
 
 
@@ -128,9 +128,9 @@ class CorrectionManager(base.BaseLibrary):
     def change_interpolation(self, interp=None, *args):
         """ Just set the interpolation method of the remapValue to this given argument.
         """
-        if interp == "Linear":
+        if interp == 'Linear':
             cmds.setAttr(self.net+".interpolation", 0)
-        elif interp == "Smooth":
+        elif interp == 'Smooth':
             cmds.setAttr(self.net+".interpolation", 1)
         else: #Spline
             cmds.setAttr(self.net+".interpolation", 2)
@@ -147,15 +147,15 @@ class CorrectionManager(base.BaseLibrary):
         net_attributes = cmds.listAttr(self.net)
         if net_attributes:
             for net_attr in net_attributes:
-                if "Rivet" in net_attr:
+                if 'Rivet' in net_attr:
                     try:
                         cmds.delete(self.ar.utils.get_node_by_message(net_attr, self.net))
                     except:
                         pass
-        if cmds.objExists("Rivet_Grp") and not cmds.listRelatives("Rivet_Grp", allDescendents=True, children=True):
-            cmds.delete("Rivet_Grp")
+        if cmds.objExists('Rivet_Grp') and not cmds.listRelatives('Rivet_Grp', allDescendents=True, children=True):
+            cmds.delete('Rivet_Grp')
         try:
-            cmds.delete(self.ar.utils.get_node_by_message("correction_data_grp", self.net))
+            cmds.delete(self.ar.utils.get_node_by_message('correction_data_grp', self.net))
         except:
             pass
         cmds.delete(self.net)
@@ -175,12 +175,12 @@ class CorrectionManager(base.BaseLibrary):
         """
         if cmds.objExists(to_attach):
             loc = cmds.spaceLocator(name=name+"_Loc")[0]
-            cmds.addAttr(loc, longName="inputNode", attributeType="message")
+            cmds.addAttr(loc, longName="inputNode", attributeType='message')
             cmds.connectAttr(to_attach+".message", loc+".inputNode", force=True)
             grp = self.ar.utils.create_zero_out([loc])[0]
             if to_rivet:
-                rivet_node = self.rivet.create_rivet(to_attach, "AnyUVSet", [grp], True, False, False, False, False, False, False, use_offset=False)[-1]
-                cmds.addAttr(self.net, longName=to_attach+"_Rivet", attributeType="message")
+                rivet_node = self.rivet.create_rivet(to_attach, 'AnyUVSet', [grp], True, False, False, False, False, False, False, use_offset=False)[-1]
+                cmds.addAttr(self.net, longName=to_attach+"_Rivet", attributeType='message')
                 cmds.connectAttr(rivet_node+".message", self.net+"."+to_attach+"_Rivet", force=True)
             else:
                 cmds.parentConstraint(to_attach, grp, maintainOffset=False, name=grp+"_PaC")
@@ -196,8 +196,8 @@ class CorrectionManager(base.BaseLibrary):
             Returns the created network node.
         """
         # loading Maya matrix node
-        loaded_quaternion_plugin = self.ar.config.check_loaded_plugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
-        loaded_matrix_plugin = self.ar.config.check_loaded_plugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
+        loaded_quaternion_plugin = self.ar.config.check_loaded_plugin('quatNodes', self.ar.data.lang['e014_cantLoadQuatNode'])
+        loaded_matrix_plugin = self.ar.config.check_loaded_plugin('matrixNodes', self.ar.data.lang['e002_matrixPluginNotFound'])
         if loaded_quaternion_plugin and loaded_matrix_plugin:
             if not nodes:
                 nodes = cmds.ls(selection=True, flatten=True)
@@ -211,10 +211,10 @@ class CorrectionManager(base.BaseLibrary):
                     # main group
                     if not cmds.objExists(self.cm_data_grp):
                         self.cm_data_grp = cmds.group(empty=True, name=self.cm_data_grp)
-                        cmds.addAttr(self.cm_data_grp, longName="dpCorrectionManagerDataGrp", attributeType="bool")
+                        cmds.addAttr(self.cm_data_grp, longName='dpCorrectionManagerDataGrp', attributeType='bool')
                         cmds.setAttr(self.cm_data_grp+".dpCorrectionManagerDataGrp", 1)
                         self.ar.ctrls.set_lock_hide([self.cm_data_grp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
-                        scalable_grp = self.ar.utils.get_node_by_message("scalableGrp")
+                        scalable_grp = self.ar.utils.get_node_by_message('scalableGrp')
                         if scalable_grp:
                             cmds.parent(self.cm_data_grp, scalable_grp)
                         cmds.setAttr(self.cm_data_grp+".visibility", 0)
@@ -223,7 +223,7 @@ class CorrectionManager(base.BaseLibrary):
                     if not name:
                         name = cmds.textField('correction_create_tf', query=True, text=True)
                         if not name:
-                            name = "Correction"
+                            name = 'Correction'
                     correction_name, name = self.ar.naming.resolve_name(name, self.net_suffix)
                     
                     # type
@@ -237,40 +237,40 @@ class CorrectionManager(base.BaseLibrary):
                     if from_ui:
                         to_rivet = cmds.checkBox('correction_rivet_cb', query=True, value=True)
                     if to_rivet:
-                        self.rivet = self.ar.config.get_instance("Rivet", [self.ar.data.tools_folder])
+                        self.rivet = self.ar.config.get_instance('Rivet', [self.ar.data.tools_folder])
                         self.rivet.ui = False
 
                     # create the container of the system data using a network node
-                    self.net = cmds.createNode("network", name=name)
-                    cmds.addAttr(self.net, longName="dpNetwork", attributeType="bool")
-                    cmds.addAttr(self.net, longName="dpCorrectionManager", attributeType="bool")
-                    cmds.addAttr(self.net, longName="name", dataType="string")
-                    cmds.addAttr(self.net, longName="type", dataType="string")
-                    cmds.addAttr(self.net, longName="inputValue", attributeType="float")
-                    cmds.addAttr(self.net, longName="interpolation", attributeType='enum', enumName="Linear:Smooth:Spline")
-                    cmds.addAttr(self.net, longName="decompose", attributeType="bool", defaultValue=0)
-                    cmds.addAttr(self.net, longName="axis", attributeType='enum', enumName="X:Y:Z")
-                    cmds.addAttr(self.net, longName="axisOrder", attributeType='enum', enumName="XYZ:YZX:ZXY:XZY:YXZ:ZYX")
-                    cmds.addAttr(self.net, longName="inputStart", attributeType="float", defaultValue=0)
-                    cmds.addAttr(self.net, longName="inputEnd", attributeType="float", defaultValue=90)
-                    cmds.addAttr(self.net, longName="outputStart", attributeType="float", defaultValue=0)
-                    cmds.addAttr(self.net, longName="outputEnd", attributeType="float", defaultValue=1)
+                    self.net = cmds.createNode('network', name=name)
+                    cmds.addAttr(self.net, longName='dpNetwork', attributeType='bool')
+                    cmds.addAttr(self.net, longName='dpCorrectionManager', attributeType='bool')
+                    cmds.addAttr(self.net, longName='name', dataType='string')
+                    cmds.addAttr(self.net, longName='type', dataType='string')
+                    cmds.addAttr(self.net, longName='inputValue', attributeType='float')
+                    cmds.addAttr(self.net, longName='interpolation', attributeType='enum', enumName='Linear:Smooth:Spline')
+                    cmds.addAttr(self.net, longName='decompose', attributeType='bool', defaultValue=0)
+                    cmds.addAttr(self.net, longName='axis', attributeType='enum', enumName='X:Y:Z')
+                    cmds.addAttr(self.net, longName='axisOrder', attributeType='enum', enumName='XYZ:YZX:ZXY:XZY:YXZ:ZYX')
+                    cmds.addAttr(self.net, longName='inputStart', attributeType='float', defaultValue=0)
+                    cmds.addAttr(self.net, longName='inputEnd', attributeType='float', defaultValue=90)
+                    cmds.addAttr(self.net, longName='outputStart', attributeType='float', defaultValue=0)
+                    cmds.addAttr(self.net, longName='outputEnd', attributeType='float', defaultValue=1)
                     # add serialization attributes
-                    message_attrs = ["correctionDataGrp", "originalLoc", "actionLoc", "correctiveMD", "extractAngleMM", "extractAngleDM", "extractAngleQtE", "extractAngleMD", "angleAxisChc", "smallerThanOneCnd", "overZeroCnd", "interpolationPMA", "inputRmV", "outputSR"]
+                    message_attrs = ['correctionDataGrp', 'originalLoc', 'actionLoc', 'correctiveMD', 'extractAngleMM', 'extractAngleDM', 'extractAngleQtE', 'extractAngleMD', 'angleAxisChc', 'smallerThanOneCnd', 'overZeroCnd', 'interpolationPMA', 'inputRmV', 'outputSR']
                     if correct_type == self.distance_name:
-                        message_attrs = ["correctionDataGrp", "originalLoc", "actionLoc", "correctiveMD", "outputRmV", "distanceBet", "distanceAllCnd", "distanceAxisExtractPMA", "distanceAxisXCnd", "distanceAxisYZCnd", "interpolationPMA", "distanceScaleMD"]
+                        message_attrs = ['correctionDataGrp', 'originalLoc', 'actionLoc', 'correctiveMD', 'outputRmV', 'distanceBet', 'distanceAllCnd', 'distanceAxisExtractPMA', 'distanceAxisXCnd', 'distanceAxisYZCnd', 'interpolationPMA', 'distanceScaleMD']
                     for message_attr in message_attrs:
-                        cmds.addAttr(self.net, longName=message_attr, attributeType="message")
-                    cmds.addAttr(self.net, longName="inputRigScale", attributeType="float", defaultValue=1)
-                    option_ctrl = self.ar.utils.get_node_by_message("optionCtrl")
+                        cmds.addAttr(self.net, longName=message_attr, attributeType='message')
+                    cmds.addAttr(self.net, longName='inputRigScale', attributeType='float', defaultValue=1)
+                    option_ctrl = self.ar.utils.get_node_by_message('optionCtrl')
                     if option_ctrl:
                         cmds.connectAttr(option_ctrl+".rigScaleOutput", self.net+".inputRigScale", force=True)
-                    cmds.addAttr(self.net, longName="corrective", attributeType="float", minValue=0, defaultValue=1, maxValue=1)
-                    cmds.addAttr(self.net, longName="outputValue", attributeType="float")
+                    cmds.addAttr(self.net, longName='corrective', attributeType='float', minValue=0, defaultValue=1, maxValue=1)
+                    cmds.addAttr(self.net, longName='outputValue', attributeType='float')
                     cmds.setAttr(self.net+".dpNetwork", 1)
                     cmds.setAttr(self.net+".dpCorrectionManager", 1)
-                    cmds.setAttr(self.net+".name", correction_name, type="string")
-                    cmds.setAttr(self.net+".type", correct_type, type="string")
+                    cmds.setAttr(self.net+".name", correction_name, type='string')
+                    cmds.setAttr(self.net+".type", correct_type, type='string')
                     # setup group
                     correction_data_grp = cmds.group(empty=True, name=correction_name+"_Grp")
                     cmds.parent(correction_data_grp, self.cm_data_grp)
@@ -281,8 +281,8 @@ class CorrectionManager(base.BaseLibrary):
                     cmds.connectAttr(action_loc+".message", self.net+".actionLoc", force=True)
 
                     # create corrective, interpolation and rigScale nodes:
-                    corrective_md = cmds.createNode("multiplyDivide", name=correction_name+"_Corrective_MD")
-                    interpolation_pma = cmds.createNode("plusMinusAverage", name=correction_name+"_Interpolation_PMA")
+                    corrective_md = cmds.createNode('multiplyDivide', name=correction_name+"_Corrective_MD")
+                    interpolation_pma = cmds.createNode('plusMinusAverage', name=correction_name+"_Interpolation_PMA")
                     self.to_ids.extend([self.net, corrective_md, interpolation_pma])
                     cmds.connectAttr(corrective_md+".message", self.net+".correctiveMD", force=True)
                     cmds.connectAttr(interpolation_pma+".message", self.net+".interpolationPMA", force=True)
@@ -293,17 +293,17 @@ class CorrectionManager(base.BaseLibrary):
                     # if rotate extration option:
                     if correct_type == self.angle_name:                        
                         # write a new self.ar.utils function to generate these matrix nodes here:
-                        extract_angle_mm = cmds.createNode("multMatrix", name=correction_name+"_ExtractAngle_MM")
-                        extract_angle_dm = cmds.createNode("decomposeMatrix", name=correction_name+"_ExtractAngle_DM")
-                        extract_angle_qte = cmds.createNode("quatToEuler", name=correction_name+"_ExtractAngle_QtE")
-                        extract_angle_md = cmds.createNode("multiplyDivide", name=correction_name+"_ExtractAngle_MD")
+                        extract_angle_mm = cmds.createNode('multMatrix', name=correction_name+"_ExtractAngle_MM")
+                        extract_angle_dm = cmds.createNode('decomposeMatrix', name=correction_name+"_ExtractAngle_DM")
+                        extract_angle_qte = cmds.createNode('quatToEuler', name=correction_name+"_ExtractAngle_QtE")
+                        extract_angle_md = cmds.createNode('multiplyDivide', name=correction_name+"_ExtractAngle_MD")
                         # workaround to generate UnitConversion nodes before connect to Choice node (passing by a temporary MultiplyDivide)
-                        angle_unit_convertion_md = cmds.createNode("multiplyDivide", name=correction_name+"_ExtractAngle_UnitConversion_MD")
-                        angle_axis_chc = cmds.createNode("choice", name=correction_name+"_ExtractAngle_Axis_Chc")
-                        smaller_than_one_cnd = cmds.createNode("condition", name=correction_name+"_ExtractAngle_SmallerThanOne_Cnd")
-                        over_zero_cnd = cmds.createNode("condition", name=correction_name+"_ExtractAngle_OverZero_Cnd")
-                        input_rmv = cmds.createNode("remapValue", name=correction_name+"_Input_RmV")
-                        output_sr = cmds.createNode("setRange", name=correction_name+"_Output_SR")
+                        angle_unit_convertion_md = cmds.createNode('multiplyDivide', name=correction_name+"_ExtractAngle_UnitConversion_MD")
+                        angle_axis_chc = cmds.createNode('choice', name=correction_name+"_ExtractAngle_Axis_Chc")
+                        smaller_than_one_cnd = cmds.createNode('condition', name=correction_name+"_ExtractAngle_SmallerThanOne_Cnd")
+                        over_zero_cnd = cmds.createNode('condition', name=correction_name+"_ExtractAngle_OverZero_Cnd")
+                        input_rmv = cmds.createNode('remapValue', name=correction_name+"_Input_RmV")
+                        output_sr = cmds.createNode('setRange', name=correction_name+"_Output_SR")
                         self.to_ids.extend([extract_angle_mm, extract_angle_dm, extract_angle_qte, extract_angle_md, angle_unit_convertion_md, angle_axis_chc, smaller_than_one_cnd, over_zero_cnd, input_rmv, output_sr])
                         cmds.setAttr(extract_angle_md+".operation", 2)
                         cmds.setAttr(smaller_than_one_cnd+".operation", 5) #less or equal
@@ -366,13 +366,13 @@ class CorrectionManager(base.BaseLibrary):
                         cmds.connectAttr(output_sr+".message", self.net+".outputSR", force=True)
                         
                     else: #Distance
-                        distance_scale_md = cmds.createNode("multiplyDivide", name=correction_name+"_DistanceRigScale_MD")
-                        output_rmv = cmds.createNode("remapValue", name=correction_name+"_Output_RmV")
-                        dist_bet = cmds.createNode("distanceBetween", name=correction_name+"_Distance_DB")
-                        distance_axis_extract_pma = cmds.createNode("plusMinusAverage", name=correction_name+"_DistanceAxisExtract_PMA")
-                        distance_all_cnd = cmds.createNode("condition", name=correction_name+"_ExtractDistance_Cnd")
-                        distance_axis_x_cnd = cmds.createNode("condition", name=correction_name+"_ExtractDistance_AxisX_Cnd")
-                        distance_axis_yz_cnd = cmds.createNode("condition", name=correction_name+"_ExtractDistance_AxisYZ_Cnd")
+                        distance_scale_md = cmds.createNode('multiplyDivide', name=correction_name+"_DistanceRigScale_MD")
+                        output_rmv = cmds.createNode('remapValue', name=correction_name+"_Output_RmV")
+                        dist_bet = cmds.createNode('distanceBetween', name=correction_name+"_Distance_DB")
+                        distance_axis_extract_pma = cmds.createNode('plusMinusAverage', name=correction_name+"_DistanceAxisExtract_PMA")
+                        distance_all_cnd = cmds.createNode('condition', name=correction_name+"_ExtractDistance_Cnd")
+                        distance_axis_x_cnd = cmds.createNode('condition', name=correction_name+"_ExtractDistance_AxisX_Cnd")
+                        distance_axis_yz_cnd = cmds.createNode('condition', name=correction_name+"_ExtractDistance_AxisYZ_Cnd")
                         self.to_ids.extend([distance_scale_md, output_rmv, dist_bet, distance_axis_extract_pma, distance_all_cnd, distance_axis_x_cnd, distance_axis_yz_cnd])
                         # connect locators source position values to extract distance from them
                         cmds.connectAttr(original_loc+".worldPosition.worldPositionX", dist_bet+".point1X")

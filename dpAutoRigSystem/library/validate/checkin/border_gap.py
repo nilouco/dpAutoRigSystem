@@ -5,10 +5,10 @@ from maya import OpenMaya, cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "BorderGap"
-TITLE = "v122_borderGap"
-DESCRIPTION = "v123_borderGapDesc"
-WIKI = "07-‐-Validator#-border-gap"
+CLASS_NAME = 'BorderGap'
+TITLE = 'v122_borderGap'
+DESCRIPTION = 'v123_borderGapDesc'
+WIKI = '07-‐-Validator#-border-gap'
 
 
 
@@ -37,9 +37,9 @@ class BorderGap(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if inputs:
-                check_items = cmds.ls(inputs, type="mesh")
+                check_items = cmds.ls(inputs, type='mesh')
             else:
-                check_items = cmds.ls(selection=False, type="mesh")
+                check_items = cmds.ls(selection=False, type='mesh')
             if check_items:
                 self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
                 # declare resulted lists
@@ -67,7 +67,7 @@ class BorderGap(action.BaseAction):
                                     if len(index_con_faces) == 1:
                                         if not item_name in gap_items:
                                             gap_items.append(item_name)
-                                        gap_components.append(item_name+'.e['+str(iter_polys.index())+']')
+                                        gap_components.append(item_name+'.e["+str(iter_polys.index())+"]')
                                     # Move to next polygon in the mesh list
                                     iter_polys.next()
                         # Move to the next selected node in the list

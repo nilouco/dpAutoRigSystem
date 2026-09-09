@@ -6,8 +6,7 @@ import time
 
 from maya import cmds
 
-PIPE_FOLDER = "_dpPipeline"
-#DISCORD_URL = "https://discord.com/api/webhooks"
+PIPE_FOLDER = '_dpPipeline'
 
 
 
@@ -17,13 +16,13 @@ class Pipeliner:
         """
         # define variables
         self.ar = ar
-        self.settings_file = "pipeline_settings.json"
-        self.default_info_file = "pipeline_info.json"
+        self.settings_file = 'pipeline_settings.json'
+        self.default_info_file = 'pipeline_info.json'
         self.info_file = self.default_info_file
-        self.webhook_file = "webhook.json"
-        self.hook_file = "hook.json"
-        self.callback_file = "publish_callback.py"
-        self.custom_asset_name_file = "custom_asset_name.json"
+        self.webhook_file = 'webhook.json'
+        self.hook_file = 'hook.json'
+        self.callback_file = 'publish_callback.py'
+        self.custom_asset_name_file = 'custom_asset_name.json'
         self.pipe_data = {}
         self.pipe_data = self.get_pipeline_data()
         self.declare_pipeline_annotation()
@@ -53,7 +52,7 @@ class Pipeliner:
         """ Open, read, close and return the json file content.
         """
         try:
-            data = open(json_path, "r", encoding='utf-8')
+            data = open(json_path, 'r', encoding='utf-8')
             content = json.loads(data.read())
             data.close()
         except:
@@ -65,7 +64,7 @@ class Pipeliner:
         """ Returns the json path for the pipeline settings file.
         """
         base_path = self.ar.data.dp_auto_rig_path+"/library/pipeline"
-        return os.path.join(base_path, self.settings_file).replace("\\", "/")
+        return os.path.join(base_path, self.settings_file).replace('\\', '/')
 
 
     def get_pipeline_path(self):
@@ -94,14 +93,14 @@ class Pipeliner:
     def get_pipeline_info(self):
         """ Load PipelineInfo data and returns it.
         """
-        json_info_path = os.path.join(self.pipe_data['path'], self.info_file).replace("\\", "/")
+        json_info_path = os.path.join(self.pipe_data['path'], self.info_file).replace('\\', '/')
         return self.update_pipe_data_by_json_path(json_info_path)
 
 
     def get_hook_info(self):
         """ Load Hook data and returns it.
         """
-        json_hook_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), self.hook_file).replace("\\", "/")
+        json_hook_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), self.hook_file).replace('\\', '/')
         return self.update_pipe_data_by_json_path(json_hook_path)
     
 
@@ -111,7 +110,7 @@ class Pipeliner:
             Returns the pipeline info name if there's one.
         """
         name = None
-        if "sceneName" in self.pipe_data:
+        if 'sceneName' in self.pipe_data:
             name = self.pipe_data['sceneName']
         if path:
             name = path
@@ -121,22 +120,22 @@ class Pipeliner:
                     try:
                         name = name[name.rfind(self.pipe_data[dependent]+"/")+len(self.pipe_data[dependent])+1:]
                         to_end_it = False
-                        if self.pipe_data["f_wip"] and self.pipe_data["f_wip"] in name:
-                            name = name.split(self.pipe_data["f_wip"])[0]
+                        if self.pipe_data['f_wip'] and self.pipe_data['f_wip'] in name:
+                            name = name.split(self.pipe_data['f_wip'])[0]
                             to_end_it = True
-                        if self.pipe_data["f_publish"] and self.pipe_data["f_publish"] in name:
-                            name = name.split(self.pipe_data["f_publish"])[0]
+                        if self.pipe_data['f_publish'] and self.pipe_data['f_publish'] in name:
+                            name = name.split(self.pipe_data['f_publish'])[0]
                             to_end_it = True
                         if to_end_it:
-                            name = name.removesuffix("/")
-                            if "/" in name:
-                                name = name[:name.rfind("/")]
+                            name = name.removesuffix('/')
+                            if '/' in name:
+                                name = name[:name.rfind('/')]
                     except:
                         self.pipe_data[field] = ""
                         self.pipe_data[dependent] = ""
                         return self.pipe_data[field]
             else:
-                name = name[:name.find("/")]
+                name = name[:name.find('/')]
             self.pipe_data[field] = name
             return self.pipe_data[field]
 
@@ -145,76 +144,76 @@ class Pipeliner:
         """ Returns a default pipeline info data to load the UI if there isn't any.
         """
         return {
-        "name"    : "Default Pipeline Info",
-        "author"  : "Danilo Pinheiro",
-        "date"    : "2023-01-01",
-        "updated" : "2025-11-10",
+        'name'    : 'Default Pipeline Info',
+        'author'  : 'Danilo Pinheiro',
+        'date'    : '2023-01-01',
+        'updated' : '2025-11-10',
         
-        "f_drive"            : "",
-        "f_studio"           : "",
-        "f_project"          : "",
-        "f_wip"              : "Rigging/WIP",
-        "f_publish"          : "Rigging/Published",
-        "f_toClient"         : "Data/ToClient",
-        "s_presets"          : "dpPresets",
-        "s_addOns"           : "dpAddOns",
-        "s_finishing"        : "dpFinishing",
-        "s_hist"             : self.ar.data.dp_data+"/dpHist",
-        "s_modelIO"          : self.ar.data.dp_data+"/dpModel",
-        "s_supportNodeIO"    : self.ar.data.dp_data+"/dpSupportNode",
-        "s_blendShapeIO"     : self.ar.data.dp_data+"/dpBlendShape",
-        "s_shaderIO"         : self.ar.data.dp_data+"/dpShader",
-        "s_guideIO"          : self.ar.data.dp_data+"/dpGuide",
-        "s_rivetIO"          : self.ar.data.dp_data+"/dpRivet",
-        "s_parentingIO"      : self.ar.data.dp_data+"/dpParenting",
-        "s_skinningIO"       : self.ar.data.dp_data+"/dpSkinning",
-        "s_deformationIO"    : self.ar.data.dp_data+"/dpDeformation",
-        "s_componentTagIO"   : self.ar.data.dp_data+"/dpComponentTag",
-        "s_inputOrderIO"     : self.ar.data.dp_data+"/dpInputOrder",
-        "s_renameIO"         : self.ar.data.dp_data+"/dpRename",
-        "s_transformationIO" : self.ar.data.dp_data+"/dpTransformation",
-        "s_controlShapeIO"   : self.ar.data.dp_data+"/dpControlShape",
-        "s_attributeIO"      : self.ar.data.dp_data+"/dpAttribute",
-        "s_constraintIO"     : self.ar.data.dp_data+"/dpConstraint",
-        "s_utilityIO"        : self.ar.data.dp_data+"/dpUtility",
-        "s_drivenKeyIO"      : self.ar.data.dp_data+"/dpDrivenKey",
-        "s_offsetMatrixIO"   : self.ar.data.dp_data+"/dpOffsetMatrix",
-        "s_connectionIO"     : self.ar.data.dp_data+"/dpConnection",
-        "s_calibrationIO"    : self.ar.data.dp_data+"/dpCalibration",
-        "s_visibilityIO"     : self.ar.data.dp_data+"/dpVisibility",
-        "s_channelIO"        : self.ar.data.dp_data+"/dpChannel",
-        "s_hierarchyIO"      : self.ar.data.dp_data+"/dpHierarchy",
-        "s_old"              : "dpOld",
-        "s_dropbox"          : "Job",
-        "s_webhook"          : "",
-        "s_callback"         : "",
-        "s_prefix"           : "",
-        "s_middle"           : "_rig_v",
-        "s_suffix"           : "",
-        "s_model"            : "_m",
-        "s_rig"              : "_v",
-        "i_padding"          : 3,
-        "b_capitalize"       : False,
-        "b_upper"            : False,
-        "b_lower"            : False,
-        "b_deliver"          : True,
-        "b_dateDir"          : True,
-        "b_assetDir"         : True,
-        "b_archive"          : True,
-        "b_zip"              : True,
-        "b_cloud"            : True,
-        "b_discord"          : True,
-        "b_imager"           : True,
-        "b_i_maya"           : True,
-        "b_i_version"        : True,
-        "b_i_studio"         : True,
-        "b_i_project"        : True,
-        "b_i_asset"          : True,
-        "b_i_model"          : True,
-        "b_i_wip"            : True,
-        "b_i_publish"        : True,
-        "b_i_date"           : True,
-        "b_i_degrade"        : True
+        'f_drive'            : "",
+        'f_studio'           : "",
+        'f_project'          : "",
+        'f_wip'              : 'Rigging/WIP',
+        'f_publish'          : 'Rigging/Published',
+        'f_toClient'         : 'Data/ToClient',
+        's_presets'          : 'dpPresets',
+        's_addOns'           : 'dpAddOns',
+        's_finishing'        : 'dpFinishing',
+        's_hist'             : self.ar.data.dp_data+'/dpHist',
+        's_modelIO'          : self.ar.data.dp_data+'/dpModel',
+        's_supportNodeIO'    : self.ar.data.dp_data+'/dpSupportNode',
+        's_blendShapeIO'     : self.ar.data.dp_data+'/dpBlendShape',
+        's_shaderIO'         : self.ar.data.dp_data+'/dpShader',
+        's_guideIO'          : self.ar.data.dp_data+'/dpGuide',
+        's_rivetIO'          : self.ar.data.dp_data+'/dpRivet',
+        's_parentingIO'      : self.ar.data.dp_data+'/dpParenting',
+        's_skinningIO'       : self.ar.data.dp_data+'/dpSkinning',
+        's_deformationIO'    : self.ar.data.dp_data+'/dpDeformation',
+        's_componentTagIO'   : self.ar.data.dp_data+'/dpComponentTag',
+        's_inputOrderIO'     : self.ar.data.dp_data+'/dpInputOrder',
+        's_renameIO'         : self.ar.data.dp_data+'/dpRename',
+        's_transformationIO' : self.ar.data.dp_data+'/dpTransformation',
+        's_controlShapeIO'   : self.ar.data.dp_data+'/dpControlShape',
+        's_attributeIO'      : self.ar.data.dp_data+'/dpAttribute',
+        's_constraintIO'     : self.ar.data.dp_data+'/dpConstraint',
+        's_utilityIO'        : self.ar.data.dp_data+'/dpUtility',
+        's_drivenKeyIO'      : self.ar.data.dp_data+'/dpDrivenKey',
+        's_offsetMatrixIO'   : self.ar.data.dp_data+'/dpOffsetMatrix',
+        's_connectionIO'     : self.ar.data.dp_data+'/dpConnection',
+        's_calibrationIO'    : self.ar.data.dp_data+'/dpCalibration',
+        's_visibilityIO'     : self.ar.data.dp_data+'/dpVisibility',
+        's_channelIO'        : self.ar.data.dp_data+'/dpChannel',
+        's_hierarchyIO'      : self.ar.data.dp_data+'/dpHierarchy',
+        's_old'              : 'dpOld',
+        's_dropbox'          : 'Job',
+        's_webhook'          : '',
+        's_callback'         : '',
+        's_prefix'           : '',
+        's_middle'           : '_rig_v',
+        's_suffix'           : '',
+        's_model'            : '_m',
+        's_rig'              : '_v',
+        'i_padding'          : 3,
+        'b_capitalize'       : False,
+        'b_upper'            : False,
+        'b_lower'            : False,
+        'b_deliver'          : True,
+        'b_dateDir'          : True,
+        'b_assetDir'         : True,
+        'b_archive'          : True,
+        'b_zip'              : True,
+        'b_cloud'            : True,
+        'b_discord'          : True,
+        'b_imager'           : True,
+        'b_i_maya'           : True,
+        'b_i_version'        : True,
+        'b_i_studio'         : True,
+        'b_i_project'        : True,
+        'b_i_asset'          : True,
+        'b_i_model'          : True,
+        'b_i_wip'            : True,
+        'b_i_publish'        : True,
+        'b_i_date'           : True,
+        'b_i_degrade'        : True
         }
 
 
@@ -222,76 +221,76 @@ class Pipeliner:
         """ Just declare a member variable to get the pipeline annotation data to search the values in the language dictionary.
         """
         self.pipeline_annotation = {
-        "name"    : "Default Pipeline Annotation",
-        "author"  : "Danilo Pinheiro",
-        "date"    : "2023-02-09",
-        "updated" : "2025-11-10",
+        'name'    : 'Default Pipeline Annotation',
+        'author'  : 'Danilo Pinheiro',
+        'date'    : '2023-02-09',
+        'updated' : '2025-11-10',
         
-        "f_drive"            : "i228_fDriveAnn",
-        "f_studio"           : "i229_fStudioAnn",
-        "f_project"          : "i230_fProjectAnn",
-        "f_wip"              : "i231_fWipAnn",
-        "f_publish"          : "i232_fPublishAnn",
-        "f_toClient"         : "i233_fToClientAnn",
-        "s_presets"          : "i234_sPresetsAnn",
-        "s_addOns"           : "i235_sAddOnsAnn",
-        "s_finishing"        : "i353_sFinishingAnn",
-        "s_hist"             : "i236_sHistAnn",
-        "s_modelIO"          : "i293_sModelIOAnn",
-        "s_supportNodeIO"    : "i302_sSupportNodeIOAnn",
-        "s_blendShapeIO"     : "i309_sBlendShapeIOAnn",
-        "s_shaderIO"         : "i294_sShaderIOAnn",
-        "s_guideIO"          : "i295_sGuideIOAnn",
-        "s_rivetIO"          : "i323_sRivetIOAnn",
-        "s_parentingIO"      : "i300_sParentingIOAnn",
-        "s_skinningIO"       : "i297_sSkinningIOAnn",
-        "s_deformationIO"    : "i310_sDeformationIOAnn",
-        "s_componentTagIO"   : "i326_sComponentTagIOAnn",
-        "s_inputOrderIO"     : "i311_sInputOrderIOAnn",
-        "s_renameIO"         : "i338_sRenameIOAnn",
-        "s_transformationIO" : "i312_sTransformationIOAnn",
-        "s_controlShapeIO"   : "i296_sControlShapeIOAnn",
-        "s_attributeIO"      : "i325_sAttributeIOAnn",
-        "s_constraintIO"     : "i328_sConstraintIOAnn",
-        "s_utilityIO"        : "i337_sUtilityIOAnn",
-        "s_drivenKeyIO"      : "i330_sDrivenKeyIOAnn",
-        "s_offsetMatrixIO"   : "i345_sOffsetMatrixIOAnn",
-        "s_connectionIO"     : "i327_sConnectionIOAnn",
-        "s_calibrationIO"    : "i324_sCalibrationIOAnn",
-        "s_visibilityIO"     : "i356_sVisibilityIOAnn",
-        "s_channelIO"        : "i347_sChannelIOAnn",
-        "s_hierarchyIO"      : "i362_sHierarchyAnn",
-        "s_old"              : "i237_sOldAnn",
-        "s_dropbox"          : "i238_sDropboxAnn",
-        "s_prefix"           : "i239_sPrefixAnn",
-        "s_middle"           : "i240_sMiddleAnn",
-        "s_suffix"           : "i241_sSuffixAnn",
-        "s_model"            : "i242_sModelAnn",
-        "s_rig"              : "i243_sRigAnn",
-        "i_padding"          : "i245_iPaddingAnn",
-        "b_capitalize"       : "i246_bCaptalizeAnn",
-        "b_upper"            : "i247_bUpperAnn",
-        "b_lower"            : "i248_bLowerAnn",
-        "b_deliver"          : "i249_bDeliverAnn",
-        "b_dateDir"          : "i250_bDateDirAnn",
-        "b_assetDir"         : "i251_bAssetDirAnn",
-        "b_archive"          : "i252_bArchiveAnn",
-        "b_zip"              : "i253_bZipAnn",
-        "b_cloud"            : "i254_bCloudAnn",
-        "b_imager"           : "i255_bImagerAnn",
-        "b_i_maya"           : "i269_biMaya",
-        "b_i_version"        : "i256_biVersionAnn",
-        "b_i_studio"         : "i257_biStudioAnn",
-        "b_i_project"        : "i258_biProjectAnn",
-        "b_i_asset"          : "i259_biAssetAnn",
-        "b_i_model"          : "i260_biModelAnn",
-        "b_i_wip"            : "i261_biRigAnn",
-        "b_i_publish"        : "i262_biPublishAnn",
-        "b_i_date"           : "i263_biDateAnn",
-        "b_i_degrade"        : "i264_biDegradeAnn",
-        "s_webhook"          : "i277_sWebhookAnn",
-        "b_discord"          : "i278_bDiscordAnn",
-        "s_callback"         : "i284_sCallbackAnn"
+        'f_drive'            : 'i228_fDriveAnn',
+        'f_studio'           : 'i229_fStudioAnn',
+        'f_project'          : 'i230_fProjectAnn',
+        'f_wip'              : 'i231_fWipAnn',
+        'f_publish'          : 'i232_fPublishAnn',
+        'f_toClient'         : 'i233_fToClientAnn',
+        's_presets'          : 'i234_sPresetsAnn',
+        's_addOns'           : 'i235_sAddOnsAnn',
+        's_finishing'        : 'i353_sFinishingAnn',
+        's_hist'             : 'i236_sHistAnn',
+        's_modelIO'          : 'i293_sModelIOAnn',
+        's_supportNodeIO'    : 'i302_sSupportNodeIOAnn',
+        's_blendShapeIO'     : 'i309_sBlendShapeIOAnn',
+        's_shaderIO'         : 'i294_sShaderIOAnn',
+        's_guideIO'          : 'i295_sGuideIOAnn',
+        's_rivetIO'          : 'i323_sRivetIOAnn',
+        's_parentingIO'      : 'i300_sParentingIOAnn',
+        's_skinningIO'       : 'i297_sSkinningIOAnn',
+        's_deformationIO'    : 'i310_sDeformationIOAnn',
+        's_componentTagIO'   : 'i326_sComponentTagIOAnn',
+        's_inputOrderIO'     : 'i311_sInputOrderIOAnn',
+        's_renameIO'         : 'i338_sRenameIOAnn',
+        's_transformationIO' : 'i312_sTransformationIOAnn',
+        's_controlShapeIO'   : 'i296_sControlShapeIOAnn',
+        's_attributeIO'      : 'i325_sAttributeIOAnn',
+        's_constraintIO'     : 'i328_sConstraintIOAnn',
+        's_utilityIO'        : 'i337_sUtilityIOAnn',
+        's_drivenKeyIO'      : 'i330_sDrivenKeyIOAnn',
+        's_offsetMatrixIO'   : 'i345_sOffsetMatrixIOAnn',
+        's_connectionIO'     : 'i327_sConnectionIOAnn',
+        's_calibrationIO'    : 'i324_sCalibrationIOAnn',
+        's_visibilityIO'     : 'i356_sVisibilityIOAnn',
+        's_channelIO'        : 'i347_sChannelIOAnn',
+        's_hierarchyIO'      : 'i362_sHierarchyAnn',
+        's_old'              : 'i237_sOldAnn',
+        's_dropbox'          : 'i238_sDropboxAnn',
+        's_prefix'           : 'i239_sPrefixAnn',
+        's_middle'           : 'i240_sMiddleAnn',
+        's_suffix'           : 'i241_sSuffixAnn',
+        's_model'            : 'i242_sModelAnn',
+        's_rig'              : 'i243_sRigAnn',
+        'i_padding'          : 'i245_iPaddingAnn',
+        'b_capitalize'       : 'i246_bCaptalizeAnn',
+        'b_upper'            : 'i247_bUpperAnn',
+        'b_lower'            : 'i248_bLowerAnn',
+        'b_deliver'          : 'i249_bDeliverAnn',
+        'b_dateDir'          : 'i250_bDateDirAnn',
+        'b_assetDir'         : 'i251_bAssetDirAnn',
+        'b_archive'          : 'i252_bArchiveAnn',
+        'b_zip'              : 'i253_bZipAnn',
+        'b_cloud'            : 'i254_bCloudAnn',
+        'b_imager'           : 'i255_bImagerAnn',
+        'b_i_maya'           : 'i269_biMaya',
+        'b_i_version'        : 'i256_biVersionAnn',
+        'b_i_studio'         : 'i257_biStudioAnn',
+        'b_i_project'        : 'i258_biProjectAnn',
+        'b_i_asset'          : 'i259_biAssetAnn',
+        'b_i_model'          : 'i260_biModelAnn',
+        'b_i_wip'            : 'i261_biRigAnn',
+        'b_i_publish'        : 'i262_biPublishAnn',
+        'b_i_date'           : 'i263_biDateAnn',
+        'b_i_degrade'        : 'i264_biDegradeAnn',
+        's_webhook'          : 'i277_sWebhookAnn',
+        'b_discord'          : 'i278_bDiscordAnn',
+        's_callback'         : 'i284_sCallbackAnn'
         }
 
 
@@ -321,10 +320,10 @@ class Pipeliner:
         if not self.pipe_data['path']:
             # mouting pipeline data dictionary
             if self.pipe_data['sceneName']:
-                self.get_info_by_path("f_drive", None)
+                self.get_info_by_path('f_drive', None)
                 if self.pipe_data['sceneName'] != self.pipe_data['f_drive'] + "/" + self.pipe_data['shortName']:
-                    self.get_info_by_path("f_studio", "f_drive")
-                    self.get_info_by_path("f_project", "f_studio")
+                    self.get_info_by_path('f_studio', 'f_drive')
+                    self.get_info_by_path('f_project', 'f_studio')
                 self.pipe_data['wipPath'] = self.pipe_data['f_drive']+"/"+self.pipe_data['f_studio']+"/"+self.pipe_data['f_project']+"/"+self.pipe_data['f_wip']
                 self.pipe_data['projectPath'] = self.pipe_data['f_drive']+"/"+self.pipe_data['f_studio']+"/"+self.pipe_data['f_project']
                 self.pipe_data['path'] = self.pipe_data['f_drive']+"/"+self.pipe_data['f_studio']+"/"+PIPE_FOLDER #dpTeam
@@ -355,7 +354,7 @@ class Pipeliner:
     def restore_old_pipe_data(self, old_pipe_data=None):
         """ Check if there are old loaded path to restore them after loading the default dictionary.
         """
-        items = ["f_drive", "f_studio", "f_project", "f_wip", "f_publish", "f_toClient", "projectPath", "path"]
+        items = ['f_drive', 'f_studio', 'f_project', 'f_wip', 'f_publish', 'f_toClient', 'projectPath', 'path']
         if old_pipe_data:
             for item in items:
                 if item in old_pipe_data:
@@ -368,19 +367,19 @@ class Pipeliner:
     def conform_loaded_info(self, item, result_items):
         """ Edit the loaded info to conform the splited data correctly.
         """
-        conform_info = result_items[0].replace("\\", "/")
-        if item == "f_drive":
-            conform_info = self.get_info_by_path("f_drive", None, conform_info)
-        elif item == "f_studio":
-            conform_info = self.get_info_by_path("f_studio", "f_drive", conform_info)
-        elif item == "f_project":
-            conform_info = self.get_info_by_path("f_project", "f_studio", conform_info)
-        elif item == "f_wip":
-            conform_info = self.get_info_by_path("f_wip", "f_project", conform_info)
-        elif item == "f_publish":
-            conform_info = self.get_info_by_path("f_publish", "f_project", conform_info)
-        elif item == "f_toClient":
-            conform_info = self.get_info_by_path("f_toClient", "f_project", conform_info)
+        conform_info = result_items[0].replace('\\', '/')
+        if item == 'f_drive':
+            conform_info = self.get_info_by_path('f_drive', None, conform_info)
+        elif item == 'f_studio':
+            conform_info = self.get_info_by_path('f_studio', 'f_drive', conform_info)
+        elif item == 'f_project':
+            conform_info = self.get_info_by_path('f_project', 'f_studio', conform_info)
+        elif item == 'f_wip':
+            conform_info = self.get_info_by_path('f_wip', 'f_project', conform_info)
+        elif item == 'f_publish':
+            conform_info = self.get_info_by_path('f_publish', 'f_project', conform_info)
+        elif item == 'f_toClient':
+            conform_info = self.get_info_by_path('f_toClient', 'f_project', conform_info)
         return conform_info
 
 
@@ -399,7 +398,7 @@ class Pipeliner:
         if self.pipe_data['path']:
             project_folder = self.pipe_data['f_project']
             if project_folder:
-                project_folder += "/"
+                project_folder += '/'
             else:
                 # try to find the project name by scene path
                 project_folder = self.pipe_data['sceneName'][self.pipe_data['sceneName'].rfind(self.pipe_data['f_studio'])+len(self.pipe_data['f_studio'])+1:self.pipe_data['sceneName'].rfind(self.pipe_data['f_wip'])]
@@ -416,15 +415,15 @@ class Pipeliner:
         if loaded:
             loaded = cmds.textFieldButtonGrp('pipeline_path_data_tfbg', query=True, text=True)
             if loaded.endswith('.json'):
-                loaded = loaded.replace("\\", "/")
+                loaded = loaded.replace('\\', '/')
                 if os.path.exists(loaded):
                     loaded_file_paths = [loaded]
         else:
             loaded_file_paths = cmds.fileDialog2(fileFilter='*.json', fileMode=1, dialogStyle=2)
         if loaded_file_paths:
-            loaded_file_path = loaded_file_paths[0].replace("\\", "/")
-            self.pipe_data['path'] = loaded_file_path[:loaded_file_path.rfind("/")]
-            self.info_file = loaded_file_path[loaded_file_path.rfind("/")+1:]
+            loaded_file_path = loaded_file_paths[0].replace('\\', '/')
+            self.pipe_data['path'] = loaded_file_path[:loaded_file_path.rfind('/')]
+            self.info_file = loaded_file_path[loaded_file_path.rfind('/')+1:]
             cmds.textFieldButtonGrp('pipeline_path_data_tfbg', edit=True, text=loaded_file_path)
             self.get_pipeline_data(self.info_file)
             self.load_ui_data()
@@ -453,7 +452,7 @@ class Pipeliner:
         clean_pipe_data = self.pipe_data
         clean_pipe_data.pop('sceneName', None)
         clean_pipe_data.pop('shortName', None)
-        out_file = open(self.pipe_data['path']+"/"+self.info_file, "w")
+        out_file = open(self.pipe_data['path']+"/"+self.info_file, 'w')
         json.dump(clean_pipe_data, out_file, indent=4)
         out_file.close()
 
@@ -478,7 +477,7 @@ class Pipeliner:
     def reset_pipe_info(self, *args):
         """ Reset the pipeline info data to default values.
         """
-        cmds.textFieldButtonGrp('pipeline_path_data_tfbg', edit=True, text="")
+        cmds.textFieldButtonGrp('pipeline_path_data_tfbg', edit=True, text='')
         self.pipe_info = self.get_default_pipeline_info()
         self.pipe_data = self.pipe_info
         self.load_ui_data()
@@ -492,13 +491,13 @@ class Pipeliner:
             file_path_names = cmds.fileDialog2(fileFilter='*.json', fileMode=0, dialogStyle=2) or None
             if file_path_names:
                 file_path = file_path_names[0]
-                if "." in file_path and not file_path.endswith(".json"):
-                    file_path = file_path[:file_path.rfind(".")]+".json"
+                if '.' in file_path and not file_path.endswith('.json'):
+                    file_path = file_path[:file_path.rfind('.')]+".json"
         if file_path:
             cmds.textFieldButtonGrp('pipeline_path_data_tfbg', edit=True, text=file_path)
-            self.pipe_data['path'] = file_path[:file_path.rfind("/")]
+            self.pipe_data['path'] = file_path[:file_path.rfind('/')]
             self.pipe_data['date'] = self.get_today()
-            self.info_file = file_path[file_path.rfind("/")+1:]
+            self.info_file = file_path[file_path.rfind('/')+1:]
             self.save_pipe_info(close_ui=False)
 
 
@@ -510,10 +509,10 @@ class Pipeliner:
         if self.ar.data.ui_state:
             path_data_from_ui = cmds.textFieldButtonGrp('pipeline_path_data_tfbg', query=True, text=True)
             if path_data_from_ui:
-                if "/" in path_data_from_ui:
-                    self.pipe_data['path'] = path_data_from_ui[:path_data_from_ui.rfind("/")]
-                if path_data_from_ui.endswith(".json"):
-                    self.info_file = path_data_from_ui[path_data_from_ui.rfind("/")+1:]
+                if '/' in path_data_from_ui:
+                    self.pipe_data['path'] = path_data_from_ui[:path_data_from_ui.rfind('/')]
+                if path_data_from_ui.endswith('.json'):
+                    self.info_file = path_data_from_ui[path_data_from_ui.rfind('/')+1:]
         if self.pipe_data['path'] and self.info_file:
             self.make_dir_if_not_exists(self.pipe_data['path'])
             self.set_pipeline_info_file()
@@ -552,8 +551,8 @@ class Pipeliner:
             # dropbox path
             if self.pipe_data['b_cloud'] and self.pipe_data['s_dropbox']:
                 # https://help.dropbox.com/fr-fr/installs/locate-dropbox-folder
-                if os.name == "posix": #Linux or Mac
-                    dropbox_folder = "~/.dropbox"
+                if os.name == 'posix': #Linux or Mac
+                    dropbox_folder = '~/.dropbox'
                 else: #Windows
                     dropbox_folder = os.getenv('LOCALAPPDATA')+"/Dropbox"
                 if os.path.exists(dropbox_folder):
@@ -561,7 +560,7 @@ class Pipeliner:
                     if os.path.exists(dropbox_info):
                         content = self.get_json_content(dropbox_info)
                         if content:
-                            self.pipe_data['dropInfoPath'] = content[next(iter(content))]['path'].replace("\\", "/")
+                            self.pipe_data['dropInfoPath'] = content[next(iter(content))]['path'].replace('\\', '/')
 #                                self.pipe_data['dropInfoHost'] = content[list(content)[0]]['host']
                             self.pipe_data['dropboxPath'] = self.pipe_data['dropInfoPath']+"/"+self.pipe_data['s_dropbox']+"/"+self.pipe_data['f_studio']+"/"+self.pipe_data['f_project']
                             self.make_dir_if_not_exists(self.pipe_data['dropboxPath'])
@@ -572,7 +571,7 @@ class Pipeliner:
                 if self.pipe_data['s_webhook']:
                     self.pipe_data['publishedWebhook'] = self.pipe_data['s_webhook']
                 else: 
-                    self.json_webhook_path = os.path.join(self.pipe_data['path'], self.webhook_file).replace("\\", "/")
+                    self.json_webhook_path = os.path.join(self.pipe_data['path'], self.webhook_file).replace('\\', '/')
                     wh = None
                     if os.path.exists(self.json_webhook_path):
                         content = self.get_json_content(self.json_webhook_path)
@@ -588,16 +587,16 @@ class Pipeliner:
                 if os.path.exists(callback):
                     self.pipe_data['s_callback'] = callback
             if self.pipe_data['s_callback']:
-                callback = self.pipe_data['s_callback'].replace("\\", "/")
-                self.pipe_data['callbackPath'] = callback[:callback.rfind("/")]
-                self.pipe_data['callbackFile'] = callback[callback.rfind("/")+1:-3]
+                callback = self.pipe_data['s_callback'].replace('\\', '/')
+                self.pipe_data['callbackPath'] = callback[:callback.rfind('/')]
+                self.pipe_data['callbackFile'] = callback[callback.rfind('/')+1:-3]
 
 
     def get_current_path(self):
         """ Returns the current scene path.
         """
         current_path = cmds.file(query=True, sceneName=True)
-        return current_path[:current_path.rfind("/")]
+        return current_path[:current_path.rfind('/')]
 
 
     def get_current_filename(self, complete=False, *args):
@@ -607,7 +606,7 @@ class Pipeliner:
         if short_scene_name:
             if complete:
                 return short_scene_name
-            return short_scene_name[:short_scene_name.rfind(".")]
+            return short_scene_name[:short_scene_name.rfind('.')]
     
     
     def get_file_extension(self):
@@ -615,7 +614,7 @@ class Pipeliner:
         """
         short_scene_name = cmds.file(query=True, sceneName=True, shortName=True)
         if short_scene_name:
-            return short_scene_name[short_scene_name.rfind("."):]
+            return short_scene_name[short_scene_name.rfind('.'):]
 
 
     def save_json_file(self, data, filename_path, indentation=4, to_sort_keys=True):
@@ -632,7 +631,7 @@ class Pipeliner:
         if asset_names:
             numbers = []
             for item in asset_names:
-                numbers.append(int(item[:item.rfind(".")].split(self.pipe_data['s_middle'])[1]))
+                numbers.append(int(item[:item.rfind('.')].split(self.pipe_data['s_middle'])[1]))
             return max(numbers)+1
     
 
@@ -643,7 +642,7 @@ class Pipeliner:
         if not short_name:
             short_name = cmds.file(query=True, sceneName=True, shortName=True)
         if self.pipe_data['s_rig'] in short_name:
-            wip_rig_version = short_name[short_name.rfind(self.pipe_data['s_rig'])+len(self.pipe_data['s_rig']):short_name.rfind(".")]
+            wip_rig_version = short_name[short_name.rfind(self.pipe_data['s_rig'])+len(self.pipe_data['s_rig']):short_name.rfind('.')]
         return wip_rig_version
 
 
@@ -667,13 +666,13 @@ class Pipeliner:
         asset_name = None
         current_path = self.get_current_path()
         if current_path:
-            folder_name = current_path[current_path.rfind("/")+1:]
+            folder_name = current_path[current_path.rfind('/')+1:]
         short_scene_name = self.get_current_filename()
         if short_scene_name:
             asset_name = short_scene_name
-            if "_" in short_scene_name:
-                asset_name = short_scene_name[:short_scene_name.find("_")]
-            for ext in [".ma", ".mb"]:
+            if '_' in short_scene_name:
+                asset_name = short_scene_name[:short_scene_name.find('_')]
+            for ext in ['.ma', '.mb']:
                 if asset_name.endswith(ext):
                     asset_name = asset_name[:-3]
         if (folder_name or asset_name) and folder_name == asset_name:
@@ -726,12 +725,12 @@ class Pipeliner:
         """ Just save a new asset file version.
         """
         if self.saveVersionFile:
-            this_type = "mayaAscii"
-            if "extension" in self.pipe_data and self.pipe_data['extension'].endswith("mb"):
-                this_type = "mayaBinary"
+            this_type = 'mayaAscii'
+            if 'extension' in self.pipe_data and self.pipe_data['extension'].endswith('mb'):
+                this_type = 'mayaBinary'
             cmds.file(rename=self.saveVersionFile)
             cmds.file(save=True, type=this_type, force=True)
-            self.ar.ui_manager.close_ui("dpSaveVersionWindow")
+            self.ar.ui_manager.close_ui('dpSaveVersionWindow')
             self.ar.data.rebuilding = False
             self.refresh_asset_data()
 
@@ -741,16 +740,16 @@ class Pipeliner:
         """
         if self.check_asset_context():
             try:
-                cmds.frameLayout("asset_fl", edit=True, label=self.ar.data.lang['i303_asset']+" - "+self.pipe_data['assetName'])
-                cmds.textFieldGrp("asset_name_tfg", edit=True, text=self.pipe_data['assetName'])
+                cmds.frameLayout('asset_fl', edit=True, label=self.ar.data.lang['i303_asset']+" - "+self.pipe_data['assetName'])
+                cmds.textFieldGrp('asset_name_tfg', edit=True, text=self.pipe_data['assetName'])
                 if self.ar.data.verbose:
                     print(self.ar.data.lang['r067_currentAssetContext']+" "+self.pipe_data['assetName'])
             except:
                 pass
         else:
             try:
-                cmds.frameLayout("asset_fl", edit=True, label=self.ar.data.lang['i303_asset']+" - "+self.ar.data.lang['i305_none'])
-                cmds.textFieldGrp("asset_name_tfg", edit=True, text=self.ar.data.lang['i305_none'])
+                cmds.frameLayout('asset_fl', edit=True, label=self.ar.data.lang['i303_asset']+" - "+self.ar.data.lang['i305_none'])
+                cmds.textFieldGrp('asset_name_tfg', edit=True, text=self.ar.data.lang['i305_none'])
                 if self.ar.data.verbose:
                     print(self.ar.data.lang['r027_noAssetContext'])
             except:
@@ -761,7 +760,7 @@ class Pipeliner:
         """ Returns True if there's an asset context to work the rebuilding or False if not.
         """
         has_asset_context = False
-        if self.pipe_data and self.pipe_data['assetName'] and self.pipe_data['assetName'] != "None":
+        if self.pipe_data and self.pipe_data['assetName'] and self.pipe_data['assetName'] != 'None':
             has_asset_context = True
         return has_asset_context
     
@@ -771,7 +770,7 @@ class Pipeliner:
         """
         # get path to update open_folder button command
         path = self.pipe_data['projectPath']
-        if "wipPath" in self.pipe_data:
+        if 'wipPath' in self.pipe_data:
             path = self.pipe_data['wipPath']
         if self.pipe_data['assetName'] and self.pipe_data['assetPath']:
             path = self.pipe_data['assetPath']
@@ -797,11 +796,11 @@ class Pipeliner:
             2 = checkBoxes UI to select assets.
         """
         if not path:
-            if "wipPath" in list(self.pipe_data.keys()):
+            if 'wipPath' in list(self.pipe_data.keys()):
                 path = self.pipe_data['wipPath']
             else:
                 # There's no path to load assets
-                cmds.confirmDialog(title=self.ar.data.lang['i187_load']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i350_notFoundPipeInfoFile'], button="Ok")
+                cmds.confirmDialog(title=self.ar.data.lang['i187_load']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i350_notFoundPipeInfoFile'], button='Ok')
         if path and os.path.exists(path):
             if not file:
                 assets = next(os.walk(path))[1]
@@ -817,7 +816,7 @@ class Pipeliner:
                     return
                 else:
                     # Inform that it isn't possible to continue without wip assets to load
-                    cmds.confirmDialog(title=self.ar.data.lang['i187_load']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i351_notFoundWIPAssets'], button="Ok")
+                    cmds.confirmDialog(title=self.ar.data.lang['i187_load']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i351_notFoundWIPAssets'], button='Ok')
             if file:
                 asset_folder = path+"/"+file
                 if mode == 0: #load
@@ -842,10 +841,10 @@ class Pipeliner:
                         self.ar.pipeline_ui.replace_data_ui(file)
                     else:
                         # There's no data do replace from the selected asset
-                        cmds.confirmDialog(title=self.ar.data.lang['i187_load']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['r007_notExportedData']+": "+file, button="Ok")
+                        cmds.confirmDialog(title=self.ar.data.lang['i187_load']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['r007_notExportedData']+": "+file, button='Ok')
         else:
             # There's no wip path to load assets
-            cmds.confirmDialog(title=self.ar.data.lang['i187_load']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i352_notFoundWIPPath'], button="Ok")
+            cmds.confirmDialog(title=self.ar.data.lang['i187_load']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i352_notFoundWIPPath'], button='Ok')
 
 
     def get_save_version_preview_text(self, *args):
@@ -866,47 +865,47 @@ class Pipeliner:
         if asset_file:
             self.new_asset_file = asset_file
         if self.new_asset_file:
-            folder = self.new_asset_file[:self.new_asset_file.rfind("/")]
+            folder = self.new_asset_file[:self.new_asset_file.rfind('/')]
             if self.make_dir_if_not_exists(folder):
                 cmds.file(rename=self.new_asset_file)
                 cmds.workspace(directory=folder)
-                cmds.file(save=True, type="mayaAscii", force=True)
-                self.ar.ui_manager.close_ui("dpNewAssetWindow")
+                cmds.file(save=True, type='mayaAscii', force=True)
+                self.ar.ui_manager.close_ui('dpNewAssetWindow')
                 self.ar.data.rebuilding = False
                 self.refresh_asset_data()
             else:
-                cmds.confirmDialog(title=self.ar.data.lang['i158_create']+" "+self.ar.data.lang['i304_new']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i349_alreadyExistsAsset'], button="Ok")
+                cmds.confirmDialog(title=self.ar.data.lang['i158_create']+" "+self.ar.data.lang['i304_new']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i349_alreadyExistsAsset'], button='Ok')
         else:
-            cmds.confirmDialog(title=self.ar.data.lang['i158_create']+" "+self.ar.data.lang['i304_new']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i307_fillFieldCorrectly'], button="Ok")
+            cmds.confirmDialog(title=self.ar.data.lang['i158_create']+" "+self.ar.data.lang['i304_new']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i307_fillFieldCorrectly'], button='Ok')
 
 
     def get_datas_to_replace(self, path, *args):
         """ Check if exists exported module data in the given path.
         """
         io_elements = [
-            "modelIO",
-            "supportNodeIO",
-            "blendShapeIO",
-            "shaderIO",
-            "guideIO",
-            "rivetIO",
-            "parentingIO",
-            "skinningIO",
-            "deformationIO",
-            "componentTagIO",
-            "inputOrderIO",
-            "renameIO",
-            "transformationIO",
-            "controlShapeIO",
-            "attributeIO",
-            "constraintIO",
-            "utilityIO",
-            "drivenKeyIO",
-            "offsetMatrixIO",
-            "connectionIO",
-            "calibrationIO",
-            "visibilityIO",
-            "channelIO"
+            'modelIO',
+            'supportNodeIO',
+            'blendShapeIO',
+            'shaderIO',
+            'guideIO',
+            'rivetIO',
+            'parentingIO',
+            'skinningIO',
+            'deformationIO',
+            'componentTagIO',
+            'inputOrderIO',
+            'renameIO',
+            'transformationIO',
+            'controlShapeIO',
+            'attributeIO',
+            'constraintIO',
+            'utilityIO',
+            'drivenKeyIO',
+            'offsetMatrixIO',
+            'connectionIO',
+            'calibrationIO',
+            'visibilityIO',
+            'channelIO'
             ]
         self.ios = []
         for item in io_elements:
@@ -937,13 +936,13 @@ class Pipeliner:
                     else:
                         self.make_dir_if_not_exists(dest_path)
                     source_item = next(os.walk(source_path))[2][-1]
-                    ext = source_item[source_item.rfind("."):]
-                    prefix = source_item[:source_item.find("_")+1]
+                    ext = source_item[source_item.rfind('.'):]
+                    prefix = source_item[:source_item.find('_')+1]
                     dest_item = dest_path+"/"+prefix+self.pipe_data['assetName']+self.pipe_data['s_model']+"0".zfill(self.pipe_data['i_padding'])+self.pipe_data['s_rig']+"0".zfill(self.pipe_data['i_padding'])+ext
                     shutil.copy2(source_path+"/"+source_item, dest_item)
             # Concatenate done message
             sucess_message_text = self.ar.data.lang['r068_replacedDataSuccess']+"\n\n"+self.ar.data.lang['i036_from']+": "+path+"\n"+self.ar.data.lang['i037_to']+": "+self.pipe_data['assetName']+"\n\n"+" \n".join(to_replace_items)
-            cmds.confirmDialog(title="dpAutoRigSystem", message=sucess_message_text, button="Ok")
+            cmds.confirmDialog(title='dpAutoRigSystem', message=sucess_message_text, button='Ok')
 
 
     def confirm_save_this_scene(self, must_save_it=True, *args):
@@ -966,7 +965,7 @@ class Pipeliner:
             return True
         else:
             if not short_name or confirm_result == save_as_name: #untitled or saveAs
-                new_names = cmds.fileDialog2(fileFilter="Maya ASCII (*.ma);;Maya Binary (*.mb);;", fileMode=0, dialogStyle=2)
+                new_names = cmds.fileDialog2(fileFilter='Maya ASCII (*.ma);;Maya Binary (*.mb);;', fileMode=0, dialogStyle=2)
                 if new_names:
                     new_name = new_names[0]
                     ext = self.ar.publisher.get_file_type_by_extension(new_name)

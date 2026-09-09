@@ -6,10 +6,10 @@ from ....library.base import action
 from ....library.util import edge_normals
 
 # global variables to this module:
-CLASS_NAME = "UnlockNormals"
-TITLE = "v078_unlockNormals"
-DESCRIPTION = "v079_unlockNormalsDesc"
-WIKI = "07-‐-Validator#-unlock-normals"
+CLASS_NAME = 'UnlockNormals'
+TITLE = 'v078_unlockNormals'
+DESCRIPTION = 'v079_unlockNormalsDesc'
+WIKI = '07-‐-Validator#-unlock-normals'
 
 
 

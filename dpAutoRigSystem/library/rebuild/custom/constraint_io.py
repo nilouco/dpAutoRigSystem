@@ -3,19 +3,19 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "ConstraintIO"
-TITLE = "r050_constraintIO"
-DESCRIPTION = "r051_constraintIODesc"
-WIKI = "10-‐-Rebuilder#-constraint"
+CLASS_NAME = 'ConstraintIO'
+TITLE = 'r050_constraintIO'
+DESCRIPTION = 'r051_constraintIODesc'
+WIKI = '10-‐-Rebuilder#-constraint'
 
 
 
 class ConstraintIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.set_action_type("r000_rebuilder")
-        self.io_folder = "s_constraintIO"
-        self.start_name = "dpConstraint"
+        self.set_action_type('r000_rebuilder')
+        self.io_folder = 's_constraintIO'
+        self.start_name = 'dpConstraint'
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -47,7 +47,7 @@ class ConstraintIO(action.BaseAction):
                         if constraints:
                             self.export_json_file(self.get_constraint_data(constraints))
                         else:
-                            self.maybe_done_io("Constraints")
+                            self.maybe_done_io('Constraints')
                     else: #import
                         constraint_data = self.import_latest_json_file(self.get_exported_items())
                         if constraint_data:

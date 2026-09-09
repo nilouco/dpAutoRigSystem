@@ -5,14 +5,14 @@ from maya import cmds
 from ..base import base
 
 # global variables to this module:
-CLASS_NAME = "CustomAttr"
-TITLE = "m212_customAttr"
-DESCRIPTION = "m213_customAttrDesc"
-WIKI = "06-‐-Tools#-custom-attributes"
+CLASS_NAME = 'CustomAttr'
+TITLE = 'm212_customAttr'
+DESCRIPTION = 'm213_customAttrDesc'
+WIKI = '06-‐-Tools#-custom-attributes'
 
-ATTR_START = "dp"
-ATTR_DPID = "dpID"
-ATTR_LIST = [ATTR_DPID, "dpControl", "dpDoNotProxyIt", "dpDoNotSkinIt", "dpIgnoreIt", "dpKeepIt", "dpDeleteIt", "dpHeadDeformerInfluence", "dpJawDeformerInfluence", "dpNotTransformIO", "dpHolder"]
+ATTR_START = 'dp'
+ATTR_DPID = 'dpID'
+ATTR_LIST = [ATTR_DPID, 'dpControl', 'dpDoNotProxyIt', 'dpDoNotSkinIt', 'dpIgnoreIt', 'dpKeepIt', 'dpDeleteIt', 'dpHeadDeformerInfluence', 'dpJawDeformerInfluence', 'dpNotTransformIO', 'dpHolder']
 DEFAULTIGNORE_LIST = ['persp', 'top', 'front', 'side']
 DEFAULTTYPE_LIST = ['transform', 'network']
 
@@ -91,7 +91,7 @@ class CustomAttr(base.BaseLibrary):
             items = list(set(items)) # just remove duplicated items
             for item in items:
                 if cmds.objExists(item):
-                    if attr_index == "custom":
+                    if attr_index == 'custom':
                         if attr_name:
                             attr = attr_name
                         elif self.ar.data.ui_state:
@@ -110,18 +110,18 @@ class CustomAttr(base.BaseLibrary):
                         #if not ATTR_DPID in (cmds.listAttr(item, userDefined=True) or []):
                         if not cmds.attributeQuery(self.dpid_attr, node=item, exists=True):
                             id = self.ar.math.generate_id(item)
-                            cmds.addAttr(item, longName=self.dpid_attr, dataType="string")
-                            cmds.setAttr(item+"."+self.dpid_attr, id, type="string", lock=True)
+                            cmds.addAttr(item, longName=self.dpid_attr, dataType='string')
+                            cmds.setAttr(item+"."+self.dpid_attr, id, type='string', lock=True)
                             ids.append(id)
                         elif not self.ar.math.validate_id(item):
                             ids.extend(self.update_id([item]))
                     else:
                         attr = self.attributes[attr_index]
                     if attr and not cmds.attributeQuery(attr, node=item, exists=True):
-                        cmds.addAttr(item, longName=attr, attributeType="bool", defaultValue=1, keyable=False)
+                        cmds.addAttr(item, longName=attr, attributeType='bool', defaultValue=1, keyable=False)
                         cmds.setAttr(item+"."+attr, edit=True, channelBox=False)
-            if self.ar.data.ui_state and cmds.textFieldButtonGrp("addCustomAttrTFG", exists=True):
-                cmds.textFieldButtonGrp('custom_attr_add_tfbg', edit=True, text="")
+            if self.ar.data.ui_state and cmds.textFieldButtonGrp('addCustomAttrTFG', exists=True):
+                cmds.textFieldButtonGrp('custom_attr_add_tfbg', edit=True, text='')
         return ids
 
 
@@ -150,7 +150,7 @@ class CustomAttr(base.BaseLibrary):
                     if self.dpid_attr in current_item_attrs:
                         custom_attributes.append(self.dpid_attr)
                     for attr in current_item_attrs:
-                        if attr.startswith(self.start_attr) and cmds.getAttr(item+"."+attr, type=True) == "bool":
+                        if attr.startswith(self.start_attr) and cmds.getAttr(item+"."+attr, type=True) == 'bool':
                             custom_attributes.append(attr)
         return custom_attributes
 
@@ -180,10 +180,10 @@ class CustomAttr(base.BaseLibrary):
         if items:
             for item in items:
                 decomposed_ids = self.ar.math.decompose_id(item)
-                id_data[item] = {#"node" : item,
+                id_data[item] = {
                                 self.dpid_attr : cmds.getAttr(item+"."+self.dpid_attr),
-                                "name" : decomposed_ids[1],
-                                "date" : decomposed_ids[2]
+                                'name' : decomposed_ids[1],
+                                'date' : decomposed_ids[2]
                                }
             if win and id_data:
                 self.ar.custom_attr_ui.id_ui(id_data)

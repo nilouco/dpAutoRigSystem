@@ -6,10 +6,10 @@ from ..base import base
 from ..util import ik_fk_snap
 
 # global variables to this module:
-CLASS_NAME = "MotionCapture"
-TITLE = "m239_motionCapture"
-DESCRIPTION = "m240_motionCaptureDesc"
-WIKI = "06-‐-Tools#-motion-capture"
+CLASS_NAME = 'MotionCapture'
+TITLE = 'm239_motionCapture'
+DESCRIPTION = 'm240_motionCaptureDesc'
+WIKI = '06-‐-Tools#-motion-capture'
 
 
 
@@ -20,7 +20,7 @@ class MotionCapture(base.BaseLibrary):
             reload(base)
             reload(ik_fk_snap)
         self.auto_rotate_attrs = [self.ar.data.lang['c047_autoRotate'], self.ar.data.lang['c032_follow']]
-        self.hik_character_attr = "Character"
+        self.hik_character_attr = 'Character'
         
 
     def build_tool(self, *args):
@@ -456,7 +456,7 @@ class MotionCapture(base.BaseLibrary):
         userDefAttrList = cmds.listAttr(opt_ctrl, userDefined=True)
         if userDefAttrList:
             for attr in userDefAttrList:
-                if attr.endswith("Fk"):
+                if attr.endswith('Fk'):
                     cmds.setAttr(opt_ctrl+"."+attr, mode)
 
 
@@ -464,7 +464,7 @@ class MotionCapture(base.BaseLibrary):
         """ Execute the ikFkSnap script nodes.
             It's very usefull to transfer baked fk animation to ik controllers.
         """
-        nets = self.ar.utils.get_network_by_attr("dpIkFkSnapNet")
+        nets = self.ar.utils.get_network_by_attr('dpIkFkSnapNet')
         if nets:
             for net in nets:
                 # declare needed variables:
@@ -480,14 +480,14 @@ class MotionCapture(base.BaseLibrary):
                 ikfk_snap_inst.snapFkToIk()
                 del ikfk_snap_inst
                 if key:
-                    cmds.setKeyframe([ik_extreme_ctrl, ik_corner_ctrl], attribute=["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ"])
+                    cmds.setKeyframe([ik_extreme_ctrl, ik_corner_ctrl], attribute=['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ'])
 
 
     def set_ctrl_mode(self, mode=1, *args):
         """ Set dpAR rig to IK or Fk mode.
             Default: mode = 1 = Fk.
         """
-        opt_ctrl = self.ar.utils.get_node_by_message("optionCtrl")
+        opt_ctrl = self.ar.utils.get_node_by_message('optionCtrl')
         if opt_ctrl:
             self.set_ikfk(opt_ctrl, mode)
             print(self.ar.data.lang['m248_setIkFkMode']+" "+str(mode))
@@ -499,8 +499,8 @@ class MotionCapture(base.BaseLibrary):
     def get_auto_rotate_ctrls(self):
         """ Get and return the clavicle and neck controllers.
         """
-        controllers = self.ar.ctrls.get_controller_node_by_id("id_030_LimbClavicle")
-        controllers.extend(self.ar.ctrls.get_controller_node_by_id("id_022_HeadNeck"))
+        controllers = self.ar.ctrls.get_controller_node_by_id('id_030_LimbClavicle')
+        controllers.extend(self.ar.ctrls.get_controller_node_by_id('id_022_HeadNeck'))
         return controllers
 
 
@@ -519,7 +519,7 @@ class MotionCapture(base.BaseLibrary):
         if controllers:
             for ctrl in controllers:
                 self.lock_auto_rotate_attr(ctrl, True)
-                zero_grp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
+                zero_grp = cmds.listRelatives(ctrl, parent=True, type='transform')[0]
                 for axis in self.ar.data.axes:
                     cmds.mute(zero_grp+".rotate"+axis, force=True)
         print(self.ar.data.lang['m249_muteAutoRotate']+" "+", ".join(controllers))
@@ -531,7 +531,7 @@ class MotionCapture(base.BaseLibrary):
         odered_items, ids = [], []
         for item in items:
             if self.ar.data.dp_id in cmds.listAttr(item):
-                ids.append(int(cmds.getAttr(item+"."+self.ar.data.dp_id).split(".")[1])) #time
+                ids.append(int(cmds.getAttr(item+"."+self.ar.data.dp_id).split('.')[1])) #time
         if ids:
             _temps, odered_items = zip(*sorted(zip(ids, items)))
         return odered_items
@@ -541,7 +541,7 @@ class MotionCapture(base.BaseLibrary):
         """ Set the biped arms as TPose and align leg and feet as vertical to front direction.
         """
         # clavicle/hips
-        before_ctrls = self.ar.ctrls.get_controller_node_by_id("id_030_LimbClavicle")
+        before_ctrls = self.ar.ctrls.get_controller_node_by_id('id_030_LimbClavicle')
         if before_ctrls:
             clav_items, hip_items = [], []
             for before_ctrl in before_ctrls:
@@ -557,7 +557,7 @@ class MotionCapture(base.BaseLibrary):
                 cmds.setAttr(clav_items[1]+".rotate"+axis, cmds.getAttr(clav_items[0]+".rotate"+axis)) #right clavicle
                 cmds.setAttr(hip_items[1]+".rotate"+axis, cmds.getAttr(hip_items[0]+".rotate"+axis)) #right hips
         # arm/leg
-        fk_ctrls = self.ar.ctrls.get_controller_node_by_id("id_031_LimbFk")
+        fk_ctrls = self.ar.ctrls.get_controller_node_by_id('id_031_LimbFk')
         if fk_ctrls:
             arms, legs = [], []
             for fkCtrl in fk_ctrls:
@@ -590,18 +590,18 @@ class MotionCapture(base.BaseLibrary):
             cmds.xform(legs[4], rotation=(-90, 0, 90), worldSpace=True) #right knee
             cmds.xform(legs[5], rotation=(0, 90, 90), worldSpace=True) #right ankle
         # fingers
-        finger_ctrls = self.ar.ctrls.get_controller_node_by_id("id_015_FingerMain") or []
-        finger_ctrls.extend(self.ar.ctrls.get_controller_node_by_id("id_016_FingerFk"))
+        finger_ctrls = self.ar.ctrls.get_controller_node_by_id('id_015_FingerMain') or []
+        finger_ctrls.extend(self.ar.ctrls.get_controller_node_by_id('id_016_FingerFk'))
         if finger_ctrls:
-            finger_ctrls = [f for f in finger_ctrls if not "_00_" in f and not self.ar.data.lang['m036_thumb'] in f]
+            finger_ctrls = [f for f in finger_ctrls if not '_00_' in f and not self.ar.data.lang['m036_thumb'] in f]
             for finger_ctrl in finger_ctrls:
-                zero_grp = finger_ctrl.replace("_Ctrl", "_SDK_Zero_0_Grp")
+                zero_grp = finger_ctrl.replace('_Ctrl', '_SDK_Zero_0_Grp')
                 if cmds.objExists(zero_grp):
                     cmds.setAttr(finger_ctrl+".rotateY", (-1)*cmds.getAttr(zero_grp+".rotateY"))
         # ik
-        opt_ctrl = self.ar.utils.get_node_by_message("optionCtrl")
+        opt_ctrl = self.ar.utils.get_node_by_message('optionCtrl')
         if opt_ctrl:
-            if "ikFkSnap" in cmds.listAttr(opt_ctrl):
+            if 'ikFkSnap' in cmds.listAttr(opt_ctrl):
                 self.run_ikfk_snap(False)
             else:
                 mel.eval('warning \"'+self.ar.data.lang['m244_setTPoseIssue']+' ikFkSnap'+'\";')
@@ -612,7 +612,7 @@ class MotionCapture(base.BaseLibrary):
     def hik_get_latest_node(self):
         """ Return the latest listed HIKCharacterNode.
         """
-        hik_items = cmds.ls(type="HIKCharacterNode")
+        hik_items = cmds.ls(type='HIKCharacterNode')
         if hik_items:
             return hik_items[-1]
 
@@ -621,10 +621,10 @@ class MotionCapture(base.BaseLibrary):
         """ Create humanIk character definition node.
             Returns its latest HIKCharacterNode.
         """
-        hik_old_items = cmds.ls(type="HIKCharacterNode")
-        mel.eval("HIKCharacterControlsTool;")
-        mel.eval("hikCreateDefinition;")
-        self.hik_node = next(iter(set(cmds.ls(type="HIKCharacterNode"))-set(hik_old_items)))
+        hik_old_items = cmds.ls(type='HIKCharacterNode')
+        mel.eval('HIKCharacterControlsTool;')
+        mel.eval('hikCreateDefinition;')
+        self.hik_node = next(iter(set(cmds.ls(type='HIKCharacterNode'))-set(hik_old_items)))
         self.id = self.ar.custom_attr.add_attr(0, [self.hik_node])[0] #dpID
         print(self.ar.data.lang['m251_createdCharDefinition']+" "+self.hik_node)
         return self.hik_node
@@ -639,21 +639,21 @@ class MotionCapture(base.BaseLibrary):
                 if not self.hik_data:
                     self.hik_data = self.hik_get_default_map_data()
                 for hik_item in self.hik_data:
-                    if "Roll" in hik_item and not rib:
+                    if 'Roll' in hik_item and not rib:
                         continue
-                    for r in ["", "1", "2", "3", "4", "5"]: #workaround to accept many ribbons renaming
+                    for r in ['', '1', '2', '3', '4', '5']: #workaround to accept many ribbons renaming
                         if "joint"+r in self.hik_data[hik_item]:
                             if cmds.objExists(self.hik_data[hik_item]["joint"+r]):
-                                if r == "" and "needJnt" in self.hik_data[hik_item] and not cmds.objExists(self.hik_data[hik_item]["needJnt"]):
+                                if r == '' and 'needJnt' in self.hik_data[hik_item] and not cmds.objExists(self.hik_data[hik_item]['needJnt']):
                                     continue
                                 cmds.connectAttr(self.hik_data[hik_item]["joint"+r]+".message", self.hik_node+"."+hik_item, force=True)
                                 if not self.hik_character_attr in cmds.listAttr(self.hik_data[hik_item]["joint"+r]):
-                                    cmds.addAttr(self.hik_data[hik_item]["joint"+r], longName=self.hik_character_attr, attributeType="message")
+                                    cmds.addAttr(self.hik_data[hik_item]["joint"+r], longName=self.hik_character_attr, attributeType='message')
                                 for attr in self.ar.data.transform_attrs:
                                     cmds.setAttr(self.hik_data[hik_item]["joint"+r]+"."+attr, lock=False)
                                 break
                         else:
-                            mel.eval('warning \"'+self.ar.data.lang['m245_jointDefinitionIssue']+str(self.hik_data[hik_item]["joint"])+'\";')
+                            mel.eval('warning \"'+self.ar.data.lang['m245_jointDefinitionIssue']+str(self.hik_data[hik_item]['joint'])+'\";')
                 print(self.ar.data.lang['m252_assignJointDefinition'])
                 if old_ref_nodes:
                     cmds.delete(old_ref_nodes[0])
@@ -666,7 +666,7 @@ class MotionCapture(base.BaseLibrary):
     def hik_map_biped_controllers(self, rib=False):
         """ Map the HumanIk biped controllers to the definition.
         """
-        iks = ["Spine", "Spine1", "Spine2"]
+        iks = ['Spine', 'Spine1', 'Spine2']
         if self.ar.data.ui_state:
             iks = self.ar.motion_capture_ui.get_ik_modes_from_ui()
         if self.hik_node:
@@ -674,18 +674,18 @@ class MotionCapture(base.BaseLibrary):
                 if not self.hik_data:
                     self.hik_data = self.hik_get_default_map_data()
                 for hik_item in self.hik_data:
-                    if "Roll" in hik_item and not rib:
+                    if 'Roll' in hik_item and not rib:
                         continue
-                    if self.hik_data[hik_item]["id"] != 0: #reference
+                    if self.hik_data[hik_item]['id'] != 0: #reference
                         #ik or fk
-                        ctrl = "control"
+                        ctrl = 'control'
                         if iks and hik_item in iks:
-                            ctrl = "ikCtrl"
+                            ctrl = 'ikCtrl'
                         if cmds.objExists(self.hik_data[hik_item][ctrl]):
                             cmds.select(self.hik_data[hik_item][ctrl])
                             mel.eval('hikControlRigSelectionChangedCallback;')
-                            mel.eval('hikCustomRigAssignEffector '+str(self.hik_data[hik_item]["id"])+';')
-                            #print(self.hik_data[hik_item]["id"], self.hik_data[hik_item][ctrl])
+                            mel.eval('hikCustomRigAssignEffector '+str(self.hik_data[hik_item]['id'])+';')
+                            #print(self.hik_data[hik_item]['id'], self.hik_data[hik_item][ctrl])
                 print(self.ar.data.lang['m253_assignCtrlDefinition'])
                 cmds.select(clear=True)
             else:
@@ -714,7 +714,7 @@ class MotionCapture(base.BaseLibrary):
         if controllers:
             for ctrl in controllers:
                 self.lock_auto_rotate_attr(ctrl, False)
-                zero_grp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
+                zero_grp = cmds.listRelatives(ctrl, parent=True, type='transform')[0]
                 for axis in self.ar.data.axes:
                     cmds.mute(zero_grp+".rotate"+axis, disable=True)
             print(self.ar.data.lang['i046_remove']+" "+self.ar.data.lang['m249_muteAutoRotate']+" "+", ".join(controllers))
@@ -723,7 +723,7 @@ class MotionCapture(base.BaseLibrary):
     def reset_default_pose(self, *args):
         """ Back rig to default pose calling the ResetPose validator.
         """
-        reset_pose = self.ar.config.get_instance("ResetPose", [self.ar.data.checkout_folder])
+        reset_pose = self.ar.config.get_instance('ResetPose', [self.ar.data.checkout_folder])
         reset_pose.verbose = False
         reset_pose.run_action(False) #fix
         reset_pose.end_progress()
@@ -745,11 +745,11 @@ class MotionCapture(base.BaseLibrary):
                 cmds.setAttr(opt_ctrl+"."+self.ar.data.lang['p003_right'].lower()+self.ar.data.lang['c006_leg_main']+"Fk", 0)
 
 
-    def hik_check_exists(self, id, dataKey="control"):
+    def hik_check_exists(self, id, dataKey='control'):
         """ Return True of False if the object inside the dataKey exists or not.
         """
         for hik_item in self.hik_data:
-            if id == self.hik_data[hik_item]["id"]:
+            if id == self.hik_data[hik_item]['id']:
                 return cmds.objExists(self.hik_data[hik_item][dataKey])
 
 
@@ -770,14 +770,14 @@ class MotionCapture(base.BaseLibrary):
     def hik_map_custom_elements(self, rib=False):
         """ Set custom HumanIk controllers properly mapping.
         """
-        fingers = ["Thumb", "Index", "Middle", "Ring", "Pinky"]
+        fingers = ['Thumb', 'Index', 'Middle', 'Ring', 'Pinky']
         for hik_item in self.hik_data:
             for finger in fingers:
                 if finger in hik_item:
-                    self.hik_set_custom_map(self.hik_data[hik_item]["id"], r=1) #Finger add rotate
-                    self.hik_set_custom_map(self.hik_data[hik_item]["id"], t=0) #Finger remove translate
-            if "Roll" in hik_item and rib:
-                self.hik_set_custom_map(self.hik_data[hik_item]["id"], r=1) #Ribbon add rotate
+                    self.hik_set_custom_map(self.hik_data[hik_item]['id'], r=1) #Finger add rotate
+                    self.hik_set_custom_map(self.hik_data[hik_item]['id'], t=0) #Finger remove translate
+            if 'Roll' in hik_item and rib:
+                self.hik_set_custom_map(self.hik_data[hik_item]['id'], r=1) #Ribbon add rotate
         self.hik_set_custom_map(15, t=0) #Head remove translate, let it rotate only
         self.hik_set_custom_map(8,  r=1) #Spine add rotate
         self.hik_set_custom_map(20, r=1) #Neck add rotate
@@ -788,7 +788,7 @@ class MotionCapture(base.BaseLibrary):
         """ Set HumanIk Chest controller.
         """
         cmds.select(self.ar.data.lang['m011_spine']+"_"+self.ar.data.lang['c028_chest']+"A_Fk_Ctrl")
-        if self.ar.data.ui_state and cmds.radioCollection('mocap_spine_mode_rc', query=True, select=True) == "spineIk":
+        if self.ar.data.ui_state and cmds.radioCollection('mocap_spine_mode_rc', query=True, select=True) == 'spineIk':
             cmds.select(self.ar.data.lang['m011_spine']+"_"+self.ar.data.lang['c028_chest']+"B_Ctrl")
         mel.eval('hikControlRigSelectionChangedCallback; hikCustomRigAssignEffector 1000;')
         cmds.select(clear=True)
@@ -824,7 +824,7 @@ class HumanIKCleaner(object):
         if self.controllers:
             for ctrl in self.controllers:
                 self.lock_auto_rotate_attr(ctrl, False)
-                zero_grp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
+                zero_grp = cmds.listRelatives(ctrl, parent=True, type='transform')[0]
                 for axis in ['X', 'Y', 'Z']:
                     cmds.mute(zero_grp+".rotate"+axis, disable=True)
             print("'''+self.ar.data.lang['i046_remove']+''' '''+self.ar.data.lang['m249_muteAutoRotate']+''' "+", ".join(self.controllers))
@@ -849,18 +849,18 @@ for hik in cmds.ls(type="HIKCharacterNode"):
     def hik_snap_ik_timeline(self, start=None, end=None, *args):
         """ Run to all timeline and snap ik from baked fk.
         """
-        opt_ctrl = self.ar.utils.get_node_by_message("optionCtrl")
-        if opt_ctrl and "ikFkSnap" in cmds.listAttr(opt_ctrl):
+        opt_ctrl = self.ar.utils.get_node_by_message('optionCtrl')
+        if opt_ctrl and 'ikFkSnap' in cmds.listAttr(opt_ctrl):
             start_frame = start
             end_frame = end
             if start == None:
                 start_frame = int(cmds.playbackOptions(query=True, minTime=True))
             if end == None:
                 end_frame = int(cmds.playbackOptions(query=True, maxTime=True))
-            self.ar.ui_manager.set_progress("HumanIk - Snap ikFk", self.ar.data.lang['m239_motionCapture'], add_one=False, add_number=False, max=(end_frame-start_frame))
+            self.ar.ui_manager.set_progress('HumanIk - Snap ikFk', self.ar.data.lang['m239_motionCapture'], add_one=False, add_number=False, max=(end_frame-start_frame))
             initial_time = cmds.currentTime(query=True)
             for t in range(start_frame, end_frame+1):
-                self.ar.ui_manager.set_progress("Timeline")
+                self.ar.ui_manager.set_progress('Timeline')
                 cmds.currentTime(t)
                 self.run_ikfk_snap()
             cmds.currentTime(initial_time)

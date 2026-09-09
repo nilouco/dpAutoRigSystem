@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "ImportReference"
-TITLE = "v042_importReference"
-DESCRIPTION = "v043_importReferenceDesc"
-WIKI = "07-‐-Validator#-import-referenced-file"
+CLASS_NAME = 'ImportReference'
+TITLE = 'v042_importReference'
+DESCRIPTION = 'v043_importReferenceDesc'
+WIKI = '07-‐-Validator#-import-referenced-file'
 
 
 

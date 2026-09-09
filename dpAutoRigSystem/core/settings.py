@@ -49,17 +49,17 @@ class Configuration:
 
 
     def load_path(self):
-        path = str(os.path.join(os.path.dirname(sys._getframe(1).f_code.co_filename))).replace("\\", "/")
-        self.ar.data.dp_auto_rig_path = path[:path.rfind("/")] #remove '/core'
+        path = str(os.path.join(os.path.dirname(sys._getframe(1).f_code.co_filename))).replace('\\', '/')
+        self.ar.data.dp_auto_rig_path = path[:path.rfind('/')] #remove '/core'
 
         #
         # TODO test it in Mac to see if we need to correct the path
         #
-        #correct_path = path[:path.rfind("/")] #remove '/core'
+        #correct_path = path[:path.rfind('/')] #remove '/core'
         #if os.name == "posix":
-        #    self.ar.data.dp_auto_rig_path = stringPath[0:stringPath.rfind("/")]
+        #    self.ar.data.dp_auto_rig_path = stringPath[0:stringPath.rfind('/')]
         #else:
-        #    self.ar.data.dp_auto_rig_path = correct_path[correct_path.find("/")-2:]
+        #    self.ar.data.dp_auto_rig_path = correct_path[correct_path.find('/')-2:]
     
 
     def clear_old_starter(self):
@@ -72,8 +72,8 @@ class Configuration:
     def load_version(self):
         self.ar.data.version = self.ar.version.__version__
         self.ar.data.update_log = self.ar.version._update_log
-        if cmds.text("loading_text", query=True, exists=True):
-            cmds.text("loading_text", edit=True, label=f"Loading dpAutoRigSystem v{self.ar.data.version} ... ")
+        if cmds.text('loading_text', query=True, exists=True):
+            cmds.text('loading_text', edit=True, label=f"Loading dpAutoRigSystem v{self.ar.data.version} ... ")
             cmds.refresh()
 
 
@@ -84,7 +84,7 @@ class Configuration:
                                                                                     self.ar.data.language_folder
                                                                                     )
         if not self.ar.data.lang:
-            raise FileExistsError("Language")
+            raise FileExistsError('Language')
 
 
     def load_validator_preset(self):
@@ -166,7 +166,7 @@ class Configuration:
     
 
     def load_icons(self):
-        self.ar.data.icon = {i[:-4]: self.ar.data.dp_auto_rig_path+"/"+self.ar.data.icons_folder+"/"+i for i in os.listdir(self.ar.data.dp_auto_rig_path+"/"+self.ar.data.icons_folder) if i.endswith(".png")}
+        self.ar.data.icon = {i[:-4]: self.ar.data.dp_auto_rig_path+"/"+self.ar.data.icons_folder+"/"+i for i in os.listdir(self.ar.data.dp_auto_rig_path+"/"+self.ar.data.icons_folder) if i.endswith('.png')}
 
 
     def check_option_data(self, name, default, folder):
@@ -184,30 +184,30 @@ class Configuration:
         # declare the resulted list:
         items = []
         content = {}
-        folder = folder.replace(".", "/")
+        folder = folder.replace('.', '/')
         path = folder
         if not absolute:
             # find path where 'dpAutoRig.py' is been executed:
             path = os.path.dirname(__file__)
             # hack in order to avoid "\\" from os.sep, them we need to use the replace string method:
-            path = os.path.join(path.split("core")[0], folder, "").replace("\\", "/")
+            path = os.path.join(path.split('core')[0], folder, '').replace('\\', '/')
         # list all files in this directory:
         found_files = os.listdir(path)
         for file in found_files:
             # verify if there is the extension ".json"
-            if file.endswith(".json"):
+            if file.endswith('.json'):
                 # get the name of the type from the file name:
-                name = file.partition(".json")[0]
+                name = file.partition('.json')[0]
                 # clear the old variable content and open the json file as read:
                 loaded_content = None
-                opened_file = open(path + file, "r", encoding='utf-8')
+                opened_file = open(path + file, 'r', encoding='utf-8')
                 try:
                     # read the json file content and store it in a dictionary:
                     loaded_content = json.loads(opened_file.read())
                     content[name] = loaded_content
                     items.append(name)
                 except:
-                    print("Error: corrupted json file:", file)
+                    print('Error: corrupted json file:', file)
                 # close the json file:
                 opened_file.close()
         return items, content
@@ -245,10 +245,10 @@ class Configuration:
         """ Just call ctrls create preset and set it as userDefined preset.
         """
         new_preset = None
-        if preset_type == "curve":
+        if preset_type == 'curve':
             preset_option_var = self.ar.data.curve_option_var
             new_preset = self.ar.ctrls.create_curve_preset()
-        elif preset_type == "validator":
+        elif preset_type == 'validator':
             preset_option_var = self.ar.data.validator_option_var
             new_preset = self.ar.config.create_validator_preset()
         if new_preset:
@@ -261,7 +261,7 @@ class Configuration:
             # show preset creation result window:
             button_label = self.ar.data.lang['c108_open']+" "+self.ar.data.lang['i298_folder']
             button_command = self.ar.packager.open_folder
-            button_argument = os.path.join(self.ar.data.dp_auto_rig_path, preset_folder.replace(".", "/"))
+            button_argument = os.path.join(self.ar.data.dp_auto_rig_path, preset_folder.replace('.', '/'))
             self.ar.logger.infoWin('i129_createPreset', 'i133_presetCreated', '\n'+preset_name+'\n\n'+self.ar.data.lang['i134_rememberPublish']+'\n\n'+self.ar.data.lang['i018_thanks'], 'center', 205, 270, buttonList=[button_label, button_command, button_argument])
             # close and reload dpAR UI in order to avoid Maya crash
             self.ar.ui_manager.reload_ui()
@@ -300,46 +300,46 @@ class Configuration:
         # json file:
         result_data = json.loads(data)
         # hack in order to avoid "\\" from os.sep, them we need to use the replace string method:
-        path = os.path.join(self.ar.data.dp_auto_rig_path, folder.replace(".", "/"), "").replace("\\", "/")
+        path = os.path.join(self.ar.data.dp_auto_rig_path, folder.replace('.', '/'), "").replace('\\', '/')
         # write json file in the HD:
         with open(path+result_data[file_name_id]+'.json', 'w') as json_file:
             json.dump(result_data, json_file, indent=4, sort_keys=True)
         return result_data
 
 
-    def get_validator_addons(self, path="addOnsPath"):
+    def get_validator_addons(self, path='addOnsPath'):
         """ Return a list of Validator's AddOns or Finishing to load and mount their folder.
         """
         if os.path.exists(self.ar.pipeliner.pipe_data[path]):
-            start_path = self.ar.pipeliner.pipe_data[path][:self.ar.pipeliner.pipe_data[path].rfind("/")]
-            end_path = self.ar.pipeliner.pipe_data[path][self.ar.pipeliner.pipe_data[path].rfind("/")+1:]
+            start_path = self.ar.pipeliner.pipe_data[path][:self.ar.pipeliner.pipe_data[path].rfind('/')]
+            end_path = self.ar.pipeliner.pipe_data[path][self.ar.pipeliner.pipe_data[path].rfind('/')+1:]
             return self.ar.env.find_modules_by_folder(start_path, end_path)
                     
 
     def get_validator_instances(self):
         validators = []
         if self.ar.data.checkaddon_folder:
-            validators.extend(self.ar.data.lib[self.ar.data.checkaddon_folder]["instances"])
-        validators.extend(self.ar.data.lib[self.ar.data.checkin_folder]["instances"])
-        validators.extend(self.ar.data.lib[self.ar.data.checkout_folder]["instances"])
+            validators.extend(self.ar.data.lib[self.ar.data.checkaddon_folder]['instances'])
+        validators.extend(self.ar.data.lib[self.ar.data.checkin_folder]['instances'])
+        validators.extend(self.ar.data.lib[self.ar.data.checkout_folder]['instances'])
         if self.ar.data.checkfinishing_folder:
-            validators.extend(self.ar.data.lib[self.ar.data.checkfinishing_folder]["instances"])
+            validators.extend(self.ar.data.lib[self.ar.data.checkfinishing_folder]['instances'])
         return validators
 
 
     def get_rebuilder_instances(self):
         rebuilders = []
         for folder in self.ar.filler.rebuilder_folders:
-            rebuilders.extend(self.ar.data.lib[folder]["instances"])
+            rebuilders.extend(self.ar.data.lib[folder]['instances'])
         return rebuilders
 
 
-    def get_instance(self, name, folders=None, info="instances"):
+    def get_instance(self, name, folders=None, info='instances'):
         if not folders:
             folders = self.lib_folders
         for folder in folders:
             if folder in self.ar.data.lib:
-                for i, item in enumerate(self.ar.data.lib[folder]["names"]):
+                for i, item in enumerate(self.ar.data.lib[folder]['names']):
                     if name == item:
                         return self.ar.data.lib[folder][info][i]
 
@@ -348,7 +348,7 @@ class Configuration:
         keys = self.ar.utils.get_keys_by_value(self.ar.data.lang_preset_data[self.ar.data.language_default], name.capitalize())
         if keys:
             for key in keys:
-                if key.startswith(("m", "i")):
+                if key.startswith(('m', 'i')):
                     return key
             return keys[0]
         return self.ar.data.template_default
@@ -360,7 +360,7 @@ class Configuration:
                 return item
 
 
-    def check_loaded_plugin(self, plugin_name, message="Not loaded plugin"):
+    def check_loaded_plugin(self, plugin_name, message='Not loaded plugin'):
         """ Check if the plugin is loaded and try to load it.
             Returns True if ok (loaded)
             Returns False if not found or not loaded.
@@ -407,7 +407,7 @@ class Option:
         self.set_option_var(self.ar.data.degree_option_var, value)
         self.ar.data.degree_option = int(value[-1])
         for module_instance in self.ar.data.guide_instances:
-            if "degree" in cmds.listAttr(module_instance.guide_base):
+            if 'degree' in cmds.listAttr(module_instance.guide_base):
                 cmds.setAttr(module_instance.guide_base+".degree", self.ar.data.degree_option)
 
 
@@ -488,9 +488,9 @@ class Option:
             if not prefix:
                 self.ar.data.prefix = ""
                 if self.ar.data.verbose:
-                    mel.eval('warning \"'+self.ar.data.lang["p001_prefixText"]+'\";')
+                    mel.eval('warning \"'+self.ar.data.lang['p001_prefixText']+'\";')
             else:
-                if not prefix.endswith("_"):
+                if not prefix.endswith('_'):
                     prefix = f"{prefix}_"
                 self.ar.data.prefix = prefix
                 if self.ar.data.ui_state and cmds.text("rig_prefix_txt", query=True, exists=True):
@@ -501,8 +501,8 @@ class Option:
         
     def reset_prefix(self):
         self.ar.data.prefix = ""
-        if self.ar.data.ui_state and cmds.text("rig_prefix_txt", query=True, exists=True):
-            cmds.text("rig_prefix_txt", edit=True, label="", visible=False)
+        if self.ar.data.ui_state and cmds.text('rig_prefix_txt', query=True, exists=True):
+            cmds.text('rig_prefix_txt', edit=True, label='', visible=False)
 
 
     def reset_options_to_default(self, *args):
@@ -589,21 +589,21 @@ class Agreement:
             self.ar.ui_manager.close_ui('dpTermsCondWindow')
             cmds.window('dpTermsCondWindow', title='dpAutoRigSystem - '+self.ar.data.lang['i281_termsCond'], iconName='dpInfo', widthHeight=(terms_width, terms_height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
             # creating text layout:
-            cmds.columnLayout("terms_cl", adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent="dpTermsCondWindow")
-            cmds.text("\n"+self.ar.data.lang['i282_termsCondDesc'], align="center", parent="terms_cl")
+            cmds.columnLayout('terms_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent='dpTermsCondWindow')
+            cmds.text("\n"+self.ar.data.lang['i282_termsCondDesc'], align='center', parent='terms_cl')
             # agreement:
             cmds.separator(height=30)
-            cmds.checkBox('terms_cond_cb', label=self.ar.data.lang['i280_iAgreeTermsCond'], align="left", value=self.ar.data.agree_terms, changeCommand=self.ar.opt.set_agree_terms_cond, parent="terms_cl")
+            cmds.checkBox('terms_cond_cb', label=self.ar.data.lang['i280_iAgreeTermsCond'], align='left', value=self.ar.data.agree_terms, changeCommand=self.ar.opt.set_agree_terms_cond, parent='terms_cl')
             cmds.separator(height=30)
             # call window:
-            cmds.showWindow("dpTermsCondWindow")
+            cmds.showWindow('dpTermsCondWindow')
 
 
 
 class Environment:
     def __init__(self, ar):
         self.ar = ar
-        self.order = "_order"
+        self.order = '_order'
 
 
     def find_env(self, key, path):
@@ -611,10 +611,10 @@ class Environment:
         """
         env = os.environ[key]
         split_envs = []
-        if os.name == "posix":
-            split_envs = env.split(":")
+        if os.name == 'posix':
+            split_envs = env.split(':')
         else:
-            split_envs = env.split(";")
+            split_envs = env.split(';')
         env_path = ""
         if split_envs:
             split_envs = [x for x in split_envs if x != "" and x != ' ' and x != None]
@@ -631,41 +631,41 @@ class Environment:
                     break
         # if we are here, we must return a default path:
         split_envs = env.rpartition(path)
-        if os.name == "posix":
+        if os.name == 'posix':
             if env_path != "":
                 env_path = env_path+".dpAutoRigSystem"
             else:
-                env_path = "dpAutoRigSystem"
+                env_path = 'dpAutoRigSystem'
         else:
-            if ":" in env_path:
-                env_path = split_envs[0][split_envs[0].rfind(":")-1:]
-        if env_path == "" or env_path == " " or env_path == None:
+            if ':' in env_path:
+                env_path = split_envs[0][split_envs[0].rfind(':')-1:]
+        if env_path == "" or env_path == ' ' or env_path == None:
             return path
         return env_path
 
 
-    def find_files_by_folder(self, path, folder, ext="py"):
+    def find_files_by_folder(self, path, folder, ext='py'):
         """ Find all files in the directory with the extension.
             Return a list of all module names (without the given extension).
         """
-        file_dir = path + "/" + folder.replace(".", "/")
+        file_dir = path + '/' + folder.replace('.', '/')
         all_files = os.listdir(file_dir)
         # select only files with extension:
         files = []
         for file in all_files:
-            if file.endswith(f".{ext}") and str(file) != "__init__.py":
-                files.append(str(file)[:file.rfind(".")])
+            if file.endswith(f".{ext}") and str(file) != '__init__.py':
+                files.append(str(file)[:file.rfind('.')])
         return files
 
 
-    def find_modules_by_folder(self, path, folder, ext="py"):
+    def find_modules_by_folder(self, path, folder, ext='py'):
         """ Find all modules in the directory.
             If find an _order*.txt file it will order the list for priority proporses.
             Return a list of all module names (without the given extension).
         """
-        folder = folder.replace(".", "/")
+        folder = folder.replace('.', '/')
         modules = self.find_files_by_folder(path, folder, ext)
-        for text in self.find_files_by_folder(path, folder, "txt"):
+        for text in self.find_files_by_folder(path, folder, 'txt'):
             if text.startswith(self.order):
                 desired_order_items = []
                 dups = modules.copy()
@@ -689,7 +689,7 @@ class Environment:
         """
         valid_modules = self.find_modules_by_folder(path, folder)
         valid_module_names = []
-        guide_folder = self.find_env("PYTHONPATH", "dpAutoRigSystem")+"."+self.ar.data.standard_folder
+        guide_folder = self.find_env('PYTHONPATH', 'dpAutoRigSystem')+"."+self.ar.data.standard_folder
         for m in valid_modules:
             mod = __import__(guide_folder+"."+m, {}, {}, [m])
             if self.ar.dev:

@@ -3,19 +3,19 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "ConnectionIO"
-TITLE = "r045_connectionIO"
-DESCRIPTION = "r046_connectionIODesc"
-WIKI = "10-‐-Rebuilder#-connection"
+CLASS_NAME = 'ConnectionIO'
+TITLE = 'r045_connectionIO'
+DESCRIPTION = 'r046_connectionIODesc'
+WIKI = '10-‐-Rebuilder#-connection'
 
 
 
 class ConnectionIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.set_action_type("r000_rebuilder")
-        self.io_folder = "s_connectionIO"
-        self.start_name = "dpConnection"
+        self.set_action_type('r000_rebuilder')
+        self.io_folder = 's_connectionIO'
+        self.start_name = 'dpConnection'
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -55,7 +55,7 @@ class ConnectionIO(action.BaseAction):
                             else:
                                 self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                     else:
-                        self.maybe_done_io("Ctrls_Grp")
+                        self.maybe_done_io('Ctrls_Grp')
                 else:
                     self.fail_io(self.ar.data.lang['r010_notFoundPath'])
             else:
@@ -105,14 +105,14 @@ class ConnectionIO(action.BaseAction):
             infos = cmds.listConnections(item, plugs=True, source=source_connection, destination=destination_connection)
             if infos:
                 for info in infos:
-                    if cmds.objectType(info[:info.find(".")]) == "unitConversion":
+                    if cmds.objectType(info[:info.find('.')]) == 'unitConversion':
                         if source_connection:
-                            connections = self.get_connection_infos(info[:info.find(".")]+".input", source_connection, destination_connection) or [None]
+                            connections = self.get_connection_infos(info[:info.find('.')]+".input", source_connection, destination_connection) or [None]
                             results.append({info : connections})
                         else:
-                            connections = self.get_connection_infos(info[:info.find(".")]+".output", source_connection, destination_connection) or [None]
+                            connections = self.get_connection_infos(info[:info.find('.')]+".output", source_connection, destination_connection) or [None]
                             results.append({info : connections})
-                        results[-1][next(iter(results[-1].keys()))].append(cmds.getAttr(info[:info.find(".")]+".conversionFactor"))
+                        results[-1][next(iter(results[-1].keys()))].append(cmds.getAttr(info[:info.find('.')]+".conversionFactor"))
                     else:
                         results.append(info)
         return results
@@ -133,10 +133,10 @@ class ConnectionIO(action.BaseAction):
                     if multi:
                         indexes = cmds.getAttr(item+"."+attr, multiIndices=True)
                         if indexes:
-                            dot = ""
-                            multi_attributes = [""]
+                            dot = ''
+                            multi_attributes = ['']
                             if attr_data[node_type][attr]:
-                                dot = "."
+                                dot = '.'
                                 multi_attributes = attr_data[node_type][attr]
                             for i in indexes:
                                 for multi_attr in multi_attributes:
@@ -169,8 +169,8 @@ class ConnectionIO(action.BaseAction):
         """ Return the connection from and to the given item and its attribute.
         """
         return {
-                "in"  : self.get_connection_infos(item+"."+attr, source_connection=True, destination_connection=False),
-                "out" : self.get_connection_infos(item+"."+attr, source_connection=False, destination_connection=True)
+                'in'  : self.get_connection_infos(item+"."+attr, source_connection=True, destination_connection=False),
+                'out' : self.get_connection_infos(item+"."+attr, source_connection=False, destination_connection=True)
                 }
 
 
@@ -189,16 +189,16 @@ class ConnectionIO(action.BaseAction):
                 # check connections
                 for attr in connection_data[item]:
                     #if attr in cmds.listAttr(item): #can't have this conditional because multiIndices doesn't exists before connect them
-                    for i, io in enumerate(["in", "out"]): #input and output
+                    for i, io in enumerate(['in', 'out']): #input and output
                         if connection_data[item][attr][io]: #there's connection
                             for io_info in connection_data[item][attr][io]:
                                 if isinstance(io_info, dict): #is dictionary, so there's an unitConversion node
                                     plug = next(iter(io_info.keys()))
                                     if not cmds.objExists(plug):
-                                        uc = cmds.createNode("unitConversion", name=plug.split(".")[0])
+                                        uc = cmds.createNode('unitConversion', name=plug.split('.')[0])
                                         cmds.setAttr(uc+".conversionFactor", io_info[plug][1])
                                     else:
-                                        uc = plug.split(".")[0]
+                                        uc = plug.split('.')[0]
                                     if io_info[plug][0] != None:
                                         if i == 0: #in
                                             if not cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False) or not uc+".output" in cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False):
@@ -220,7 +220,7 @@ class ConnectionIO(action.BaseAction):
                                                     cmds.setAttr(io_info[plug][0], lock=True)
                                     else: #there is a not connected unitConversion node
                                         self.fail_io(self.ar.data.lang['r047_notConnectedUC']+": "+uc)
-                                elif cmds.objExists(io_info[:io_info.find(".")]):
+                                elif cmds.objExists(io_info[:io_info.find('.')]):
                                     if i == 0: #in
                                         # if there isn't this attribute here, maybe it's an issue parenting the guides. Check the guide serialization before rig them.
                                         if not cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False) or not io_info in cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False):
@@ -237,7 +237,7 @@ class ConnectionIO(action.BaseAction):
                                             if is_locked:
                                                 cmds.setAttr(io_info, lock=True)
                                 else:
-                                     self.maybe_done_io(io_info[:io_info.find(".")])
+                                     self.maybe_done_io(io_info[:io_info.find('.')])
                                 if not item in well_imported_items:
                                     well_imported_items.append(item)
             else:

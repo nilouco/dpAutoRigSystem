@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "Cycle"
-TITLE = "v105_cycle"
-DESCRIPTION = "v106_cycleDesc"
-WIKI = "07-‐-Validator#-cycle-checker"
+CLASS_NAME = 'Cycle'
+TITLE = 'v105_cycle'
+DESCRIPTION = 'v106_cycleDesc'
+WIKI = '07-‐-Validator#-cycle-checker'
 
 
 
@@ -41,7 +41,7 @@ class Cycle(action.BaseAction):
             else:
                 cycles = cmds.cycleCheck(all=False, list=True)
                 if cycles:
-                    self.checked_items.append("\n".join(cycles))
+                    self.checked_items.append('\n'.join(cycles))
             if cycles:
                 self.found_issues.append(True)
                 if self.first_mode:

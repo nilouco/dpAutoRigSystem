@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "Keyframe"
-TITLE = "v040_keyframe"
-DESCRIPTION = "v041_keyframeDesc"
-WIKI = "07-‐-Validator#-keyframe-cleaner"
+CLASS_NAME = 'Keyframe'
+TITLE = 'v040_keyframe'
+DESCRIPTION = 'v041_keyframeDesc'
+WIKI = '07-‐-Validator#-keyframe-cleaner'
 
 
 
@@ -38,11 +38,11 @@ class Keyframe(action.BaseAction):
                 check_items = cmds.ls(selection=False)
             if check_items:
                 # get animation node list
-                anim_curve_items = cmds.ls(type="animCurve")
+                anim_curve_items = cmds.ls(type='animCurve')
                 if anim_curve_items:
                     animated_items = []
                     for anim_crv in anim_curve_items:
-                        connections = cmds.ls(cmds.listConnections(anim_crv), type=["transform", "blendShape", "nonLinear"])
+                        connections = cmds.ls(cmds.listConnections(anim_crv), type=['transform', 'blendShape', 'nonLinear'])
                         if connections and not connections[0] in animated_items:
                             animated_items.append(connections[0])
                     if animated_items:
@@ -50,7 +50,7 @@ class Keyframe(action.BaseAction):
                         for item in animated_items:
                             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                             if item in check_items and cmds.objExists(item):
-                                connected_anim_curves = cmds.listConnections(item, source=True, destination=False, type="animCurve") #blendWeighted/pairBlend
+                                connected_anim_curves = cmds.listConnections(item, source=True, destination=False, type='animCurve') #blendWeighted/pairBlend
                                 if connected_anim_curves:
                                     found_key = False
                                     for crv in connected_anim_curves:

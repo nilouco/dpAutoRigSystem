@@ -3,20 +3,20 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "OffsetMatrixIO"
-TITLE = "r061_offsetMatrixIO"
-DESCRIPTION = "r062_offsetMatrixIODesc"
-WIKI = "10-‐-Rebuilder#-offset-matrix"
+CLASS_NAME = 'OffsetMatrixIO'
+TITLE = 'r061_offsetMatrixIO'
+DESCRIPTION = 'r062_offsetMatrixIODesc'
+WIKI = '10-‐-Rebuilder#-offset-matrix'
 
 
 
 class OffsetMatrixIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.set_action_type("r000_rebuilder")
-        self.io_folder = "s_offsetMatrixIO"
-        self.start_name = "dpOffsetMatrix"
-        self.offset_matrix_attr = "offsetParentMatrix"
+        self.set_action_type('r000_rebuilder')
+        self.io_folder = 's_offsetMatrixIO'
+        self.start_name = 'dpOffsetMatrix'
+        self.offset_matrix_attr = 'offsetParentMatrix'
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -43,7 +43,7 @@ class OffsetMatrixIO(action.BaseAction):
                     if inputs:
                         nodes = inputs
                     else:
-                        nodes = cmds.ls(selection=False, type="transform")
+                        nodes = cmds.ls(selection=False, type='transform')
                     if nodes:
                         if self.first_mode: #export
                             to_export_data = self.get_offset_matrix_data(nodes)

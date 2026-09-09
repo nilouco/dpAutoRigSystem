@@ -19,9 +19,9 @@ class Publisher:
         """ Return the file type based in the extension of the given file name.
         """
         ext = file_name[-2:]
-        if ext == "mb":
-            return "mayaBinary"
-        return "mayaAscii"
+        if ext == 'mb':
+            return 'mayaBinary'
+        return 'mayaAscii'
 
 
     def run_checked_validators(self, first_mode=True, stop_if_found_block=True, publish_log=None):
@@ -45,7 +45,7 @@ class Publisher:
             self.ar.ui_manager.set_progress(end_it=True)
         else:
             validation_results = self.ar.data.lang['v007_allOk']
-        self.ar.logger.infoWin('i019_log', 'i224_diagnose', validation_results, "left", 250, 150)
+        self.ar.logger.infoWin('i019_log', 'i224_diagnose', validation_results, 'left', 250, 150)
 
 
     def run_publishing(self, from_ui=False, verify_validator=True, comments=False, *args):
@@ -74,19 +74,19 @@ class Publisher:
             if publish_filename:
                 # start logging
                 publish_log = {}
-                publish_log["scene"] = self.ar.pipeliner.pipe_data['sceneName']
-                if publish_filename[-3:-1] != ".m":
+                publish_log['scene'] = self.ar.pipeliner.pipe_data['sceneName']
+                if publish_filename[-3:-1] != '.m':
                     publish_filename += ".m"+self.ar.pipeliner.pipe_data['sceneName'][-1]
                 self.ar.pipeliner.pipe_data['publishFileName'] = publish_filename
-                publish_log["published"] = self.ar.pipeliner.pipe_data['publishPath']+"/"+publish_filename
-                publish_log["exportPath"] = self.ar.pipeliner.pipe_data['f_drive']+"/"+self.ar.pipeliner.pipe_data['f_studio']+"/"+self.ar.pipeliner.pipe_data['f_project']+"/"+self.ar.pipeliner.pipe_data['f_toClient']+"/"+self.ar.pipeliner.get_today()
+                publish_log['published'] = self.ar.pipeliner.pipe_data['publishPath']+"/"+publish_filename
+                publish_log['exportPath'] = self.ar.pipeliner.pipe_data['f_drive']+"/"+self.ar.pipeliner.pipe_data['f_studio']+"/"+self.ar.pipeliner.pipe_data['f_project']+"/"+self.ar.pipeliner.pipe_data['f_toClient']+"/"+self.ar.pipeliner.get_today()
                 # comments
-                publish_log["comments"] = ""
+                publish_log['comments'] = ''
                 comment_value = comments
                 if from_ui and not comments:
                     comment_value = cmds.textFieldGrp('publisher_comment_tfg', query=True, text=True)
                 if comment_value:
-                    publish_log["comments"] = comment_value
+                    publish_log['comments'] = comment_value
                 
                 # checking validators
                 validation_results = False
@@ -106,29 +106,29 @@ class Publisher:
                     if all_grp:
                         # published from file
                         if not cmds.objExists(all_grp+".publishedFromFile"):
-                            cmds.addAttr(all_grp, longName="publishedFromFile", dataType="string")
-                        cmds.setAttr(all_grp+".publishedFromFile", self.ar.pipeliner.pipe_data['sceneName'], type="string")
+                            cmds.addAttr(all_grp, longName='publishedFromFile', dataType='string')
+                        cmds.setAttr(all_grp+".publishedFromFile", self.ar.pipeliner.pipe_data['sceneName'], type='string')
                         # asset name
                         if not cmds.objExists(all_grp+".assetName"):
-                            cmds.addAttr(all_grp, longName="assetName", dataType="string")
-                        cmds.setAttr(all_grp+".assetName", self.ar.pipeliner.pipe_data['assetName'], type="string")
+                            cmds.addAttr(all_grp, longName='assetName', dataType='string')
+                        cmds.setAttr(all_grp+".assetName", self.ar.pipeliner.pipe_data['assetName'], type='string')
                         # comments
                         if not cmds.objExists(all_grp+".comment"):
-                            cmds.addAttr(all_grp, longName="comment", dataType="string")
-                        cmds.setAttr(all_grp+".comment", comment_value, type="string")
+                            cmds.addAttr(all_grp, longName='comment', dataType='string')
+                        cmds.setAttr(all_grp+".comment", comment_value, type='string')
                         # model version
                         short_name = cmds.file(query=True, sceneName=True, shortName=True)
                         if self.ar.pipeliner.pipe_data['s_model'] in short_name:
                             model_version = short_name[short_name.find(self.ar.pipeliner.pipe_data['s_model'])+len(self.ar.pipeliner.pipe_data['s_model']):]
-                            model_version = int(model_version[:model_version.find("_")])
+                            model_version = int(model_version[:model_version.find('_')])
                             if not cmds.objExists(all_grp+".modelVersion"):
-                                cmds.addAttr(all_grp, longName="modelVersion", attributeType="long")
+                                cmds.addAttr(all_grp, longName='modelVersion', attributeType='long')
                             cmds.setAttr(all_grp+".modelVersion", model_version)
                             self.ar.pipeliner.pipe_data['modelVersion'] = model_version
                         if cmds.objExists(all_grp+".system"):
                             built_version = cmds.getAttr(all_grp+".system")
-                            if "dpAutoRig_" in built_version: #suport old rigged files
-                                built_version = built_version.split("dpAutoRig_")[1]
+                            if 'dpAutoRig_' in built_version: #suport old rigged files
+                                built_version = built_version.split('dpAutoRig_')[1]
                     else:
                         built_version = self.ar.data.version
 
@@ -182,18 +182,18 @@ class Publisher:
                         # discord
                         if self.ar.pipeliner.pipe_data['b_discord']:
                             self.ar.ui_manager.set_progress(self.ar.data.lang['i226_exportFiles']+"... dpLog", add_number=False)
-                            message_text = self.ar.pipeliner.pipe_data["sceneName"]+"\n"+self.ar.pipeliner.pipe_data['publishPath']+"/**"+self.ar.pipeliner.pipe_data['publishFileName']+"**\n*"+self.ar.pipeliner.pipe_data["comments"]+"*"
+                            message_text = self.ar.pipeliner.pipe_data['sceneName']+"\n"+self.ar.pipeliner.pipe_data['publishPath']+"/**"+self.ar.pipeliner.pipe_data['publishFileName']+"**\n*"+self.ar.pipeliner.pipe_data['comments']+"*"
                             result = self.ar.packager.to_discord(self.ar.pipeliner.pipe_data['publishedWebhook'], message_text)
                             if result: #error
                                 print(self.ar.data.lang[result])
 
                     # publishing callback
                     if self.ar.pipeliner.pipe_data['s_callback']:
-                        self.ar.ui_manager.set_progress("Callback...", add_number=False)
+                        self.ar.ui_manager.set_progress('Callback...', add_number=False)
                         if self.ar.pipeliner.pipe_data['callbackPath'] and self.ar.pipeliner.pipe_data['callbackFile']:
                             callback_result = self.ar.packager.to_callback(self.ar.pipeliner.pipe_data['callbackPath'], self.ar.pipeliner.pipe_data['callbackFile'], self.ar.pipeliner.pipe_data)
                             if callback_result:
-                                print("Callback result =", callback_result)
+                                print('Callback result =', callback_result)
 
                     # publisher log window
                     self.ar.publish_ui.success_published_ui(publish_filename)
@@ -250,7 +250,7 @@ class Publisher:
             if not comments.startswith(self.ar.data.lang['i358_batch']) and not comments.endswith(self.ar.data.lang['i358_batch']):
                 comments = self.ar.data.lang['i358_batch']+" - "+comments
             if not assets and self.ar.data.ui_state:
-                assets = [a[a.rfind("|")+1:-3] for a in self.ar.pipeline_ui.select_asset_checkboxes if cmds.checkBox(a, query=True, value=True)] #removed '_cb'
+                assets = [a[a.rfind('|')+1:-3] for a in self.ar.pipeline_ui.select_asset_checkboxes if cmds.checkBox(a, query=True, value=True)] #removed '_cb'
             if assets:
                 print(self.ar.data.lang['i335_starting']+" "+self.ar.data.lang['i358_batch']+" "+self.ar.data.lang['m046_publisher']+"...")
                 print(self.ar.data.lang['i219_comments']+":", comments)
@@ -263,8 +263,8 @@ class Publisher:
                     else:
                         published_items.append(self.ar.pipeliner.pipe_data['publishFileName'])
                 if errors:
-                    self.ar.publish_ui.success_published_ui("\n".join(published_items), errors)
+                    self.ar.publish_ui.success_published_ui('\n'.join(published_items), errors)
                 else:
                     cmds.file(newFile=True, force=True)
-                    self.ar.publish_ui.success_published_ui("\n".join(published_items))
+                    self.ar.publish_ui.success_published_ui('\n'.join(published_items))
             self.ar.ui_manager.close_ui("dpSelectAssetCBWindow")

@@ -3,19 +3,19 @@ from maya import cmds, mel
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "DeformationIO"
-TITLE = "r033_deformationIO"
-DESCRIPTION = "r034_deformationIODesc"
-WIKI = "10-‐-Rebuilder#-deformation"
+CLASS_NAME = 'DeformationIO'
+TITLE = 'r033_deformationIO'
+DESCRIPTION = 'r034_deformationIODesc'
+WIKI = '10-‐-Rebuilder#-deformation'
 
 
 
 class DeformationIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.set_action_type("r000_rebuilder")
-        self.io_folder = "s_deformationIO"
-        self.start_name = "dpDeformation"
+        self.set_action_type('r000_rebuilder')
+        self.io_folder = 's_deformationIO'
+        self.start_name = 'dpDeformation'
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -43,8 +43,8 @@ class DeformationIO(action.BaseAction):
                         if inputs:
                             items = inputs
                         else:
-                            items = cmds.listRelatives(cmds.ls(selection=False, type="mesh"), parent=True) or []
-                            items.extend(cmds.listRelatives(cmds.ls(selection=False, type="nurbsCurve"), parent=True) or [])
+                            items = cmds.listRelatives(cmds.ls(selection=False, type='mesh'), parent=True) or []
+                            items.extend(cmds.listRelatives(cmds.ls(selection=False, type='nurbsCurve'), parent=True) or [])
                         if items:
                             # finding deformers
                             has_def = False
@@ -101,31 +101,31 @@ class DeformationIO(action.BaseAction):
                         # Get shape indexes for the deformer so we can query the deformer weights
                         shapes, indexes, shape_to_index_data = self.ar.skin.get_shape_to_index_data(deformer_node)
                         # update dictionary
-                        deformer_data[deformer_node]["shapeList"] = shapes
-                        deformer_data[deformer_node]["indexList"] = indexes
-                        deformer_data[deformer_node]["shapeToIndexDic"] = shape_to_index_data
-                        deformer_data[deformer_node]["weights"] = {}
+                        deformer_data[deformer_node]['shapeList'] = shapes
+                        deformer_data[deformer_node]['indexList'] = indexes
+                        deformer_data[deformer_node]['shapeToIndexDic'] = shape_to_index_data
+                        deformer_data[deformer_node]['weights'] = {}
                         for shape in shapes:
                             # Get weights
                             index = shape_to_index_data[shape]
                             weights = self.ar.skin.get_deformer_weights(deformer_node, index)
-                            if deformer_data[deformer_node]["relatedNode"] and deformer_type != "ffd":
+                            if deformer_data[deformer_node]['relatedNode'] and deformer_type != 'ffd':
                                 # nonLinear because other don't have weights (wrap, shrinkWrap and wire)
-                                weights = self.ar.skin.get_deformer_weights(deformer_data[deformer_node]["relatedNode"], index)
-                            deformer_data[deformer_node]["weights"][index] = weights
+                                weights = self.ar.skin.get_deformer_weights(deformer_data[deformer_node]['relatedNode'], index)
+                            deformer_data[deformer_node]['weights'][index] = weights
                         # componentTag
-                        deformer_data[deformer_node]["componentTag"] = self.ar.skin.check_use_component_tag(deformer_node)
+                        deformer_data[deformer_node]['componentTag'] = self.ar.skin.check_use_component_tag(deformer_node)
                         # parenting
-                        deformer_data[deformer_node]["father"] = None
-                        if deformer_data[deformer_node]["relatedNode"] and cmds.listRelatives(deformer_data[deformer_node]["relatedNode"], allParents=True):
-                            deformer_data[deformer_node]["father"] = cmds.listRelatives(deformer_data[deformer_node]["relatedNode"], allParents=True, fullPath=True)[0]
+                        deformer_data[deformer_node]['father'] = None
+                        if deformer_data[deformer_node]['relatedNode'] and cmds.listRelatives(deformer_data[deformer_node]['relatedNode'], allParents=True):
+                            deformer_data[deformer_node]['father'] = cmds.listRelatives(deformer_data[deformer_node]['relatedNode'], allParents=True, fullPath=True)[0]
         return deformer_data
 
 
     def import_deformation(self, deformer_node, deformer_data, well_imported):
         """ Import deformer data creating a new deformer node, set values and weights.
         """
-        self.existShapeList = [s for s in deformer_data[deformer_node]["shapeList"] if cmds.objExists(s)]
+        self.existShapeList = [s for s in deformer_data[deformer_node]['shapeList'] if cmds.objExists(s)]
         new_def_node = None
         # verify if the deformer node exists to don't recreate it and import data
         if cmds.objExists(deformer_node):
@@ -133,45 +133,45 @@ class DeformationIO(action.BaseAction):
             self.ar.skin.assign_deformer(deformer_node, self.existShapeList)
         else:
             # create a new deformer if it doesn't exists
-            if deformer_data[deformer_node]["type"] == "cluster":
-                new_def_node = cmds.cluster(self.existShapeList, name=deformer_data[deformer_node]["name"], useComponentTags=deformer_data[deformer_node]["componentTag"])[0] #[cluster, handle]
-            elif deformer_data[deformer_node]["type"] == "deltaMush":
-                new_def_node = cmds.deltaMush(self.existShapeList, name=deformer_data[deformer_node]["name"], useComponentTags=deformer_data[deformer_node]["componentTag"])[0] #[deltaMush]
-            elif deformer_data[deformer_node]["type"] == "tension":
-                new_def_node = cmds.tension(self.existShapeList, name=deformer_data[deformer_node]["name"], useComponentTags=deformer_data[deformer_node]["componentTag"])[0] #[tension]
-            elif deformer_data[deformer_node]["type"] == "ffd":
-                lattice_items = cmds.lattice(self.existShapeList, name=deformer_data[deformer_node]["name"], divisions=deformer_data[deformer_node]["divisions"], useComponentTags=deformer_data[deformer_node]["componentTag"]) #[set, ffd, base] 
+            if deformer_data[deformer_node]['type'] == 'cluster':
+                new_def_node = cmds.cluster(self.existShapeList, name=deformer_data[deformer_node]['name'], useComponentTags=deformer_data[deformer_node]['componentTag'])[0] #[cluster, handle]
+            elif deformer_data[deformer_node]['type'] == 'deltaMush':
+                new_def_node = cmds.deltaMush(self.existShapeList, name=deformer_data[deformer_node]['name'], useComponentTags=deformer_data[deformer_node]['componentTag'])[0] #[deltaMush]
+            elif deformer_data[deformer_node]['type'] == 'tension':
+                new_def_node = cmds.tension(self.existShapeList, name=deformer_data[deformer_node]['name'], useComponentTags=deformer_data[deformer_node]['componentTag'])[0] #[tension]
+            elif deformer_data[deformer_node]['type'] == 'ffd':
+                lattice_items = cmds.lattice(self.existShapeList, name=deformer_data[deformer_node]['name'], divisions=deformer_data[deformer_node]['divisions'], useComponentTags=deformer_data[deformer_node]['componentTag']) #[set, ffd, base] 
                 new_def_node = lattice_items[0]
-                self.ar.skin.set_lattice_points(lattice_items[1], deformer_data[deformer_node]["relatedData"]["pointList"])
-                cmds.rename(lattice_items[1], deformer_data[deformer_node]["relatedNode"])
-                cmds.rename(lattice_items[2], deformer_data[deformer_node]["relatedData"]["baseLatticeMatrix"])
-            elif deformer_data[deformer_node]["type"] == "sculpt":
-                sculpt_items = cmds.sculpt(self.existShapeList, name=deformer_data[deformer_node]["name"], useComponentTags=deformer_data[deformer_node]["componentTag"]) #[sculpt, sculptor, orig]
+                self.ar.skin.set_lattice_points(lattice_items[1], deformer_data[deformer_node]['relatedData']['pointList'])
+                cmds.rename(lattice_items[1], deformer_data[deformer_node]['relatedNode'])
+                cmds.rename(lattice_items[2], deformer_data[deformer_node]['relatedData']['baseLatticeMatrix'])
+            elif deformer_data[deformer_node]['type'] == 'sculpt':
+                sculpt_items = cmds.sculpt(self.existShapeList, name=deformer_data[deformer_node]['name'], useComponentTags=deformer_data[deformer_node]['componentTag']) #[sculpt, sculptor, orig]
                 new_def_node = sculpt_items[0]
-                cmds.rename(sculpt_items[1], deformer_data[deformer_node]["relatedData"]["sculptor"])
-                cmds.rename(sculpt_items[2], deformer_data[deformer_node]["relatedData"]["originLocator"])
-            elif deformer_data[deformer_node]["type"] == "wrap":
-                if cmds.objExists(deformer_data[deformer_node]["relatedNode"]):
+                cmds.rename(sculpt_items[1], deformer_data[deformer_node]['relatedData']['sculptor'])
+                cmds.rename(sculpt_items[2], deformer_data[deformer_node]['relatedData']['originLocator'])
+            elif deformer_data[deformer_node]['type'] == 'wrap':
+                if cmds.objExists(deformer_data[deformer_node]['relatedNode']):
                     wrap_base_shape = False
-                    if "inflType" in cmds.listAttr(deformer_data[deformer_node]["relatedNode"]):
-                        plugged_items = cmds.listConnections(deformer_data[deformer_node]["relatedNode"]+".inflType", destination=True, source=False)
+                    if 'inflType' in cmds.listAttr(deformer_data[deformer_node]['relatedNode']):
+                        plugged_items = cmds.listConnections(deformer_data[deformer_node]['relatedNode']+".inflType", destination=True, source=False)
                         if plugged_items:
                             for plugged in plugged_items:
-                                if cmds.objectType(plugged) == "wrap":
+                                if cmds.objectType(plugged) == 'wrap':
                                     wrap_base_shapes = cmds.listConnections(plugged+".basePoints[0]", destination=False, source=True)
                                     if wrap_base_shapes:
                                         wrap_base_shape = wrap_base_shapes[0]
                                         break
-                    cmds.select(self.existShapeList, deformer_data[deformer_node]["relatedNode"])
-                    mel.eval("CreateWrap;")
+                    cmds.select(self.existShapeList, deformer_data[deformer_node]['relatedNode'])
+                    mel.eval('CreateWrap;')
                     hist = cmds.listHistory(self.existShapeList)
-                    wrap_items = cmds.ls(hist, type="wrap")[0]
-                    new_def_node = cmds.rename(wrap_items, deformer_data[deformer_node]["name"])
+                    wrap_items = cmds.ls(hist, type='wrap')[0]
+                    new_def_node = cmds.rename(wrap_items, deformer_data[deformer_node]['name'])
                     new_wrap_base_node = cmds.listConnections(new_def_node+".basePoints[0]", destination=False, source=True)[0]
                     if wrap_base_shape:
                         cmds.connectAttr(wrap_base_shape+".worldMesh[0]", new_def_node+".basePoints[0]", force=True)
                         cmds.delete(new_wrap_base_node)
-                    support_grp = self.ar.utils.get_node_by_message("supportGrp")
+                    support_grp = self.ar.utils.get_node_by_message('supportGrp')
                     if support_grp:
                         parent_nodes = []
                         if wrap_base_shape:
@@ -180,58 +180,58 @@ class DeformationIO(action.BaseAction):
                             parent_nodes = cmds.listRelatives(new_wrap_base_node, parent=True)
                         if parent_nodes and parent_nodes[0] != support_grp:
                             cmds.parent(new_wrap_base_node, support_grp)
-            elif deformer_data[deformer_node]["type"] == "shrinkWrap":
-                new_def_node = cmds.deformer(self.existShapeList, type=deformer_data[deformer_node]["type"], name=deformer_data[deformer_node]["name"], useComponentTags=deformer_data[deformer_node]["componentTag"])[0] #shrinkWrap
-                for c_attr in ["continuity", "smoothUVs", "keepBorder", "boundaryRule", "keepHardEdge", "propagateEdgeHardness", "keepMapBorders"]:
-                    cmds.connectAttr(deformer_data[deformer_node]["relatedNode"]+"."+c_attr, new_def_node+"."+c_attr, force=True)
-                cmds.connectAttr(deformer_data[deformer_node]["relatedNode"]+".worldMesh", new_def_node+".targetGeom", force=True)
-            elif deformer_data[deformer_node]["type"] == "wire":
-                if not cmds.objExists(deformer_data[deformer_node]["relatedNode"]):
+            elif deformer_data[deformer_node]['type'] == 'shrinkWrap':
+                new_def_node = cmds.deformer(self.existShapeList, type=deformer_data[deformer_node]['type'], name=deformer_data[deformer_node]['name'], useComponentTags=deformer_data[deformer_node]['componentTag'])[0] #shrinkWrap
+                for c_attr in ['continuity', 'smoothUVs', 'keepBorder', 'boundaryRule', 'keepHardEdge', 'propagateEdgeHardness', 'keepMapBorders']:
+                    cmds.connectAttr(deformer_data[deformer_node]['relatedNode']+"."+c_attr, new_def_node+"."+c_attr, force=True)
+                cmds.connectAttr(deformer_data[deformer_node]['relatedNode']+".worldMesh", new_def_node+".targetGeom", force=True)
+            elif deformer_data[deformer_node]['type'] == 'wire':
+                if not cmds.objExists(deformer_data[deformer_node]['relatedNode']):
                     is_periodic = False
-                    if deformer_data[deformer_node]["relatedData"]["form"] == 2:
+                    if deformer_data[deformer_node]['relatedData']['form'] == 2:
                         is_periodic = True
-                    cmds.curve(name=deformer_data[deformer_node]["relatedNode"], periodic=is_periodic, point=deformer_data[deformer_node]["relatedData"]["point"], degree=deformer_data[deformer_node]["relatedData"]["degree"], knot=deformer_data[deformer_node]["relatedData"]["knot"])
-                new_def_node = cmds.wire(self.existShapeList, wire=deformer_data[deformer_node]["relatedNode"], name=deformer_data[deformer_node]["name"], useComponentTags=deformer_data[deformer_node]["componentTag"])[0] #wire
-            elif deformer_data[deformer_node]["nonLinear"]:
-                non_linears = cmds.nonLinear(self.existShapeList, type=deformer_data[deformer_node]["nonLinear"], name=deformer_data[deformer_node]["name"], useComponentTags=deformer_data[deformer_node]["componentTag"]) #[def, handle] bend, flare, sine, squash, twist, wave
+                    cmds.curve(name=deformer_data[deformer_node]['relatedNode'], periodic=is_periodic, point=deformer_data[deformer_node]['relatedData']['point'], degree=deformer_data[deformer_node]['relatedData']['degree'], knot=deformer_data[deformer_node]['relatedData']['knot'])
+                new_def_node = cmds.wire(self.existShapeList, wire=deformer_data[deformer_node]['relatedNode'], name=deformer_data[deformer_node]['name'], useComponentTags=deformer_data[deformer_node]['componentTag'])[0] #wire
+            elif deformer_data[deformer_node]['nonLinear']:
+                non_linears = cmds.nonLinear(self.existShapeList, type=deformer_data[deformer_node]['nonLinear'], name=deformer_data[deformer_node]['name'], useComponentTags=deformer_data[deformer_node]['componentTag']) #[def, handle] bend, flare, sine, squash, twist, wave
                 new_def_node = non_linears[0]
-                cmds.rename(non_linears[1], deformer_data[deformer_node]["relatedData"])
+                cmds.rename(non_linears[1], deformer_data[deformer_node]['relatedData'])
             else: #solidify, proximityWrap, morph, textureDeformer, jiggle
-                new_def_node = cmds.deformer(self.existShapeList, type=deformer_data[deformer_node]["type"], name=deformer_data[deformer_node]["name"], useComponentTags=deformer_data[deformer_node]["componentTag"])[0]
-            if deformer_data[deformer_node]["type"] == "morph":
-                if cmds.objExists(deformer_data[deformer_node]["relatedNode"]):
-                    cmds.connectAttr(deformer_data[deformer_node]["relatedNode"]+".worldMesh[0]", new_def_node+".morphTarget[0]", force=True)
+                new_def_node = cmds.deformer(self.existShapeList, type=deformer_data[deformer_node]['type'], name=deformer_data[deformer_node]['name'], useComponentTags=deformer_data[deformer_node]['componentTag'])[0]
+            if deformer_data[deformer_node]['type'] == 'morph':
+                if cmds.objExists(deformer_data[deformer_node]['relatedNode']):
+                    cmds.connectAttr(deformer_data[deformer_node]['relatedNode']+".worldMesh[0]", new_def_node+".morphTarget[0]", force=True)
                 else:
                     well_imported = False
-                    self.fail_io(self.latest_data_file+": "+deformer_node+" - "+deformer_data[deformer_node]["relatedNode"])
+                    self.fail_io(self.latest_data_file+": "+deformer_node+" - "+deformer_data[deformer_node]['relatedNode'])
         # parenting
         need_parent_it = False
-        if deformer_data[deformer_node]["father"] and cmds.objExists(deformer_data[deformer_node]["father"]):
-            if cmds.listRelatives(deformer_data[deformer_node]["relatedNode"], allParents=True, fullPath=True):
-                if not deformer_data[deformer_node]["father"] in cmds.listRelatives(deformer_data[deformer_node]["relatedNode"], allParents=True, fullPath=True):
+        if deformer_data[deformer_node]['father'] and cmds.objExists(deformer_data[deformer_node]['father']):
+            if cmds.listRelatives(deformer_data[deformer_node]['relatedNode'], allParents=True, fullPath=True):
+                if not deformer_data[deformer_node]['father'] in cmds.listRelatives(deformer_data[deformer_node]['relatedNode'], allParents=True, fullPath=True):
                     need_parent_it = True
             else:
                 need_parent_it = True
         if need_parent_it:
-            if deformer_data[deformer_node]["type"] == "ffd":
-                cmds.parent([deformer_data[deformer_node]["relatedNode"], deformer_data[deformer_node]["relatedData"]["baseLatticeMatrix"]], deformer_data[deformer_node]["father"])
+            if deformer_data[deformer_node]['type'] == 'ffd':
+                cmds.parent([deformer_data[deformer_node]['relatedNode'], deformer_data[deformer_node]['relatedData']['baseLatticeMatrix']], deformer_data[deformer_node]['father'])
             else:
-                cmds.parent(deformer_data[deformer_node]["relatedNode"], deformer_data[deformer_node]["father"])
+                cmds.parent(deformer_data[deformer_node]['relatedNode'], deformer_data[deformer_node]['father'])
         # import attribute values
         if new_def_node:
-            for attr in deformer_data[deformer_node]["attributes"]:
+            for attr in deformer_data[deformer_node]['attributes']:
                 try:
-                    cmds.setAttr(new_def_node+"."+attr, deformer_data[deformer_node]["attributes"][attr])
+                    cmds.setAttr(new_def_node+"."+attr, deformer_data[deformer_node]['attributes'][attr])
                 except:
                     pass #just to avoid try set connected attributes like envelope or curvature.
         # import deformer weights, except for skinCluster, blendShape, sculpt, wrap
-        weights_data = deformer_data[deformer_node]["weights"]
+        weights_data = deformer_data[deformer_node]['weights']
         if weights_data:
-            for index in deformer_data[deformer_node]["indexList"]:
-                currentIndex = self.ar.skin.get_current_deformed_index(deformer_node, deformer_data[deformer_node]["shapeToIndexDic"], index)
+            for index in deformer_data[deformer_node]['indexList']:
+                currentIndex = self.ar.skin.get_current_deformed_index(deformer_node, deformer_data[deformer_node]['shapeToIndexDic'], index)
                 if weights_data[str(index)]:
                     # cluster, deltaMush, tension, ffd, shrinkWrap, wire, nonLinear, solidify, proximityWrap, textureDeformer, jiggle
-                    self.ar.skin.set_deformer_weights(deformer_data[deformer_node]["name"], weights_data[str(index)], currentIndex)
+                    self.ar.skin.set_deformer_weights(deformer_data[deformer_node]['name'], weights_data[str(index)], currentIndex)
         return well_imported
 
 
@@ -242,7 +242,7 @@ class DeformationIO(action.BaseAction):
         to_import_items, not_found_meshs, changed_shape_meshes = [], [], []
         for deformer_node in deformer_data:
             # check mesh existing
-            for shape in deformer_data[deformer_node]["shapeList"]:
+            for shape in deformer_data[deformer_node]['shapeList']:
                 if cmds.objExists(shape):
                     if not deformer_node in to_import_items:
                         to_import_items.append(deformer_node)
@@ -258,7 +258,7 @@ class DeformationIO(action.BaseAction):
                     self.fail_io(self.latest_data_file+": "+deformer_node+" - "+str(e))
             if not_found_meshs: #call again the same instruction to try create a deformer in a deformer, like a cluster in a lattice.
                 for deformer_node in not_found_meshs:
-                    for shape in deformer_data[deformer_node]["shapeList"]:
+                    for shape in deformer_data[deformer_node]['shapeList']:
                         if cmds.objExists(shape):
                             try:
                                 well_imported = self.import_deformation(deformer_node, deformer_data, well_imported)

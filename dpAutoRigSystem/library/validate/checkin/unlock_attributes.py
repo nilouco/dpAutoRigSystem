@@ -6,7 +6,7 @@ from ....library.base import action
 CLASS_NAME = 'UnlockAttributes'
 TITLE = 'v092_unlockAttributes'
 DESCRIPTION = 'v093_unlockAttributesDesc'
-WIKI = "07-‐-Validator#-unlock-attributes"
+WIKI = '07-‐-Validator#-unlock-attributes'
 
 
 
@@ -32,7 +32,7 @@ class UnlockAttributes(action.BaseAction):
         # ---
         # --- validator code --- beginning
         if not self.ar.utils.get_all_grp():
-            if not self.ar.utils.get_network_by_attr("dpGuideNet"):
+            if not self.ar.utils.get_network_by_attr('dpGuideNet'):
                 if not cmds.file(query=True, reference=True):
                     nodes = cmds.ls(selection=False)
                     if inputs:

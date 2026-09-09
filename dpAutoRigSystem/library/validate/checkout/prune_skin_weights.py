@@ -3,10 +3,10 @@ from maya import cmds, mel
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "PruneSkinWeights"
-TITLE = "v103_pruneSkinWeights"
-DESCRIPTION = "v104_pruneSkinWeightsDesc"
-WIKI = "07-‐-Validator#-prune-skin-weights"
+CLASS_NAME = 'PruneSkinWeights'
+TITLE = 'v103_pruneSkinWeights'
+DESCRIPTION = 'v104_pruneSkinWeightsDesc'
+WIKI = '07-‐-Validator#-prune-skin-weights'
 
 
 

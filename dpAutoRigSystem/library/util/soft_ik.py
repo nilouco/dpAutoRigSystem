@@ -34,7 +34,7 @@ class SoftIk:
         self.ar = ar
 
 
-    def create_soft_ik(self, user_name, ctrl_name, ikh_name, ik_joints, skin_joints, dist_between, world_ref, stretch=True, axis="Z"):
+    def create_soft_ik(self, user_name, ctrl_name, ikh_name, ik_joints, skin_joints, dist_between, world_ref, stretch=True, axis='Z'):
         """ Create the softIk setup for given parameters.
             Just a general function edited from Nick Miller code.
             Returns the softIk calibrate multiplyDivide node to receive the Option_Ctrl.rigScale output.
@@ -42,27 +42,27 @@ class SoftIk:
         self.to_ids = []
         soft_ik_calib_value = 0.02*cmds.getAttr(dist_between+".distance")
         # add the dSoft and softIk attributes on the controller:
-        cmds.addAttr(ctrl_name, longName="softIk", attributeType="double", min=0, defaultValue=0, max=1, keyable=True)
-        cmds.addAttr(ctrl_name, longName="softIk_"+self.ar.data.lang['c111_calibrate'], attributeType="double", min=0.001, defaultValue=soft_ik_calib_value, keyable=False)
-        cmds.addAttr(ctrl_name, longName="softDistance", attributeType="double", min=0.001, defaultValue=0.001, keyable=True)
+        cmds.addAttr(ctrl_name, longName='softIk', attributeType='double', min=0, defaultValue=0, max=1, keyable=True)
+        cmds.addAttr(ctrl_name, longName="softIk_"+self.ar.data.lang['c111_calibrate'], attributeType='double', min=0.001, defaultValue=soft_ik_calib_value, keyable=False)
+        cmds.addAttr(ctrl_name, longName='softDistance', attributeType='double', min=0.001, defaultValue=0.001, keyable=True)
         
         # set up node network for softIk:
-        calibrate_md = cmds.createNode("multiplyDivide", name=user_name+"_SoftCalibrate_MD")
-        soft_rmv = cmds.createNode("remapValue", name=user_name+"_SoftDistance_RmV")
-        da_md = cmds.createNode("plusMinusAverage", name=user_name+"_DA_PMA")
-        x_minus_da_pma = cmds.createNode("plusMinusAverage", name=user_name+"_X_Minus_DA_PMA")
-        negative_x_minus_md = cmds.createNode("multiplyDivide", name=user_name+"_Negate_X_Minus_MD")
-        div_by_d_soft_md = cmds.createNode("multiplyDivide", name=user_name+"_DivBy_DSoft_MD")
-        pow_e_md = cmds.createNode("multiplyDivide", name=user_name+"_Pow_E_MD")
-        one_minus_pow_e_pma = cmds.createNode("plusMinusAverage", name=user_name+"_One_Minus_Pow_E_PMA")
-        times_d_soft_md = cmds.createNode("multiplyDivide", name=user_name+"_Times_DSoft_MD")
-        plus_da_pma = cmds.createNode("plusMinusAverage", name=user_name+"_Plus_DA_PMA")
-        da_cnd = cmds.createNode("condition", name=user_name+"_DA_Cnd")
-        dist_diff_pma = cmds.createNode("plusMinusAverage", name=user_name+"_Dist_Diff_PMA")
-        length_start_md = cmds.createNode("multiplyDivide", name=user_name+"_Length_Start_MD")
-        lenght_output_md = cmds.createNode("multiplyDivide", name=user_name+"_Length_Output_MD")
-        soft_ik_rig_scale_md = cmds.createNode("multiplyDivide", name=user_name+"_SoftIk_RigScale_MD")
-        soft_ik_rig_scale_clp = cmds.createNode("clamp", name=user_name+"_SoftIk_RigScale_Clp")
+        calibrate_md = cmds.createNode('multiplyDivide', name=user_name+"_SoftCalibrate_MD")
+        soft_rmv = cmds.createNode('remapValue', name=user_name+"_SoftDistance_RmV")
+        da_md = cmds.createNode('plusMinusAverage', name=user_name+"_DA_PMA")
+        x_minus_da_pma = cmds.createNode('plusMinusAverage', name=user_name+"_X_Minus_DA_PMA")
+        negative_x_minus_md = cmds.createNode('multiplyDivide', name=user_name+"_Negate_X_Minus_MD")
+        div_by_d_soft_md = cmds.createNode('multiplyDivide', name=user_name+"_DivBy_DSoft_MD")
+        pow_e_md = cmds.createNode('multiplyDivide', name=user_name+"_Pow_E_MD")
+        one_minus_pow_e_pma = cmds.createNode('plusMinusAverage', name=user_name+"_One_Minus_Pow_E_PMA")
+        times_d_soft_md = cmds.createNode('multiplyDivide', name=user_name+"_Times_DSoft_MD")
+        plus_da_pma = cmds.createNode('plusMinusAverage', name=user_name+"_Plus_DA_PMA")
+        da_cnd = cmds.createNode('condition', name=user_name+"_DA_Cnd")
+        dist_diff_pma = cmds.createNode('plusMinusAverage', name=user_name+"_Dist_Diff_PMA")
+        length_start_md = cmds.createNode('multiplyDivide', name=user_name+"_Length_Start_MD")
+        lenght_output_md = cmds.createNode('multiplyDivide', name=user_name+"_Length_Output_MD")
+        soft_ik_rig_scale_md = cmds.createNode('multiplyDivide', name=user_name+"_SoftIk_RigScale_MD")
+        soft_ik_rig_scale_clp = cmds.createNode('clamp', name=user_name+"_SoftIk_RigScale_Clp")
         self.to_ids.extend([calibrate_md, soft_rmv, da_md, x_minus_da_pma, negative_x_minus_md, div_by_d_soft_md, pow_e_md, one_minus_pow_e_pma, times_d_soft_md, plus_da_pma, da_cnd, dist_diff_pma, length_start_md, lenght_output_md, soft_ik_rig_scale_md, soft_ik_rig_scale_clp])
         
         # set default values and operations:
@@ -89,7 +89,7 @@ class SoftIk:
         cmds.connectAttr(soft_rmv+".outValue", ctrl_name+".softDistance", force=True)
         cmds.connectAttr(ctrl_name+".startChainLength", length_start_md+".input1X", force=True)
         cmds.connectAttr(length_start_md+".outputX", da_md+".input1D[0]", force=True)
-        cmds.connectAttr(ctrl_name+"."+self.ar.data.lang["c113_length"], length_start_md+".input2X", force=True)
+        cmds.connectAttr(ctrl_name+"."+self.ar.data.lang['c113_length'], length_start_md+".input2X", force=True)
         cmds.connectAttr(ctrl_name+".softDistance", da_md+".input1D[1]", force=True)
         cmds.connectAttr(dist_between+".distance", x_minus_da_pma+".input1D[0]", force=True)
         cmds.connectAttr(da_md+".output1D", x_minus_da_pma+".input1D[1]", force=True)
@@ -113,13 +113,13 @@ class SoftIk:
         cmds.connectAttr(world_ref+".scaleX", soft_ik_rig_scale_md+".input2X", force=True)
         cmds.connectAttr(soft_ik_rig_scale_md+".outputX", ikh_name+".translate"+axis, force=True)
 
-        self.ar.ctrls.set_lock_hide([ctrl_name], ["softDistance"])
+        self.ar.ctrls.set_lock_hide([ctrl_name], ['softDistance'])
 
         # if stretch exists, we need to do this...
         if stretch:
-            soft_ratio_md = cmds.createNode("multiplyDivide", name=user_name+"_Soft_Ratio_MD")
-            disable_fk_stretch_md = cmds.createNode("multiplyDivide", name=user_name+"_DisableFkStretch_MD")
-            stretch_bc = cmds.createNode("blendColors", name=user_name+"_Stretch_BC")
+            soft_ratio_md = cmds.createNode('multiplyDivide', name=user_name+"_Soft_Ratio_MD")
+            disable_fk_stretch_md = cmds.createNode('multiplyDivide', name=user_name+"_DisableFkStretch_MD")
+            stretch_bc = cmds.createNode('blendColors', name=user_name+"_Stretch_BC")
             self.to_ids.extend([soft_ratio_md, disable_fk_stretch_md, stretch_bc])
             cmds.setAttr(soft_ratio_md+".operation", 2) #divide
             cmds.setAttr(stretch_bc+".color2R", 1)
@@ -131,7 +131,7 @@ class SoftIk:
             cmds.connectAttr(dist_diff_pma+".output1D", stretch_bc+".color2G", force=True)
             cmds.connectAttr(soft_ratio_md+".outputX", stretch_bc+".color1R", force=True)
             cmds.connectAttr(stretch_bc+".outputR", lenght_output_md+".input1X", force=True)
-            cmds.connectAttr(ctrl_name+"."+self.ar.data.lang["c113_length"], lenght_output_md+".input2X", force=True)
+            cmds.connectAttr(ctrl_name+"."+self.ar.data.lang['c113_length'], lenght_output_md+".input2X", force=True)
             cmds.connectAttr(stretch_bc+".outputG", soft_ik_rig_scale_clp+".inputR", force=True)
             i = 0
             while ( i < len(ik_joints)-1 ):

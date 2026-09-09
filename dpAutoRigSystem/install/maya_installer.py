@@ -17,23 +17,23 @@ def onMayaDroppedPythonFile(*args):
         installer.create_shelf_button()
         installer.finish()
     except Exception as e:
-        cmds.confirmDialog(title="Error", message=str(e))
+        cmds.confirmDialog(title='Error', message=str(e))
 
 
 
 class MayaInstaller:
     def __init__(self, *args):
-        self.ar_name = "dpAutoRigSystem"
+        self.ar_name = 'dpAutoRigSystem'
         self.shelf_code = f"import {self.ar_name}\nfrom {self.ar_name}.core import main\nar = main.Start()\nar.ui()"
 
 
     def define_paths(self, remove_last_folder=True):
         self.installer_folder = os.path.dirname(__file__).replace('\\', '/')
         if remove_last_folder:
-            self.installer_folder = self.installer_folder[:self.installer_folder.rfind("/")] #remove '/install'
-        scripts_folder = os.path.normpath(os.path.join(cmds.about(preferences=True), "../scripts")).replace('\\', '/')
+            self.installer_folder = self.installer_folder[:self.installer_folder.rfind('/')] #remove '/install'
+        scripts_folder = os.path.normpath(os.path.join(cmds.about(preferences=True), '../scripts')).replace('\\', '/')
         self.dp_ar_folder = os.path.join(scripts_folder, self.ar_name).replace('\\', '/')
-        self.shelf_image = str(f"{self.dp_ar_folder}/icons/ar.png").replace("\\", "/")
+        self.shelf_image = str(f"{self.dp_ar_folder}/icons/ar.png").replace('\\', '/')
         return self.dp_ar_folder
 
 
@@ -45,7 +45,7 @@ class MayaInstaller:
 
     def delete_old_files(self, folder=None):
         # remove all old live files and folders for this current version, that means delete myself, OMG!
-        print("Deleting old files...")
+        print('Deleting old files...')
         if not folder:
             folder = self.dp_ar_folder
         for each_file in next(os.walk(folder))[2]:
@@ -56,17 +56,17 @@ class MayaInstaller:
                     shutil.rmtree(f"{folder}/{each_folder}", onexc=self.remove_readonly)
                 except:
                     shutil.rmtree(f"{folder}/{each_folder}", onerror=self.remove_readonly) #for Python 3.11 and older
-        print("Successfully deleted all old files.")
+        print('Successfully deleted all old files.')
 
 
     def copy_files(self):
         # copy files to scripts
         self.create_folder(self.dp_ar_folder)
         for source_folder, folders, files in os.walk(self.installer_folder):       
-            dest_path = source_folder.replace(self.installer_folder, self.dp_ar_folder, 1).replace("\\", "/")
+            dest_path = source_folder.replace(self.installer_folder, self.dp_ar_folder, 1).replace('\\', '/')
             self.create_folder(dest_path)
             for ar_file in files:
-                source_file = os.path.join(source_folder, ar_file).replace("\\", "/")
+                source_file = os.path.join(source_folder, ar_file).replace('\\', '/')
                 shutil.copy2(source_file, dest_path)
 
 
@@ -89,7 +89,7 @@ class MayaInstaller:
                                         imageOverlayLabel="", 
                                         image=self.shelf_image, 
                                         command=self.shelf_code, 
-                                        sourceType="python"
+                                        sourceType='python'
                                     )
                     button_exists = True
         if not button_exists:
@@ -101,7 +101,7 @@ class MayaInstaller:
                                 command=self.shelf_code,
                                 parent=current_shelf
                             )
-        print("Created dpAutoRigSystem shelf button.")
+        print('Created dpAutoRigSystem shelf button.')
 
 
     def create_folder(self, folder):
@@ -111,6 +111,6 @@ class MayaInstaller:
     
     def finish(self):
         cmds.refresh()
-        cmds.confirmDialog(title="Success", message=f"{self.ar_name} installed!")
+        cmds.confirmDialog(title='Success', message=f"{self.ar_name} installed!")
         print(f"\n----------\nSuccessfully installed {self.ar_name}. Enjoy it, thanks!\n----------\n")
         cmds.evalDeferred(self.shelf_code, lowestPriority=True)

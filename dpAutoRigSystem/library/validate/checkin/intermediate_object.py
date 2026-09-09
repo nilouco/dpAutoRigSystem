@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "IntermediateObject"
-TITLE = "v142_intermediateObject"
-DESCRIPTION = "v143_intermediateObjectDesc"
-WIKI = "07-‐-Validator#-intermediate-object"
+CLASS_NAME = 'IntermediateObject'
+TITLE = 'v142_intermediateObject'
+DESCRIPTION = 'v143_intermediateObjectDesc'
+WIKI = '07-‐-Validator#-intermediate-object'
 
 
 
@@ -33,9 +33,9 @@ class IntermediateObject(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if inputs:
-                check_items = cmds.ls(inputs, type="mesh", shapes=True, intermediateObjects=True)
+                check_items = cmds.ls(inputs, type='mesh', shapes=True, intermediateObjects=True)
             else:
-                check_items = cmds.ls(selection=False, type="mesh", shapes=True, intermediateObjects=True) #all intermediateObject meshes in the scene
+                check_items = cmds.ls(selection=False, type='mesh', shapes=True, intermediateObjects=True) #all intermediateObject meshes in the scene
             if check_items:
                 self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
                 for item in check_items:

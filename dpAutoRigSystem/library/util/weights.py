@@ -5,34 +5,34 @@ class Weights:
     def __init__(self, ar):
         self.ar = ar
         self.def_attr_data = {
-                            "cluster"         : [None, "envelope", "relative", "angleInterpolation"],
-                            "deltaMush"       : [None, "envelope", "smoothingIterations", "smoothingStep", "inwardConstraint", "outwardConstraint", "distanceWeight", "displacement", "scaleX", "scaleY", "scaleZ", "pinBorderVertices"],
-                            "tension"         : [None, "envelope", "smoothingIterations", "smoothingStep", "inwardConstraint", "outwardConstraint", "squashConstraint", "stretchConstraint", "relative", "pinBorderVertices", "shearStrength", "bendStrength"],
-                            "solidify"        : [None, "envelope", "normalScale", "tangentPlaneScale", "scaleEnvelope", "attachmentMode", "useBorderFalloff", "stabilizationLevel", "borderFalloffBlur"],
-                            "ffd"             : ["deformedLatticeMatrix", "envelope", "localInfluenceS", "localInfluenceT", "localInfluenceU", "local", "outsideLattice", "outsideFalloffDist", "usePartialResolution", "partialResolution", "bindToOriginalGeometry", "freezeGeometry"],
-                            "proximityWrap"   : [None, "envelope", "maxDrivers", "falloffScale", "dropoffRateScale", "scaleCompensation", "wrapMode", "coordinateFrames", "smoothNormals", "spanSamples", "smoothInfluences", "softNormalization", "useBindTags"],
-                            "wrap"            : ["driverPoints", "envelope", "weightThreshold", "maxDistance", "autoWeightThreshold", "exclusiveBind", "falloffMode", "envelope"],
-                            "shrinkWrap"      : ["targetGeom", "envelope", "targetSmoothLevel", "projection", "closestIfNoIntersection", "reverse", "bidirectional", "boundingBoxCenter", "axisReference", "alongX", "alongY", "alongZ", "offset", "targetInflation", "falloff", "falloffIterations", "shapePreservationEnable", "shapePreservationSteps", "shapePreservationReprojection"],
-                            "morph"           : [None, "envelope", "morphMode", "morphSpace", "useComponentLookup", "scaleEnvelope", "uniformScaleWeight", "normalScale", "tangentPlaneScale", "tangentialDamping", "inwardConstraint", "outwardConstraint"],
-                            "wire"            : ["deformedWire", "envelope", "crossingEffect", "tension", "localInfluence", "rotation"],
-                            "sculpt"          : [None, "envelope", "mode", "dropoffType", "maximumDisplacement", "dropoffDistance", "insideMode"],
-                            "textureDeformer" : [None, "envelope", "strength", "offset", "vectorStrengthX", "vectorStrengthY", "vectorStrengthZ", "vectorOffsetX", "vectorOffsetY", "vectorOffsetZ", "handleVisibility", "pointSpace"],
-                            "jiggle"          : [None, "envelope", "currentTime", "enable", "ignoreTransform", "forceAlongNormal", "forceOnTangent", "motionMultiplier", "stiffness", "damping", "jiggleWeight", "directionBias"],
-                            "deformBend"      : ["deformerData", "envelope", "curvature", "lowBound", "highBound"],
-                            "deformFlare"     : ["deformerData", "envelope", "startFlareX", "startFlareZ", "endFlareX", "endFlareZ", "curve", "lowBound", "highBound"],
-                            "deformSine"      : ["deformerData", "envelope", "amplitude", "wavelength", "offset", "dropoff", "lowBound", "highBound"],
-                            "deformSquash"    : ["deformerData", "envelope", "factor", "expand", "maxExpandPos", "startSmoothness", "endSmoothness", "lowBound", "highBound"],
-                            "deformTwist"     : ["deformerData", "envelope", "startAngle", "endAngle", "lowBound", "highBound"],
-                            "deformWave"      : ["deformerData", "envelope", "amplitude", "wavelength", "offset", "dropoff", "dropoffPosition", "minRadius", "maxRadius"],
+                            'cluster'         : [None, 'envelope', 'relative', 'angleInterpolation'],
+                            'deltaMush'       : [None, 'envelope', 'smoothingIterations', 'smoothingStep', 'inwardConstraint', 'outwardConstraint', 'distanceWeight', 'displacement', 'scaleX', 'scaleY', 'scaleZ', 'pinBorderVertices'],
+                            'tension'         : [None, 'envelope', 'smoothingIterations', 'smoothingStep', 'inwardConstraint', 'outwardConstraint', 'squashConstraint', 'stretchConstraint', 'relative', 'pinBorderVertices', 'shearStrength', 'bendStrength'],
+                            'solidify'        : [None, 'envelope', 'normalScale', 'tangentPlaneScale', 'scaleEnvelope', 'attachmentMode', 'useBorderFalloff', 'stabilizationLevel', 'borderFalloffBlur'],
+                            'ffd'             : ['deformedLatticeMatrix', 'envelope', 'localInfluenceS', 'localInfluenceT', 'localInfluenceU', 'local', 'outsideLattice', 'outsideFalloffDist', 'usePartialResolution', 'partialResolution', 'bindToOriginalGeometry', 'freezeGeometry'],
+                            'proximityWrap'   : [None, 'envelope', 'maxDrivers', 'falloffScale', 'dropoffRateScale', 'scaleCompensation', 'wrapMode', 'coordinateFrames', 'smoothNormals', 'spanSamples', 'smoothInfluences', 'softNormalization', 'useBindTags'],
+                            'wrap'            : ['driverPoints', 'envelope', 'weightThreshold', 'maxDistance', 'autoWeightThreshold', 'exclusiveBind', 'falloffMode', 'envelope'],
+                            'shrinkWrap'      : ['targetGeom', 'envelope', 'targetSmoothLevel', 'projection', 'closestIfNoIntersection', 'reverse', 'bidirectional', 'boundingBoxCenter', 'axisReference', 'alongX', 'alongY', 'alongZ', 'offset', 'targetInflation', 'falloff', 'falloffIterations', 'shapePreservationEnable', 'shapePreservationSteps', 'shapePreservationReprojection'],
+                            'morph'           : [None, 'envelope', 'morphMode', 'morphSpace', 'useComponentLookup', 'scaleEnvelope', 'uniformScaleWeight', 'normalScale', 'tangentPlaneScale', 'tangentialDamping', 'inwardConstraint', 'outwardConstraint'],
+                            'wire'            : ['deformedWire', 'envelope', 'crossingEffect', 'tension', 'localInfluence', 'rotation'],
+                            'sculpt'          : [None, 'envelope', 'mode', 'dropoffType', 'maximumDisplacement', 'dropoffDistance', 'insideMode'],
+                            'textureDeformer' : [None, 'envelope', 'strength', 'offset', 'vectorStrengthX', 'vectorStrengthY', 'vectorStrengthZ', 'vectorOffsetX', 'vectorOffsetY', 'vectorOffsetZ', 'handleVisibility', 'pointSpace'],
+                            'jiggle'          : [None, 'envelope', 'currentTime', 'enable', 'ignoreTransform', 'forceAlongNormal', 'forceOnTangent', 'motionMultiplier', 'stiffness', 'damping', 'jiggleWeight', 'directionBias'],
+                            'deformBend'      : ['deformerData', 'envelope', 'curvature', 'lowBound', 'highBound'],
+                            'deformFlare'     : ['deformerData', 'envelope', 'startFlareX', 'startFlareZ', 'endFlareX', 'endFlareZ', 'curve', 'lowBound', 'highBound'],
+                            'deformSine'      : ['deformerData', 'envelope', 'amplitude', 'wavelength', 'offset', 'dropoff', 'lowBound', 'highBound'],
+                            'deformSquash'    : ['deformerData', 'envelope', 'factor', 'expand', 'maxExpandPos', 'startSmoothness', 'endSmoothness', 'lowBound', 'highBound'],
+                            'deformTwist'     : ['deformerData', 'envelope', 'startAngle', 'endAngle', 'lowBound', 'highBound'],
+                            'deformWave'      : ['deformerData', 'envelope', 'amplitude', 'wavelength', 'offset', 'dropoff', 'dropoffPosition', 'minRadius', 'maxRadius'],
                             } #first element used to find the attribute node listing connection
     
     
     def get_io_filename(self, mesh):
-        """ Returns the cut file_name if found "|" in the given mesh name to avoid windows special character backup issue.
+        """ Returns the cut file_name if found '|' in the given mesh name to avoid windows special character backup issue.
         """
         file_name = mesh
-        if "|" in mesh:
-            file_name = mesh[mesh.rfind("|")+1:]
+        if '|' in mesh:
+            file_name = mesh[mesh.rfind('|')+1:]
         return file_name
     
 
@@ -95,29 +95,29 @@ class Weights:
         return matrix_data
 
 
-    def get_deformed_items(self, deformer_types=None, ignore_attr="None"):
+    def get_deformed_items(self, deformer_types=None, ignore_attr='None'):
         """ Returns a list of deformed item transforms of meshes and nurbsCurves.
             Use given lists and attribute to filter the results.
         """
         if deformer_types is None:
-            deformer_types = ["skinCluster"]
+            deformer_types = ['skinCluster']
         deformerd_items, done_items = [], []
-        items = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh") or []
-        items.extend(cmds.ls(selection=False, noIntermediate=True, long=True, type="nurbsCurve") or [])
+        items = cmds.ls(selection=False, noIntermediate=True, long=True, type='mesh') or []
+        items.extend(cmds.ls(selection=False, noIntermediate=True, long=True, type='nurbsCurve') or [])
         if items:
             for item in items:
-                transform_node = item[:item[1:].find("|")+1]
+                transform_node = item[:item[1:].find('|')+1]
                 if not transform_node in done_items:
                     done_items.append(transform_node)
-                    transforms = cmds.listRelatives(transform_node, allDescendents=True, children=True, fullPath=True, type="transform")
+                    transforms = cmds.listRelatives(transform_node, allDescendents=True, children=True, fullPath=True, type='transform')
                     if transforms:
                         transforms.append(transform_node)
                     else:
                         transforms = [transform_node]
                     for child in transforms:
                         if not cmds.objExists(child+"."+ignore_attr):
-                            if len(cmds.ls(child[child.rfind("|")+1:])) == 1:
-                                child = child[child.rfind("|")+1:] #unique name
+                            if len(cmds.ls(child[child.rfind('|')+1:])) == 1:
+                                child = child[child.rfind('|')+1:] #unique name
                             else:
                                 print(self.ar.data.lang['i299_notUniqueName'], child)
                             for desired_type in deformer_types:
@@ -126,7 +126,7 @@ class Weights:
         return deformerd_items
 
 
-    def check_existing_deformer_node(self, item, deleteIt=False, deformer_type="skinCluster"):
+    def check_existing_deformer_node(self, item, deleteIt=False, deformer_type='skinCluster'):
         """ Return a list with:
                 True/False if there's/not a deformer.
                 The current deformer list by default.
@@ -147,39 +147,39 @@ class Weights:
     def get_deformer_info(self, deformer_node):
         """ Return the dictionary with attributes and values.
         """
-        def_data = {"attributes" : {}}
+        def_data = {'attributes' : {}}
         if deformer_node:
             def_type = cmds.objectType(deformer_node)
-            def_data["type"] = def_type
+            def_data['type'] = def_type
             for n, attr in enumerate(list(self.def_attr_data[def_type])):
                 if n == 0:
-                    def_data["nonLinear"] = None
-                    def_data["relatedNode"] = None
-                    def_data["relatedData"] = None
-                    def_data["divisions"] = None
+                    def_data['nonLinear'] = None
+                    def_data['relatedNode'] = None
+                    def_data['relatedData'] = None
+                    def_data['divisions'] = None
                     if attr:
                         connected_nodes = None
                         connected_nodes = cmds.listConnections(deformer_node+"."+attr, destination=False, source=True)
-                        if attr == "deformerData": #nonLinear
+                        if attr == 'deformerData': #nonLinear
                             connected_nodes = cmds.listConnections(deformer_node+"."+attr, destination=True, source=False)
                             if connected_nodes:
-                                def_data["relatedData"] = cmds.listRelatives(deformer_node, parent=True, type="transform")[0]
+                                def_data['relatedData'] = cmds.listRelatives(deformer_node, parent=True, type='transform')[0]
                                 deformer_node = connected_nodes[0]
-                                def_data["nonLinear"] = def_type.replace("deform", "").lower()
-                        if def_type == "ffd": #lattice
-                            def_data["relatedData"] = self.get_lattice_info(connected_nodes[0], deformer_node)
-                            def_data["divisions"] = cmds.lattice(deformer_node, query=True, divisions=True)
-                        elif def_type == "wire":
-                            def_data["relatedData"] = self.get_curve_info(connected_nodes[0])
+                                def_data['nonLinear'] = def_type.replace('deform', "").lower()
+                        if def_type == 'ffd': #lattice
+                            def_data['relatedData'] = self.get_lattice_info(connected_nodes[0], deformer_node)
+                            def_data['divisions'] = cmds.lattice(deformer_node, query=True, divisions=True)
+                        elif def_type == 'wire':
+                            def_data['relatedData'] = self.get_curve_info(connected_nodes[0])
                         if connected_nodes:
-                            def_data["relatedNode"] = connected_nodes[0]
-                    if def_type == "sculpt":
-                        def_data["relatedData"] = self.get_sculpt_info(deformer_node)
-                    elif def_type == "morph":
-                        def_data["relatedNode"] = cmds.listConnections(deformer_node+".morphTarget[0]", destination=False, source=True)[0]
+                            def_data['relatedNode'] = connected_nodes[0]
+                    if def_type == 'sculpt':
+                        def_data['relatedData'] = self.get_sculpt_info(deformer_node)
+                    elif def_type == 'morph':
+                        def_data['relatedNode'] = cmds.listConnections(deformer_node+".morphTarget[0]", destination=False, source=True)[0]
                 else:
-                    def_data["attributes"][attr] = cmds.getAttr(deformer_node+"."+attr)
-            def_data["name"] = deformer_node
+                    def_data['attributes'][attr] = cmds.getAttr(deformer_node+"."+attr)
+            def_data['name'] = deformer_node
         return def_data
 
 
@@ -187,7 +187,7 @@ class Weights:
         """ Return the dictionary with the componentTag tagged info.
         """
         if not nodes:
-            nodes = cmds.listRelatives(cmds.ls(selection=False, type=["mesh", "lattice"]), parent=True)
+            nodes = cmds.listRelatives(cmds.ls(selection=False, type=['mesh', 'lattice']), parent=True)
         tag_info_data = {}
         if nodes:
             for node in nodes:
@@ -196,8 +196,8 @@ class Weights:
                 if tag_hists:
                     tag_info_data[node] = {}
                     for tag_dic in tag_hists:
-                        tag_info_data[node][tag_dic["key"]] = tag_dic
-                        tag_info_data[node][tag_dic["key"]].update({"components": cmds.geometryAttrInfo(node+"."+out_attr, components=True, componentTagExpression=tag_dic["key"])})
+                        tag_info_data[node][tag_dic['key']] = tag_dic
+                        tag_info_data[node][tag_dic['key']].update({'components': cmds.geometryAttrInfo(node+"."+out_attr, components=True, componentTagExpression=tag_dic['key'])})
         return tag_info_data
 
 
@@ -222,9 +222,9 @@ class Weights:
                                 has_tag = True
                                 break
                         if has_tag:
-                            tag_influence_data[deformer_node] = {"expression" : {}}
+                            tag_influence_data[deformer_node] = {'expression' : {}}
                             for index in orig_geos:
-                                tag_influence_data[deformer_node]["expression"][index] = cmds.getAttr(deformer_node+".input["+str(index)+"].componentTagExpression")
+                                tag_influence_data[deformer_node]['expression'][index] = cmds.getAttr(deformer_node+".input["+str(index)+"].componentTagExpression")
         return tag_influence_data
     
 
@@ -233,41 +233,41 @@ class Weights:
         """
         falloff_data = {}
         fallof_type_attr_data = {
-                                "primitiveFalloff" : ["primitive", "useOriginalGeometry", "vertexSpace", "positiveSizeX", "positiveSizeY", "positiveSizeZ", "negativeSizeX", "negativeSizeY", "negativeSizeZ"],
-                                "blendFalloff"     : ["baseWeight"],
-                                "uniformFalloff"   : ["uniformWeight"],
-                                "proximityFalloff" : ["useOriginalGeometry", "vertexSpace", "volume", "proximitySubset", "useBindTags", "bindTagsFilter"],
-                                "subsetFalloff"    : ["useFalloffTags", "falloffTags",  "withinBoundary",  "useOriginalGeometry",  "mode",  "scale"],
-                                "componentFalloff" : None,
-                                "transferFalloff"  : ["useBindTags", "bindTagsFilter"]
+                                'primitiveFalloff' : ['primitive', 'useOriginalGeometry', 'vertexSpace', 'positiveSizeX', 'positiveSizeY', 'positiveSizeZ', 'negativeSizeX', 'negativeSizeY', 'negativeSizeZ'],
+                                'blendFalloff'     : ['baseWeight'],
+                                'uniformFalloff'   : ['uniformWeight'],
+                                'proximityFalloff' : ['useOriginalGeometry', 'vertexSpace', 'volume', 'proximitySubset', 'useBindTags', 'bindTagsFilter'],
+                                'subsetFalloff'    : ['useFalloffTags', 'falloffTags',  'withinBoundary',  'useOriginalGeometry',  'mode',  'scale'],
+                                'componentFalloff' : None,
+                                'transferFalloff'  : ['useBindTags', 'bindTagsFilter']
                                 }
-        common_attrs = ["start", "end"]
-        multi_attr_data = { "ramp"             : ["ramp_Position", "ramp_FloatValue", "ramp_Interp"],
-                            "target"           : ["weight", "mode"],
-                            "weightInfoLayers" : ["defaultWeight"]
+        common_attrs = ['start', 'end']
+        multi_attr_data = { 'ramp'             : ['ramp_Position', 'ramp_FloatValue', 'ramp_Interp'],
+                            'target'           : ['weight', 'mode'],
+                            'weightInfoLayers' : ['defaultWeight']
                             }
         if not nodes:
             nodes = cmds.ls(selection=False, type=list(fallof_type_attr_data.keys()))
         if nodes:
             for node in nodes:
                 node_type = cmds.objectType(node)
-                falloff_data[node] = { "name" : node,
-                                     "type" : node_type,
-                                     "outputWeightFunction" : cmds.listConnections(node+".outputWeightFunction", source=False, destination=True, plugs=True),
-                                     "attributes" : {}
+                falloff_data[node] = { 'name' : node,
+                                     'type' : node_type,
+                                     'outputWeightFunction' : cmds.listConnections(node+".outputWeightFunction", source=False, destination=True, plugs=True),
+                                     'attributes' : {}
                                     }
                 # node attributes and common
                 if fallof_type_attr_data[node_type]:
                     for attr in (fallof_type_attr_data[node_type] + common_attrs):
                         if cmds.objExists(node+"."+attr):
-                            falloff_data[node]["attributes"][attr] = cmds.getAttr(node+"."+attr)
+                            falloff_data[node]['attributes'][attr] = cmds.getAttr(node+"."+attr)
                 # specific multiIndices attributes
                 for multi_attr in multi_attr_data:
                     if cmds.objExists(node+"."+multi_attr) and cmds.getAttr(node+"."+multi_attr, multiIndices=True):
                         for _i, index in enumerate(cmds.getAttr(node+"."+multi_attr, multiIndices=True)):
                             for name in multi_attr_data[multi_attr]:
                                 attr_name = multi_attr+"["+str(index)+"]."+name
-                                falloff_data[node]["attributes"][attr_name] = cmds.getAttr(node+"."+attr_name)
+                                falloff_data[node]['attributes'][attr_name] = cmds.getAttr(node+"."+attr_name)
         return falloff_data
     
 
@@ -283,9 +283,9 @@ class Weights:
             index = len(indexes)+1
         contents = " ".join(component_items)
         try:
-            cmds.setAttr(injest_node+".componentTags["+str(index)+"].componentTagName", tag_name, type="string")
+            cmds.setAttr(injest_node+".componentTags["+str(index)+"].componentTagName", tag_name, type='string')
             #cmds.setAttr(tags[0]+".componentTags["+str(index)+"].componentTagContents", len(component_items), contents, type="component_items")
-            mel.eval('setAttr '+injest_node+'.componentTags['+str(index)+'].componentTagContents -type component_items '+str(len(component_items))+' '+contents+';')
+            mel.eval('setAttr '+injest_node+'.componentTags["+str(index)+"].componentTagContents -type component_items '+str(len(component_items))+' '+contents+';')
         except:
             well_imported = False
         return well_imported
@@ -302,22 +302,22 @@ class Weights:
             if cmds.objExists(tagged_node):
                 for tag in tagged_data[tagged_node]:
                     if not current_tagged_data:
-                        to_import_items.append([tagged_node, tag, tagged_data[tagged_node][tag]["node"]])
+                        to_import_items.append([tagged_node, tag, tagged_data[tagged_node][tag]['node']])
                     elif tagged_node in current_tagged_data:
-                        if not tag in current_tagged_data[tagged_node] and not [tagged_node, tag, tagged_data[tagged_node][tag]["node"]] in to_import_items:
-                            to_import_items.append([tagged_node, tag, tagged_data[tagged_node][tag]["node"]])
+                        if not tag in current_tagged_data[tagged_node] and not [tagged_node, tag, tagged_data[tagged_node][tag]['node']] in to_import_items:
+                            to_import_items.append([tagged_node, tag, tagged_data[tagged_node][tag]['node']])
                     else:
-                        if not [tagged_node, tag, tagged_data[tagged_node][tag]["node"]] in to_import_items:
-                            to_import_items.append([tagged_node, tag, tagged_data[tagged_node][tag]["node"]])
+                        if not [tagged_node, tag, tagged_data[tagged_node][tag]['node']] in to_import_items:
+                            to_import_items.append([tagged_node, tag, tagged_data[tagged_node][tag]['node']])
             else:
                 self.not_work_well_infos.append(tagged_node)
                 well_imported = False
         if to_import_items:
             for tags in to_import_items:
                 try:
-                    well_imported = self.import_component_tag(tags[0], tags[1], tags[2], tagged_data[tags[0]][tags[1]]["components"], well_imported)
+                    well_imported = self.import_component_tag(tags[0], tags[1], tags[2], tagged_data[tags[0]][tags[1]]['components'], well_imported)
                 except Exception as e:
-                    self.not_work_well_infos.append(", ".join(tags)+" - "+str(e))
+                    self.not_work_well_infos.append(', '.join(tags)+" - "+str(e))
                     well_imported = False
         return well_imported
 
@@ -330,10 +330,10 @@ class Weights:
         for inf_node in inf_data:
             # check deformer node existing
             if cmds.objExists(inf_node):
-                for inf_index in inf_data[inf_node]["expression"]:
-                    if inf_data[inf_node]["expression"][inf_index] != "":
+                for inf_index in inf_data[inf_node]['expression']:
+                    if inf_data[inf_node]['expression'][inf_index] != "":
                         try:
-                            cmds.setAttr(inf_node+".input["+str(inf_index)+"].componentTagExpression", inf_data[inf_node]["expression"][inf_index], type="string")
+                            cmds.setAttr(inf_node+".input["+str(inf_index)+"].componentTagExpression", inf_data[inf_node]['expression'][inf_index], type='string')
                         except Exception as e:
                             self.not_work_well_infos.append(inf_node+" - "+str(e))
                             well_imported = False
@@ -351,14 +351,14 @@ class Weights:
         for falloff_node in falloff_data:
             # check falloff node existing
             if not cmds.objExists(falloff_node):
-                falloff_node = cmds.createNode(falloff_data[falloff_node]["type"], name=falloff_data[falloff_node]["name"])
+                falloff_node = cmds.createNode(falloff_data[falloff_node]['type'], name=falloff_data[falloff_node]['name'])
             if not falloff_node:
                 self.not_work_well_infos.append(falloff_node)
                 well_imported = False
             else:
                 # connect falloff
-                if falloff_data[falloff_node]["outputWeightFunction"]:
-                    for plug in falloff_data[falloff_node]["outputWeightFunction"]:
+                if falloff_data[falloff_node]['outputWeightFunction']:
+                    for plug in falloff_data[falloff_node]['outputWeightFunction']:
                         if not cmds.listConnections(falloff_node+".outputWeightFunction", plugs=True, source=False, destination=True) or not plug in cmds.listConnections(falloff_node+".outputWeightFunction", plugs=True, source=False, destination=True):
                             try:
                                 cmds.connectAttr(falloff_node+".outputWeightFunction", plug, force=True)
@@ -366,12 +366,12 @@ class Weights:
                                 self.not_work_well_infos.append(falloff_node+".outputWeightFunction -> "+plug)
                                 well_imported = False
                 # set falloff attributes
-                for attr in falloff_data[falloff_node]["attributes"]:
+                for attr in falloff_data[falloff_node]['attributes']:
                     try:
-                        cmds.setAttr(falloff_node+"."+attr, falloff_data[falloff_node]["attributes"][attr])
+                        cmds.setAttr(falloff_node+"."+attr, falloff_data[falloff_node]['attributes'][attr])
                     except:
                         try:
-                            cmds.setAttr(falloff_node+"."+attr, falloff_data[falloff_node]["attributes"][attr], type="string")
+                            cmds.setAttr(falloff_node+"."+attr, falloff_data[falloff_node]['attributes'][attr], type='string')
                         except:
                             self.not_work_well_infos.append(falloff_node+"."+attr)
                             well_imported = False
@@ -410,22 +410,22 @@ class Weights:
 
     def get_lattice_info(self, connected_node, deformer_node):
         return {
-                "pointList" : self.get_lattice_points(connected_node),
-                "baseLatticeMatrix" : cmds.listConnections(deformer_node+".baseLatticeMatrix", destination=False, source=True)[0]
+                'pointList' : self.get_lattice_points(connected_node),
+                'baseLatticeMatrix' : cmds.listConnections(deformer_node+".baseLatticeMatrix", destination=False, source=True)[0]
                }
 
 
     def get_curve_info(self, curve):
         """ Return a dictionary with the information about the curve like points, degree, spans, form and knots.
         """
-        crv_info = cmds.createNode("curveInfo")
-        cmds.connectAttr(cmds.listRelatives(curve, children=True, type="shape")[0]+".worldSpace", crv_info+".inputCurve", force=True)
+        crv_info = cmds.createNode('curveInfo')
+        cmds.connectAttr(cmds.listRelatives(curve, children=True, type='shape')[0]+".worldSpace", crv_info+".inputCurve", force=True)
         result_data = {
-                        "point"  : cmds.getAttr(curve+".cv[*]"),
-                        "degree" : cmds.getAttr(curve+".degree"),
-                        "spans"  : cmds.getAttr(curve+".spans"),
-                        "form"   : cmds.getAttr(curve+".form"),
-                        "knot"   : cmds.getAttr(crv_info+".knots[*]")
+                        'point'  : cmds.getAttr(curve+".cv[*]"),
+                        'degree' : cmds.getAttr(curve+".degree"),
+                        'spans'  : cmds.getAttr(curve+".spans"),
+                        'form'   : cmds.getAttr(curve+".form"),
+                        'knot'   : cmds.getAttr(crv_info+".knots[*]")
                     }
         cmds.delete(crv_info)
         return result_data
@@ -435,8 +435,8 @@ class Weights:
         """ Return a dictionary of the connected nodes on sculptObjectGeometry and startPosition of the given sculpt deformer node.
         """
         return {
-                "sculptor"      : cmds.listConnections(deformer_node+".sculptObjectGeometry", destination=False, source=True)[0],
-                "originLocator" : cmds.listConnections(deformer_node+".startPosition", destination=False, source=True)[0]
+                'sculptor'      : cmds.listConnections(deformer_node+".sculptObjectGeometry", destination=False, source=True)[0],
+                'originLocator' : cmds.listConnections(deformer_node+".startPosition", destination=False, source=True)[0]
                 }
 
 
@@ -444,7 +444,7 @@ class Weights:
         """ Return a list of all current supported deformer types.
         """
         deformers = list(self.def_attr_data.keys())
-        deformers.extend(["skinCluster", "blendShape", "nonLinear"])
+        deformers.extend(['skinCluster', 'blendShape', 'nonLinear'])
         return deformers
 
 
@@ -538,7 +538,7 @@ class Weights:
             message_outputs = cmds.listConnections(deformer_node+".message", destination=True, source=False)
             if message_outputs:
                 for item in message_outputs:
-                    if cmds.objectType(item) == "objectSet":
+                    if cmds.objectType(item) == 'objectSet':
                         has_tag = False
                         break
         return has_tag

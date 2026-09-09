@@ -3,19 +3,19 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "UtilityIO"
-TITLE = "r054_utilityIO"
-DESCRIPTION = "r055_utilityIODesc"
-WIKI = "10-‐-Rebuilder#-utility"
+CLASS_NAME = 'UtilityIO'
+TITLE = 'r054_utilityIO'
+DESCRIPTION = 'r055_utilityIODesc'
+WIKI = '10-‐-Rebuilder#-utility'
 
 
 
 class UtilityIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.set_action_type("r000_rebuilder")
-        self.io_folder = "s_utilityIO"
-        self.start_name = "dpUtility"
+        self.set_action_type('r000_rebuilder')
+        self.io_folder = 's_utilityIO'
+        self.start_name = 'dpUtility'
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -47,7 +47,7 @@ class UtilityIO(action.BaseAction):
                         if utilities:
                             self.export_json_file(self.get_utility_data(utilities))
                         else:
-                            self.maybe_done_io("Utility nodes.")
+                            self.maybe_done_io('Utility nodes.')
                     else: #import
                         utility_data = self.import_latest_json_file(self.get_exported_items())
                         if utility_data:
@@ -82,30 +82,30 @@ class UtilityIO(action.BaseAction):
             if not cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True) or not self.ar.utils.validate_id(item):
                 # getting attributes values
                 node_type = cmds.objectType(item)
-                data[item] = {"attributes" : {},
-                                "type"       : node_type,
-                                "name"       : item
+                data[item] = {'attributes' : {},
+                                'type'       : node_type,
+                                'name'       : item
                             }
                 for attr in self.ar.utils.type_attr_data[node_type]:
                     if cmds.attributeQuery(attr, node=item, exists=True):
-                        data[item]["attributes"][attr] = cmds.getAttr(item+"."+attr)
+                        data[item]['attributes'][attr] = cmds.getAttr(item+"."+attr)
                 # compound attributes
                 if node_type in self.ar.utils.type_multi_attr_data:
                     for multi_attr in self.ar.utils.type_multi_attr_data[node_type]:
                         indexes = cmds.getAttr(item+"."+multi_attr, multiIndices=True)
                         if indexes:
-                            dot = ""
-                            attributes = [""]
+                            dot = ''
+                            attributes = ['']
                             if self.ar.utils.type_multi_attr_data[node_type][multi_attr]:
-                                dot = "."
+                                dot = '.'
                                 attributes = self.ar.utils.type_multi_attr_data[node_type][multi_attr]
                             for i in indexes:
                                 for attr in attributes:
                                     attr_name = multi_attr+"["+str(i)+"]"+dot+attr
                                     attr_value = cmds.getAttr(item+"."+attr_name)
-                                    data[item]["attributes"][attr_name] = attr_value
+                                    data[item]['attributes'][attr_name] = attr_value
                                     if isinstance(attr_value, list):
-                                        data[item]["attributes"][attr_name] = attr_value[0]
+                                        data[item]['attributes'][attr_name] = attr_value[0]
         return data
 
 
@@ -121,15 +121,15 @@ class UtilityIO(action.BaseAction):
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             # create utility node if it needs
             if not cmds.objExists(item):
-                cmds.createNode(utility_data[item]["type"], name=utility_data[item]["name"])
+                cmds.createNode(utility_data[item]['type'], name=utility_data[item]['name'])
                 # set attribute values
-                if utility_data[item]["attributes"]:
-                    for attr in utility_data[item]["attributes"]:
+                if utility_data[item]['attributes']:
+                    for attr in utility_data[item]['attributes']:
                         #if isinstance(attr, list): 
-                        if str(utility_data[item]["attributes"][attr]).count(",") > 1: #support vector attributes like color_Color
-                            cmds.setAttr(item+"."+attr, utility_data[item]["attributes"][attr][0], utility_data[item]["attributes"][attr][1], utility_data[item]["attributes"][attr][2], type="double3")
+                        if str(utility_data[item]['attributes'][attr]).count(',') > 1: #support vector attributes like color_Color
+                            cmds.setAttr(item+"."+attr, utility_data[item]['attributes'][attr][0], utility_data[item]['attributes'][attr][1], utility_data[item]['attributes'][attr][2], type='double3')
                         else:
-                            cmds.setAttr(item+"."+attr, utility_data[item]["attributes"][attr])
+                            cmds.setAttr(item+"."+attr, utility_data[item]['attributes'][attr])
                 well_imported_items.append(item)
             else:
                 existing_nodes.append(item)

@@ -3,20 +3,20 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "VisibilityIO"
-TITLE = "r070_visibilityIO"
-DESCRIPTION = "r071_visibilityIODesc"
-WIKI = "10-‐-Rebuilder#-visibility"
+CLASS_NAME = 'VisibilityIO'
+TITLE = 'r070_visibilityIO'
+DESCRIPTION = 'r071_visibilityIODesc'
+WIKI = '10-‐-Rebuilder#-visibility'
 
 
 
 class VisibilityIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.set_action_type("r000_rebuilder")
-        self.io_folder = "s_visibilityIO"
-        self.start_name = "dpVisibility"
-        self.ignores = ["defaultLayer"]
+        self.set_action_type('r000_rebuilder')
+        self.io_folder = 's_visibilityIO'
+        self.start_name = 'dpVisibility'
+        self.ignores = ['defaultLayer']
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -43,7 +43,7 @@ class VisibilityIO(action.BaseAction):
                     if inputs:
                         items = inputs
                     else:
-                        items = cmds.ls(selection=False)#, type="transform")
+                        items = cmds.ls(selection=False)#, type='transform')
                     if items:
                         if self.first_mode: #export
                             self.export_json_file(self.get_visibility_data(items))
@@ -54,7 +54,7 @@ class VisibilityIO(action.BaseAction):
                             else:
                                 self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                     else:
-                        self.maybe_done_io("Ctrls_Grp")
+                        self.maybe_done_io('Ctrls_Grp')
                 else:
                     self.fail_io(self.ar.data.lang['r010_notFoundPath'])
             else:
@@ -80,7 +80,7 @@ class VisibilityIO(action.BaseAction):
         self.ar.ui_manager.set_progress(max=len(items), add_one=False, add_number=False)
         for item in items:
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
-            if cmds.objExists(item) and "visibility" in cmds.listAttr(item) and not cmds.listConnections(item+".visibility", source=True, destination=False):
+            if cmds.objExists(item) and 'visibility' in cmds.listAttr(item) and not cmds.listConnections(item+".visibility", source=True, destination=False):
                 data[item] = cmds.getAttr(item+".visibility")
         return data
 
@@ -96,7 +96,7 @@ class VisibilityIO(action.BaseAction):
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             # check attribute
             if not cmds.objExists(item):
-                item = item[item.rfind("|")+1:] #short name (after last "|")
+                item = item[item.rfind('|')+1:] #short name (after last '|')
             if cmds.objExists(item):
                 if not cmds.getAttr(item+".visibility", lock=True) and not item in self.ignores:
                     try:

@@ -3,9 +3,9 @@ from maya import cmds, mel
 from ...base import curve
 
 # global variables to this module:    
-CLASS_NAME = "DiamondFlat"
-TITLE = "m177_diamondFlat"
-DESCRIPTION = "m099_cvControlDesc"
+CLASS_NAME = 'DiamondFlat'
+TITLE = 'm177_diamondFlat'
+DESCRIPTION = 'm099_cvControlDesc'
 
 
 
@@ -32,7 +32,7 @@ class DiamondFlat(curve.BaseCurve):
     def create_combined_curves(self, cv_id, cv_name, cv_size, cv_degree):
         """ Combine controllers in order to return it.
         """
-        square = self.ar.config.get_instance("Square", [self.ar.data.curve_simple_folder])
+        square = self.ar.config.get_instance('Square', [self.ar.data.curve_simple_folder])
         curve1 = square.cv_main(False, cv_id, cv_name, cv_size, cv_degree)
         cmds.setAttr(curve1+".rotateZ", 45)
         return self.combine_curves([curve1])

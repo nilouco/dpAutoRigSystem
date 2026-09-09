@@ -5,10 +5,10 @@ from maya import cmds
 from ..base import base
 
 # global variables to this module:    
-CLASS_NAME = "FingerHandPose"
-TITLE = "m256_fingerHandPose"
-DESCRIPTION = "m257_fingerHandPoseDesc"
-WIKI = "06-‐-Tools#-finger-hand-pose"
+CLASS_NAME = 'FingerHandPose'
+TITLE = 'm256_fingerHandPose'
+DESCRIPTION = 'm257_fingerHandPoseDesc'
+WIKI = '06-‐-Tools#-finger-hand-pose'
 
 
 
@@ -18,7 +18,7 @@ class FingerHandPose(base.BaseLibrary):
         if self.ar.dev:
             reload(base)
         self.old_drivenkeys = cmds.ls(selection=False, type=self.ar.data.drivenkey_types)
-        self.sides = ["", self.ar.data.lang['p002_left']+"_", self.ar.data.lang['p003_right']+"_"]
+        self.sides = ['', self.ar.data.lang['p002_left']+"_", self.ar.data.lang['p003_right']+"_"]
         self.arm_name = self.ar.data.lang['c037_arm']
         self.wrist_name = self.ar.data.lang['c004_arm_extrem']
         self.finger_index_name = self.ar.data.lang['m007_finger']+"_"+self.ar.data.lang['m032_index']
@@ -50,13 +50,13 @@ class FingerHandPose(base.BaseLibrary):
                     hand_ctrls.append(hand_ctrl)
                     for attr in self.hand_attributes:
                         if not attr in cmds.listAttr(hand_ctrl):
-                            cmds.addAttr(hand_ctrl, longName=attr, attributeType="double", minValue=-1, maxValue=1, defaultValue=0, keyable=True)
+                            cmds.addAttr(hand_ctrl, longName=attr, attributeType='double', minValue=-1, maxValue=1, defaultValue=0, keyable=True)
                     for f, finger in enumerate(self.fingers):
                         for n in range(1, 4):
                             if cmds.objExists(side+finger+"_"+str(n).zfill(2)+"_Ctrl"):
-                                finger_grp = side+finger+"_%02d_Pose_Grp"%(n)
+                                finger_grp = f"{side}{finger}_{n:02d}_Pose_Grp"
                                 if not cmds.objExists(finger_grp):
-                                    finger_grp = cmds.group(side+finger+"_"+str(n).zfill(2)+"_Ctrl", name=side+finger+"_%02d_Pose_Grp"%(n))
+                                    finger_grp = cmds.group(side+finger+"_"+str(n).zfill(2)+"_Ctrl", name=f"{side}{finger}_{n:02d}_Pose_Grp")
                                     cmds.xform(finger_grp, rotatePivot=cmds.xform(side+finger+"_"+str(n).zfill(2)+"_Ctrl", query=True, rotatePivot=True, worldSpace=True), worldSpace=True)
                                     self.to_ids.append(finger_grp)
                                 # Curl

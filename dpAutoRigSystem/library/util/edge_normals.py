@@ -54,24 +54,24 @@ class ConvertNormals:
             else:
                 m_current_index = m_edge_id
                 if m_current_index > (m_last_indices[1]+1):
-                    m_a_member += f'{m_path.fullPathName()}.e[{m_last_indices[0]}:{m_last_indices[1]}] '
+                    m_a_member += f"{m_path.fullPathName()}.e[{m_last_indices[0]}:{m_last_indices[1]}] "
                     m_last_indices[0] = m_current_index
                     m_last_indices[1] = m_current_index 
                 else:
                     m_last_indices[1] = m_current_index
             m_have_edge = True
         if m_have_edge:
-            m_a_member += f'{m_path.fullPathName()}.e[{m_last_indices[0]}:{m_last_indices[1]}] '
+            m_a_member += f"{m_path.fullPathName()}.e[{m_last_indices[0]}:{m_last_indices[1]}] "
         m_result_string = ""
         m_result_string += f"select -r {m_path.fullPathName()};\n"
-        m_result_string += "polyNormalPerVertex -ufn true;\n"
-        m_result_string += "polySoftEdge -a 180 -ch 0;\n"
+        m_result_string += 'polyNormalPerVertex -ufn true;\n'
+        m_result_string += 'polySoftEdge -a 180 -ch 0;\n'
         if m_a_member != '':
             m_result_string += f"select -r {m_a_member};\n"
-            m_result_string += "polySoftEdge -a 0 -ch 0;\n"
+            m_result_string += 'polySoftEdge -a 0 -ch 0;\n'
         #else:
-        #    print("No hard edges in this mesh, set all edges to soft!")
-        m_result_string += "select -cl;"
+        #    print('No hard edges in this mesh, set all edges to soft!')
+        m_result_string += 'select -cl;'
         #print(m_result_string)
         OpenMaya.MGlobal.executeCommand(m_result_string)
     

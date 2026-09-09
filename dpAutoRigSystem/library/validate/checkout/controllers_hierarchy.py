@@ -3,18 +3,18 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "ControllersHierarchy"
-TITLE = "v060_controllersHierarchy"
-DESCRIPTION = "v061_controllerssHierarchyDesc"
-WIKI = "07-‐-Validator#-controls-hierarchy"
+CLASS_NAME = 'ControllersHierarchy'
+TITLE = 'v060_controllersHierarchy'
+DESCRIPTION = 'v061_controllerssHierarchyDesc'
+WIKI = '07-‐-Validator#-controls-hierarchy'
 
 
 
 class ControllersHierarchy(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.io_folder = "s_hierarchyIO"
-        self.start_name = "dpHierarchy"
+        self.io_folder = 's_hierarchyIO'
+        self.start_name = 'dpHierarchy'
 
 
     def check_nurbs(self, transform):
@@ -26,7 +26,7 @@ class ControllersHierarchy(action.BaseAction):
             return False
         if shapes:
             for shape in shapes:
-                if "nurbsCurve" not in cmds.objectType(shape):
+                if 'nurbsCurve' not in cmds.objectType(shape):
                     return False
         else:
             return False
@@ -57,7 +57,7 @@ class ControllersHierarchy(action.BaseAction):
     def raise_hierarchy(self, root_node):
         hierarchy_data = {}
         self.add_to_tree(root_node, hierarchy_data)
-        transform_descendents = cmds.listRelatives(root_node, allDescendents=True, type="transform")
+        transform_descendents = cmds.listRelatives(root_node, allDescendents=True, type='transform')
         if transform_descendents != None:
             for node in transform_descendents:
                 if self.check_nurbs(node):
@@ -110,11 +110,11 @@ class ControllersHierarchy(action.BaseAction):
 
     def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
-            It"s in verify mode by default.
-            If first_mode parameter is False, it"ll run in fix mode.
+            It's in verify mode by default.
+            If first_mode parameter is False, it'll run in fix mode.
             Returns dataLog with the validation result as:
                 - checked_items = node list of checked items
-                - found_issues = True if an issue was found, False if there isn"t an issue for the checked node
+                - found_issues = True if an issue was found, False if there isn't an issue for the checked node
                 - good_results = True if well done, False if we got an error
                 - messages = reported text
         """
@@ -126,7 +126,7 @@ class ControllersHierarchy(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             root_node = None
-            global_ctrl = self.ar.utils.get_node_by_message("globalCtrl")
+            global_ctrl = self.ar.utils.get_node_by_message('globalCtrl')
             # Verify if another Ctrl was sent via code to check hierarchy from.
             if inputs and cmds.objExists(inputs[0]) and self.check_nurbs(inputs[0]):
                 root_node = inputs[0]
@@ -147,7 +147,7 @@ class ControllersHierarchy(action.BaseAction):
                         is_hierarchy_same = self.compare_hierarchy(last_hierarchy_data, current_file_hierarchy_data)
                         self.checked_items.append(str(last_hierarchy_data))
                     else:
-                        self.checked_items.append("Controls Hierarchy")
+                        self.checked_items.append('Controls Hierarchy')
                         self.messages.append(self.ar.data.lang['v063_firstHierarchy'])
                     if self.first_mode: #verify
                         if is_hierarchy_same:
@@ -163,7 +163,7 @@ class ControllersHierarchy(action.BaseAction):
                             self.found_issues.append(False)
                             self.good_results.append(True)
                         else:
-                            self.checked_items.append("Scene")
+                            self.checked_items.append('Scene')
                             self.found_issues.append(True)
                             self.good_results.append(False)
                             self.messages.append(self.ar.data.lang['v005_cantFix']+" "+self.ar.data.lang['v064_hierarchy'])

@@ -23,7 +23,7 @@ class Ribbon:
         self.ar = ar
         
         
-    def add_ribbon_to_limb(self, limb_instance, prefix='', name=None, ori_loc=None, ini_jnt=None, skip_axis='y', num=5, ini_jxt=None, side=0, arm=True, world_ref="worldRef", joint_label_add=0, add_artic=True, additional=False, add_correct=True, jcr_number=0, jcr_pos=None, jcr_rot=None, ori_b_loc=None):
+    def add_ribbon_to_limb(self, limb_instance, prefix='', name=None, ori_loc=None, ini_jnt=None, skip_axis='y', num=5, ini_jxt=None, side=0, arm=True, world_ref='worldRef', joint_label_add=0, add_artic=True, additional=False, add_correct=True, jcr_number=0, jcr_pos=None, jcr_rot=None, ori_b_loc=None):
         """ Create the Ribbon system to be added in the Limb module.
             Returns a dictionary with all nodes needed to be integrated.
         """
@@ -60,7 +60,7 @@ class Ribbon:
         mid_loc = cmds.duplicate(ori_loc, rr=True)
 
         cmds.matchTransform(aux_loc, lista[1], position=True, rotation=True)
-        cmds.delete(cmds.aimConstraint(lista[2], aux_loc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(0, 1, 0)))
+        cmds.delete(cmds.aimConstraint(lista[2], aux_loc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType='vector', worldUpVector=(0, 1, 0)))
         cmds.delete(cmds.orientConstraint(ori_loc, aux_loc, mo=False, skip=skipa, weight=1))
 
         cmds.matchTransform(mid_loc, lista[1], position=True, rotation=True)
@@ -82,19 +82,19 @@ class Ribbon:
         attr_value = 0.25
         if arm:
             attr_value = 0.75
-        cmds.addAttr(up_ctrl, longName="autoTwistBone", attributeType='float', min=0, defaultValue=attr_value, max=1, keyable=True)
-        cmds.addAttr(up_ctrl, longName="baseTwist", attributeType='float', keyable=True)
-        cmds.addAttr(up_ctrl, longName="autoRotate", attributeType='float', min=0, defaultValue=0.5, max=1, keyable=True)
-        cmds.addAttr(up_ctrl, longName="invert", attributeType='bool', defaultValue=0, keyable=False)
-        cmds.addAttr(down_ctrl, longName="autoRotate", attributeType='float', min=0, defaultValue=0.5, max=1, keyable=True)
-        cmds.addAttr(down_ctrl, longName="invert", attributeType='bool', defaultValue=0, keyable=False)
+        cmds.addAttr(up_ctrl, longName='autoTwistBone', attributeType='float', min=0, defaultValue=attr_value, max=1, keyable=True)
+        cmds.addAttr(up_ctrl, longName='baseTwist', attributeType='float', keyable=True)
+        cmds.addAttr(up_ctrl, longName='autoRotate', attributeType='float', min=0, defaultValue=0.5, max=1, keyable=True)
+        cmds.addAttr(up_ctrl, longName='invert', attributeType='bool', defaultValue=0, keyable=False)
+        cmds.addAttr(down_ctrl, longName='autoRotate', attributeType='float', min=0, defaultValue=0.5, max=1, keyable=True)
+        cmds.addAttr(down_ctrl, longName='invert', attributeType='bool', defaultValue=0, keyable=False)
         
         if ori_b_loc:
             lista.append(cmds.listRelatives(lista[2], c=True)[0])
             aux_b_loc = cmds.duplicate(ori_b_loc, rr=True)
             mid_b_loc = cmds.duplicate(ori_b_loc, rr=True)
             cmds.matchTransform(aux_b_loc, lista[2], position=True, rotation=True)
-            cmds.delete(cmds.aimConstraint(lista[3], aux_b_loc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(0, 1, 0)))
+            cmds.delete(cmds.aimConstraint(lista[3], aux_b_loc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType='vector', worldUpVector=(0, 1, 0)))
             cmds.delete(cmds.orientConstraint(ori_b_loc, aux_b_loc, mo=False, skip=skipa, weight=1))
             cmds.matchTransform(mid_b_loc, lista[2], position=True, rotation=True)
             cmds.delete(cmds.orientConstraint(ori_b_loc, mid_b_loc, mo=False, skip=skipa, weight=1))
@@ -106,14 +106,14 @@ class Ribbon:
             self.elbow_b_ctrl = elbow_b_ctrls[1]
             self.elbow_b_zero_0 = elbow_b_ctrls[2]
             self.elbow_b_zero_1 = elbow_b_ctrls[3]
-            cmds.addAttr(down_b_ctrl, longName="autoRotate", attributeType='float', min=0, defaultValue=0.5, max=1, keyable=True)
-            cmds.addAttr(down_b_ctrl, longName="invert", attributeType='bool', defaultValue=0, keyable=False)
+            cmds.addAttr(down_b_ctrl, longName='autoRotate', attributeType='float', min=0, defaultValue=0.5, max=1, keyable=True)
+            cmds.addAttr(down_b_ctrl, longName='invert', attributeType='bool', defaultValue=0, keyable=False)
 
         if add_artic:
             # corner joint
-            self.corner_jxt, self.corner_jnt = self.create_corner_joint(prefix, name, "Corner", self.elbow_ctrl)
+            self.corner_jxt, self.corner_jnt = self.create_corner_joint(prefix, name, 'Corner', self.elbow_ctrl)
             if ori_b_loc:
-                self.corner_b_jxt, self.corner_b_jnt = self.create_corner_joint(prefix, name, "CornerB", self.elbow_b_ctrl)
+                self.corner_b_jxt, self.corner_b_jnt = self.create_corner_joint(prefix, name, 'CornerB', self.elbow_b_ctrl)
             if not arm:
                 cmds.setAttr(self.corner_jnt+".rotateX", 180)
                 cmds.setAttr(self.corner_jnt+".rotateZ", 90)
@@ -246,15 +246,15 @@ class Ribbon:
                 limb_joints.insert(len(up_limb['skinJointsList'])+len(down_limb['skinJointsList'])+1, self.corner_b_jnt)
         for i in range(len(limb_joints)):
             old_name = limb_joints[i][:-4]
-            limb_joints[i] = cmds.rename(limb_joints[i], prefix+name+'_%02d_Jnt'%(i+artic_number)) #because 00 is the clavicle and 01 is the shoulder if we have articulation joint
+            limb_joints[i] = cmds.rename(limb_joints[i], f"{prefix}{name}_{(i+artic_number):02d}_Jnt") #because 00 is the clavicle and 01 is the shoulder if we have articulation joint
             if not self.ar.data.lang['c043_corner'] in old_name:
                 for child in cmds.listRelatives(limb_joints[i], allDescendents=True) or []:
                     if old_name in child:
-                        cmds.rename(child, child.replace(old_name, prefix+name+'_%02d'%(i+artic_number)))
+                        cmds.rename(child, child.replace(old_name, f"{prefix}{name}_{(i+artic_number):02d}"))
         
         scale_grp = cmds.group(up_limb['scaleGrp'], down_limb['scaleGrp'], jnt_grp, n=prefix+name+'_Ribbon_Scale_Grp')
-        cmds.setAttr(up_limb['scaleGrp']+'.v', cmds.getAttr(up_limb['finalGrp']+'.v'))
-        cmds.setAttr(down_limb['scaleGrp']+'.v', cmds.getAttr(down_limb['finalGrp']+'.v'))
+        cmds.setAttr(up_limb['scaleGrp']+'.visibility', cmds.getAttr(up_limb['finalGrp']+'.visibility'))
+        cmds.setAttr(down_limb['scaleGrp']+'.visibility', cmds.getAttr(down_limb['finalGrp']+'.visibility'))
         
         cmds.delete(up_jnt_grp, down_jnt_grp)
         
@@ -265,7 +265,7 @@ class Ribbon:
         cmds.delete(mid_loc, aux_loc)
         if ori_b_loc:
             cmds.parent(down_b_limb['scaleGrp'], scale_grp)
-            cmds.setAttr(down_b_limb['scaleGrp']+'.v', cmds.getAttr(down_b_limb['finalGrp']+'.v'))
+            cmds.setAttr(down_b_limb['scaleGrp']+'.visibility', cmds.getAttr(down_b_limb['finalGrp']+'.visibility'))
             cmds.delete(down_b_jnt_grp)
             cmds.parent(down_b_limb['finalGrp'], static_grp)
             cmds.parent(down_b_zero, elbow_b_grp, down_b_limb['extraCtrlGrp'], ctrls_grp)
@@ -290,24 +290,24 @@ class Ribbon:
             cmds.setAttr(pac+"."+ini_jxt+"W1", 0.3)
 
         # corner autoRotate setup
-        loaded_quaternion_plugin = self.ar.config.check_loaded_plugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
-        loaded_matrix_plugin = self.ar.config.check_loaded_plugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
+        loaded_quaternion_plugin = self.ar.config.check_loaded_plugin('quatNodes', self.ar.data.lang['e014_cantLoadQuatNode'])
+        loaded_matrix_plugin = self.ar.config.check_loaded_plugin('matrixNodes', self.ar.data.lang['e002_matrixPluginNotFound'])
         if loaded_quaternion_plugin and loaded_matrix_plugin:
-            corner_auto_rotate_md = cmds.createNode("multiplyDivide", name=prefix+name+"_"+corner_name+"_AutoRotate_MD")
-            corner_auto_rotate_mm = cmds.createNode("multMatrix", name=prefix+name+"_"+corner_name+"_AutoRotate_MM")
-            corner_auto_rotate_dm = cmds.createNode("decomposeMatrix", name=prefix+name+"_"+corner_name+"_AutoRotate_DM")
-            corner_auto_rotate_qte = cmds.createNode("quatToEuler", name=prefix+name+"_"+corner_name+"_AutoRotate_QtE")
-            corner_auto_rotate_rev = cmds.createNode("reverse", name=prefix+name+"_"+corner_name+"_AutoRotate_Rev")
-            corner_auto_rotate_inv_pin_md = cmds.createNode("multiplyDivide", name=corner_auto_rotate_md.replace("MD", "Pin_Inv_MD"))
-            corner_auto_rotate_inv_mid_md = cmds.createNode("multiplyDivide", name=corner_auto_rotate_md.replace("MD", "Mid_Inv_MD"))
+            corner_auto_rotate_md = cmds.createNode('multiplyDivide', name=prefix+name+"_"+corner_name+"_AutoRotate_MD")
+            corner_auto_rotate_mm = cmds.createNode('multMatrix', name=prefix+name+"_"+corner_name+"_AutoRotate_MM")
+            corner_auto_rotate_dm = cmds.createNode('decomposeMatrix', name=prefix+name+"_"+corner_name+"_AutoRotate_DM")
+            corner_auto_rotate_qte = cmds.createNode('quatToEuler', name=prefix+name+"_"+corner_name+"_AutoRotate_QtE")
+            corner_auto_rotate_rev = cmds.createNode('reverse', name=prefix+name+"_"+corner_name+"_AutoRotate_Rev")
+            corner_auto_rotate_inv_pin_md = cmds.createNode('multiplyDivide', name=corner_auto_rotate_md.replace('MD', 'Pin_Inv_MD'))
+            corner_auto_rotate_inv_mid_md = cmds.createNode('multiplyDivide', name=corner_auto_rotate_md.replace('MD', 'Mid_Inv_MD'))
             self.to_ids.extend([corner_auto_rotate_md, corner_auto_rotate_mm, corner_auto_rotate_dm, corner_auto_rotate_qte, corner_auto_rotate_rev, corner_auto_rotate_inv_pin_md, corner_auto_rotate_inv_mid_md])
             idx = 2
             if ori_b_loc:
                 idx = 3
-            extreme_loc = cmds.spaceLocator(name=lista[idx].replace("Jnt", "AutoRotate_Loc"))[0]
+            extreme_loc = cmds.spaceLocator(name=lista[idx].replace('Jnt', 'AutoRotate_Loc'))[0]
             cmds.matchTransform(extreme_loc, lista[idx], position=True, rotation=True)
             corner_auto_rot_grp = cmds.group(extreme_loc, name=extreme_loc+"_Grp")
-            extreme_orig_loc = cmds.duplicate(extreme_loc, name=lista[2].replace("Jnt", "AutoRotate_Orig_Loc"))[0]
+            extreme_orig_loc = cmds.duplicate(extreme_loc, name=lista[2].replace('Jnt', "AutoRotate_Orig_Loc"))[0]
             for axis in self.ar.data.axes:
                 cmds.connectAttr(lista[idx]+".rotate"+axis, extreme_loc+".rotate"+axis, force=True)
                 cmds.setAttr(extreme_orig_loc+".rotate"+axis, cmds.getAttr(extreme_loc+".rotate"+axis))
@@ -394,7 +394,7 @@ class Ribbon:
             Returns the group create_zero_out and the control curve.
         """
         grp = None
-        curve = self.ar.ctrls.create_controller("id_038_RibbonBend", name, r=self.radius, d=self.curve_degree, rot=(0, 90, 0), guide_source=self.limb_instance.guide_base)
+        curve = self.ar.ctrls.create_controller('id_038_RibbonBend', name, r=self.radius, d=self.curve_degree, rot=(0, 90, 0), guide_source=self.limb_instance.guide_base)
         self.ar.ctrls.set_lock_hide([curve], ['v'])
         if zero:
             grp = cmds.group(curve, n=name+'_Grp')
@@ -407,9 +407,9 @@ class Ribbon:
             Returns the group, the control curve and its create_zero_out group.
         """
         if arm_style:
-            curve = self.ar.ctrls.create_controller("id_039_RibbonCorner", name, r=self.radius, d=self.curve_degree, rot=(0, 90, 0), guide_source=self.limb_instance.name_guide+"_Corner")
+            curve = self.ar.ctrls.create_controller('id_039_RibbonCorner', name, r=self.radius, d=self.curve_degree, rot=(0, 90, 0), guide_source=self.limb_instance.name_guide+"_Corner")
         else:
-            curve = self.ar.ctrls.create_controller("id_039_RibbonCorner", name, r=self.radius, d=self.curve_degree, rot=(90, 0, 0), guide_source=self.limb_instance.name_guide+"_Corner")
+            curve = self.ar.ctrls.create_controller('id_039_RibbonCorner', name, r=self.radius, d=self.curve_degree, rot=(90, 0, 0), guide_source=self.limb_instance.name_guide+"_Corner")
         grp = None
         if zero:
             zero0 = cmds.group(curve, name=name+'_Zero_0_Grp')
@@ -430,7 +430,7 @@ class Ribbon:
         return [grp, curve, zero0, zero1]
     
     
-    def create_ribbon(self, axis=(0, 0, 1), name='RibbonSetup', horizontal=False, num_joints=3, guides=None, ini_jxt=None, v=True, s=0, up_ctrl=None, world_ref="worldRef", joint_label_add=0, joint_label_name="RibbonName", center_up_down=0, add_artic=True, additional_joint=False, limbArm=True, ori_b_loc=None):
+    def create_ribbon(self, axis=(0, 0, 1), name='RibbonSetup', horizontal=False, num_joints=3, guides=None, ini_jxt=None, v=True, s=0, up_ctrl=None, world_ref='worldRef', joint_label_add=0, joint_label_name='RibbonName', center_up_down=0, add_artic=True, additional_joint=False, limbArm=True, ori_b_loc=None):
         """ Main method to create the Ribbon system.
             center_up_down = [0, 1, 2] # center, up, down ribbon part to change proportions used in volumeVariation.
             Returns results in a dictionary.
@@ -550,46 +550,46 @@ class Ribbon:
             cmds.setAttr(drv_Jnt[0]+'.jointOrient', 0, 90, 0)
             cmds.setAttr(drv_Jnt[2]+'.jointOrient', 0, 90, 0)
             
-            cmds.setAttr(drv_Jnt[0]+'.tz', -dist)
-            cmds.setAttr(drv_Jnt[3]+'.tz', end_dist*dist)
-            cmds.setAttr(drv_Jnt[2]+'.tz', dist)
-            cmds.setAttr(drv_Jnt[4]+'.tz', -end_dist*dist)
+            cmds.setAttr(drv_Jnt[0]+'.translateZ', -dist)
+            cmds.setAttr(drv_Jnt[3]+'.translateZ', end_dist*dist)
+            cmds.setAttr(drv_Jnt[2]+'.translateZ', dist)
+            cmds.setAttr(drv_Jnt[4]+'.translateZ', -end_dist*dist)
         
         elif horizontal and axis==(0, 1, 0) or horizontal and axis==(0, 0, 1) or horizontal and axis==(0, 0, -1):
             cmds.setAttr(drv_Jnt[0]+'.jointOrient', 0, 0, 0)
             cmds.setAttr(drv_Jnt[2]+'.jointOrient', 0, 0, 0)
             
-            cmds.setAttr(drv_Jnt[0]+'.tx', -dist)
-            cmds.setAttr(drv_Jnt[3]+'.tx', end_dist*dist)
-            cmds.setAttr(drv_Jnt[2]+'.tx', dist)
-            cmds.setAttr(drv_Jnt[4]+'.tx', -end_dist*dist)
+            cmds.setAttr(drv_Jnt[0]+'.translateX', -dist)
+            cmds.setAttr(drv_Jnt[3]+'.translateX', end_dist*dist)
+            cmds.setAttr(drv_Jnt[2]+'.translateX', dist)
+            cmds.setAttr(drv_Jnt[4]+'.translateX', -end_dist*dist)
             
         elif not horizontal and axis==(1, 0, 0):
             cmds.setAttr(drv_Jnt[0]+'.jointOrient', 0, 0, -90)
             cmds.setAttr(drv_Jnt[2]+'.jointOrient', 0, 0, -90)
         
-            cmds.setAttr(drv_Jnt[0]+'.ty', -dist)
-            cmds.setAttr(drv_Jnt[3]+'.ty', end_dist*dist)
-            cmds.setAttr(drv_Jnt[2]+'.ty', dist)
-            cmds.setAttr(drv_Jnt[4]+'.ty', -end_dist*dist)
+            cmds.setAttr(drv_Jnt[0]+'.translateY', -dist)
+            cmds.setAttr(drv_Jnt[3]+'.translateY', end_dist*dist)
+            cmds.setAttr(drv_Jnt[2]+'.translateY', dist)
+            cmds.setAttr(drv_Jnt[4]+'.translateY', -end_dist*dist)
             
         elif not horizontal and axis==(0, 1, 0):
             cmds.setAttr(drv_Jnt[0]+'.jointOrient', 0, 90, 0)
             cmds.setAttr(drv_Jnt[2]+'.jointOrient', 0, 90, 0)
         
-            cmds.setAttr(drv_Jnt[0]+'.tz', -dist)
-            cmds.setAttr(drv_Jnt[3]+'.tz', end_dist*dist)
-            cmds.setAttr(drv_Jnt[2]+'.tz', dist)
-            cmds.setAttr(drv_Jnt[4]+'.tz', -end_dist*dist)
+            cmds.setAttr(drv_Jnt[0]+'.translateZ', -dist)
+            cmds.setAttr(drv_Jnt[3]+'.translateZ', end_dist*dist)
+            cmds.setAttr(drv_Jnt[2]+'.translateZ', dist)
+            cmds.setAttr(drv_Jnt[4]+'.translateZ', -end_dist*dist)
             
         elif not horizontal and axis==(0, 0, 1):
             cmds.setAttr(drv_Jnt[0]+'.jointOrient', 0, 0, -90)
             cmds.setAttr(drv_Jnt[2]+'.jointOrient', 0, 0, -90)
         
-            cmds.setAttr(drv_Jnt[0]+'.ty', -dist)
-            cmds.setAttr(drv_Jnt[3]+'.ty', end_dist*dist)
-            cmds.setAttr(drv_Jnt[2]+'.ty', dist)
-            cmds.setAttr(drv_Jnt[4]+'.ty', -end_dist*dist)
+            cmds.setAttr(drv_Jnt[0]+'.translateY', -dist)
+            cmds.setAttr(drv_Jnt[3]+'.translateY', end_dist*dist)
+            cmds.setAttr(drv_Jnt[2]+'.translateY', dist)
+            cmds.setAttr(drv_Jnt[4]+'.translateY', -end_dist*dist)
         
         #fix the control locators position and orientation
         cmds.parent(top_Loc[0], drv_Jnt[2])
@@ -608,7 +608,7 @@ class Ribbon:
         
         cmds.parent(aux_Jnt[0], mid_Loc[0])
         #create a nurbs control in order to be used in the ribbon offset
-        mid_ctrl = self.ar.ctrls.create_controller("Circle", name+'_MidCtrl', r=self.radius, d=self.curve_degree, rot=(0, 90, 0), guide_source=self.limb_instance.name_guide+"_Corner")
+        mid_ctrl = self.ar.ctrls.create_controller('Circle', name+'_MidCtrl', r=self.radius, d=self.curve_degree, rot=(0, 90, 0), guide_source=self.limb_instance.name_guide+"_Corner")
         self.ar.utils.remove_user_defined_attr(mid_ctrl, True)
         middle_ctrl = mid_ctrl #TODO: it's very confused yet, sorry... seems mid_ctrl is a father curve of the middle_ctrl
         mid_ctrl = cmds.group(n=mid_ctrl+'_Grp', em=True)
@@ -663,8 +663,8 @@ class Ribbon:
         curve_info_node = cmds.rename(curve_info_node, ribbon+"_CurveInfo")
         curve_from_surface_iso = cmds.listConnections(curve_info_node+".inputCurve", source=True, destination=False)
         cmds.rename(curve_from_surface_iso, ribbon+"_CurveFromSurface_Iso")
-        rb_scale_md = cmds.createNode("multiplyDivide", name=ribbon+"_ScaleCompensate_MD")
-        rb_normalize_md = cmds.createNode("multiplyDivide", name=ribbon+"_Normalize_MD")
+        rb_scale_md = cmds.createNode('multiplyDivide', name=ribbon+"_ScaleCompensate_MD")
+        rb_normalize_md = cmds.createNode('multiplyDivide', name=ribbon+"_Normalize_MD")
         self.to_ids.extend([curve_info_node, rb_scale_md, rb_normalize_md, ribbon+"_CurveFromSurface_Iso"])
         cmds.setAttr(rb_normalize_md+".operation", 2)
         cmds.connectAttr(curve_info_node+".arcLength", rb_normalize_md+".input2X", force=True)
@@ -672,9 +672,9 @@ class Ribbon:
 
         if cmds.objExists(world_ref):
             if not cmds.objExists(world_ref+"."+self.limb_manual_vv_attr):
-                cmds.addAttr(world_ref, longName=self.limb_vv_attr, attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
-                cmds.addAttr(world_ref, longName=self.limb_manual_vv_attr, attributeType="float", defaultValue=1, keyable=True)
-                cmds.addAttr(world_ref, longName=self.limb_min_vv_attr, attributeType="float", defaultValue=0.01, keyable=True)
+                cmds.addAttr(world_ref, longName=self.limb_vv_attr, attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
+                cmds.addAttr(world_ref, longName=self.limb_manual_vv_attr, attributeType='float', defaultValue=1, keyable=True)
+                cmds.addAttr(world_ref, longName=self.limb_min_vv_attr, attributeType='float', defaultValue=0.01, keyable=True)
             cmds.connectAttr(world_ref+".scaleX", rb_scale_md+".input1X", force=True)
         
         #fix group hierarchy
@@ -685,7 +685,7 @@ class Ribbon:
             
             # create extra control
             extra_name = jnt[:-4] #removed _Jnt suffix
-            extra_ctrl = self.ar.ctrls.create_controller("id_040_RibbonExtra", ctrl_name=extra_name+"_Ctrl", r=self.radius, d=self.curve_degree, guide_source=self.limb_instance.guide_base, parent_tag=self.limb_instance.get_parent_to_tag(extra_ctrls))
+            extra_ctrl = self.ar.ctrls.create_controller('id_040_RibbonExtra', ctrl_name=extra_name+"_Ctrl", r=self.radius, d=self.curve_degree, guide_source=self.limb_instance.guide_base, parent_tag=self.limb_instance.get_parent_to_tag(extra_ctrls))
             extra_ctrls.append(extra_ctrl)
             cmds.rotate(0, 90, 0, extra_ctrl)
             cmds.makeIdentity(extra_ctrl, a=True)
@@ -696,15 +696,15 @@ class Ribbon:
             cmds.scaleConstraint(extra_ctrl, jnt, w=1, name=jnt+"_ScC")
             
             # work with volume variation
-            rb_proportion_md = cmds.createNode("multiplyDivide", name=extra_name+"_Proportion_MD")
-            rb_intensity_md = cmds.createNode("multiplyDivide", name=extra_name+"_Intensity_MD")
-            rb_length_md = cmds.createNode("multiplyDivide", name=extra_name+"_Length_MD")
-            rb_add_scale_pma = cmds.createNode("plusMinusAverage", name=extra_name+"_AddScale_PMA")
-            rb_scale_clp = cmds.createNode("clamp", name=extra_name+"_Scale_Clp")
-            rb_blend_bc = cmds.createNode("blendColors", name=extra_name+"_BC")
+            rb_proportion_md = cmds.createNode('multiplyDivide', name=extra_name+"_Proportion_MD")
+            rb_intensity_md = cmds.createNode('multiplyDivide', name=extra_name+"_Intensity_MD")
+            rb_length_md = cmds.createNode('multiplyDivide', name=extra_name+"_Length_MD")
+            rb_add_scale_pma = cmds.createNode('plusMinusAverage', name=extra_name+"_AddScale_PMA")
+            rb_scale_clp = cmds.createNode('clamp', name=extra_name+"_Scale_Clp")
+            rb_blend_bc = cmds.createNode('blendColors', name=extra_name+"_BC")
             self.to_ids.extend([rb_proportion_md, rb_intensity_md, rb_length_md, rb_add_scale_pma, rb_scale_clp, rb_blend_bc])
             cmds.connectAttr(world_ref+"."+self.limb_vv_attr, rb_blend_bc+".blender", force=True)
-            cmds.setAttr(rb_blend_bc+".color2", 1, 1, 1, type="double3")
+            cmds.setAttr(rb_blend_bc+".color2", 1, 1, 1, type='double3')
             cmds.connectAttr(rb_normalize_md+".outputX", rb_proportion_md+".input1X", force=True)
             cmds.setAttr(rb_proportion_md+".input2X", proportions[i])
             cmds.connectAttr(rb_proportion_md+".outputX", rb_intensity_md+".input1X", force=True)
@@ -721,27 +721,27 @@ class Ribbon:
             
             # additional joint
             if additional_joint:
-                additional_axes = ["Y", "Z"]
+                additional_axes = ['Y', 'Z']
                 additional_dirs = [-1, 1]
                 d = 1
                 for add_dir in additional_dirs:
                     for add_axis in additional_axes:
                         cmds.select(jnt)
-                        jad = cmds.joint(name=jnt.replace("_Jnt", "_"+str(d).zfill(2)+"_Jad"), scaleCompensate=False)
+                        jad = cmds.joint(name=jnt.replace('_Jnt', "_"+str(d).zfill(2)+"_Jad"), scaleCompensate=False)
                         # joint position:
                         if s == 1: #right
                             if axis == (0, 0, -1): #arm
-                                if add_axis == "Z":
+                                if add_axis == 'Z':
                                     # flip direction to conform with left side
                                     add_dir = -1 * add_dir
                             else: #leg
                                 # flip direction to conform with left side
                                 add_dir = -1 * add_dir
                         cmds.setAttr(jad+".translate"+add_axis, add_dir*self.radius*0.5)
-                        self.ar.naming.set_joint_label(jad, s+joint_label_add, 18, joint_label_name+'_%02d_%02d'%(i,d))
-                        cmds.addAttr(jad, longName="dpAR_joint", attributeType='float', keyable=False)
+                        self.ar.naming.set_joint_label(jad, s+joint_label_add, 18, f"{joint_label_name}_{i:02d}_{d:02d}")
+                        cmds.addAttr(jad, longName='dpAR_joint', attributeType='float', keyable=False)
                         # control:
-                        add_ctrl = self.ar.ctrls.create_controller("id_088_LimbAdditional", ctrl_name=extra_name+"_Add_%02d_Ctrl"%d, r=self.radius*0.1, d=self.curve_degree, guide_source=self.limb_instance.guide_base)
+                        add_ctrl = self.ar.ctrls.create_controller('id_088_LimbAdditional', ctrl_name=f"{extra_name}_Add_{d:02d}_Ctrl", r=self.radius*0.1, d=self.curve_degree, guide_source=self.limb_instance.guide_base)
                         extra_ctrls.append(add_ctrl)
                         add_ctrl_grp = self.ar.utils.create_zero_out([add_ctrl])[0]
                         cmds.matchTransform(add_ctrl_grp, jad, position=True, rotation=True)
@@ -757,15 +757,15 @@ class Ribbon:
         
         if add_artic and center_up_down == 1: #up
             # corner scale volumeVariation setup:
-            rb_proportion_md = cmds.createNode("multiplyDivide", name=self.elbow_ctrl.replace("_Ctrl", "_Proportion_MD"))
-            rb_intensity_md = cmds.createNode("multiplyDivide", name=self.elbow_ctrl.replace("_Ctrl", "_Intensity_MD"))
-            rb_add_scale_pma = cmds.createNode("plusMinusAverage", name=self.elbow_ctrl.replace("_Ctrl", "_AddScale_PMA"))
-            rb_length_md = cmds.createNode("multiplyDivide", name=self.elbow_ctrl.replace("_Ctrl", "_Length_MD"))
-            rb_scale_clp = cmds.createNode("clamp", name=self.elbow_ctrl.replace("_Ctrl", "_Scale_Clp"))
-            rb_blend_bc = cmds.createNode("blendColors", name=self.elbow_ctrl.replace("_Ctrl", "_BC"))
+            rb_proportion_md = cmds.createNode('multiplyDivide', name=self.elbow_ctrl.replace('_Ctrl', '_Proportion_MD'))
+            rb_intensity_md = cmds.createNode('multiplyDivide', name=self.elbow_ctrl.replace('_Ctrl', '_Intensity_MD'))
+            rb_add_scale_pma = cmds.createNode('plusMinusAverage', name=self.elbow_ctrl.replace('_Ctrl', '_AddScale_PMA'))
+            rb_length_md = cmds.createNode('multiplyDivide', name=self.elbow_ctrl.replace('_Ctrl', '_Length_MD'))
+            rb_scale_clp = cmds.createNode('clamp', name=self.elbow_ctrl.replace('_Ctrl', '_Scale_Clp'))
+            rb_blend_bc = cmds.createNode('blendColors', name=self.elbow_ctrl.replace('_Ctrl', '_BC'))
             self.to_ids.extend([rb_proportion_md, rb_intensity_md, rb_add_scale_pma, rb_length_md, rb_scale_clp, rb_blend_bc])
             cmds.connectAttr(world_ref+"."+self.limb_vv_attr, rb_blend_bc+".blender", force=True)
-            cmds.setAttr(rb_blend_bc+".color2", 1, 1, 1, type="double3")
+            cmds.setAttr(rb_blend_bc+".color2", 1, 1, 1, type='double3')
             cmds.connectAttr(rb_normalize_md+".outputX", rb_proportion_md+".input1X", force=True)
             cmds.setAttr(rb_proportion_md+".input2X", 1)
             cmds.connectAttr(rb_proportion_md+".outputX", rb_intensity_md+".input1X", force=True)
@@ -888,8 +888,8 @@ class Ribbon:
             bttm_LocPos = cmds.xform(bttm_Loc[0], query=True, worldSpace=True, translation=True)
             cmds.move(bttm_LocPos[0], bttm_LocPos[1], bttm_LocPos[2], bttm_LocGrp+".scalePivot", bttm_LocGrp+".rotatePivot", absolute=True)
             cmds.move(bttm_LocPos[0], bttm_LocPos[1], bttm_LocPos[2], bttm_LocTwistBoneGrp+".scalePivot", bttm_LocTwistBoneGrp+".rotatePivot", absolute=True)
-            twist_bone_md = cmds.createNode("multiplyDivide", name=up_ctrl+"_TwistBone_MD")
-            invert_twist_bone_md = cmds.createNode("multiplyDivide", name=up_ctrl+"_InvertTwistBone_MD")
+            twist_bone_md = cmds.createNode('multiplyDivide', name=up_ctrl+"_TwistBone_MD")
+            invert_twist_bone_md = cmds.createNode('multiplyDivide', name=up_ctrl+"_InvertTwistBone_MD")
             self.to_ids.extend([twist_bone_md, invert_twist_bone_md])
             cmds.setAttr(invert_twist_bone_md+".input2Z", -1)
             cmds.connectAttr(up_ctrl+".autoTwistBone", twist_bone_md+".input1Z", force=True)
@@ -899,15 +899,15 @@ class Ribbon:
             result_data['twistBoneMD'] = twist_bone_md
         
         # autoRotate:
-        loaded_quaternion_plugin = self.ar.config.check_loaded_plugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
-        loaded_matrix_plugin = self.ar.config.check_loaded_plugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
+        loaded_quaternion_plugin = self.ar.config.check_loaded_plugin('quatNodes', self.ar.data.lang['e014_cantLoadQuatNode'])
+        loaded_matrix_plugin = self.ar.config.check_loaded_plugin('matrixNodes', self.ar.data.lang['e002_matrixPluginNotFound'])
         if loaded_quaternion_plugin and loaded_matrix_plugin:
             up_twist_bone_md = self.ar.math.create_twist_bone_matrix(top_Loc[0], top_Loc[3], name+"_Top_TwistBone")
             bottom_twist_bone_md = self.ar.math.create_twist_bone_matrix(bttm_Loc[0], bttm_Loc[3], name+"_Bottom_TwistBone")
-            twist_bone_pma = cmds.createNode("plusMinusAverage", name=name+"_TwistBone_PMA")
-            twist_bone_inv_md = cmds.createNode("multiplyDivide", name=name+"_TwistBone_Inv_MD")
-            twist_bone_cnd = cmds.createNode("condition", name=name+"_TwistBone_Cnd")
-            twist_auto_rot_md = cmds.createNode("multiplyDivide", name=name+"_TwistBone_AutoRotate_MD")
+            twist_bone_pma = cmds.createNode('plusMinusAverage', name=name+"_TwistBone_PMA")
+            twist_bone_inv_md = cmds.createNode('multiplyDivide', name=name+"_TwistBone_Inv_MD")
+            twist_bone_cnd = cmds.createNode('condition', name=name+"_TwistBone_Cnd")
+            twist_auto_rot_md = cmds.createNode('multiplyDivide', name=name+"_TwistBone_AutoRotate_MD")
             self.to_ids.extend([twist_bone_pma, twist_bone_inv_md, twist_bone_inv_md, twist_bone_cnd, twist_auto_rot_md])
             cmds.setAttr(twist_bone_cnd+".colorIfTrueR", -1)
             cmds.setAttr(twist_bone_cnd+".secondTerm", 1)
@@ -925,7 +925,7 @@ class Ribbon:
         #updating values
         cmds.setAttr(rb_scale_md+".input2X", cmds.getAttr(curve_info_node+".arcLength"))
         for jnt in rb_Jnt:
-            rb_add_scale_pma = jnt.replace("_Jnt", "_AddScale_PMA")
+            rb_add_scale_pma = jnt.replace('_Jnt', '_AddScale_PMA')
             cmds.setAttr(rb_add_scale_pma+".input1D[0]", 1-cmds.getAttr(rb_add_scale_pma+".input1D[1]"))
 
         self.ar.utils.add_attr_to_items([mid_ctrl, extra_ctrl_grp, locators_grps, skin_jnt_grp, final_system_grp], self.ar.utils.ignore_transform_io_attr)
@@ -952,11 +952,11 @@ class Ribbon:
         result_data['bendGrpList'] = [top_Loc[0], bttm_Loc[0]]
         result_data['extraCtrlGrp'] = extra_ctrl_grp
         result_data['extraCtrlList'] = extra_ctrls
-        cmds.setAttr(final_system_grp+'.v', v)
+        cmds.setAttr(final_system_grp+'.visibility', v)
         return result_data
     
     
-    def create_follicles(self, rib, num, pad=0.5, name='xxxx', horizontal=False, side=0, joint_label_add=0, joint_label_name="RibbonName"): 
+    def create_follicles(self, rib, num, pad=0.5, name='xxxx', horizontal=False, side=0, joint_label_add=0, joint_label_name='RibbonName'): 
         """ Create follicles to be used by the Ribbon system.
             Returns a list with joints and follicles created.
         """
@@ -969,8 +969,8 @@ class Ribbon:
             passo = (1/float(num))/2.0;
             for i in range(num):
                 #create the follicle and do correct connections to link it to the 
-                fol_shape = cmds.createNode('follicle', name=name+'_%02d_FolShape'%i)
-                fol_transform = cmds.rename(cmds.listRelatives(fol_shape, p=1)[0], name+'_%02d_Fol'%i)         
+                fol_shape = cmds.createNode('follicle', name=f"{name}_{i:02d}_FolShape")
+                fol_transform = cmds.rename(cmds.listRelatives(fol_shape, p=1)[0], f"{name}_{i:02d}_Fol")         
                 fols.append(fol_transform)
                 cmds.connectAttr(rib+'.worldMatrix[0]', fol_shape+'.inputWorldMatrix')
                 cmds.connectAttr(rib+'.local', fol_shape+'.inputSurface')
@@ -980,9 +980,9 @@ class Ribbon:
                 cmds.setAttr(fol_shape+'.parameterV', 0.5) 
                 #create the joint in the follicle
                 cmds.select(cl=True)
-                jnts.append(cmds.joint(n=name+'_%02d_Jnt'%i))
+                jnts.append(cmds.joint(n=f"{name}_{i:02d}_Jnt"))
                 cmds.setAttr(jnts[i]+'.jointOrient', 0, 0, 0)
-                self.ar.naming.set_joint_label(name+'_%02d_Jnt'%i, side+joint_label_add, 18, joint_label_name+'_%02d'%i)
+                self.ar.naming.set_joint_label(f"{name}_{i:02d}_Jnt", side+joint_label_add, 18, f"{joint_label_name}_{i:02d}")
                 cmds.addAttr(jnts[i], longName="dpAR_joint", attributeType='float', keyable=False)
                 cmds.select(cl=True)
                 #calculate the position of the first follicle
@@ -994,8 +994,8 @@ class Ribbon:
             passo = (1/float(num))/2.0;
             for i in range(num):
                 #create the follicle and do correct connections in order to link it to the ribbon
-                fol_shape = cmds.createNode('follicle', name=name+'_%02d_FolShape'%i)
-                fol_transform = cmds.rename(cmds.listRelatives(fol_shape, p=1)[0], name+'_%02d_Fol'%i)
+                fol_shape = cmds.createNode('follicle', name=f"{name}_{i:02d}_FolShape")
+                fol_transform = cmds.rename(cmds.listRelatives(fol_shape, p=1)[0], f"{name}_{i:02d}_Fol")
                 fols.append(fol_transform)
                 cmds.connectAttr(rib+'.worldMatrix[0]', fol_shape+'.inputWorldMatrix')
                 cmds.connectAttr(rib+'.local', fol_shape+'.inputSurface')
@@ -1005,10 +1005,10 @@ class Ribbon:
                 cmds.setAttr(fol_shape+'.parameterV', passo) 
                 #create the joint in the follicle
                 cmds.select(cl=True)
-                jnts.append(cmds.joint(n=name+'_%02d_Jnt'%i))
+                jnts.append(cmds.joint(name=f"{name}_{i:02d}_Jnt"))
                 cmds.setAttr(jnts[i]+'.jointOrient', 0, 0, 0)
-                self.ar.naming.set_joint_label(name+'_%02d_Jnt'%i, side+joint_label_add, 18, joint_label_name+'_%02d'%i)
-                cmds.addAttr(jnts[i], longName="dpAR_joint", attributeType='float', keyable=False)
+                self.ar.naming.set_joint_label(f"{name}_{i:02d}_Jnt", side+joint_label_add, 18, f"{joint_label_name}_{i:02d}")
+                cmds.addAttr(jnts[i], longName='dpAR_joint', attributeType='float', keyable=False)
                 cmds.select(cl=True)
                 #calculate the first follicle position
                 passo+=(1/float(num))
@@ -1026,7 +1026,7 @@ class Ribbon:
         corner_jnt = cmds.joint(name=prefix+name+'_'+corner_name+'_Jnt', scaleCompensate=False, radius=1.5)
         cmds.setAttr(corner_jxt+".segmentScaleCompensate", 1)
         cmds.setAttr(corner_jnt+".segmentScaleCompensate", 0) #jar
-        cmds.addAttr(corner_jnt, longName="dpAR_joint", attributeType='float', keyable=False)
+        cmds.addAttr(corner_jnt, longName='dpAR_joint', attributeType='float', keyable=False)
         cmds.parentConstraint(ctrl, corner_jxt, maintainOffset=False, name=corner_jxt+"_PaC")
         cmds.scaleConstraint(ctrl, corner_jxt, maintainOffset=False, name=corner_jxt+"_ScC")
         return [corner_jxt, corner_jnt]
@@ -1037,7 +1037,7 @@ class Ribbon:
         """
         for i in range(jcr_number):
             cmds.select(corner_jnt)
-            jcr = cmds.joint(name=corner_jnt[:corner_jnt.rfind("_")+1]+str(i)+"_Jcr")
+            jcr = cmds.joint(name=corner_jnt[:corner_jnt.rfind('_')+1]+str(i)+"_Jcr")
             cmds.setAttr(jcr+".segmentScaleCompensate", 0)
             cmds.addAttr(jcr, longName='dpAR_joint', attributeType='float', keyable=False)
             if jcr_pos:

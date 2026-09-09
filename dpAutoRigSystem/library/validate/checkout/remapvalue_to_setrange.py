@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "RemapvalueToSetrange"
-TITLE = "v136_remapValueToSetRange"
-DESCRIPTION = "v137_remapValueToSetRangeDesc"
-WIKI = "07-‐-Validator#-remapvalue-to-setrange"
+CLASS_NAME = 'RemapvalueToSetrange'
+TITLE = 'v136_remapValueToSetRange'
+DESCRIPTION = 'v137_remapValueToSetRangeDesc'
+WIKI = '07-‐-Validator#-remapvalue-to-setrange'
 
 
 
@@ -14,12 +14,12 @@ class RemapvalueToSetrange(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.mapping_data = {
-                            "inputMax"   : "oldMaxX",
-                            "inputMin"   : "oldMinX",
-                            "outputMax"  : "maxX",
-                            "outputMin"  : "minX",
-                            "inputValue" : "valueX",
-                            "outValue"   : "outValueX"
+                            'inputMax'   : 'oldMaxX',
+                            'inputMin'   : 'oldMinX',
+                            'outputMax'  : 'maxX',
+                            'outputMin'  : 'minX',
+                            'inputValue' : 'valueX',
+                            'outValue'   : 'outValueX'
                             }
     
 
@@ -41,9 +41,9 @@ class RemapvalueToSetrange(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if inputs:
-                check_items = cmds.ls(inputs, type="remapValue")
+                check_items = cmds.ls(inputs, type='remapValue')
             else:
-                check_items = cmds.ls(selection=False, type="remapValue")
+                check_items = cmds.ls(selection=False, type='remapValue')
             if check_items:
                 to_change_rmv_items = []
                 for item in check_items:
@@ -81,7 +81,7 @@ class RemapvalueToSetrange(action.BaseAction):
                             self.good_results.append(False)
                         else: #fix
                             try:
-                                sr_node = cmds.createNode("setRange", name=rmv_node.replace("_RmV", "_SR"))
+                                sr_node = cmds.createNode('setRange', name=rmv_node.replace('_RmV', '_SR'))
                                 # Transfer values or connections
                                 for rmv_attr, sr_attr in self.mapping_data.items():
                                     self.ar.ctrls.transfer_plug(f"{rmv_node}.{rmv_attr}", f"{sr_node}.{sr_attr}")

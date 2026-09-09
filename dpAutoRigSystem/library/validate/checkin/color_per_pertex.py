@@ -3,10 +3,10 @@ from maya import cmds
 from ....library.base import action
 
 # global variables to this module:
-CLASS_NAME = "ColorPerVertex"
-TITLE = "v117_colorPerVertex"
-DESCRIPTION = "v118_colorPerVertexDesc"
-WIKI = "07-‐-Validator#-colorpervertex-cleaner"
+CLASS_NAME = 'ColorPerVertex'
+TITLE = 'v117_colorPerVertex'
+DESCRIPTION = 'v118_colorPerVertexDesc'
+WIKI = '07-‐-Validator#-colorpervertex-cleaner'
 
 
 
@@ -33,7 +33,7 @@ class ColorPerVertex(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if inputs:
-                check_items = cmds.ls(inputs, type="polyColorPerVertex")
+                check_items = cmds.ls(inputs, type='polyColorPerVertex')
             else:
                 check_items = cmds.ls(selection=False, type='polyColorPerVertex')
             if check_items:
@@ -46,14 +46,14 @@ class ColorPerVertex(action.BaseAction):
                         self.good_results.append(False)
                     else: #fix
                         try:
-                            meshes = cmds.ls(cmds.listHistory(item, future=True), long=True, type="mesh")
+                            meshes = cmds.ls(cmds.listHistory(item, future=True), long=True, type='mesh')
                             cmds.lockNode(item, lock=False)
                             cmds.delete(item)
                             if meshes:
                                 for mesh in meshes:
                                     cmds.setAttr(mesh+".displayColors", 0)
                             else:
-                                meshes = ["None"]
+                                meshes = ['None']
                             cmds.select(clear=True)
                             self.good_results.append(True)
                             self.messages.append(self.ar.data.lang['v004_fixed']+": "+item+" - Mesh: "+", ".join(meshes))

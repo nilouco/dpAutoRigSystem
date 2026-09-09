@@ -1,9 +1,9 @@
 from ...base import curve
 
 # global variables to this module:    
-CLASS_NAME = "SquashTop"
-TITLE = "m121_squashTop"
-DESCRIPTION = "m099_cvControlDesc"
+CLASS_NAME = 'SquashTop'
+TITLE = 'm121_squashTop'
+DESCRIPTION = 'm099_cvControlDesc'
 
 
 

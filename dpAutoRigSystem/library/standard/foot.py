@@ -3,10 +3,10 @@ from maya import cmds
 from ..base import standard
 
 # global variables to this module:
-CLASS_NAME = "Foot"
-TITLE = "m024_foot"
-DESCRIPTION = "m025_footDesc"
-WIKI = "03-‐-Guides#-foot"
+CLASS_NAME = 'Foot'
+TITLE = 'm024_foot'
+DESCRIPTION = 'm025_footDesc'
+WIKI = '03-‐-Guides#-foot'
 
 
 
@@ -31,7 +31,7 @@ class Foot(standard.BaseStandard):
         self.create_guide_elements()
         self.set_guide_base_initial_position()
         self.add_node_to_guide_net([self.guide_foot_loc, self.guide_rfa_loc, self.guide_rfb_loc, self.guide_rfc_loc, self.guide_rfd_loc, self.guide_rfe_loc, self.guide_rff_loc, self.guide_end_loc], 
-                                   ["Foot", "RfA", "RfB", "RfC", "RfD", "RfE", "RfF", "JointEnd"])
+                                   ['Foot', 'RfA', 'RfB', 'RfC', 'RfD', 'RfE', 'RfF', 'JointEnd'])
 
     
     def create_guide_elements(self):
@@ -60,7 +60,7 @@ class Foot(standard.BaseStandard):
         self.line_end = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
         # setup
         self.ar.utils.set_template([self.line_foot, self.line_rfa, self.line_rfb, self.line_rfc, self.line_rfd, self.line_rfe, self.line_rff, self.line_end])
-        cmds.setAttr(self.guide_end_loc+".tz", 1.3)
+        cmds.setAttr(self.guide_end_loc+".translateZ", 1.3)
         cmds.setAttr(self.guide_foot_loc+".translateZ", 2)
         cmds.setAttr(self.guide_foot_loc+".rotateX", 90)
         cmds.setAttr(self.guide_foot_loc+".rotateZ", -90)
@@ -91,7 +91,7 @@ class Foot(standard.BaseStandard):
         guide_rfe_zero = self.ar.utils.create_zero_out([self.guide_rfe_loc], True)
         # edit
         guide_rfe_offset_grp = cmds.listRelatives(guide_rfe_zero, children=True)[0]
-        cmds.parentConstraint(self.guide_rff_loc, guide_rfe_offset_grp, maintainOffset=True, skipTranslate="y", name=guide_rfe_offset_grp+"_PaC")
+        cmds.parentConstraint(self.guide_rff_loc, guide_rfe_offset_grp, maintainOffset=True, skipTranslate='y', name=guide_rfe_offset_grp+"_PaC")
         cmds.parentConstraint(self.guide_rfa_loc, self.line_rfa, maintainOffset=False, name=self.line_rfa+"_PaC")
         cmds.parentConstraint(self.guide_rfb_loc, self.line_rfb, maintainOffset=False, name=self.line_rfb+"_PaC")
         cmds.parentConstraint(self.guide_rfc_loc, self.line_rfc, maintainOffset=False, name=self.line_rfc+"_PaC")
@@ -169,11 +169,11 @@ class Foot(standard.BaseStandard):
                 cmds.setAttr(middle_foot_jnt+".segmentScaleCompensate", 0)
 
                 # creating Fk controls:
-                foot_ctrl = self.ar.ctrls.create_controller("id_020_FootFk", side+self.number_name+"_"+self.ar.data.lang['c009_leg_extrem']+"_Ctrl", r=(self.radius*0.5), d=self.curve_degree, dir="+Z", guide_source=self.name_guide+"_Foot")
+                foot_ctrl = self.ar.ctrls.create_controller('id_020_FootFk', side+self.number_name+"_"+self.ar.data.lang['c009_leg_extrem']+"_Ctrl", r=(self.radius*0.5), d=self.curve_degree, dir='+Z', guide_source=self.name_guide+"_Foot")
                 self.foot_ctrls.append(foot_ctrl)
                 cmds.setAttr(foot_ctrl+".rotateOrder", 1)
                 self.rev_foot_ctrl_shapes.append(cmds.listRelatives(foot_ctrl, children=True, type='nurbsCurve')[0])
-                middle_foot_ctrl = self.ar.ctrls.create_controller("id_021_FootMiddle", side+self.number_name+"_"+self.ar.data.lang['c017_revFoot_middle'].capitalize()+"_Ctrl", r=(self.radius*0.5), d=self.curve_degree, guide_source=self.name_guide+"_RfF")
+                middle_foot_ctrl = self.ar.ctrls.create_controller('id_021_FootMiddle', side+self.number_name+"_"+self.ar.data.lang['c017_revFoot_middle'].capitalize()+"_Ctrl", r=(self.radius*0.5), d=self.curve_degree, guide_source=self.name_guide+"_RfF")
                 cmds.setAttr(middle_foot_ctrl+'.overrideEnabled', 1)
                 cmds.setAttr(middle_foot_ctrl+".rotateOrder", 4)
                 cmds.matchTransform(foot_ctrl, self.guide_foot_loc, position=True, rotation=True)
@@ -185,12 +185,12 @@ class Foot(standard.BaseStandard):
                 foot_ctrl_zeros = self.ar.utils.create_zero_out([foot_ctrl, middle_foot_ctrl])
 
                 # reverse foot controls:
-                rfa_ctrl = self.ar.ctrls.create_controller("id_018_FootReverse", side+self.number_name+"_"+outside_rf_attr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, parent_tag=middle_foot_ctrl)
-                rfb_ctrl = self.ar.ctrls.create_controller("id_018_FootReverse", side+self.number_name+"_"+inside_rf_attr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, parent_tag=middle_foot_ctrl)
-                rfc_ctrl = self.ar.ctrls.create_controller("id_018_FootReverse", side+self.number_name+"_"+heel_rf_attr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, dir="+Y", rot=(0, 90, 0), parent_tag=middle_foot_ctrl)
-                rfd_ctrl = self.ar.ctrls.create_controller("id_018_FootReverse", side+self.number_name+"_"+toe_rf_attr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, dir="+Y", rot=(0, 90, 0), parent_tag=middle_foot_ctrl)
-                rfe_ctrl = self.ar.ctrls.create_controller("id_018_FootReverse", side+self.number_name+"_"+bottom_rf_attr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, dir="+Y", rot=(0, 90, 0), parent_tag=middle_foot_ctrl)
-                rff_ctrl = self.ar.ctrls.create_controller("id_019_FootReverseE", side+self.number_name+"_"+ball_rf_attr.capitalize()+"_Ctrl", r=(self.radius*0.5), d=self.curve_degree, rot=(0, 90, 0), parent_tag=foot_ctrl)
+                rfa_ctrl = self.ar.ctrls.create_controller('id_018_FootReverse', side+self.number_name+"_"+outside_rf_attr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, parent_tag=middle_foot_ctrl)
+                rfb_ctrl = self.ar.ctrls.create_controller('id_018_FootReverse', side+self.number_name+"_"+inside_rf_attr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, parent_tag=middle_foot_ctrl)
+                rfc_ctrl = self.ar.ctrls.create_controller('id_018_FootReverse', side+self.number_name+"_"+heel_rf_attr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, dir='+Y', rot=(0, 90, 0), parent_tag=middle_foot_ctrl)
+                rfd_ctrl = self.ar.ctrls.create_controller('id_018_FootReverse', side+self.number_name+"_"+toe_rf_attr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, dir='+Y', rot=(0, 90, 0), parent_tag=middle_foot_ctrl)
+                rfe_ctrl = self.ar.ctrls.create_controller('id_018_FootReverse', side+self.number_name+"_"+bottom_rf_attr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, dir='+Y', rot=(0, 90, 0), parent_tag=middle_foot_ctrl)
+                rff_ctrl = self.ar.ctrls.create_controller('id_019_FootReverseE', side+self.number_name+"_"+ball_rf_attr.capitalize()+"_Ctrl", r=(self.radius*0.5), d=self.curve_degree, rot=(0, 90, 0), parent_tag=foot_ctrl)
                 self.ball_rf_items.append(rff_ctrl)
                 cmds.connectAttr(rff_ctrl+".message", middle_foot_ctrl+".parentTag", force=True)
                 
@@ -217,9 +217,9 @@ class Foot(standard.BaseStandard):
                 
                 # edit ball controller shape
                 if s == 0: #left
-                    temp_ball_cluster = cmds.cluster((cmds.listRelatives(rff_ctrl, children=True, type="shape")[0])+".cv[3:5]")[1]
+                    temp_ball_cluster = cmds.cluster((cmds.listRelatives(rff_ctrl, children=True, type='shape')[0])+".cv[3:5]")[1]
                 else: #right
-                    temp_ball_cluster = cmds.cluster((cmds.listRelatives(rff_ctrl, children=True, type="shape")[0])+".cv[0:2]")[1]
+                    temp_ball_cluster = cmds.cluster((cmds.listRelatives(rff_ctrl, children=True, type='shape')[0])+".cv[0:2]")[1]
                 cmds.setAttr(temp_ball_cluster+".translateY", self.radius*0.3)
                 cmds.delete(rff_ctrl, constructionHistory=True)
                 temp_ball_cluster = cmds.cluster(rff_ctrl)[1]
@@ -308,13 +308,13 @@ class Foot(standard.BaseStandard):
                 cmds.setAttr(foot_ctrl+"."+foot_rf_attr+rf_roll+rf_plant, channelBox=True)
 
                 # create clampNodes in order to limit the side rotations:
-                side_clp = cmds.createNode("clamp", name=side+self.number_name+"_Side_Clp")
+                side_clp = cmds.createNode('clamp', name=side+self.number_name+"_Side_Clp")
                 # outside values in R
                 cmds.setAttr(side_clp+".minR", -360)
                 # inside values in G
                 cmds.setAttr(side_clp+".maxG", 360)
                 # inverting sideRoll values:
-                side_md = cmds.createNode("multiplyDivide", name=side+self.number_name+"_Side_MD")
+                side_md = cmds.createNode('multiplyDivide', name=side+self.number_name+"_Side_MD")
                 cmds.setAttr(side_md+".input2X", -1)
                 # connections:
                 cmds.connectAttr(foot_ctrl+"."+side_rf_attr+rf_roll, side_md+".input1X", force=True)
@@ -324,15 +324,15 @@ class Foot(standard.BaseStandard):
                 cmds.connectAttr(side_clp+".outputG", rfb_zero+".rotateZ", force=True)
 
                 # for footRoll:
-                foot_heel_clp = cmds.createNode("clamp", name=side+self.number_name+"_Roll_Heel_Clp")
+                foot_heel_clp = cmds.createNode('clamp', name=side+self.number_name+"_Roll_Heel_Clp")
                 # heel values in R
                 cmds.setAttr(foot_heel_clp+".minR", -360)
                 cmds.connectAttr(foot_ctrl+"."+foot_rf_attr+rf_roll, foot_heel_clp+".inputR", force=True)
                 cmds.connectAttr(foot_heel_clp+".outputR", rfc_zero+".rotateX", force=True)
                 
                 # footRoll with angle limit:
-                foot_pma = cmds.createNode("plusMinusAverage", name=side+self.number_name+"_Roll_PMA")
-                foot_sr = cmds.createNode("setRange", name=side+self.number_name+"_Roll_SR")
+                foot_pma = cmds.createNode('plusMinusAverage', name=side+self.number_name+"_Roll_PMA")
+                foot_sr = cmds.createNode('setRange', name=side+self.number_name+"_Roll_SR")
                 cmds.setAttr(foot_sr+".oldMaxY", 180)
                 cmds.setAttr(foot_pma+".input1D[0]", 180)
                 cmds.setAttr(foot_pma+".operation", 2) #substract
@@ -345,8 +345,8 @@ class Foot(standard.BaseStandard):
                 cmds.connectAttr(foot_pma+".output1D", foot_sr+".maxY", force=True)
                 
                 # plant angle for foot roll:
-                foot_plant_clp = cmds.createNode("clamp", name=side+self.number_name+"_Roll_Plant_Clp")
-                foot_plant_cnd = cmds.createNode("condition", name=side+self.number_name+"_Roll_Plant_Cnd")
+                foot_plant_clp = cmds.createNode('clamp', name=side+self.number_name+"_Roll_Plant_Clp")
+                foot_plant_cnd = cmds.createNode('condition', name=side+self.number_name+"_Roll_Plant_Cnd")
                 cmds.setAttr(foot_plant_cnd+".operation", 4) #less than
                 cmds.connectAttr(foot_ctrl+"."+foot_rf_attr+rf_roll, foot_plant_clp+".inputR", force=True)
                 cmds.connectAttr(foot_ctrl+"."+foot_rf_attr+rf_roll+rf_plant, foot_plant_clp+".maxR", force=True)
@@ -356,10 +356,10 @@ class Foot(standard.BaseStandard):
                 cmds.connectAttr(foot_ctrl+"."+foot_rf_attr+rf_roll+rf_plant, foot_plant_cnd+".colorIfFalseR", force=True)
                 
                 # back to zero footRoll when greather then angle plus plant values:
-                angle_plant_pma = cmds.createNode("plusMinusAverage", name=side+self.number_name+"_AnglePlant_PMA")
-                angle_plant_md = cmds.createNode("multiplyDivide", name=side+self.number_name+"_AnglePlant_MD")
-                angle_plant_rmv = cmds.createNode("remapValue", name=side+self.number_name+"_AnglePlant_RmV")
-                angle_plant_cnd = cmds.createNode("condition", name=side+self.number_name+"_AnglePlant_Cnd")
+                angle_plant_pma = cmds.createNode('plusMinusAverage', name=side+self.number_name+"_AnglePlant_PMA")
+                angle_plant_md = cmds.createNode('multiplyDivide', name=side+self.number_name+"_AnglePlant_MD")
+                angle_plant_rmv = cmds.createNode('remapValue', name=side+self.number_name+"_AnglePlant_RmV")
+                angle_plant_cnd = cmds.createNode('condition', name=side+self.number_name+"_AnglePlant_Cnd")
                 cmds.setAttr(angle_plant_md+".input2X", -1)
                 cmds.setAttr(angle_plant_rmv+".inputMax", 90)
                 cmds.setAttr(angle_plant_rmv+".value[0].value_Interp", 3) #spline
@@ -382,18 +382,18 @@ class Foot(standard.BaseStandard):
                 if s == 0: #left
                     cmds.connectAttr(foot_plant_cnd+".outColorR", foot_ctrl_zeros[1]+".rotateX", force=True)
                 else: #fix right side mirror
-                    foot_plant_inv_md = cmds.createNode("multiplyDivide", name=side+self.number_name+"_Plant_Inv_MD")
+                    foot_plant_inv_md = cmds.createNode('multiplyDivide', name=side+self.number_name+"_Plant_Inv_MD")
                     cmds.setAttr(foot_plant_inv_md+".input2X", -1)
                     cmds.connectAttr(foot_plant_cnd+".outColorR", foot_plant_inv_md+".input1X", force=True)
                     cmds.connectAttr(foot_plant_inv_md+".outputX", foot_ctrl_zeros[1]+".rotateX", force=True)
                     self.to_ids.append(foot_plant_inv_md)
                 
                 # create follow attribute to footBall control to space switch to middle control space:
-                cmds.addAttr(rff_ctrl, longName="follow", attributeType ="double", min=0, max=1, defaultValue=0, keyable=True)
+                cmds.addAttr(rff_ctrl, longName='follow', attributeType='double', min=0, max=1, defaultValue=0, keyable=True)
                 foot_ball_pac = cmds.parentConstraint(middle_foot_ctrl, rfe_ctrl, rff_zero_follow, maintainOffset=True, name=rff_zero_follow+"_PaC")[0]
                 cmds.setAttr(foot_ball_pac+".interpType", 0)
                 cmds.connectAttr(rff_ctrl+".follow", foot_ball_pac+"."+middle_foot_ctrl+"W0")
-                foot_ball_rev = cmds.createNode("reverse", name=rff_ctrl+"_PaC_Rev")
+                foot_ball_rev = cmds.createNode('reverse', name=rff_ctrl+"_PaC_Rev")
                 cmds.connectAttr(rff_ctrl+".follow", foot_ball_rev+".inputX")
                 cmds.connectAttr(foot_ball_rev+".outputX", foot_ball_pac+"."+rfe_ctrl+"W1")
 
@@ -403,15 +403,15 @@ class Foot(standard.BaseStandard):
                 # show or hide reverseFoot controls:
                 cmds.addAttr(foot_ctrl, longName=show_ctrls_attr, attributeType='short', minValue=0, defaultValue=1, maxValue=1)
                 cmds.setAttr(foot_ctrl+"."+show_ctrls_attr, keyable=False, channelBox=True)
-                cmds.addAttr(foot_ctrl, longName="visIkFk", attributeType='float', minValue=0, defaultValue=1, maxValue=1, keyable=False)
-                vis_md = cmds.createNode("multiplyDivide", name=side+self.number_name+"_Vis_MD")
+                cmds.addAttr(foot_ctrl, longName='visIkFk', attributeType='float', minValue=0, defaultValue=1, maxValue=1, keyable=False)
+                vis_md = cmds.createNode('multiplyDivide', name=side+self.number_name+"_Vis_MD")
                 cmds.connectAttr(foot_ctrl+".visIkFk", vis_md+".input2X", force=True)
                 cmds.connectAttr(foot_ctrl+"."+show_ctrls_attr, vis_md+".input1X", force=True)
                 for rf_ctrl in [rfa_ctrl, rfb_ctrl, rfc_ctrl, rfd_ctrl, rfe_ctrl, rff_ctrl]: #showHideCtrlList
                     rf_ctrl_shape = cmds.listRelatives(rf_ctrl, children=True, type='nurbsCurve')[0]
                     cmds.connectAttr(vis_md+".outputX", rf_ctrl_shape+".visibility", force=True)
                 # create a masterModuleGrp to be checked if this rig exists:
-                temp_scalable_hook_grp = cmds.createNode("transform", name=side+self.number_name+"_TEMP_Grp")
+                temp_scalable_hook_grp = cmds.createNode('transform', name=side+self.number_name+"_TEMP_Grp")
                 self.create_hook_setup(side, [foot_ctrl_zeros[0]], [temp_scalable_hook_grp])
                 cmds.delete(temp_scalable_hook_grp)
                 cmds.xform(self.scalable_hook_grp, matrix=cmds.getAttr(foot_jnt+".worldMatrix"), worldSpace=True)
@@ -441,14 +441,14 @@ class Foot(standard.BaseStandard):
         """ This method will create a dictionary with informations about integrations system between modules.
         """
         self.composed = {
-                            "revFootCtrlList": self.foot_ctrls,
-                            "revFootCtrlGrpList": self.rev_foot_ctrl_grp_finals,
-                            "revFootCtrlShapeList": self.rev_foot_ctrl_shapes,
-                            "toLimbIkHandleGrpList": self.to_limb_ik_handle_grps,
-                            "parentConstList": self.pacs,
-                            "scaleConstList": self.sccs,
-                            "footJntList": self.foot_joints,
-                            "ballRFList": self.ball_rf_items,
-                            "reverseFootAttrList": self.reverse_foot_attrs,
-                            "scalableGrp": self.scalable_grp,
+                            'revFootCtrlList': self.foot_ctrls,
+                            'revFootCtrlGrpList': self.rev_foot_ctrl_grp_finals,
+                            'revFootCtrlShapeList': self.rev_foot_ctrl_shapes,
+                            'toLimbIkHandleGrpList': self.to_limb_ik_handle_grps,
+                            'parentConstList': self.pacs,
+                            'scaleConstList': self.sccs,
+                            'footJntList': self.foot_joints,
+                            'ballRFList': self.ball_rf_items,
+                            'reverseFootAttrList': self.reverse_foot_attrs,
+                            'scalableGrp': self.scalable_grp,
                         }
