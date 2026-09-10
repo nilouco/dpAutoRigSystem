@@ -42,7 +42,7 @@ class Override(action.BaseAction):
                         self.ar.ui_manager.set_progress(max=len(nodes), add_one=False, add_number=False)
                         for item in nodes:
                             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
-                            if cmds.objExists(item+".overrideEnabled") and cmds.getAttr(item+".overrideEnabled") == 1:
+                            if cmds.objExists(f"{item}.overrideEnabled") and cmds.getAttr(f"{item}.overrideEnabled") == 1:
                                 override_items.append(item)
                         # conditional to check here
                         if override_items:
@@ -54,13 +54,13 @@ class Override(action.BaseAction):
                                 else: #fix
                                     try:
                                         cmds.lockNode(item, lock=False, lockUnpublished=False)
-                                        cmds.setAttr(item+".overrideEnabled", lock=False)
-                                        cmds.setAttr(item+".overrideEnabled", 0)
+                                        cmds.setAttr(f"{item}.overrideEnabled", lock=False)
+                                        cmds.setAttr(f"{item}.overrideEnabled", 0)
                                         self.good_results.append(True)
-                                        self.messages.append(self.ar.data.lang['v004_fixed']+": "+item)
+                                        self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {item}")
                                     except:
                                         self.good_results.append(False)
-                                        self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
+                                        self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}")
                     else:
                         self.not_found_node()
                 else:

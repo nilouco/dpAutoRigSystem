@@ -53,7 +53,7 @@ class RemainingVertex(action.BaseAction):
                         # verify if objName or shape_name is in check_items
                         for item in check_items:
                             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
-                            if item == shape_name and not cmds.getAttr(item+".intermediateObject"):
+                            if item == shape_name and not cmds.getAttr(f"{item}.intermediateObject"):
                                 iter_vertex = OpenMaya.MItMeshVertex(shape)
                                 iter_edges  = OpenMaya.MItMeshEdge(shape)
                                 # Iterate through edges on current mesh
@@ -74,9 +74,9 @@ class RemainingVertex(action.BaseAction):
                                     if len(index_con_edges) < 3:
                                         if border_edge_indexes:
                                             if not set(index_con_edges).intersection(border_edge_indexes):
-                                                remaining_vertices.append(item_name+'.vtx["+str(iter_vertex.index())+"]')
+                                                remaining_vertices.append(f"{item_name}.vtx['{iter_vertex.index()}']")
                                         else:
-                                            remaining_vertices.append(item_name+'.vtx["+str(iter_vertex.index())+"]')
+                                            remaining_vertices.append(f"{item_name}.vtx['{iter_vertex.index()}'']")
                                     # Move to next vertex in the mesh list
                                     iter_vertex.next()
                         # Move to the next selected node in the list
@@ -93,13 +93,13 @@ class RemainingVertex(action.BaseAction):
                             try:
                                 cmds.delete(item)
                                 self.good_results.append(True)
-                                self.messages.append(self.ar.data.lang['v004_fixed']+": "+item)
+                                self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {item}")
                             except:
                                 self.good_results.append(False)
-                                self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
+                                self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}")
                     if self.first_mode:
-                        self.messages.append("Remaining vertex: "+str(remaining_vertices))
-                        self.messages.append("---\n"+self.ar.data.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(remaining_vertices)+")\n---")
+                        self.messages.append(f"Remaining vertex: {remaining_vertices}")
+                        self.messages.append(f"---\n{self.ar.data.lang['v121_sharePythonSelect']}\nmaya.cmds.select('{remaining_vertices}')\n---")
                         cmds.select(remaining_vertices)
             else:
                 self.not_found_node()

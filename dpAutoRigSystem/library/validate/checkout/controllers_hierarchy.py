@@ -166,7 +166,7 @@ class ControllersHierarchy(action.BaseAction):
                             self.checked_items.append('Scene')
                             self.found_issues.append(True)
                             self.good_results.append(False)
-                            self.messages.append(self.ar.data.lang['v005_cantFix']+" "+self.ar.data.lang['v064_hierarchy'])
+                            self.messages.append(f"{self.ar.data.lang['v005_cantFix']} {self.ar.data.lang['v064_hierarchy']}")
                             self.messages.append(self.ar.data.lang['i201_saveScene'])
                     self.maybe_done = False
                 else:

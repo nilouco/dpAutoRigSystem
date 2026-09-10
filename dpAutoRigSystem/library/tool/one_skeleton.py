@@ -85,7 +85,7 @@ class OneSkeleton(base.BaseLibrary):
             self.ar.ctrls.set_controller_scale_compensate(False)
             self.ar.ui_manager.set_progress(end_it=True)
         else:
-            mel.eval('warning \"'+self.ar.data.lang['v014_notFoundNodes']+'\";')
+            mel.eval(f'warning "{self.ar.data.lang['v014_notFoundNodes']}";')
 
 
     def grouper(self, iterable, n, fill_value=None, *args):
@@ -106,14 +106,14 @@ class OneSkeleton(base.BaseLibrary):
         for sourceNode in source_items:
             self.ar.ui_manager.set_progress("Joint")
             cmds.select(clear=True)
-            new_joint = cmds.joint(name=self.prefix+sourceNode+self.suffix, scaleCompensate=False)
+            new_joint = cmds.joint(name=f"{self.prefix}{sourceNode}{self.suffix}", scaleCompensate=False)
             new_joints.append(new_joint)
             # Match joint orient
             for attr in ['jointOrientX', 'jointOrientY', 'jointOrientZ']:
                 value = cmds.getAttr(f"{sourceNode}.{attr}")
                 cmds.setAttr(f"{new_joint}.{attr}", value)
             # Constraint to the original
-            pac = cmds.parentConstraint([sourceNode, new_joint], maintainOffset=False, name=new_joint+"_PaC")[0]
+            pac = cmds.parentConstraint([sourceNode, new_joint], maintainOffset=False, name=f"{new_joint}_PaC")[0]
             cmds.refresh()
             self.ar.custom_attr.add_attr(0, [new_joint, pac]) #dpID
             # Transfer skinCluster + bindPose connection from the original
@@ -129,7 +129,7 @@ class OneSkeleton(base.BaseLibrary):
                     if sourceAttr in cmds.listAttr(new_joint):
                         # Transfer connection to the new node
                         cmds.disconnectAttr(src, dest)
-                        cmds.connectAttr(new_joint+"."+sourceAttr, dest, force=True)
+                        cmds.connectAttr(f"{new_joint}.{sourceAttr}", dest, force=True)
             self.bind_pre_matrix_node(new_joint)
         return new_joints
 
@@ -137,17 +137,17 @@ class OneSkeleton(base.BaseLibrary):
     def re_set_scale(self, source_items):
         for sourceNode in source_items:
             for axis in self.ar.data.axes:
-                cmds.setAttr(self.prefix+sourceNode+self.suffix+".scale"+axis, cmds.getAttr(sourceNode+".scale"+axis))
+                cmds.setAttr(f"{self.prefix}{sourceNode}{self.suffix}.scale{axis}", cmds.getAttr(f"{sourceNode}.scale{axis}"))
 
     
     def scale_connect(self, source_items):
         for sourceNode in source_items:
-            cmds.scaleConstraint(sourceNode, self.prefix+sourceNode+self.suffix, maintainOffset=True, name=self.prefix+sourceNode+self.suffix+"_ScC")[0]
+            cmds.scaleConstraint(sourceNode, f"{self.prefix}{sourceNode}{self.suffix}", maintainOffset=True, name=f"{self.prefix}{sourceNode}{self.suffix}_ScC")[0]
             #cmds.setAttr(f"{scc}.constraintScaleCompensate", True)
 
 
     def bind_pre_matrix_node(self, new_joint):
-        destinations = cmds.listConnections(new_joint+".worldMatrix", source=False, destination=True, plugs=True, type='skinCluster') or []
+        destinations = cmds.listConnections(f"{new_joint}.worldMatrix", source=False, destination=True, plugs=True, type='skinCluster') or []
         for destination in destinations:
             skin, attr = destination.split('.', 1)
             match = re.search(r"^matrix\[(\d+)\]$", attr)
@@ -184,7 +184,7 @@ class OneSkeleton(base.BaseLibrary):
         unique_inf_items = []
         skinclusters = []
         if not cmds.listRelatives(meshes, type='transform', parent=True, fullPath=True):
-            mel.eval('warning \"'+self.ar.data.lang['i041_meshConnEmpty']+'\";')
+            mel.eval(f'warning "{self.ar.data.lang['i041_meshConnEmpty']}";')
             return
         for transform_node in list(set(cmds.listRelatives(meshes, type='transform', parent=True, fullPath=True))):
             skinclusters.extend(self.ar.skin.check_existing_deformer_node(transform_node)[2] or [])
@@ -204,7 +204,7 @@ class OneSkeleton(base.BaseLibrary):
         cmds.select(clear=True)
         cmds.joint(name=root, scaleCompensate=False)
         cmds.addAttr(root, longName='dpRootJoint', attributeType='bool', defaultValue=1)
-        cmds.setAttr(root+".visibility", 0)
+        cmds.setAttr(f"{root}.visibility", 0)
         self.ar.ctrls.set_lock_hide([root], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'dpRootJoint'], cb=True)
         try:
             cmds.parent(root, self.ar.utils.get_all_grp())
@@ -280,8 +280,8 @@ class OneSkeleton(base.BaseLibrary):
         lower_teeth = self.ar.data.lang['m076_lowerTeeth']
         tongue = self.ar.data.lang['m077_tongue']
         ear = self.ar.data.lang['m040_ear']
-        upper_tooth = self.ar.data.lang['c044_upper']+self.ar.data.lang['m267_tooth']
-        lower_tooth = self.ar.data.lang['c045_lower']+self.ar.data.lang['m267_tooth']
+        upper_tooth = f"{self.ar.data.lang['c044_upper']}{self.ar.data.lang['m155_tooth']}"
+        lower_tooth = f"{self.ar.data.lang['c045_lower']}{self.ar.data.lang['m155_tooth']}"
         
         nose = self.ar.data.lang['m078_nose']
         nostril = self.ar.data.lang['m079_nostril']
@@ -1113,8 +1113,8 @@ class OneSkeleton(base.BaseLibrary):
         lower_teeth = self.ar.data.lang['m076_lowerTeeth']
         ear = self.ar.data.lang['m040_ear']
         eye = self.ar.data.lang['c036_eye']
-        upper_tooth = self.ar.data.lang['c044_upper']+self.ar.data.lang['m267_tooth']
-        lower_tooth = self.ar.data.lang['c045_lower']+self.ar.data.lang['m267_tooth']
+        upper_tooth = f"{self.ar.data.lang['c044_upper']}{self.ar.data.lang['m155_tooth']}"
+        lower_tooth = f"{self.ar.data.lang['c045_lower']}{self.ar.data.lang['m155_tooth']}"
 
         tweaks = self.ar.data.lang['m081_tweaks']
         eyebrow = self.ar.data.lang['c041_eyebrow']

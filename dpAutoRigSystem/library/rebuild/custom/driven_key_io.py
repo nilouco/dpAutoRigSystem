@@ -82,7 +82,7 @@ class DrivenKeyIO(action.BaseAction):
         self.ar.ui_manager.set_progress(max=len(nodes), add_one=False, add_number=False)
         for item in nodes:
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
-            if not cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True) or not self.ar.utils.validate_id(item):
+            if not cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True) or not self.ar.math.validate_id(item):
                 # getting attributes if they exists
                 data[item] = { 'attributes'     : {},
                             'keys'             : {},
@@ -99,26 +99,26 @@ class DrivenKeyIO(action.BaseAction):
                             'inWeight'         : {},
                             'outAngle'         : {},
                             'outWeight'        : {},
-                            'input'            : cmds.listConnections(item+".input", source=True, destination=False, plugs=True),
-                            'output'           : cmds.listConnections(item+".output", source=False, destination=True, plugs=True),
-                            'curveColor'       : cmds.getAttr(item+".curveColor")[0],
-                            'weightedTangents' : cmds.getAttr(item+".weightedTangents"),
+                            'input'            : cmds.listConnections(f"{item}.input", source=True, destination=False, plugs=True),
+                            'output'           : cmds.listConnections(f"{item}.output", source=False, destination=True, plugs=True),
+                            'curveColor'       : cmds.getAttr(f"{item}.curveColor")[0],
+                            'weightedTangents' : cmds.getAttr(f"{item}.weightedTangents"),
                             'type'             : cmds.objectType(item),
-                            'size'             : cmds.getAttr(item+".keyTimeValue", multiIndices=True, size=True),
+                            'size'             : cmds.getAttr(f"{item}.keyTimeValue", multiIndices=True, size=True),
                             'name'             : item
                             }
                 for attr in attributes:
-                    if cmds.objExists(item+"."+attr):
-                        data[item]['attributes'][attr] = cmds.getAttr(item+"."+attr)
+                    if cmds.objExists(f"{item}.{attr}"):
+                        data[item]['attributes'][attr] = cmds.getAttr(f"{item}.{attr}")
                 # storage the keys
-                if cmds.getAttr(item+".keyTimeValue", multiIndices=True):
-                    for i, index in enumerate(cmds.getAttr(item+".keyTimeValue", multiIndices=True)):
+                if cmds.getAttr(f"{item}.keyTimeValue", multiIndices=True):
+                    for i, index in enumerate(cmds.getAttr(f"{item}.keyTimeValue", multiIndices=True)):
                         data[item]['keyTimeValue'][index] = {}
                         data[item]['keys'][index] = {}
                         for kt_attr in key_time_attributes:
-                            data[item]['keyTimeValue'][index][kt_attr] = cmds.getAttr(item+".keyTimeValue["+str(i)+"]."+kt_attr)
+                            data[item]['keyTimeValue'][index][kt_attr] = cmds.getAttr(f"{item}.keyTimeValue[{i}].{kt_attr}")
                         for k_attr in key_attributes:
-                            data[item]['keys'][index][k_attr] = cmds.getAttr(item+"."+k_attr+"["+str(i)+"]")
+                            data[item]['keys'][index][k_attr] = cmds.getAttr(f"{item}.{k_attr}[{i}]")
                         data[item]['keyTanInType'][index]    = cmds.keyTangent(item, query=True, index=(i, i), inTangentType=True)[0]
                         data[item]['keyTanOutType'][index]   = cmds.keyTangent(item, query=True, index=(i, i), outTangentType=True)[0]
                         data[item]['keyTanInX'][index]       = cmds.keyTangent(item, query=True, index=(i, i), ix=True)[0]
@@ -149,15 +149,15 @@ class DrivenKeyIO(action.BaseAction):
                 node = cmds.createNode(drivenkey_data[item]['type'], name=drivenkey_data[item]['name'])
                 # set attribute values
                 for attr in drivenkey_data[item]['attributes']:
-                    if cmds.objExists(node+"."+attr):
-                        cmds.setAttr(node+"."+attr, drivenkey_data[item]['attributes'][attr])
-                cmds.setAttr(node+".curveColor", drivenkey_data[item]['curveColor'][0], drivenkey_data[item]['curveColor'][1], drivenkey_data[item]['curveColor'][2], type='double3')
+                    if cmds.objExists(f"{node}.{attr}"):
+                        cmds.setAttr(f"{node}.{attr}", drivenkey_data[item]['attributes'][attr])
+                cmds.setAttr(f"{node}.curveColor", drivenkey_data[item]['curveColor'][0], drivenkey_data[item]['curveColor'][1], drivenkey_data[item]['curveColor'][2], type='double3')
                 cmds.keyTangent(node, edit=True, weightedTangents=drivenkey_data[item]['weightedTangents'])
                 # set driven keys
                 for i in range(drivenkey_data[item]['size']):
                     cmds.setKeyframe(item, float=drivenkey_data[item]['keyTimeValue'][str(i)]['keyTime'], value=drivenkey_data[item]['keyTimeValue'][str(i)]['keyValue'])
                     for k_attr in drivenkey_data[item]['keys'][str(i)]:
-                        cmds.setAttr(item+"."+k_attr+"["+str(i)+"]", drivenkey_data[item]['keys'][str(i)][k_attr])
+                        cmds.setAttr(f"{item}.{k_attr}[{i}]", drivenkey_data[item]['keys'][str(i)][k_attr])
                     cmds.keyTangent(node, edit=True, index=(int(i), int(i)), inTangentType=drivenkey_data[item]['keyTanInType'][str(i)])
                     cmds.keyTangent(node, edit=True, index=(int(i), int(i)), outTangentType=drivenkey_data[item]['keyTanOutType'][str(i)])
                     cmds.keyTangent(node, edit=True, index=(int(i), int(i)), ix=drivenkey_data[item]['keyTanInX'][str(i)])
@@ -173,13 +173,13 @@ class DrivenKeyIO(action.BaseAction):
                         cmds.keyTangent(node, edit=True, index=(int(i), int(i)), weightLock=drivenkey_data[item]['keyWeightLocked'][str(i)])
                 # reconnect node
                 if drivenkey_data[item]['input'] and cmds.objExists(drivenkey_data[item]['input'][0]):
-                    cmds.connectAttr(drivenkey_data[item]['input'][0], node+".input", force=True)
+                    cmds.connectAttr(drivenkey_data[item]['input'][0], f"{node}.input", force=True)
                 if drivenkey_data[item]['output']:
                     for c, output_node in enumerate(drivenkey_data[item]['output']):
                         if cmds.objExists(drivenkey_data[item]['output'][c]):
                             is_locked = cmds.getAttr(drivenkey_data[item]['output'][c], lock=True)
                             cmds.setAttr(drivenkey_data[item]['output'][c], lock=False)
-                            cmds.connectAttr(node+".output", drivenkey_data[item]['output'][c], force=True)
+                            cmds.connectAttr(f"{node}.output", drivenkey_data[item]['output'][c], force=True)
                             if is_locked:
                                 cmds.setAttr(drivenkey_data[item]['output'][c], lock=True)
                 well_imported_items.append(node)
@@ -191,4 +191,4 @@ class DrivenKeyIO(action.BaseAction):
             if existing_nodes:
                 self.well_done_io(self.ar.data.lang['r032_notImportedData'])
             else:
-                self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(existing_nodes))
+                self.fail_io(f"{self.ar.data.lang['v014_notFoundNodes']}: {', '.join(existing_nodes)}")

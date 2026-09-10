@@ -55,10 +55,10 @@ class BindPose(action.BaseAction):
                             if joints:
                                 cmds.dagPose(joints, save=True, bindPose=True, name=self.bind_pose_name)
                             self.good_results.append(True)
-                            self.messages.append(self.ar.data.lang['v004_fixed']+": "+self.bind_pose_name)
+                            self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {self.bind_pose_name}")
                         except:
                             self.good_results.append(False)
-                            self.messages.append(self.ar.data.lang['v005_cantFix']+": "+", ".join(check_items))
+                            self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {', '.join(check_items)}")
             else:
                 self.not_found_node()
         else:

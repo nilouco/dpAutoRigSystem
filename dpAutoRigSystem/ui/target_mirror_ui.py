@@ -16,11 +16,11 @@ class TargetMirrorUI:
         # creating targetMirrorUI Window:
         width  = 305
         height = 250
-        cmds.window('dpTargetMirrorWindow', title=self.ar.data.lang['m055_tgtMirror']+" "+str(self.ar.data.version), widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        cmds.window('dpTargetMirrorWindow', title=f"{self.ar.data.lang['m055_tgtMirror']} {self.ar.data.version}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         cmds.columnLayout('target_mirror_main_cl')
         cmds.rowColumnLayout('target_mirror_header_rcl', numberOfColumns=2, columnWidth=[(1, 120), (2, 190)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent='target_mirror_main_cl')
-        cmds.button('target_mirror_load_orig_model_bt', label=self.ar.data.lang['i043_origModel']+" >", annotation=self.ar.data.lang['i044_origDesc'], backgroundColor=(1.0, 1.0, 0.7), width=120, command=self.load_original_model, parent='target_mirror_header_rcl')
+        cmds.button('target_mirror_load_orig_model_bt', label=f"{self.ar.data.lang['i043_origModel']} >", annotation=self.ar.data.lang['i044_origDesc'], backgroundColor=(1.0, 1.0, 0.7), width=120, command=self.load_original_model, parent='target_mirror_header_rcl')
         cmds.textField('target_mirror_orig_model_tf', width=160, text='', parent='target_mirror_header_rcl')
         cmds.columnLayout('target_mirror_cl', columnOffset=('left', 10), width=310, parent='target_mirror_main_cl')
         cmds.text('target_mirror_targets_txt', label=self.ar.data.lang['i047_targetList'], height=30, parent='target_mirror_cl')
@@ -96,9 +96,9 @@ class TargetMirrorUI:
                     # add selected items in the empyt target scroll list
                     cmds.textScrollList('target_mirror_targets_tsl', edit=True, append=meshes)
             else:
-                mel.eval("warning \""+self.ar.data.lang['i055_tgtSelect']+"\';")
+                mel.eval(f'warning "{self.ar.data.lang['i055_tgtSelect']}";')
         else:
-            mel.eval("warning \""+self.ar.data.lang['i055_tgtSelect']+"\';")
+            mel.eval(f'warning "{self.ar.data.lang['i055_tgtSelect']}";')
     
     
     def remove_selected(self, *args):

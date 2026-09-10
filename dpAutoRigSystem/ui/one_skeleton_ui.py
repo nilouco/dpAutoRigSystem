@@ -14,7 +14,7 @@ class OneSkeletonUI:
         self.ar.ui_manager.close_ui('one_skeleton_win')
         width  = 230
         height = 230
-        cmds.window('one_skeleton_win', title=self.ar.data.lang['m254_oneSkeleton']+" "+str(self.ar.data.version), widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        cmds.window('one_skeleton_win', title=f"{self.ar.data.lang['m254_oneSkeleton']} {self.ar.data.version}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         cmds.columnLayout('one_skeleton_cl', columnOffset=('both', 10), rowSpacing=10, adjustableColumn=True, parent='one_skeleton_win')
         cmds.separator(height=5, style='in', horizontal=True, parent='one_skeleton_cl')

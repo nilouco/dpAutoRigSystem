@@ -80,7 +80,7 @@ class RenameIO(action.BaseAction):
         for item in items:
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
-                data[item] = cmds.getAttr(item+"."+self.ar.data.dp_id)
+                data[item] = cmds.getAttr(f"{item}.{self.ar.data.dp_id}")
         return data
 
 
@@ -109,8 +109,8 @@ class RenameIO(action.BaseAction):
         if well_imported_items:
             self.well_done_io(self.latest_data_file)
         elif not_found_nodes:
-            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(not_found_nodes))
+            self.fail_io(f"{self.ar.data.lang['v014_notFoundNodes']}: {', '.join(not_found_nodes)}")
         elif maybe_items:
-            self.maybe_done_io(self.ar.data.lang['r066_shapeToReplace']+" "+', '.join(maybe_items))
+            self.maybe_done_io(f"{self.ar.data.lang['r066_shapeToReplace']} {', '.join(maybe_items)}")
         else:
             self.maybe_done_io(self.ar.data.lang['r032_notImportedData'])

@@ -50,13 +50,13 @@ class Weights:
     def get_deformer_weights(self, deformer_node, idx, influences=False, *args):
         """ Read the deformer information to return a dictionary with influence index or connected matrix nodes as keys and the weight as values.
         """
-        weight_plug = deformer_node+".weightList["+str(idx)+"].weights"
+        weight_plug = f"{deformer_node}.weightList[{idx}].weights"
         if cmds.objExists(weight_plug):
             weight_keys = cmds.getAttr(weight_plug, multiIndices=True)
             if influences:
                 matrix_items = []
                 for item in weight_keys:
-                    sources = cmds.listConnections(deformer_node+".matrix["+str(item)+"]", source=True, destination=False)
+                    sources = cmds.listConnections(f"{deformer_node}.matrix[{item}]", source=True, destination=False)
                     if sources:
                         matrix_items.append(sources[0])
                 weight_keys = matrix_items
@@ -71,7 +71,7 @@ class Weights:
         """ Just unlock joints from a given skinCluster node.
         """
         for joint in cmds.skinCluster(skincluster_node, influences=True, query=True):
-            cmds.setAttr(joint+".liw", 0)
+            cmds.setAttr(f"{joint}.liw", 0)
 
 
     def normalize_item_weights(self, item):
@@ -87,9 +87,9 @@ class Weights:
             Useful to set skinCluster weights values correctly.
         """
         matrix_data = {}
-        matrix_items = cmds.getAttr(deformer_name+".matrix", multiIndices=True)
+        matrix_items = cmds.getAttr(f"{deformer_name}.matrix", multiIndices=True)
         for m in matrix_items:
-            matrix_items = cmds.listConnections(deformer_name+".matrix["+str(m)+"]", source=True, destination=False)
+            matrix_items = cmds.listConnections(f"{deformer_name}.matrix[{m}]", source=True, destination=False)
             if matrix_items:
                 matrix_data[matrix_items[0]] = m
         return matrix_data
@@ -115,7 +115,7 @@ class Weights:
                     else:
                         transforms = [transform_node]
                     for child in transforms:
-                        if not cmds.objExists(child+"."+ignore_attr):
+                        if not cmds.objExists(f"{child}.{ignore_attr}"):
                             if len(cmds.ls(child[child.rfind('|')+1:])) == 1:
                                 child = child[child.rfind('|')+1:] #unique name
                             else:
@@ -159,9 +159,9 @@ class Weights:
                     def_data['divisions'] = None
                     if attr:
                         connected_nodes = None
-                        connected_nodes = cmds.listConnections(deformer_node+"."+attr, destination=False, source=True)
+                        connected_nodes = cmds.listConnections(f"{deformer_node}.{attr}", destination=False, source=True)
                         if attr == 'deformerData': #nonLinear
-                            connected_nodes = cmds.listConnections(deformer_node+"."+attr, destination=True, source=False)
+                            connected_nodes = cmds.listConnections(f"{deformer_node}.{attr}", destination=True, source=False)
                             if connected_nodes:
                                 def_data['relatedData'] = cmds.listRelatives(deformer_node, parent=True, type='transform')[0]
                                 deformer_node = connected_nodes[0]
@@ -176,9 +176,9 @@ class Weights:
                     if def_type == 'sculpt':
                         def_data['relatedData'] = self.get_sculpt_info(deformer_node)
                     elif def_type == 'morph':
-                        def_data['relatedNode'] = cmds.listConnections(deformer_node+".morphTarget[0]", destination=False, source=True)[0]
+                        def_data['relatedNode'] = cmds.listConnections(f"{deformer_node}.morphTarget[0]", destination=False, source=True)[0]
                 else:
-                    def_data['attributes'][attr] = cmds.getAttr(deformer_node+"."+attr)
+                    def_data['attributes'][attr] = cmds.getAttr(f"{deformer_node}.{attr}")
             def_data['name'] = deformer_node
         return def_data
 
@@ -192,12 +192,12 @@ class Weights:
         if nodes:
             for node in nodes:
                 out_attr = cmds.deformableShape(node, localShapeOutAttr=True)[0]
-                tag_hists = cmds.geometryAttrInfo(node+"."+out_attr, componentTagHistory=True)
+                tag_hists = cmds.geometryAttrInfo(f"{node}.{out_attr}", componentTagHistory=True)
                 if tag_hists:
                     tag_info_data[node] = {}
                     for tag_dic in tag_hists:
                         tag_info_data[node][tag_dic['key']] = tag_dic
-                        tag_info_data[node][tag_dic['key']].update({'components': cmds.geometryAttrInfo(node+"."+out_attr, components=True, componentTagExpression=tag_dic['key'])})
+                        tag_info_data[node][tag_dic['key']].update({'components': cmds.geometryAttrInfo(f"{node}.{out_attr}", components=True, componentTagExpression=tag_dic['key'])})
         return tag_info_data
 
 
@@ -213,18 +213,18 @@ class Weights:
         tag_influence_data = {}
         if deformers:
             for deformer_node in deformers:
-                if cmds.objExists(deformer_node+".originalGeometry"):
-                    orig_geos = cmds.getAttr(deformer_node+".originalGeometry", multiIndices=True)
+                if cmds.objExists(f"{deformer_node}.originalGeometry"):
+                    orig_geos = cmds.getAttr(f"{deformer_node}.originalGeometry", multiIndices=True)
                     if orig_geos:
                         has_tag = False
                         for index in orig_geos:
-                            if cmds.getAttr(deformer_node + ".input[" + str(index) + "].componentTagExpression") != "*":
+                            if cmds.getAttr(f"{deformer_node}.input[{index}].componentTagExpression") != "*":
                                 has_tag = True
                                 break
                         if has_tag:
                             tag_influence_data[deformer_node] = {'expression' : {}}
                             for index in orig_geos:
-                                tag_influence_data[deformer_node]['expression'][index] = cmds.getAttr(deformer_node+".input["+str(index)+"].componentTagExpression")
+                                tag_influence_data[deformer_node]['expression'][index] = cmds.getAttr(f"{deformer_node}.input[{index}].componentTagExpression")
         return tag_influence_data
     
 
@@ -253,21 +253,21 @@ class Weights:
                 node_type = cmds.objectType(node)
                 falloff_data[node] = { 'name' : node,
                                      'type' : node_type,
-                                     'outputWeightFunction' : cmds.listConnections(node+".outputWeightFunction", source=False, destination=True, plugs=True),
+                                     'outputWeightFunction' : cmds.listConnections(f"{node}.outputWeightFunction", source=False, destination=True, plugs=True),
                                      'attributes' : {}
                                     }
                 # node attributes and common
                 if fallof_type_attr_data[node_type]:
                     for attr in (fallof_type_attr_data[node_type] + common_attrs):
-                        if cmds.objExists(node+"."+attr):
-                            falloff_data[node]['attributes'][attr] = cmds.getAttr(node+"."+attr)
+                        if cmds.objExists(f"{node}.{attr}"):
+                            falloff_data[node]['attributes'][attr] = cmds.getAttr(f"{node}.{attr}")
                 # specific multiIndices attributes
                 for multi_attr in multi_attr_data:
-                    if cmds.objExists(node+"."+multi_attr) and cmds.getAttr(node+"."+multi_attr, multiIndices=True):
-                        for _i, index in enumerate(cmds.getAttr(node+"."+multi_attr, multiIndices=True)):
+                    if cmds.objExists(f"{node}.{multi_attr}") and cmds.getAttr(f"{node}.{multi_attr}", multiIndices=True):
+                        for _i, index in enumerate(cmds.getAttr(f"{node}.{multi_attr}", multiIndices=True)):
                             for name in multi_attr_data[multi_attr]:
-                                attr_name = multi_attr+"["+str(index)+"]."+name
-                                falloff_data[node]['attributes'][attr_name] = cmds.getAttr(node+"."+attr_name)
+                                attr_name = f"{multi_attr}[{index}].{name}"
+                                falloff_data[node]['attributes'][attr_name] = cmds.getAttr(f"{node}.{attr_name}")
         return falloff_data
     
 
@@ -278,14 +278,14 @@ class Weights:
         """
         well_imported = True
         index = 0
-        indexes = cmds.getAttr(tagged_node+".componentTags", multiIndices=True)
+        indexes = cmds.getAttr(f"{tagged_node}.componentTags", multiIndices=True)
         if indexes:
             index = len(indexes)+1
         contents = " ".join(component_items)
         try:
-            cmds.setAttr(injest_node+".componentTags["+str(index)+"].componentTagName", tag_name, type='string')
+            cmds.setAttr(f"{injest_node}.componentTags[{index}].componentTagName", tag_name, type='string')
             #cmds.setAttr(tags[0]+".componentTags["+str(index)+"].componentTagContents", len(component_items), contents, type="component_items")
-            mel.eval('setAttr '+injest_node+'.componentTags["+str(index)+"].componentTagContents -type component_items '+str(len(component_items))+' '+contents+';')
+            mel.eval(f"setAttr {injest_node}.componentTags[{index}].componentTagContents -type component_items {len(component_items)} {contents};")
         except:
             well_imported = False
         return well_imported
@@ -317,7 +317,7 @@ class Weights:
                 try:
                     well_imported = self.import_component_tag(tags[0], tags[1], tags[2], tagged_data[tags[0]][tags[1]]['components'], well_imported)
                 except Exception as e:
-                    self.not_work_well_infos.append(', '.join(tags)+" - "+str(e))
+                    self.not_work_well_infos.append(f"{', '.join(tags)} - {e}")
                     well_imported = False
         return well_imported
 
@@ -333,9 +333,9 @@ class Weights:
                 for inf_index in inf_data[inf_node]['expression']:
                     if inf_data[inf_node]['expression'][inf_index] != "":
                         try:
-                            cmds.setAttr(inf_node+".input["+str(inf_index)+"].componentTagExpression", inf_data[inf_node]['expression'][inf_index], type='string')
+                            cmds.setAttr(f"{inf_node}.input[{inf_index}].componentTagExpression", inf_data[inf_node]['expression'][inf_index], type='string')
                         except Exception as e:
-                            self.not_work_well_infos.append(inf_node+" - "+str(e))
+                            self.not_work_well_infos.append(f"{inf_node} - {e}")
                             well_imported = False
         return well_imported
 
@@ -359,21 +359,21 @@ class Weights:
                 # connect falloff
                 if falloff_data[falloff_node]['outputWeightFunction']:
                     for plug in falloff_data[falloff_node]['outputWeightFunction']:
-                        if not cmds.listConnections(falloff_node+".outputWeightFunction", plugs=True, source=False, destination=True) or not plug in cmds.listConnections(falloff_node+".outputWeightFunction", plugs=True, source=False, destination=True):
+                        if not cmds.listConnections(f"{falloff_node}.outputWeightFunction", plugs=True, source=False, destination=True) or not plug in cmds.listConnections(f"{falloff_node}.outputWeightFunction", plugs=True, source=False, destination=True):
                             try:
-                                cmds.connectAttr(falloff_node+".outputWeightFunction", plug, force=True)
+                                cmds.connectAttr(f"{falloff_node}.outputWeightFunction", plug, force=True)
                             except:
-                                self.not_work_well_infos.append(falloff_node+".outputWeightFunction -> "+plug)
+                                self.not_work_well_infos.append(f"{falloff_node}.outputWeightFunction -> {plug}")
                                 well_imported = False
                 # set falloff attributes
                 for attr in falloff_data[falloff_node]['attributes']:
                     try:
-                        cmds.setAttr(falloff_node+"."+attr, falloff_data[falloff_node]['attributes'][attr])
+                        cmds.setAttr(f"{falloff_node}.{attr}", falloff_data[falloff_node]['attributes'][attr])
                     except:
                         try:
-                            cmds.setAttr(falloff_node+"."+attr, falloff_data[falloff_node]['attributes'][attr], type='string')
+                            cmds.setAttr(f"{falloff_node}.{attr}", falloff_data[falloff_node]['attributes'][attr], type='string')
                         except:
-                            self.not_work_well_infos.append(falloff_node+"."+attr)
+                            self.not_work_well_infos.append(f"{falloff_node}.{attr}")
                             well_imported = False
         return well_imported
 
@@ -382,7 +382,7 @@ class Weights:
         """ Set the deformer weights to the given node for the indexed shape.
         """
         for vtx in weights_data:
-            cmds.setAttr(deformer_node+".weightList["+str(idx)+"].weights["+str(vtx)+"]", weights_data[vtx])
+            cmds.setAttr(f"{deformer_node}.weightList[{idx}].weights[{vtx}]", weights_data[vtx])
 
 
     def get_lattice_points(self, lattice_node):
@@ -390,10 +390,10 @@ class Weights:
         """
         points = []
         # loop for all 3D points
-        for s in range(cmds.getAttr(lattice_node+".sDivisions")):
-            for t in range(cmds.getAttr(lattice_node+".tDivisions")):
-                for u in range(cmds.getAttr(lattice_node+".uDivisions")):
-                    points.append(cmds.getAttr(lattice_node+".pt["+str(s)+"]["+str(t)+"]["+str(u)+"]")[0])
+        for s in range(cmds.getAttr(f"{lattice_node}.sDivisions")):
+            for t in range(cmds.getAttr(f"{lattice_node}.tDivisions")):
+                for u in range(cmds.getAttr(f"{lattice_node}.uDivisions")):
+                    points.append(cmds.getAttr(f"{lattice_node}.pt[{s}][{t}][{u}]")[0])
         return points
 
 
@@ -401,17 +401,17 @@ class Weights:
         """ Loop for all lattice 3D points and set them position.
         """
         i = 0
-        for s in range(cmds.getAttr(lattice_handle+".sDivisions")):
-            for t in range(cmds.getAttr(lattice_handle+".tDivisions")):
-                for u in range(cmds.getAttr(lattice_handle+".uDivisions")):
-                    cmds.xform(lattice_handle+".pt["+str(s)+"]["+str(t)+"]["+str(u)+"]", translation=points[i])
+        for s in range(cmds.getAttr(f"{lattice_handle}.sDivisions")):
+            for t in range(cmds.getAttr(f"{lattice_handle}.tDivisions")):
+                for u in range(cmds.getAttr(f"{lattice_handle}.uDivisions")):
+                    cmds.xform(f"{lattice_handle}.pt[{s}][{t}][{u}]", translation=points[i])
                     i += 1
 
 
     def get_lattice_info(self, connected_node, deformer_node):
         return {
                 'pointList' : self.get_lattice_points(connected_node),
-                'baseLatticeMatrix' : cmds.listConnections(deformer_node+".baseLatticeMatrix", destination=False, source=True)[0]
+                'baseLatticeMatrix' : cmds.listConnections(f"{deformer_node}.baseLatticeMatrix", destination=False, source=True)[0]
                }
 
 
@@ -419,13 +419,13 @@ class Weights:
         """ Return a dictionary with the information about the curve like points, degree, spans, form and knots.
         """
         crv_info = cmds.createNode('curveInfo')
-        cmds.connectAttr(cmds.listRelatives(curve, children=True, type='shape')[0]+".worldSpace", crv_info+".inputCurve", force=True)
+        cmds.connectAttr(f"{cmds.listRelatives(curve, children=True, type='shape')[0]}.worldSpace", f"{crv_info}.inputCurve", force=True)
         result_data = {
-                        'point'  : cmds.getAttr(curve+".cv[*]"),
-                        'degree' : cmds.getAttr(curve+".degree"),
-                        'spans'  : cmds.getAttr(curve+".spans"),
-                        'form'   : cmds.getAttr(curve+".form"),
-                        'knot'   : cmds.getAttr(crv_info+".knots[*]")
+                        'point'  : cmds.getAttr(f"{curve}.cv[*]"),
+                        'degree' : cmds.getAttr(f"{curve}.degree"),
+                        'spans'  : cmds.getAttr(f"{curve}.spans"),
+                        'form'   : cmds.getAttr(f"{curve}.form"),
+                        'knot'   : cmds.getAttr(f"{crv_info}.knots[*]")
                     }
         cmds.delete(crv_info)
         return result_data
@@ -435,8 +435,8 @@ class Weights:
         """ Return a dictionary of the connected nodes on sculptObjectGeometry and startPosition of the given sculpt deformer node.
         """
         return {
-                'sculptor'      : cmds.listConnections(deformer_node+".sculptObjectGeometry", destination=False, source=True)[0],
-                'originLocator' : cmds.listConnections(deformer_node+".startPosition", destination=False, source=True)[0]
+                'sculptor'      : cmds.listConnections(f"{deformer_node}.sculptObjectGeometry", destination=False, source=True)[0],
+                'originLocator' : cmds.listConnections(f"{deformer_node}.startPosition", destination=False, source=True)[0]
                 }
 
 
@@ -497,7 +497,7 @@ class Weights:
                         need_to_add_def = False
                     else:
                         for input_def in input_deformers:
-                            if deformer_node == input_def+"HandleShape": #hack to check if it's a nonLinear handle shape
+                            if deformer_node == f"{input_def}HandleShape": #hack to check if it's a nonLinear handle shape
                                 need_to_add_def = False
                 if need_to_add_def:
                     cmds.deformer(deformer_node, edit=True, geometry=item)
@@ -535,7 +535,7 @@ class Weights:
         """
         has_tag = True
         if deformer_node:
-            message_outputs = cmds.listConnections(deformer_node+".message", destination=True, source=False)
+            message_outputs = cmds.listConnections(f"{deformer_node}.message", destination=True, source=False)
             if message_outputs:
                 for item in message_outputs:
                     if cmds.objectType(item) == 'objectSet':

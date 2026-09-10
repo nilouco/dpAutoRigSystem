@@ -44,14 +44,14 @@ class ReorderAttr(base.BaseLibrary):
                     if user_def_attrs:
                         if not attributes[0] in user_def_attrs:
                             if verbose:
-                                mel.eval("warning \""+self.ar.data.lang['m235_selectedStaticAttr']+"\";")
+                                mel.eval(f'warning "{self.ar.data.lang['m235_selectedStaticAttr']}";')
                         else:
                             cmds.scriptEditorInfo(suppressInfo=True)
                             # unlock all user defined attibutes before start the changing position:
                             lock_attrs = cmds.listAttr(item, userDefined=True, locked=True)
                             if lock_attrs:
                                 for lock_attr in lock_attrs:
-                                    cmds.setAttr(item+"."+lock_attr, lock=False)
+                                    cmds.setAttr(f"{item}.{lock_attr}", lock=False)
 
                             # start moving attributes
                             if mode == 0: #down
@@ -71,7 +71,7 @@ class ReorderAttr(base.BaseLibrary):
                                         cmds.undo()
                                 if skip_hidden and attr_pos < attr_size-1:
                                     next_attr_type = cmds.attributeQuery(user_defs[attr_pos+1], node=item, attributeType=True)
-                                    if next_attr_type in self.next_attr_types or (not cmds.getAttr(item+"."+user_defs[attr_pos+1], channelBox=True) and not cmds.getAttr(item+"."+user_defs[attr_pos+1], keyable=True)):
+                                    if next_attr_type in self.next_attr_types or (not cmds.getAttr(f"{item}.{user_defs[attr_pos+1]}", channelBox=True) and not cmds.getAttr(f"{item}.{user_defs[attr_pos+1]}", keyable=True)):
                                         self.move_attr(mode, items, attributes, False, True)
                                         
                             elif mode == 1: #up
@@ -87,22 +87,22 @@ class ReorderAttr(base.BaseLibrary):
                                         cmds.undo()
                                 if skip_hidden and attr_pos > 1:
                                     next_attr_type = cmds.attributeQuery(user_defs[attr_pos-1], node=item, attributeType=True)
-                                    if next_attr_type in self.next_attr_types or (not cmds.getAttr(item+"."+user_defs[attr_pos-1], channelBox=True) and not cmds.getAttr(item+"."+user_defs[attr_pos-1], keyable=True)):
+                                    if next_attr_type in self.next_attr_types or (not cmds.getAttr(f"{item}.{user_defs[attr_pos-1]}", channelBox=True) and not cmds.getAttr(f"{item}.{user_defs[attr_pos-1]}", keyable=True)):
                                         self.move_attr(mode, items, attributes, False, True)
                             
                             # lock all user defined attibutes after the changing position:
                             if lock_attrs:
                                 for lock_attr in lock_attrs:
-                                    cmds.setAttr(item+"."+lock_attr, lock=True)
+                                    cmds.setAttr(f"{item}.{lock_attr}", lock=True)
                     else:
                         if verbose:
-                            mel.eval("warning \""+self.ar.data.lang['m236_canReorderUserDefAttr']+"\";")
+                            mel.eval(f'warning "{self.ar.data.lang['m236_canReorderUserDefAttr']}";')
             else:
                 if verbose:
-                    mel.eval("warning \""+self.ar.data.lang['m237_selectChannelBoxAttr']+"\";")
+                    mel.eval(f'warning "{self.ar.data.lang['m237_selectChannelBoxAttr']}";')
         else:
             if verbose:
-                mel.eval("warning \""+self.ar.data.lang['m238_selectTransform']+"\";")
+                mel.eval(f'warning "{self.ar.data.lang['m238_selectTransform']}";')
         # back ScritpEditor to show info:
         cmds.scriptEditorInfo(suppressInfo=True)
  

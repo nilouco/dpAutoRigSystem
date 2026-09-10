@@ -48,7 +48,7 @@ class Cycle(action.BaseAction):
                     self.good_results.append(False)
                 else: #fix = can't do it automatically, sorry
                     self.good_results.append(False)
-                    self.messages.append(self.ar.data.lang['v005_cantFix']+": "+", ".join(cycles))
+                    self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {', '.join(cycles)}")
             else:
                 self.found_issues.append(False)
                 self.good_results.append(True)

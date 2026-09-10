@@ -35,7 +35,7 @@ class Updater:
         """ Check if there's an update for this current script version.
             Output the result in a window.
         """
-        print("\n"+self.ar.data.lang['i084_checkUpdate'])
+        print(f"\n{self.ar.data.lang['i084_checkUpdate']}")
         
         # compare current version with GitHub master
         raw_results = self.check_raw_version_url()
@@ -111,19 +111,19 @@ class Updater:
     def download(self, url, ext='zip', *args):
         """ Download the file from given url and ask user to choose a folder and a file name to save it.
         """
-        ext_filter = "*."+ext
+        ext_filter = f"*.{ext}"
         folder = cmds.fileDialog2(fileFilter=ext_filter, dialogStyle=2)
         if folder:
             self.ar.ui_manager.set_progress('Downloading...', 'Download Update', amount=50)
             try:
                 urllib.request.urlretrieve(url, folder[0])
-                button_label = self.ar.data.lang['c108_open']+" "+self.ar.data.lang['i298_folder']
+                button_label = f"{self.ar.data.lang['c108_open']} {self.ar.data.lang['i298_folder']}"
                 button_command = self.ar.packager.open_folder
                 button_argument = folder[0][:folder[0].rfind('/')]
-                self.ar.logger.infoWin('i094_downloadUpdate', 'i096_downloaded', folder[0]+'\n\n'+self.ar.data.lang['i018_thanks'], 'center', 205, 270, buttonList=[button_label, button_command, button_argument])
+                self.ar.logger.infoWin('i094_downloadUpdate', 'i096_downloaded', f"{folder[0]}\n\n{self.ar.data.lang['i018_thanks']}", 'center', 205, 270, buttonList=[button_label, button_command, button_argument])
                 self.ar.ui_manager.close_ui('dpUpdateWindow')
             except:
-                self.ar.logger.infoWin('i094_downloadUpdate', 'e009_failDownloadUpdate', folder[0]+'\n\n'+self.ar.data.lang['i097_sorry'], 'center', 205, 270)
+                self.ar.logger.infoWin('i094_downloadUpdate', 'e009_failDownloadUpdate', f"{folder[0]}\n\n{self.ar.data.lang['i097_sorry']}", 'center', 205, 270)
             self.ar.ui_manager.set_progress(end_it=True)
     
 
@@ -160,24 +160,24 @@ class Updater:
                 self.ar.ui_manager.set_progress('Installing')
                 
                 # declare temporarily folder:
-                temp_folder = dest_folder+"/"+zip_names[0]+ar_name
+                temp_folder = f"{dest_folder}/{zip_names[0]}{ar_name}"
                 
                 # store custom presets in order to avoid overwrite them when installing the update:
-                self.keep_files_when_update(dest_folder+"/"+self.ar.data.language_folder.replace('.', '/'), temp_folder+"/"+self.ar.data.language_folder.replace('.', '/'))
-                self.keep_files_when_update(dest_folder+"/"+self.ar.data.curve_preset_folder.replace('.', '/'), temp_folder+"/"+self.ar.data.curve_preset_folder.replace('.', '/'))
-                self.keep_files_when_update(dest_folder+"/"+self.ar.data.template_folder.replace('.', '/'), temp_folder+"/"+self.ar.data.template_folder.replace('.', '/'))
+                self.keep_files_when_update(f"{dest_folder}/{self.ar.data.language_folder.replace('.', '/')}", f"{temp_folder}/{self.ar.data.language_folder.replace('.', '/')}")
+                self.keep_files_when_update(f"{dest_folder}/{self.ar.data.curve_preset_folder.replace('.', '/')}", f"{temp_folder}/{self.ar.data.curve_preset_folder.replace('.', '/')}")
+                self.keep_files_when_update(f"{dest_folder}/{self.ar.data.template_folder.replace('.', '/')}", f"{temp_folder}/{self.ar.data.template_folder.replace('.', '/')}")
                 
                 # keep pipeline_info data
-                if os.path.exists(dest_folder+"/"+self.ar.data.pipeline_folder.replace('.', '/')+"/pipeline_settings.json"):
-                    shutil.copy2(os.path.join(dest_folder, self.ar.data.pipeline_folder.replace('.', '/')+"/pipeline_settings.json"), temp_folder+"/"+self.ar.data.pipeline_folder.replace('.', '/'))
-                if os.path.exists(dest_folder+"/pipeline_info.json"):
+                if os.path.exists(f"{dest_folder}/{self.ar.data.pipeline_folder.replace('.', '/')}/pipeline_settings.json"):
+                    shutil.copy2(os.path.join(dest_folder, f"{self.ar.data.pipeline_folder.replace('.', '/')}/pipeline_settings.json"), f"{temp_folder}/{self.ar.data.pipeline_folder.replace('.', '/')}")
+                if os.path.exists(f"{dest_folder}/pipeline_info.json"):
                     shutil.copy2(os.path.join(dest_folder, "pipeline_info.json"), temp_folder)
                 # remove all old live files and folders for this current version, that means delete myself, OMG!
                 for each_folder in next(os.walk(dest_folder))[1]:
-                    if not "-"+ar_name+"-" in each_folder:
-                        shutil.rmtree(dest_folder+"/"+each_folder, ignore_errors=True)
+                    if not f"-{ar_name}-" in each_folder:
+                        shutil.rmtree(f"{dest_folder}/{each_folder}", ignore_errors=True)
                 for each_file in next(os.walk(dest_folder))[2]:
-                    os.remove(dest_folder+"/"+each_file)
+                    os.remove(f"{dest_folder}/{each_file}")
                 # pass in all files to copy them (doing the simple installation):
                 for source_folder, folders, files in os.walk(temp_folder):       
                     # declare destination directory:
@@ -195,7 +195,7 @@ class Updater:
                         self.ar.ui_manager.set_progress('Installing')
                 
                 # delete the temporarily folder used to download and install the update:
-                shutil.rmtree(dest_folder+"/"+zip_names[0])
+                shutil.rmtree(f"{dest_folder}/{zip_names[0]}")
                 # quit UI in order to force user to refresh dpAutoRigSystem creating a new instance:
                 self.ar.ui_manager.delete_exist_window()
                 
@@ -205,14 +205,14 @@ class Updater:
                 button_label = self.ar.data.lang['c110_start']
                 button_command = self.ar.ui_manager.reload_ui
                 button_argument = None
-                self.ar.logger.infoWin('i095_installUpdate', 'i099_installed', '\n\n'+new_version+'\n\n'+self.ar.data.lang['i173_reloadScript']+'\n\n'+self.ar.data.lang['i018_thanks'], 'center', 205, 270, buttonList=[button_label, button_command, button_argument])
+                self.ar.logger.infoWin('i095_installUpdate', 'i099_installed', f"\n\n{new_version}\n\n{self.ar.data.lang['i173_reloadScript']}\n\n{self.ar.data.lang['i018_thanks']}", 'center', 205, 270, buttonList=[button_label, button_command, button_argument])
             except Exception as e:
                 # report fail update installation:
-                print(self.ar.data.lang['i141_error']+": "+str(e))
+                print(f"{self.ar.data.lang['i141_error']}: {e}")
                 button_label = 'Download'
                 button_command = self.ar.web.visit_website
                 button_argument = self.ar.data.master_url
-                self.ar.logger.infoWin('i095_installUpdate', 'e010_failInstallUpdate', '\n\n'+new_version+'\n\n'+self.ar.data.lang['i097_sorry']+'\n\n'+str(e), 'center', 205, 270, buttonList=[button_label, button_command, button_argument])
+                self.ar.logger.infoWin('i095_installUpdate', 'e010_failInstallUpdate', f"\n\n{new_version}\n\n{self.ar.data.lang['i097_sorry']}\n\n{e}", 'center', 205, 270, buttonList=[button_label, button_command, button_argument])
             self.ar.ui_manager.set_progress(end_it=True)
         else:
             print(self.ar.data.lang['i038_canceled'])

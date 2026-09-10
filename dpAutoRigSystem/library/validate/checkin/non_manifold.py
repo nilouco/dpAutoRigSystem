@@ -53,12 +53,12 @@ class NonManifold(action.BaseAction):
                                         # Cleanup non manifolds
                                         mel.eval('polyCleanupArgList 4 { "0","1","0","0","0","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","1","0","0" };')
                                         self.good_results.append(True)
-                                        self.messages.append(self.ar.data.lang['v004_fixed']+": "+geo)
+                                        self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {geo}")
                                         mel.eval('changeSelectMode -object;')
                                         cmds.select(clear=True)
                                     except:
                                         self.good_results.append(False)
-                                        self.messages.append(self.ar.data.lang['v005_cantFix']+": "+geo)
+                                        self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {geo}")
                     else:
                         self.not_found_node()
                 else:

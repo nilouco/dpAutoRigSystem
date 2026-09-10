@@ -49,14 +49,14 @@ class UnusedDeformer(action.BaseAction):
                     for def_node in deformers:
                         self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                         has_tags = False
-                        indices = cmds.getAttr(def_node+".input", multiIndices=True)
+                        indices = cmds.getAttr(f"{def_node}.input", multiIndices=True)
                         if indices:
                             for i in indices:
-                                if not cmds.getAttr(def_node+".input["+str(i)+"].groupId") and cmds.getAttr(def_node+".input["+str(i)+"].componentTagExpression"):
+                                if not cmds.getAttr(f"{def_node}.input[{i}].groupId") and cmds.getAttr(f"{def_node}.input[{i}].componentTagExpression"):
                                     has_tags = True
                                     break
                         if not has_tags:
-                            def_sets = cmds.listConnections(def_node+".message", type="objectSet")
+                            def_sets = cmds.listConnections(f"{def_node}.message", type="objectSet")
                             if not def_sets:
                                 unused_items.append(def_node)
                             else:
@@ -81,10 +81,10 @@ class UnusedDeformer(action.BaseAction):
                             cmds.lockNode(unused_items, lock=False)
                             cmds.delete(unused_items)
                             self.good_results.append(True)
-                            self.messages.append(self.ar.data.lang['v004_fixed']+": nodes = "+str(len(unused_items)))
+                            self.messages.append(f"{self.ar.data.lang['v004_fixed']}: nodes = {len(unused_items)}")
                         except:
                             self.good_results.append(False)
-                            self.messages.append(self.ar.data.lang['v005_cantFix']+": nodes = "+str(len(unused_items)))
+                            self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: nodes = {len(unused_items)}")
             else:
                 self.not_found_node()
         else:

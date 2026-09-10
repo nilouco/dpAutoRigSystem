@@ -67,10 +67,10 @@ class ParentedGeometry(action.BaseAction):
                                                 # if no parent, just unparent it to world
                                                 cmds.parent(item, world=True)
                                             self.good_results.append(True)
-                                            self.messages.append(self.ar.data.lang['v004_fixed']+": "+item)
+                                            self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {item}")
                                         except:
                                             self.good_results.append(False)
-                                            self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
+                                            self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}")
             else:
                 self.not_found_node()
         else:

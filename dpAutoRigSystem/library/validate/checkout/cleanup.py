@@ -43,7 +43,7 @@ class Cleanup(action.BaseAction):
                     if cmds.objExists(item):
                         self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                         # conditional to check here
-                        if self.cleanup_attr in cmds.listAttr(item) and cmds.getAttr(item+"."+self.cleanup_attr) == 1:
+                        if self.cleanup_attr in cmds.listAttr(item) and cmds.getAttr(f"{item}.{self.cleanup_attr}") == 1:
                             self.checked_items.append(item)
                             self.found_issues.append(True)
                             if self.first_mode:
@@ -54,10 +54,10 @@ class Cleanup(action.BaseAction):
                                     cmds.lockNode(item, lock=False)
                                     cmds.delete(item)
                                     self.good_results.append(True)
-                                    self.messages.append(self.ar.data.lang['v004_fixed']+": "+item)
+                                    self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {item}")
                                 except:
                                     self.good_results.append(False)
-                                    self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
+                                    self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}")
             else:
                 self.not_found_node()
         else:

@@ -51,15 +51,15 @@ class ColorPerVertex(action.BaseAction):
                             cmds.delete(item)
                             if meshes:
                                 for mesh in meshes:
-                                    cmds.setAttr(mesh+".displayColors", 0)
+                                    cmds.setAttr(f"{mesh}.displayColors", 0)
                             else:
                                 meshes = ['None']
                             cmds.select(clear=True)
                             self.good_results.append(True)
-                            self.messages.append(self.ar.data.lang['v004_fixed']+": "+item+" - Mesh: "+", ".join(meshes))
+                            self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {item} - Mesh: {', '.join(meshes)}")
                         except:
                             self.good_results.append(False)
-                            self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item+" - Mesh: "+", ".join(meshes))
+                            self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item} - Mesh: {', '.join(meshes)}")
             else:
                 self.not_found_node()
         else:

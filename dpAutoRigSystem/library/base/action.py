@@ -88,7 +88,7 @@ class BaseAction(base.BaseLibrary):
         """
         print(f"\n----------\n{self.ar.data.lang['c110_start']}: {self.get_title()}")
         if self.verbose:
-            self.ar.ui_manager.set_progress(self.get_title()+': '+self.ar.data.lang['c110_start'], self.ar.data.lang[self.action_type], add_one=False, add_number=False)
+            self.ar.ui_manager.set_progress(f"{self.get_title()}: {self.ar.data.lang['c110_start']}", self.ar.data.lang[self.action_type], add_one=False, add_number=False)
         # redeclare variables
         self.ar.data.rebuilding = rebuilding
         self.checked_items = []
@@ -162,14 +162,14 @@ class BaseAction(base.BaseLibrary):
     def update_info_data_button(self):
         """ Just get the latest exported data and edit the info button text.
         """
-        self.info_text = "\n\n"+self.ar.data.lang['r060_latestExportedData']+"\n"
+        self.info_text = f"\n\n{self.ar.data.lang['r060_latestExportedData']}\n"
         button_label = self.get_latest_exported_data()
         button_command = self.ar.packager.open_folder
         button_argument = self.io_path
-        if cmds.iconTextButton(self.name+"_itb", query=True, exists=True):
+        if cmds.iconTextButton(f"{self.name}_itb", query=True, exists=True):
             #functools.partial(<bound method Logger.infoWin of <dpAutoRigSystem.Pipeline.dpLogger.Logger object at 0x00000259E390BD10>>, 'r003_modelIO', 'r004_modelIODesc', None, 'center', 305, 250, wiki='10-‐-Rebuilder#-model')
-            this_wiki = str(cmds.iconTextButton(self.name+"_itb", query=True, command=True)).split("wiki='")[1][:-2]
-            cmds.iconTextButton(self.name+"_itb", edit=True, command=partial(self.ar.logger.infoWin, self.title, self.description, self.info_text, 'center', 305, 250, buttonList=[button_label, button_command, button_argument], wiki=this_wiki))
+            this_wiki = str(cmds.iconTextButton(f"{self.name}_itb", query=True, command=True)).split("wiki='")[1][:-2]
+            cmds.iconTextButton(f"{self.name}_itb", edit=True, command=partial(self.ar.logger.infoWin, self.title, self.description, self.info_text, 'center', 305, 250, buttonList=[button_label, button_command, button_argument], wiki=this_wiki))
 
 
     def get_latest_exported_data(self, *args):
@@ -207,16 +207,16 @@ class BaseAction(base.BaseLibrary):
         """ Prepare the log output text and data dictionary for this checked validator/rebuilder.
         """
         # header
-        log_text = self.ar.data.lang['m006_name']+": "+self.get_title()+"\n"
+        log_text = f"{self.ar.data.lang['m006_name']}: {self.get_title()}\n"
         # mode
-        log_text += self.ar.data.lang['v003_mode']+": "
+        log_text += f"{self.ar.data.lang['v003_mode']}: "
         action_text = self.second_bt_label.upper()
         if self.first_mode:
             action_text = self.first_bt_label.upper()
-        log_text += action_text+"\n"
+        log_text += f"{action_text}\n"
         # issues
         if True in self.found_issues:
-            log_text += self.ar.data.lang['v006_foundIssue']+":\n"
+            log_text += f"{self.ar.data.lang['v006_foundIssue']}:\n"
             for i, item in enumerate(self.found_issues):
                 if item == True:
                     log_text += self.checked_items[i]
@@ -227,7 +227,7 @@ class BaseAction(base.BaseLibrary):
         # messages
         if self.messages:
             for msg in self.messages:
-                log_text += "\n"+msg
+                log_text += f"\n{msg}"
         log_text += '\n'
         # dataLog
         self.log_data['log'] = self.ar.data.lang[self.action_type]
@@ -244,9 +244,9 @@ class BaseAction(base.BaseLibrary):
         self.log_data['log_text'] = log_text
         # verbose call info window
         if self.verbose:
-            self.ar.logger.infoWin('i019_log', self.action_type, self.log_data['time']+"\n\n"+log_text, 'left', 250, 250)
-            print("\n-------------\n"+self.ar.data.lang[self.action_type]+"\n"+self.log_data['time']+"\n\n"+log_text)
-            if not self.ar.utils.export_log_dic_to_json(self.log_data, sub_folder=self.ar.data.dp_data+"/"+self.ar.data.dp_log):
+            self.ar.logger.infoWin('i019_log', self.action_type, f"{self.log_data['time']}\n\n{log_text}", 'left', 250, 250)
+            print(f"\n-------------\n{self.ar.data.lang[self.action_type]}\n{self.log_data['time']}\n\n{log_text}")
+            if not self.ar.utils.export_log_dic_to_json(self.log_data, sub_folder=f"{self.ar.data.dp_data}/{self.ar.data.dp_log}"):
                 print(self.ar.data.lang['i201_saveScene'])
 
     
@@ -274,7 +274,7 @@ class BaseAction(base.BaseLibrary):
         self.checked_items.append(item)
         self.found_issues.append(False)
         self.good_results.append(True)
-        self.messages.append(self.ar.data.lang[text]+": "+item)
+        self.messages.append(f"{self.ar.data.lang[text]}: {item}")
 
 
     def maybe_done_io(self, item=""):
@@ -284,14 +284,14 @@ class BaseAction(base.BaseLibrary):
         self.checked_items.append(item)
         self.found_issues.append(False)
         self.good_results.append(True)
-        self.messages.append(self.ar.data.lang['r063_maybeDoneIO']+": "+item)
+        self.messages.append(f"{self.ar.data.lang['r063_maybeDoneIO']}: {item}")
 
 
     def get_io_path(self, io_folder):
         """ Returns the IO path for the current scene.
         """
         if 'assetPath' in self.ar.pipeliner.pipe_data and io_folder:
-            return self.ar.pipeliner.pipe_data['assetPath']+"/"+self.ar.pipeliner.pipe_data[io_folder]
+            return f"{self.ar.pipeliner.pipe_data['assetPath']}/{self.ar.pipeliner.pipe_data[io_folder]}"
 
 
     def get_exported_items(self, items=None, sub_folder="", ask_has_data=False, get_any=False):
@@ -311,8 +311,8 @@ class BaseAction(base.BaseLibrary):
                 if os.path.exists(self.io_path):
                     exported_items = next(os.walk(self.io_path))[2]
             else:
-                if os.path.exists(self.io_path+"/"+sub_folder):
-                    exported_items = next(os.walk(self.io_path+"/"+sub_folder))[2]
+                if os.path.exists(f"{self.io_path}/{sub_folder}"):
+                    exported_items = next(os.walk(f"{self.io_path}/{sub_folder}"))[2]
             if exported_items:
                 if sub_folder or get_any:
                     return exported_items
@@ -361,7 +361,7 @@ class BaseAction(base.BaseLibrary):
                     try:
                         input_deformers = cmds.findDeformers(child)
                     except:
-                        self.messages.append(self.ar.data.lang['i075_moreOne']+": "+child)
+                        self.messages.append(f"{self.ar.data.lang['i075_moreOne']}: {child}")
                         input_deformers = False
                     if input_deformers:
                         for deformer_node in input_deformers:
@@ -373,18 +373,18 @@ class BaseAction(base.BaseLibrary):
             to_change_items = items
         if to_change_items:
             for node in to_change_items:
-                if not cmds.listConnections(node+".nodeState", source=True, destination=False):
+                if not cmds.listConnections(f"{node}.nodeState", source=True, destination=False):
                     value = state
                     if data:
                         value = data[node]
-                    result_data[node] = cmds.getAttr(node+".nodeState")
-                    lock_attr_status = cmds.getAttr(node+".nodeState", lock=True)
+                    result_data[node] = cmds.getAttr(f"{node}.nodeState")
+                    lock_attr_status = cmds.getAttr(f"{node}.nodeState", lock=True)
                     lock_node_status = cmds.lockNode(node, query=True, lock=True)[0]
                     cmds.lockNode(node, lock=False)
-                    cmds.setAttr(node+".nodeState", lock=False)
+                    cmds.setAttr(f"{node}.nodeState", lock=False)
                     # set nodeState attribute value
-                    cmds.setAttr(node+".nodeState", value)
-                    cmds.setAttr(node+".nodeState", lock=lock_attr_status)
+                    cmds.setAttr(f"{node}.nodeState", value)
+                    cmds.setAttr(f"{node}.nodeState", lock=lock_attr_status)
                     if lock_node_status:
                         cmds.lockNode(node, lock=True)
         return result_data
@@ -399,11 +399,11 @@ class BaseAction(base.BaseLibrary):
         if check_items:
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title], self.ar.data.lang[self.action_type], add_one=False, add_number=False)
             self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
-            filtered_items = self.ar.utils.filter_transforms(check_items, verbose=self.verbose, title=self.ar.data.lang[self.title]+" "+self.ar.data.lang['i329_broken'])
+            filtered_items = self.ar.utils.filter_transforms(check_items, verbose=self.verbose, title=f"{self.ar.data.lang[self.title]} {self.ar.data.lang['i329_broken']}")
             if filtered_items:
                 for item in filtered_items:
                     short_name = item[item.rfind('|')+1:]
-                    if not self.ar.utils.validate_id(short_name):
+                    if not self.ar.math.validate_id(short_name):
                         item_type = cmds.objectType(item)
                         if not item_type in data['BrokenID']:
                             data['BrokenID'][item_type] = {}
@@ -431,11 +431,11 @@ class BaseAction(base.BaseLibrary):
             try:
                 # export json file
                 self.ar.pipeliner.make_dir_if_not_exists(self.io_path)
-                json_name = self.io_path+"/"+self.start_name+"_"+self.ar.pipeliner.pipe_data['currentFileName']+".json"
+                json_name = f"{self.io_path}/{self.start_name}_{self.ar.pipeliner.pipe_data['currentFileName']}.json"
                 self.ar.pipeliner.save_json_file(data, json_name)
                 self.well_done_io(json_name)
             except Exception as e:
-                self.fail_io(json_name+": "+str(e))
+                self.fail_io(f"{json_name}: {e}")
         else:
             self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
 
@@ -465,14 +465,14 @@ class BaseAction(base.BaseLibrary):
                     user_defined_attributes = cmds.listAttr(mesh, userDefined=True)
                     if user_defined_attributes:
                         for user_defined_attr in user_defined_attributes:
-                            attributes += " -attr "+user_defined_attr
-            abc_name = path+"/"+start_name+"_"+file_name+".abc"
-            cmds.AbcExport(jobArg="-frameRange 0 0 -uvWrite -writeVisibility -writeUVSets -worldSpace -dataFormat ogawa -root "+io_items+attributes+" -file "+abc_name)
+                            attributes += f" -attr {user_defined_attr}"
+            abc_name = f"{path}/{start_name}_{file_name}.abc"
+            cmds.AbcExport(jobArg=f"-frameRange 0 0 -uvWrite -writeVisibility -writeUVSets -worldSpace -dataFormat ogawa -root {io_items}{attributes} -file {abc_name}")
             if node_state_data:
                 self.change_node_state(items, find_deform=False, data=node_state_data) #back deformer as before
             self.well_done_io(abc_name)
         except Exception as e:
-            self.fail_io(', '.join(items)+": "+str(e))
+            self.fail_io(f"{', '.join(items)}: {e}")
 
 
     def import_latest_alembic_file(self, exported_items):
@@ -485,12 +485,12 @@ class BaseAction(base.BaseLibrary):
                 # import alembic
                 exported_items.sort()
                 self.latest_data_file = exported_items[-1]
-                abc_to_import = self.io_path+"/"+self.latest_data_file
+                abc_to_import = f"{self.io_path}/{self.latest_data_file}"
                 #cmds.AbcImport(jobArg="-mode import \""+abc_to_import+"\"")
-                mel.eval("AbcImport -mode import \""+abc_to_import+"\";")
+                mel.eval(f'AbcImport -mode import "{abc_to_import}";')
                 self.well_done_io(self.latest_data_file)
             except Exception as e:
-                self.fail_io(self.latest_data_file+": "+str(e))
+                self.fail_io(f"{self.latest_data_file}: {e}")
         else:
             self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
 
@@ -504,7 +504,7 @@ class BaseAction(base.BaseLibrary):
                 path = self.io_path
             exported_items.sort()
             self.latest_data_file = exported_items[-1]
-            return self.ar.pipeliner.get_json_content(self.io_path+"/"+exported_items[-1])
+            return self.ar.pipeliner.get_json_content(f"{self.io_path}/{exported_items[-1]}")
         else:
             self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
 
@@ -576,11 +576,9 @@ class BaseAction(base.BaseLibrary):
             for node in temps:
                 is_cleaned = True
                 if not 'guideBase' in cmds.listAttr(node) and not 'dpGuide' in cmds.listAttr(node):
-                    children = cmds.listRelatives(node, children=True, allDescendents=True)
-                    if children:
-                        for child in children:
-                            if 'guideBase' in cmds.listAttr(child) or 'dpGuide' in cmds.listAttr(child):
-                                is_cleaned = False
+                    for child in cmds.listRelatives(node, children=True, allDescendents=True) or []:
+                        if 'guideBase' in cmds.listAttr(child) or 'dpGuide' in cmds.listAttr(child):
+                            is_cleaned = False
                 else:
                     is_cleaned = False
                 if is_cleaned:
@@ -629,29 +627,29 @@ class BaseAction(base.BaseLibrary):
                             }
                 for attr in attributes:
                     if attr in cmds.listAttr(const):
-                        data[const]['attributes'][attr] = cmds.getAttr(const+"."+attr)
+                        data[const]['attributes'][attr] = cmds.getAttr(f"{const}.{attr}")
                 data[const]['worldUpMatrix'] = []
                 if 'worldUpMatrix' in cmds.listAttr(const):
-                    data[const]['worldUpMatrix'] = cmds.listConnections(const+".worldUpMatrix", source=True, destination=False)
-                data[const]['constraintParentInverseMatrix'] = cmds.listConnections(const+".constraintParentInverseMatrix", source=True, destination=False)
+                    data[const]['worldUpMatrix'] = cmds.listConnections(f"{const}.worldUpMatrix", source=True, destination=False)
+                data[const]['constraintParentInverseMatrix'] = cmds.listConnections(f"{const}.constraintParentInverseMatrix", source=True, destination=False)
                 data[const]['target'] = {}
                 if 'target' in cmds.listAttr(const):
                     target_attr = None
-                    if cmds.objExists(const+".target[0].targetParentMatrix"):
+                    if cmds.objExists(f"{const}.target[0].targetParentMatrix"):
                         target_attr = "targetParentMatrix"
-                    elif cmds.objExists(const+".target[0].targetGeometry"):
+                    elif cmds.objExists(f"{const}.target[0].targetGeometry"):
                         target_attr = "targetGeometry"
-                    elif cmds.objExists(const+".target[0].targetMesh"):
+                    elif cmds.objExists(f"{const}.target[0].targetMesh"):
                         target_attr = "targetMesh"
                     if target_attr:
                         data[const]['target'][target_attr] = {}
-                        for target in cmds.getAttr(const+".target", multiIndices=True):
-                            data[const]['target'][target_attr][target] = [cmds.listConnections(const+".target["+str(target)+"]."+target_attr, source=True, destination=False)[0], cmds.getAttr(const+".target["+str(target)+"].targetWeight")]
+                        for target in cmds.getAttr(f"{const}.target", multiIndices=True):
+                            data[const]['target'][target_attr][target] = [cmds.listConnections(f"{const}.target[{target}].{target_attr}", source=True, destination=False)[0], cmds.getAttr(f"{const}.target[{target}].targetWeight")]
                 # store connection info to disconnect when import if need to skip the constraint driving
                 for output_attr in output_attributes:
                     data[const]['output'][output_attr] = None
                     if output_attr in cmds.listAttr(const):
-                        if cmds.listConnections(const+"."+output_attr, source=False, destination=True):
+                        if cmds.listConnections(f"{const}.{output_attr}", source=False, destination=True):
                             data[const]['output'][output_attr] = True
                         else:
                             data[const]['output'][output_attr] = False
@@ -706,23 +704,23 @@ class BaseAction(base.BaseLibrary):
                         # set attribute values
                         if constraint_data[item]['attributes']:
                             for attr in constraint_data[item]['attributes']:
-                                cmds.setAttr(const+"."+attr, constraint_data[item]['attributes'][attr])
+                                cmds.setAttr(f"{const}.{attr}", constraint_data[item]['attributes'][attr])
                         # set weight values
                         for v, value in enumerate(values):
-                            cmds.setAttr(item+"."+targets[v]+"W"+str(v), value)
+                            cmds.setAttr(f"{item}.{targets[v]}W{v}", value)
                         if constraint_data[item]['worldUpMatrix']:
-                            cmds.connectAttr(constraint_data[item]['worldUpMatrix'][0]+".worldMatrix", const+".worldUpMatrix", force=True)
+                            cmds.connectAttr(f"{constraint_data[item]['worldUpMatrix'][0]}.worldMatrix", f"{const}.worldUpMatrix", force=True)
                         # disconnect to keep the same exported skip option
                         for output_attr in constraint_data[item]['output']:
                             if output_attr in cmds.listAttr(const) and not constraint_data[item]['output'][output_attr]:
-                                connected_items = cmds.listConnections(const+"."+output_attr, source=False, destination=True, plugs=True)
+                                connected_items = cmds.listConnections(f"{const}.{output_attr}", source=False, destination=True, plugs=True)
                                 if connected_items:
-                                    cmds.disconnectAttr(const+"."+output_attr, connected_items[0])
+                                    cmds.disconnectAttr(f"{const}.{output_attr}", connected_items[0])
                         well_imported_items.append(const)
                 else:
                     cmds.createNode(constraint_type, name=item) #broken node
                     if verbose:
-                        self.fail_io(self.ar.data.lang['i329_broken']+" node - "+item)
+                        self.fail_io(f"{self.ar.data.lang['i329_broken']} node - {item}")
             else:
                 existing_nodes.append(item)
         if verbose:
@@ -732,7 +730,7 @@ class BaseAction(base.BaseLibrary):
                 if existing_nodes:
                     self.well_done_io(self.ar.data.lang['r032_notImportedData'])
                 else:
-                    self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(existing_nodes))
+                    self.fail_io(f"{self.ar.data.lang['v014_notFoundNodes']}: {', '.join(existing_nodes)}")
 
 
     def remove_constraints(self, items):

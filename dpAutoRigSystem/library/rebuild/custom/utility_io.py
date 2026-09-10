@@ -79,7 +79,7 @@ class UtilityIO(action.BaseAction):
         self.ar.ui_manager.set_progress(max=len(utilities), add_one=False, add_number=False)
         for item in utilities:
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
-            if not cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True) or not self.ar.utils.validate_id(item):
+            if not cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True) or not self.ar.math.validate_id(item):
                 # getting attributes values
                 node_type = cmds.objectType(item)
                 data[item] = {'attributes' : {},
@@ -88,11 +88,11 @@ class UtilityIO(action.BaseAction):
                             }
                 for attr in self.ar.utils.type_attr_data[node_type]:
                     if cmds.attributeQuery(attr, node=item, exists=True):
-                        data[item]['attributes'][attr] = cmds.getAttr(item+"."+attr)
+                        data[item]['attributes'][attr] = cmds.getAttr(f"{item}.{attr}")
                 # compound attributes
                 if node_type in self.ar.utils.type_multi_attr_data:
                     for multi_attr in self.ar.utils.type_multi_attr_data[node_type]:
-                        indexes = cmds.getAttr(item+"."+multi_attr, multiIndices=True)
+                        indexes = cmds.getAttr(f"{item}.{multi_attr}", multiIndices=True)
                         if indexes:
                             dot = ''
                             attributes = ['']
@@ -101,8 +101,8 @@ class UtilityIO(action.BaseAction):
                                 attributes = self.ar.utils.type_multi_attr_data[node_type][multi_attr]
                             for i in indexes:
                                 for attr in attributes:
-                                    attr_name = multi_attr+"["+str(i)+"]"+dot+attr
-                                    attr_value = cmds.getAttr(item+"."+attr_name)
+                                    attr_name = f"{multi_attr}[{i}]{dot}{attr}"
+                                    attr_value = cmds.getAttr(f"{item}.{attr_name}")
                                     data[item]['attributes'][attr_name] = attr_value
                                     if isinstance(attr_value, list):
                                         data[item]['attributes'][attr_name] = attr_value[0]
@@ -127,9 +127,9 @@ class UtilityIO(action.BaseAction):
                     for attr in utility_data[item]['attributes']:
                         #if isinstance(attr, list): 
                         if str(utility_data[item]['attributes'][attr]).count(',') > 1: #support vector attributes like color_Color
-                            cmds.setAttr(item+"."+attr, utility_data[item]['attributes'][attr][0], utility_data[item]['attributes'][attr][1], utility_data[item]['attributes'][attr][2], type='double3')
+                            cmds.setAttr(f"{item}.{attr}", utility_data[item]['attributes'][attr][0], utility_data[item]['attributes'][attr][1], utility_data[item]['attributes'][attr][2], type='double3')
                         else:
-                            cmds.setAttr(item+"."+attr, utility_data[item]['attributes'][attr])
+                            cmds.setAttr(f"{item}.{attr}", utility_data[item]['attributes'][attr])
                 well_imported_items.append(item)
             else:
                 existing_nodes.append(item)
@@ -139,4 +139,4 @@ class UtilityIO(action.BaseAction):
             if existing_nodes:
                 self.well_done_io(self.ar.data.lang['r032_notImportedData'])
             else:
-                self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(existing_nodes))
+                self.fail_io(f"{self.ar.data.lang['v014_notFoundNodes']}: {', '.join(existing_nodes)}")

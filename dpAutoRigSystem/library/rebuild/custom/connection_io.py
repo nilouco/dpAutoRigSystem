@@ -88,7 +88,7 @@ class ConnectionIO(action.BaseAction):
                     attributes.extend(user_defined_attributes)
                 connected_attributes = []
                 for attr in attributes:
-                    if cmds.objExists(item+"."+attr) and cmds.listConnections(item+"."+attr):
+                    if cmds.objExists(f"{item}.{attr}") and cmds.listConnections(f"{item}.{attr}"):
                         connected_attributes.append(attr)
                 if connected_attributes:
                     data[item] = {}
@@ -107,12 +107,12 @@ class ConnectionIO(action.BaseAction):
                 for info in infos:
                     if cmds.objectType(info[:info.find('.')]) == 'unitConversion':
                         if source_connection:
-                            connections = self.get_connection_infos(info[:info.find('.')]+".input", source_connection, destination_connection) or [None]
+                            connections = self.get_connection_infos(f"{info[:info.find('.')]}.input", source_connection, destination_connection) or [None]
                             results.append({info : connections})
                         else:
-                            connections = self.get_connection_infos(info[:info.find('.')]+".output", source_connection, destination_connection) or [None]
+                            connections = self.get_connection_infos(f"{info[:info.find('.')]}.output", source_connection, destination_connection) or [None]
                             results.append({info : connections})
-                        results[-1][next(iter(results[-1].keys()))].append(cmds.getAttr(info[:info.find('.')]+".conversionFactor"))
+                        results[-1][next(iter(results[-1].keys()))].append(cmds.getAttr(f"{info[:info.find('.')]}.conversionFactor"))
                     else:
                         results.append(info)
         return results
@@ -126,12 +126,12 @@ class ConnectionIO(action.BaseAction):
         if node_type in attr_data:
             connected_attributes = []
             for attr in attr_data[node_type]:
-                if cmds.listConnections(item+"."+attr):
+                if cmds.listConnections(f"{item}.{attr}"):
                     connected_attributes.append(attr)
             if connected_attributes:
                 for attr in connected_attributes:
                     if multi:
-                        indexes = cmds.getAttr(item+"."+attr, multiIndices=True)
+                        indexes = cmds.getAttr(f"{item}.{attr}", multiIndices=True)
                         if indexes:
                             dot = ''
                             multi_attributes = ['']
@@ -140,7 +140,7 @@ class ConnectionIO(action.BaseAction):
                                 multi_attributes = attr_data[node_type][attr]
                             for i in indexes:
                                 for multi_attr in multi_attributes:
-                                    attr_name = attr+"["+str(i)+"]"+dot+multi_attr
+                                    attr_name = f"{attr}[{i}]{dot}{multi_attr}"
                                     data[attr_name] = self.get_connection_io_data(item, attr_name)
                     else:
                         data[attr] = self.get_connection_io_data(item, attr)
@@ -154,7 +154,7 @@ class ConnectionIO(action.BaseAction):
         self.ar.ui_manager.set_progress(max=len(items), add_one=False, add_number=False)
         for item in items:
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
-            if cmds.objExists(item) and (not cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True) or not self.ar.utils.validate_id(item)):
+            if cmds.objExists(item) and (not cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True) or not self.ar.math.validate_id(item)):
                     for attr_data, multi in zip([self.ar.utils.type_attr_data, self.ar.utils.type_out_attr_data, self.ar.utils.type_multi_attr_data, self.ar.utils.type_out_multi_attr_data], [False, False, True, True]):
                         attr_connection_data = self.get_attr_connections(item, attr_data, multi)
                         if attr_connection_data:
@@ -169,8 +169,8 @@ class ConnectionIO(action.BaseAction):
         """ Return the connection from and to the given item and its attribute.
         """
         return {
-                'in'  : self.get_connection_infos(item+"."+attr, source_connection=True, destination_connection=False),
-                'out' : self.get_connection_infos(item+"."+attr, source_connection=False, destination_connection=True)
+                'in'  : self.get_connection_infos(f"{item}.{attr}", source_connection=True, destination_connection=False),
+                'out' : self.get_connection_infos(f"{item}.{attr}", source_connection=False, destination_connection=True)
                 }
 
 
@@ -196,44 +196,44 @@ class ConnectionIO(action.BaseAction):
                                     plug = next(iter(io_info.keys()))
                                     if not cmds.objExists(plug):
                                         uc = cmds.createNode('unitConversion', name=plug.split('.')[0])
-                                        cmds.setAttr(uc+".conversionFactor", io_info[plug][1])
+                                        cmds.setAttr(f"{uc}.conversionFactor", io_info[plug][1])
                                     else:
                                         uc = plug.split('.')[0]
                                     if io_info[plug][0] != None:
                                         if i == 0: #in
-                                            if not cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False) or not uc+".output" in cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False):
-                                                is_locked = cmds.getAttr(item+"."+attr, lock=True)
-                                                cmds.setAttr(item+"."+attr, lock=False)
-                                                cmds.connectAttr(uc+".output", item+"."+attr, force=True)
+                                            if not cmds.listConnections(f"{item}.{attr}", plugs=True, source=True, destination=False) or not f"{uc}.output" in cmds.listConnections(f"{item}.{attr}", plugs=True, source=True, destination=False):
+                                                is_locked = cmds.getAttr(f"{item}.{attr}", lock=True)
+                                                cmds.setAttr(f"{item}.{attr}", lock=False)
+                                                cmds.connectAttr(f"{uc}.output", f"{item}.{attr}", force=True)
                                                 if is_locked:
-                                                    cmds.setAttr(item+"."+attr, lock=True)
-                                            if not cmds.listConnections(uc+".input", plugs=True, source=True, destination=False) or not io_info[plug][0] in cmds.listConnections(uc+".input", plugs=True, source=True, destination=False):
-                                                cmds.connectAttr(io_info[plug][0], uc+".input", force=True)
+                                                    cmds.setAttr(f"{item}.{attr}", lock=True)
+                                            if not cmds.listConnections(f"{uc}.input", plugs=True, source=True, destination=False) or not io_info[plug][0] in cmds.listConnections(f"{uc}.input", plugs=True, source=True, destination=False):
+                                                cmds.connectAttr(io_info[plug][0], f"{uc}.input", force=True)
                                         else: #out
-                                            if not cmds.listConnections(item+"."+attr, plugs=True, source=False, destination=True) or not uc+".input" in cmds.listConnections(item+"."+attr, plugs=True, source=False, destination=True):
-                                                cmds.connectAttr(item+"."+attr, uc+".input", force=True)
-                                            if not cmds.listConnections(uc+".output", plugs=True, source=False, destination=True) or not io_info[plug][0] in cmds.listConnections(uc+".output", plugs=True, source=False, destination=True):
+                                            if not cmds.listConnections(f"{item}.{attr}", plugs=True, source=False, destination=True) or not f"{uc}.input" in cmds.listConnections(f"{item}.{attr}", plugs=True, source=False, destination=True):
+                                                cmds.connectAttr(f"{item}.{attr}", f"{uc}.input", force=True)
+                                            if not cmds.listConnections(f"{uc}.output", plugs=True, source=False, destination=True) or not io_info[plug][0] in cmds.listConnections(f"{uc}.output", plugs=True, source=False, destination=True):
                                                 is_locked = cmds.getAttr(io_info[plug][0], lock=True)
                                                 cmds.setAttr(io_info[plug][0], lock=False)
-                                                cmds.connectAttr(uc+".output", io_info[plug][0], force=True)
+                                                cmds.connectAttr(f"{uc}.output", io_info[plug][0], force=True)
                                                 if is_locked:
                                                     cmds.setAttr(io_info[plug][0], lock=True)
                                     else: #there is a not connected unitConversion node
-                                        self.fail_io(self.ar.data.lang['r047_notConnectedUC']+": "+uc)
+                                        self.fail_io(f"{self.ar.data.lang['r047_notConnectedUC']}: {uc}")
                                 elif cmds.objExists(io_info[:io_info.find('.')]):
                                     if i == 0: #in
                                         # if there isn't this attribute here, maybe it's an issue parenting the guides. Check the guide serialization before rig them.
-                                        if not cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False) or not io_info in cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False):
-                                            is_locked = cmds.getAttr(item+"."+attr, lock=True)
-                                            cmds.setAttr(item+"."+attr, lock=False)
-                                            cmds.connectAttr(io_info, item+"."+attr, force=True)
+                                        if not cmds.listConnections(f"{item}.{attr}", plugs=True, source=True, destination=False) or not io_info in cmds.listConnections(f"{item}.{attr}", plugs=True, source=True, destination=False):
+                                            is_locked = cmds.getAttr(f"{item}.{attr}", lock=True)
+                                            cmds.setAttr(f"{item}.{attr}", lock=False)
+                                            cmds.connectAttr(io_info, f"{item}.{attr}", force=True)
                                             if is_locked:
-                                                cmds.setAttr(item+"."+attr, lock=True)
+                                                cmds.setAttr(f"{item}.{attr}", lock=True)
                                     else: #out
-                                        if not cmds.listConnections(item+"."+attr, plugs=True, source=False, destination=True) or not io_info in cmds.listConnections(item+"."+attr, plugs=True, source=False, destination=True):
+                                        if not cmds.listConnections(f"{item}.{attr}", plugs=True, source=False, destination=True) or not io_info in cmds.listConnections(f"{item}.{attr}", plugs=True, source=False, destination=True):
                                             is_locked = cmds.getAttr(io_info, lock=True)
                                             cmds.setAttr(io_info, lock=False)
-                                            cmds.connectAttr(item+"."+attr, io_info, force=True)
+                                            cmds.connectAttr(f"{item}.{attr}", io_info, force=True)
                                             if is_locked:
                                                 cmds.setAttr(io_info, lock=True)
                                 else:
@@ -243,6 +243,6 @@ class ConnectionIO(action.BaseAction):
             else:
                 not_found_nodes.append(item)
         if not_found_nodes:
-            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(not_found_nodes))
+            self.fail_io(f"{self.ar.data.lang['v014_notFoundNodes']}: {', '.join(not_found_nodes)}")
         elif well_imported_items:
             self.well_done_io(self.latest_data_file)

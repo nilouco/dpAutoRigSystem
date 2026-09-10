@@ -80,8 +80,8 @@ class VisibilityIO(action.BaseAction):
         self.ar.ui_manager.set_progress(max=len(items), add_one=False, add_number=False)
         for item in items:
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
-            if cmds.objExists(item) and 'visibility' in cmds.listAttr(item) and not cmds.listConnections(item+".visibility", source=True, destination=False):
-                data[item] = cmds.getAttr(item+".visibility")
+            if cmds.objExists(item) and 'visibility' in cmds.listAttr(item) and not cmds.listConnections(f"{item}.visibility", source=True, destination=False):
+                data[item] = cmds.getAttr(f"{item}.visibility")
         return data
 
 
@@ -98,16 +98,16 @@ class VisibilityIO(action.BaseAction):
             if not cmds.objExists(item):
                 item = item[item.rfind('|')+1:] #short name (after last '|')
             if cmds.objExists(item):
-                if not cmds.getAttr(item+".visibility", lock=True) and not item in self.ignores:
+                if not cmds.getAttr(f"{item}.visibility", lock=True) and not item in self.ignores:
                     try:
-                        cmds.setAttr(item+".visibility", vis_data[item])
+                        cmds.setAttr(f"{item}.visibility", vis_data[item])
                         if not item in well_imported_items:
                             well_imported_items.append(item)
                     except Exception as e:
-                        self.fail_io(item+" - "+str(e))
+                        self.fail_io(f"{item} - {e}")
             else:
                 not_found_nodes.append(item)
         if well_imported_items:
             self.well_done_io(self.latest_data_file)
         else:
-            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(not_found_nodes))
+            self.fail_io(f"{self.ar.data.lang['v014_notFoundNodes']}: {', '.join(not_found_nodes)}")

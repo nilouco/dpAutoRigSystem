@@ -13,7 +13,7 @@ class GuideUI:
         """
         cmds.rowLayout(f"{standard.number_name}_rl", numberOfColumns=3, width=190, columnWidth3=(30, 120, 20), adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 4), (3, 'both', 0)], parent=f"{standard.number_name}_top_cl")
         cmds.button(f"{standard.number_name}_select_bt", label=' ', annotation=self.ar.data.lang['m004_select'], command=partial(self.update_edit_selected_module_ui, standard, True), backgroundColor=(0.5, 0.5, 0.5), dragCallback=partial(self.select_button_callback, standard), parent=f"{standard.number_name}_rl")
-        cmds.textField(f"{standard.number_name}_custom_name_tf", annotation=self.ar.data.lang['i101_customName'], text=cmds.getAttr(standard.guide_base+".customName"), changeCommand=standard.set_guide_custom_name, parent=f"{standard.number_name}_rl")
+        cmds.textField(f"{standard.number_name}_custom_name_tf", annotation=self.ar.data.lang['i101_customName'], text=cmds.getAttr(f"{standard.guide_base}.customName"), changeCommand=standard.set_guide_custom_name, parent=f"{standard.number_name}_rl")
         cmds.iconTextButton(image=self.ar.data.icon['plus_info'], height=30, width=17, style='iconOnly', command=partial(self.plus_info_ui, standard), parent=f"{standard.number_name}_rl")
         self.update_edit_selected_module_ui(standard)
 
@@ -68,10 +68,10 @@ class GuideUI:
 
     def create_edit_selected_layout(self, standard):
         # edit label of frame layout:
-        guide_name = cmds.getAttr(standard.guide_base+".customName")
+        guide_name = cmds.getAttr(f"{standard.guide_base}.customName")
         if not guide_name:
             guide_name = standard.number_name
-        cmds.frameLayout('rig_edit_selected_module_fl', edit=True, collapse=self.ar.data.collapse_edit_sel_mod, label=self.ar.data.lang['i011_editSelected']+" "+self.ar.data.lang['i143_module']+" :  "+self.ar.data.lang[standard.title]+" - "+guide_name)
+        cmds.frameLayout('rig_edit_selected_module_fl', edit=True, collapse=self.ar.data.collapse_edit_sel_mod, label=f"{self.ar.data.lang['i011_editSelected']} {self.ar.data.lang['i143_module']} :  {self.ar.data.lang[standard.title]} - {guide_name}")
         cmds.columnLayout('rig_selected_module_cl', adjustableColumn=True, parent='rig_edit_selected_module_fl')
         # re-create segment layout:
         cmds.rowLayout('edit_seg_del_dup_rl', numberOfColumns=4, columnWidth4=(100, 140, 50, 75), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'both', 2), (4, 'both', 10)], parent='rig_selected_module_cl' )
@@ -82,10 +82,10 @@ class GuideUI:
     def segment_layout(self, standard):
         if 'nJoints' in cmds.listAttr(standard.guide_base):
             cmds.text('edit_segments_txt', label=self.ar.data.lang['m003_segments'], parent='edit_seg_del_dup_rl')
-            if cmds.getAttr(standard.guide_base+".nJoints") > 0:
-                cmds.intField('edit_guide_n_joints_if', value=cmds.getAttr(standard.guide_base+".nJoints"), minValue=1, changeCommand=partial(standard.change_joint_number, 0), parent='edit_seg_del_dup_rl')
+            if cmds.getAttr(f"{standard.guide_base}.nJoints") > 0:
+                cmds.intField('edit_guide_n_joints_if', value=cmds.getAttr(f"{standard.guide_base}.nJoints"), minValue=1, changeCommand=partial(standard.change_joint_number, 0), parent='edit_seg_del_dup_rl')
             else:
-                cmds.intField('edit_guide_n_joints_if', value=cmds.getAttr(standard.guide_base+".nJoints"), minValue=0, editable=False, parent='edit_seg_del_dup_rl')
+                cmds.intField('edit_guide_n_joints_if', value=cmds.getAttr(f"{standard.guide_base}.nJoints"), minValue=0, editable=False, parent='edit_seg_del_dup_rl')
         else:
             cmds.text(' ', parent='edit_seg_del_dup_rl')
             cmds.text(' ', parent='edit_seg_del_dup_rl')
@@ -99,7 +99,7 @@ class GuideUI:
     def flip_layout(self, standard):
         # create a flip layout:
         if 'flip' in cmds.listAttr(standard.guide_base):
-            cmds.checkBox('edit_guide_flip', label='Flip', value=cmds.getAttr(standard.guide_base+".flip"), changeCommand=partial(standard.set_guide_attr, 'flip'), parent='edit_guide_mirror_rl')
+            cmds.checkBox('edit_guide_flip', label='Flip', value=cmds.getAttr(f"{standard.guide_base}.flip"), changeCommand=partial(standard.set_guide_attr, 'flip'), parent='edit_guide_mirror_rl')
             if standard.check_father_mirror() and standard.father_flip_exists:
                 cmds.checkBox('edit_guide_flip', edit=True, enable=False)
         else:
@@ -112,7 +112,7 @@ class GuideUI:
         for item in self.ar.data.mirror_menus:
             cmds.menuItem(f"{item}_mi", label=item, parent='edit_mirror_om')
         # verify if there are a list of mirrorNames to menuOption:
-        current_mirror_names = cmds.getAttr(standard.guide_base+".mirrorNameList")
+        current_mirror_names = cmds.getAttr(f"{standard.guide_base}.mirrorNameList")
         if current_mirror_names:
             mirror_names = str(current_mirror_names).split(';')
         else:
@@ -122,24 +122,24 @@ class GuideUI:
             B = self.ar.data.lang['p005_bottom']
             F = self.ar.data.lang['p006_front']
             K = self.ar.data.lang['p007_back']
-            mirror_names = [L+' --> '+R, R+' --> '+L, T+' --> '+B, B+' --> '+T, F+' --> '+K, K+' --> '+F]
+            mirror_names = [f"{L} --> "+R, f"{R} --> "+L, f"{T} --> "+B, f"{B} --> "+T, f"{F} --> "+K, f"{K} --> "+F]
         # create items for mirrorName menu:
         cmds.optionMenu('edit_mirror_name_om', label='', changeCommand=standard.change_mirror_name, parent='edit_guide_mirror_rl')
         menu_name_item_text = ""
         for item in mirror_names:
             if item != "":
                 cmds.menuItem(f"{item}_mi", label=item, parent='edit_mirror_name_om')
-                menu_name_item_text += item + ";"
-        cmds.setAttr(standard.guide_base+".mirrorNameList", menu_name_item_text, type='string')
+                menu_name_item_text += f"{item};"
+        cmds.setAttr(f"{standard.guide_base}.mirrorNameList", menu_name_item_text, type='string')
         # verify if it is the first time to creation this instance or re-loading an existing guide:
-        first_time = cmds.getAttr(standard.guide_base+".mirrorAxis")
+        first_time = cmds.getAttr(f"{standard.guide_base}.mirrorAxis")
         if first_time == "" or first_time == None:
             # set initial values to guide base:
-            cmds.setAttr(standard.guide_base+".mirrorAxis", self.ar.data.mirror_menus[0], type='string')
-            cmds.setAttr(standard.guide_base+".mirrorName", mirror_names[0], type='string')
+            cmds.setAttr(f"{standard.guide_base}.mirrorAxis", self.ar.data.mirror_menus[0], type='string')
+            cmds.setAttr(f"{standard.guide_base}.mirrorName", mirror_names[0], type='string')
         else:
             cmds.optionMenu('edit_mirror_om', edit=True, value=first_time) #initial mirror
-            cmds.optionMenu('edit_mirror_name_om', edit=True, value=cmds.getAttr(standard.guide_base+".mirrorName")) #initial mirror name
+            cmds.optionMenu('edit_mirror_name_om', edit=True, value=cmds.getAttr(f"{standard.guide_base}.mirrorName")) #initial mirror name
 
 
     def rig_it_button(self, standard):
@@ -152,7 +152,7 @@ class GuideUI:
         cmds.optionMenu('edit_guide_curve_degree_om', label='', changeCommand=partial(self.change_curve_degree, standard), parent='edit_guide_degree_rl')
         for item in ['0 - Preset', '1 - Linear', '3 - Cubic']: #degreeMenuItemList
             cmds.menuItem(f"{item}_mi", label=item, parent='edit_guide_curve_degree_om')
-        current_degree = cmds.getAttr(standard.guide_base+".degree")
+        current_degree = cmds.getAttr(f"{standard.guide_base}.degree")
         # set layout with the current value:
         if current_degree == 0:
             cmds.optionMenu('edit_guide_curve_degree_om', edit=True, value='0 - Preset')
@@ -175,7 +175,7 @@ class GuideUI:
             for item in [self.ar.data.lang['m042_default'], self.ar.data.lang['m026_biped'], self.ar.data.lang['m037_quadruped']]: #styleMenuItemList
                 cmds.menuItem(f"{item}_mi", label=item, parent='edit_guide_style_om')
             # read from guide attribute the current value to style:
-            current_style = cmds.getAttr(standard.guide_base+".style")
+            current_style = cmds.getAttr(f"{standard.guide_base}.style")
             cmds.optionMenu('edit_guide_style_om', edit=True, select=int(current_style+1))
 
 
@@ -187,7 +187,7 @@ class GuideUI:
             for item in [self.ar.data.lang['m028_arm'], self.ar.data.lang['m030_leg']]: #typeMenuItemList
                 cmds.menuItem(f"{item}_mi", label=item, parent='edit_guide_type_om')
             # read from guide attribute the current value to type:
-            current_type = cmds.getAttr(standard.guide_base+".type")
+            current_type = cmds.getAttr(f"{standard.guide_base}.type")
             cmds.optionMenu('edit_guide_type_om', edit=True, select=int(current_type+1))
 
 
@@ -198,7 +198,7 @@ class GuideUI:
             cmds.optionMenu('edit_guide_deformed_by_om', label='', changeCommand=standard.change_deformed_by, parent='edit_guide_deformed_by_rl')
             for item in ['0 - None', '1 - Head Deformer', '2 - Jaw Deformer', '3 - Head and Jaw Deformers']: #deformedByMenuItemList
                 cmds.menuItem(f"{item}_mi", label=item, parent='edit_guide_deformed_by_om')
-            current_deformed_by_value = cmds.getAttr(standard.guide_base+".deformedBy")
+            current_deformed_by_value = cmds.getAttr(f"{standard.guide_base}.deformedBy")
             # set layout with the current value:
             if current_deformed_by_value == 1:
                 cmds.optionMenu('edit_guide_deformed_by_om', edit=True, value='1 - Head Deformer')
@@ -217,131 +217,131 @@ class GuideUI:
             cmds.optionMenu('edit_guide_eye_aim_direction_om', label='', changeCommand=standard.change_aim_direction, parent='edit_guide_eye_aim_direction_rl')
             for item in self.ar.data.directions:
                 cmds.menuItem(f"{item}_mi", label=item, parent='edit_guide_eye_aim_direction_om')
-            cmds.optionMenu('edit_guide_eye_aim_direction_om', edit=True, value=self.ar.data.directions[cmds.getAttr(standard.guide_base+".aimDirection")])
+            cmds.optionMenu('edit_guide_eye_aim_direction_om', edit=True, value=self.ar.data.directions[cmds.getAttr(f"{standard.guide_base}.aimDirection")])
 
 
     def indirectskin_layout(self, standard):
         if 'indirectSkin' in cmds.listAttr(standard.guide_base):
             cmds.rowLayout('edit_guide_indirectskin_rl', numberOfColumns=4, columnWidth4=(100, 150, 10, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent='rig_selected_module_cl' )
             cmds.text(' ', parent='edit_guide_indirectskin_rl')
-            cmds.checkBox('edit_guide_indirectskin_cb', label='Indirect Skinning', value=cmds.getAttr(standard.guide_base+".indirectSkin"), changeCommand=standard.change_indirectskin, parent='edit_guide_indirectskin_rl')
+            cmds.checkBox('edit_guide_indirectskin_cb', label='Indirect Skinning', value=cmds.getAttr(f"{standard.guide_base}.indirectSkin"), changeCommand=standard.change_indirectskin, parent='edit_guide_indirectskin_rl')
             cmds.text(' ', parent='edit_guide_indirectskin_rl')
-            cmds.checkBox('edit_guide_indirectskin_holder_cb', label=self.ar.data.lang['c046_holder'], value=cmds.getAttr(standard.guide_base+".holder"), enable=False, changeCommand=partial(standard.set_guide_attr, 'holder'), parent='edit_guide_indirectskin_rl')
+            cmds.checkBox('edit_guide_indirectskin_holder_cb', label=self.ar.data.lang['c046_holder'], value=cmds.getAttr(f"{standard.guide_base}.holder"), enable=False, changeCommand=partial(standard.set_guide_attr, 'holder'), parent='edit_guide_indirectskin_rl')
             cmds.rowLayout('edit_guide_indirectskin_sdk_locator_rl', numberOfColumns=4, columnWidth4=(100, 150, 10, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent='rig_selected_module_cl' )
             cmds.text(' ', parent='edit_guide_indirectskin_sdk_locator_rl')
             cmds.text(' ', parent='edit_guide_indirectskin_sdk_locator_rl')
             cmds.text(' ', parent='edit_guide_indirectskin_sdk_locator_rl')
-            cmds.checkBox('edit_guide_indirectskin_sdk_locator_cb', label='SDK Locator', value=cmds.getAttr(standard.guide_base+".sdkLocator"), enable=False, changeCommand=partial(standard.set_guide_attr, 'sdkLocator'), parent='edit_guide_indirectskin_sdk_locator_rl')
-            standard.change_indirectskin(cmds.getAttr(standard.guide_base+".indirectSkin"))
+            cmds.checkBox('edit_guide_indirectskin_sdk_locator_cb', label='SDK Locator', value=cmds.getAttr(f"{standard.guide_base}.sdkLocator"), enable=False, changeCommand=partial(standard.set_guide_attr, 'sdkLocator'), parent='edit_guide_indirectskin_sdk_locator_rl')
+            standard.change_indirectskin(cmds.getAttr(f"{standard.guide_base}.indirectSkin"))
 
 
     def eyelid_layout(self, standard):
         if 'eyelid' in cmds.listAttr(standard.guide_base):
             cmds.rowLayout('edit_guide_eyelid_rl', numberOfColumns=6, columnWidth6=(30, 75, 75, 80, 40, 60), columnAlign=[(1, 'right'), (2, 'left'), (6, 'right')], adjustableColumn=6, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2), (6, 'both', 2)], parent='rig_selected_module_cl')
             cmds.text(' ', parent='edit_guide_eyelid_rl')
-            cmds.checkBox('edit_guide_eyelid_cb', label=self.ar.data.lang['i079_eyelid'], value=cmds.getAttr(standard.guide_base+".eyelid"), changeCommand=standard.change_eyelid, parent='edit_guide_eyelid_rl')
-            cmds.checkBox('edit_guide_eyelid_pivot_cb', label=self.ar.data.lang['i283_pivot'], value=cmds.getAttr(standard.guide_base+".lidPivot"), changeCommand=standard.change_lid_pivot, parent='edit_guide_eyelid_rl')
-            cmds.checkBox('edit_guide_eyelid_specular_cb', label=self.ar.data.lang['i184_specular'], value=cmds.getAttr(standard.guide_base+".specular"), changeCommand=partial(standard.change_eye_guide_attr, 'specular'), parent='edit_guide_eyelid_rl')
-            cmds.checkBox('edit_guide_eyelid_iris_cb', label=self.ar.data.lang['i080_iris'], value=cmds.getAttr(standard.guide_base+".iris"), changeCommand=partial(standard.change_eye_guide_attr, 'iris'), parent='edit_guide_eyelid_rl')
-            cmds.checkBox('edit_guide_eyelid_pupil_cb', label=self.ar.data.lang['i081_pupil'], value=cmds.getAttr(standard.guide_base+".pupil"), changeCommand=partial(standard.change_eye_guide_attr, 'pupil'), parent='edit_guide_eyelid_rl')
+            cmds.checkBox('edit_guide_eyelid_cb', label=self.ar.data.lang['i079_eyelid'], value=cmds.getAttr(f"{standard.guide_base}.eyelid"), changeCommand=standard.change_eyelid, parent='edit_guide_eyelid_rl')
+            cmds.checkBox('edit_guide_eyelid_pivot_cb', label=self.ar.data.lang['i283_pivot'], value=cmds.getAttr(f"{standard.guide_base}.lidPivot"), changeCommand=standard.change_lid_pivot, parent='edit_guide_eyelid_rl')
+            cmds.checkBox('edit_guide_eyelid_specular_cb', label=self.ar.data.lang['i184_specular'], value=cmds.getAttr(f"{standard.guide_base}.specular"), changeCommand=partial(standard.change_eye_guide_attr, 'specular'), parent='edit_guide_eyelid_rl')
+            cmds.checkBox('edit_guide_eyelid_iris_cb', label=self.ar.data.lang['i080_iris'], value=cmds.getAttr(f"{standard.guide_base}.iris"), changeCommand=partial(standard.change_eye_guide_attr, 'iris'), parent='edit_guide_eyelid_rl')
+            cmds.checkBox('edit_guide_eyelid_pupil_cb', label=self.ar.data.lang['i081_pupil'], value=cmds.getAttr(f"{standard.guide_base}.pupil"), changeCommand=partial(standard.change_eye_guide_attr, 'pupil'), parent='edit_guide_eyelid_rl')
 
 
     def geometry_layout(self, standard):
         if 'geo' in cmds.listAttr(standard.guide_base):
             cmds.rowLayout('edit_guide_geo_rl', numberOfColumns=3, columnWidth3=(100, 100, 70), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent='rig_selected_module_cl' )
-            cmds.button('edit_guide_geo_bt', label=self.ar.data.lang['m146_geo']+" >", command=partial(self.load_geo, standard), parent='edit_guide_geo_rl')
-            cmds.textField('edit_guide_geo_tf', text=cmds.getAttr(standard.guide_base+".geo"), enable=True, changeCommand=partial(standard.set_guide_attr, 'geo', is_string=True), parent='edit_guide_geo_rl')
+            cmds.button('edit_guide_geo_bt', label=f"{self.ar.data.lang['m146_geo']} >", command=partial(self.load_geo, standard), parent='edit_guide_geo_rl')
+            cmds.textField('edit_guide_geo_tf', text=cmds.getAttr(f"{standard.guide_base}.geo"), enable=True, changeCommand=partial(standard.set_guide_attr, 'geo', is_string=True), parent='edit_guide_geo_rl')
 
 
     def start_frame_layout(self, standard):
         if 'startFrame' in cmds.listAttr(standard.guide_base):
             cmds.rowLayout('edit_guide_start_frame_rl', numberOfColumns=4, columnWidth4=(100, 60, 70, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent='rig_selected_module_cl' )
             cmds.text('edit_guide_start_frame_txt', label=self.ar.data.lang['i169_startFrame'], parent='edit_guide_start_frame_rl')
-            cmds.intField('edit_guide_start_frame_if', value=cmds.getAttr(standard.guide_base+".startFrame"), changeCommand=partial(standard.set_guide_attr, 'startFrame'), parent='edit_guide_start_frame_rl')
+            cmds.intField('edit_guide_start_frame_if', value=cmds.getAttr(f"{standard.guide_base}.startFrame"), changeCommand=partial(standard.set_guide_attr, 'startFrame'), parent='edit_guide_start_frame_rl')
 
 
     def steering_layout(self, standard):
         if 'steering' in cmds.listAttr(standard.guide_base):
             if not 'startFrame' in cmds.listAttr(standard.guide_base):
                 cmds.rowLayout('edit_guide_start_frame_rl', numberOfColumns=4, columnWidth4=(100, 60, 70, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent='rig_selected_module_cl' )
-            cmds.checkBox('edit_guide_steering_cb', label=self.ar.data.lang['m158_steering'], value=cmds.getAttr(standard.guide_base+".steering"), changeCommand=partial(standard.set_guide_attr, 'steering'), parent='edit_guide_start_frame_rl')
-            cmds.checkBox('edit_guide_show_ctrls_cb', label=self.ar.data.lang['i170_showControls'], value=cmds.getAttr(standard.guide_base+".showControls"), changeCommand=partial(standard.set_guide_attr, 'showControls'), parent='edit_guide_start_frame_rl')
+            cmds.checkBox('edit_guide_steering_cb', label=self.ar.data.lang['m158_steering'], value=cmds.getAttr(f"{standard.guide_base}.steering"), changeCommand=partial(standard.set_guide_attr, 'steering'), parent='edit_guide_start_frame_rl')
+            cmds.checkBox('edit_guide_show_ctrls_cb', label=self.ar.data.lang['i170_showControls'], value=cmds.getAttr(f"{standard.guide_base}.showControls"), changeCommand=partial(standard.set_guide_attr, 'showControls'), parent='edit_guide_start_frame_rl')
 
 
     def fatherb_layout(self, standard):
         if 'fatherB' in cmds.listAttr(standard.guide_base):
             cmds.rowLayout('edit_guide_fatherb_rl', numberOfColumns=3, columnWidth3=(100, 100, 70), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent='rig_selected_module_cl' )
-            cmds.button('edit_guide_fatherb_bt', label=self.ar.data.lang['m160_fatherB']+" >", command=standard.load_father_b, parent='edit_guide_fatherb_rl')
-            cmds.textField('edit_guide_fatherb_tf', text=cmds.getAttr(standard.guide_base+".fatherB"), enable=True, changeCommand=partial(standard.set_guide_attr, 'fatherB', is_string=True), parent='edit_guide_fatherb_rl')
+            cmds.button('edit_guide_fatherb_bt', label=f"{self.ar.data.lang['m160_fatherB']} >", command=standard.load_father_b, parent='edit_guide_fatherb_rl')
+            cmds.textField('edit_guide_fatherb_tf', text=cmds.getAttr(f"{standard.guide_base}.fatherB"), enable=True, changeCommand=partial(standard.set_guide_attr, 'fatherB', is_string=True), parent='edit_guide_fatherb_rl')
 
 
     def head_items_layout(self, standard):
         if 'jaw' in cmds.listAttr(standard.guide_base):
             cmds.rowLayout('edit_guide_head_items_rl', numberOfColumns=5, columnWidth5=(30, 75, 75, 75, 75), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'right')], adjustableColumn=5, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2)], parent='rig_selected_module_cl')
             cmds.text(' ', parent='edit_guide_head_items_rl')
-            cmds.checkBox('edit_guide_head_jaw_cb', label=self.ar.data.lang['c025_jaw'], value=cmds.getAttr(standard.guide_base+".jaw"), changeCommand=standard.change_jaw, parent='edit_guide_head_items_rl')
-            cmds.checkBox('edit_guide_head_chin_cb', label=self.ar.data.lang['c026_chin'], value=cmds.getAttr(standard.guide_base+".chin"), changeCommand=standard.change_chin, enable=cmds.checkBox('edit_guide_head_jaw_cb', query=True, value=True), parent='edit_guide_head_items_rl')
-            cmds.checkBox('edit_guide_head_lips_cb', label=self.ar.data.lang['c062_lips'], value=cmds.getAttr(standard.guide_base+".lips"), changeCommand=standard.change_lips, enable=cmds.checkBox('edit_guide_head_jaw_cb', query=True, value=True), parent='edit_guide_head_items_rl')
-            cmds.checkBox('edit_guide_head_upperhead_cb', label=self.ar.data.lang['c044_upper']+" "+self.ar.data.lang['c024_head'], value=cmds.getAttr(standard.guide_base+".upperHead"), changeCommand=standard.change_upper_head, parent='edit_guide_head_items_rl')
+            cmds.checkBox('edit_guide_head_jaw_cb', label=self.ar.data.lang['c025_jaw'], value=cmds.getAttr(f"{standard.guide_base}.jaw"), changeCommand=standard.change_jaw, parent='edit_guide_head_items_rl')
+            cmds.checkBox('edit_guide_head_chin_cb', label=self.ar.data.lang['c026_chin'], value=cmds.getAttr(f"{standard.guide_base}.chin"), changeCommand=standard.change_chin, enable=cmds.checkBox('edit_guide_head_jaw_cb', query=True, value=True), parent='edit_guide_head_items_rl')
+            cmds.checkBox('edit_guide_head_lips_cb', label=self.ar.data.lang['c062_lips'], value=cmds.getAttr(f"{standard.guide_base}.lips"), changeCommand=standard.change_lips, enable=cmds.checkBox('edit_guide_head_jaw_cb', query=True, value=True), parent='edit_guide_head_items_rl')
+            cmds.checkBox('edit_guide_head_upperhead_cb', label=f"{self.ar.data.lang['c044_upper']} {self.ar.data.lang['c024_head']}", value=cmds.getAttr(f"{standard.guide_base}.upperHead"), changeCommand=standard.change_upper_head, parent='edit_guide_head_items_rl')
 
 
     def articulation_layout(self, standard):      
         if 'articulation' in cmds.listAttr(standard.guide_base):
             cmds.rowLayout('edit_guide_articulation_rl', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent='rig_selected_module_cl' )
             cmds.text('edit_guide_articulation_rl', label=self.ar.data.lang['m173_articulation'], parent='edit_guide_articulation_rl')
-            cmds.checkBox('edit_guide_articulation_cb', label='', value=cmds.getAttr(standard.guide_base+".articulation"), changeCommand=standard.change_articulation, parent='edit_guide_articulation_rl')
+            cmds.checkBox('edit_guide_articulation_cb', label='', value=cmds.getAttr(f"{standard.guide_base}.articulation"), changeCommand=standard.change_articulation, parent='edit_guide_articulation_rl')
 
 
     def nostril_layout(self, standard):
         if 'nostril' in cmds.listAttr(standard.guide_base):
             cmds.text(' ', parent='edit_guide_articulation_rl')
-            cmds.checkBox('edit_guide_nostril_cb', label=self.ar.data.lang['m079_nostril'], value=cmds.getAttr(standard.guide_base+".nostril"), changeCommand=standard.change_nostril, parent='edit_guide_articulation_rl')
+            cmds.checkBox('edit_guide_nostril_cb', label=self.ar.data.lang['m079_nostril'], value=cmds.getAttr(f"{standard.guide_base}.nostril"), changeCommand=standard.change_nostril, parent='edit_guide_articulation_rl')
 
 
     def corrective_layout(self, standard):
         if 'corrective' in cmds.listAttr(standard.guide_base):
             cmds.rowLayout('edit_guide_corrective_rl', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent='rig_selected_module_cl' )
             cmds.text('edit_guide_corrective_txt', label=self.ar.data.lang['c124_corrective'].capitalize(), parent='edit_guide_corrective_rl')
-            cmds.checkBox('edit_guide_corrective_cb', label='', value=cmds.getAttr(standard.guide_base+".corrective"), changeCommand=partial(standard.set_guide_attr, 'corrective'), parent='edit_guide_corrective_rl')
+            cmds.checkBox('edit_guide_corrective_cb', label='', value=cmds.getAttr(f"{standard.guide_base}.corrective"), changeCommand=partial(standard.set_guide_attr, 'corrective'), parent='edit_guide_corrective_rl')
             if 'articulation' in cmds.listAttr(standard.guide_base):
-                cmds.text('edit_guide_corrective_txt', edit=True, enable=cmds.getAttr(standard.guide_base+".articulation"))
-                cmds.checkBox('edit_guide_corrective_cb', edit=True, enable=cmds.getAttr(standard.guide_base+".articulation"))
+                cmds.text('edit_guide_corrective_txt', edit=True, enable=cmds.getAttr(f"{standard.guide_base}.articulation"))
+                cmds.checkBox('edit_guide_corrective_cb', edit=True, enable=cmds.getAttr(f"{standard.guide_base}.articulation"))
 
 
     def dynamic_layout(self, standard):
         if 'dynamic' in cmds.listAttr(standard.guide_base):
             cmds.rowLayout('edit_guide_dynamic_rl', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent='rig_selected_module_cl' )
             cmds.text('edit_guide_dynamic_txt', label=self.ar.data.lang['m097_dynamic'], parent='edit_guide_dynamic_rl')
-            cmds.checkBox('edit_guide_dynamic_cb', label='', value=cmds.getAttr(standard.guide_base+".dynamic"), changeCommand=partial(standard.set_guide_attr, 'dynamic'), parent='edit_guide_dynamic_rl')
+            cmds.checkBox('edit_guide_dynamic_cb', label='', value=cmds.getAttr(f"{standard.guide_base}.dynamic"), changeCommand=partial(standard.set_guide_attr, 'dynamic'), parent='edit_guide_dynamic_rl')
 
 
     def main_ctrl_layout(self, standard):
-        if 'nJoints' in cmds.listAttr(standard.guide_base) and 'mainControls' in cmds.listAttr(standard.guide_base) and cmds.getAttr(standard.guide_base+".nJoints") > 0:
+        if 'nJoints' in cmds.listAttr(standard.guide_base) and 'mainControls' in cmds.listAttr(standard.guide_base) and cmds.getAttr(f"{standard.guide_base}.nJoints") > 0:
             cmds.rowLayout('edit_guide_main_ctrl_rl', numberOfColumns=2, columnWidth2=(100, 100), columnAlign=[(1, 'right'), (2, 'left')], adjustableColumn=2, columnAttach=[(1, 'right', 2), (2, 'left', 2)], parent='rig_selected_module_cl' )
-            if cmds.getAttr(standard.guide_base+".nJoints") > 1:
-                cmds.checkBox('edit_guide_main_ctrl_cb', label=self.ar.data.lang['m227_mainCtrls'], value=cmds.getAttr(standard.guide_base+".mainControls"), enable=True, changeCommand=standard.set_main_ctrls, parent='edit_guide_main_ctrl_rl')
-                cmds.intField('edit_guide_main_ctrl_if', value=cmds.getAttr(standard.guide_base+".nMain"), minValue=1, changeCommand=partial(standard.change_main_ctrls_number, 0), editable=cmds.getAttr(standard.guide_base+".mainControls"), parent='edit_guide_main_ctrl_rl')
+            if cmds.getAttr(f"{standard.guide_base}.nJoints") > 1:
+                cmds.checkBox('edit_guide_main_ctrl_cb', label=self.ar.data.lang['m227_mainCtrls'], value=cmds.getAttr(f"{standard.guide_base}.mainControls"), enable=True, changeCommand=standard.set_main_ctrls, parent='edit_guide_main_ctrl_rl')
+                cmds.intField('edit_guide_main_ctrl_if', value=cmds.getAttr(f"{standard.guide_base}.nMain"), minValue=1, changeCommand=partial(standard.change_main_ctrls_number, 0), editable=cmds.getAttr(f"{standard.guide_base}.mainControls"), parent='edit_guide_main_ctrl_rl')
             else:
                 cmds.checkBox('edit_guide_main_ctrl_cb', label=self.ar.data.lang['m227_mainCtrls'], value=False, enable=True, changeCommand=standard.set_main_ctrls, parent='edit_guide_main_ctrl_rl')
-                cmds.intField('edit_guide_main_ctrl_if', value=cmds.getAttr(standard.guide_base+".nMain"), minValue=1, changeCommand=partial(standard.change_main_ctrls_number, 0), editable=False, parent='edit_guide_main_ctrl_rl')
-                cmds.setAttr(standard.guide_base+".mainControls", 0)
+                cmds.intField('edit_guide_main_ctrl_if', value=cmds.getAttr(f"{standard.guide_base}.nMain"), minValue=1, changeCommand=partial(standard.change_main_ctrls_number, 0), editable=False, parent='edit_guide_main_ctrl_rl')
+                cmds.setAttr(f"{standard.guide_base}.mainControls", 0)
 
 
     def deformer_layout(self, standard):
         if 'deformer' in cmds.listAttr(standard.guide_base):
             cmds.rowLayout('edit_guide_deformer_rl', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent='rig_selected_module_cl' )
-            cmds.text('edit_guide_deformer_txt', label=self.ar.data.lang['c097_deformer'].capitalize(), enable=cmds.getAttr(standard.guide_base+".upperHead"), parent='edit_guide_deformer_rl')
-            cmds.checkBox('edit_guide_deformer_cb', label='', value=cmds.getAttr(standard.guide_base+".deformer"), changeCommand=standard.change_deformer, enable=cmds.getAttr(standard.guide_base+".upperHead"), parent='edit_guide_deformer_rl')
+            cmds.text('edit_guide_deformer_txt', label=self.ar.data.lang['c097_deformer'].capitalize(), enable=cmds.getAttr(f"{standard.guide_base}.upperHead"), parent='edit_guide_deformer_rl')
+            cmds.checkBox('edit_guide_deformer_cb', label='', value=cmds.getAttr(f"{standard.guide_base}.deformer"), changeCommand=standard.change_deformer, enable=cmds.getAttr(f"{standard.guide_base}.upperHead"), parent='edit_guide_deformer_rl')
 
 
     def facial_layout(self, standard):
         if 'facial' in cmds.listAttr(standard.guide_base):
             facial_enable_value = True
-            if not cmds.getAttr(standard.guide_base+".jaw") or not cmds.getAttr(standard.guide_base+".chin") or not cmds.getAttr(standard.guide_base+".lips") or not cmds.getAttr(standard.guide_base+".upperHead"):
+            if not cmds.getAttr(f"{standard.guide_base}.jaw") or not cmds.getAttr(f"{standard.guide_base}.chin") or not cmds.getAttr(f"{standard.guide_base}.lips") or not cmds.getAttr(f"{standard.guide_base}.upperHead"):
                 facial_enable_value=False
             cmds.rowLayout('edit_guide_facial_rl', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent='rig_selected_module_cl' )
             cmds.text('edit_guide_facial_txt', label=self.ar.data.lang['c059_facial'].capitalize(), enable=facial_enable_value, parent='edit_guide_facial_rl')
-            facial_value = cmds.getAttr(standard.guide_base+".facial")
+            facial_value = cmds.getAttr(f"{standard.guide_base}.facial")
             cmds.checkBox('edit_guide_facial_cb', label='', value=facial_value, changeCommand=standard.change_facial, enable=facial_enable_value, parent='edit_guide_facial_rl') #facial
             collapsed = False
             if not facial_value:
@@ -350,26 +350,26 @@ class GuideUI:
             cmds.frameLayout('edit_guide_facial_fl', label=self.ar.data.lang['m139_facialCtrlsAttr'], collapsable=True, collapse=collapsed, enable=facial_value, parent='rig_selected_module_cl')
             cmds.rowColumnLayout('edit_guide_facial_rcl', numberOfColumns=2, columnWidth=[(1, 70), (2, 300)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent='edit_guide_facial_fl')
             # facial element checkboxes
-            cmds.checkBox('edit_guide_facial_brow_cb', label=self.ar.data.lang['c060_brow'], value=cmds.getAttr(standard.guide_base+".facialBrow"), changeCommand=partial(standard.change_facial_element, 'facialBrow'), parent='edit_guide_facial_rcl')
+            cmds.checkBox('edit_guide_facial_brow_cb', label=self.ar.data.lang['c060_brow'], value=cmds.getAttr(f"{standard.guide_base}.facialBrow"), changeCommand=partial(standard.change_facial_element, 'facialBrow'), parent='edit_guide_facial_rcl')
             cmds.text('edit_guide_facial_brow_txt', label=', '.join(self.ar.data.facial_brow_targets), parent='edit_guide_facial_rcl')
-            cmds.checkBox('edit_guide_facial_eyelid_cb', label=self.ar.data.lang['c042_eyelid'], value=cmds.getAttr(standard.guide_base+".facialEyelid"), changeCommand=partial(standard.change_facial_element, 'facialEyelid'), parent='edit_guide_facial_rcl')
+            cmds.checkBox('edit_guide_facial_eyelid_cb', label=self.ar.data.lang['c042_eyelid'], value=cmds.getAttr(f"{standard.guide_base}.facialEyelid"), changeCommand=partial(standard.change_facial_element, 'facialEyelid'), parent='edit_guide_facial_rcl')
             cmds.text('edit_guide_facial_eyelid_txt', label=', '.join(self.ar.data.facial_eyelid_targets[2:]), parent='edit_guide_facial_rcl')
-            cmds.checkBox('edit_guide_facial_mouth_cb', label=self.ar.data.lang['c061_mouth'], value=cmds.getAttr(standard.guide_base+".facialMouth"), changeCommand=partial(standard.change_facial_element, 'facialMouth'), parent='edit_guide_facial_rcl')
+            cmds.checkBox('edit_guide_facial_mouth_cb', label=self.ar.data.lang['c061_mouth'], value=cmds.getAttr(f"{standard.guide_base}.facialMouth"), changeCommand=partial(standard.change_facial_element, 'facialMouth'), parent='edit_guide_facial_rcl')
             cmds.text('edit_guide_facial_mouth_txt', label=', '.join(self.ar.data.facial_mouth_targets), parent='edit_guide_facial_rcl')
-            cmds.checkBox('edit_guide_facial_lips_cb', label=self.ar.data.lang['c062_lips'], value=cmds.getAttr(standard.guide_base+".facialLips"), changeCommand=partial(standard.change_facial_element, 'facialLips'), parent='edit_guide_facial_rcl')
+            cmds.checkBox('edit_guide_facial_lips_cb', label=self.ar.data.lang['c062_lips'], value=cmds.getAttr(f"{standard.guide_base}.facialLips"), changeCommand=partial(standard.change_facial_element, 'facialLips'), parent='edit_guide_facial_rcl')
             cmds.text('edit_guide_facial_lips_txt', label=', '.join(self.ar.data.facial_lips_targets), parent='edit_guide_facial_rcl')
-            cmds.checkBox('edit_guide_facial_sneer_cb', label=self.ar.data.lang['c063_sneer'], value=cmds.getAttr(standard.guide_base+".facialSneer"), changeCommand=partial(standard.change_facial_element, 'facialSneer'), parent='edit_guide_facial_rcl')
+            cmds.checkBox('edit_guide_facial_sneer_cb', label=self.ar.data.lang['c063_sneer'], value=cmds.getAttr(f"{standard.guide_base}.facialSneer"), changeCommand=partial(standard.change_facial_element, 'facialSneer'), parent='edit_guide_facial_rcl')
             cmds.text('edit_guide_facial_sneer_txt', label=', '.join([item for item in self.ar.data.facial_sneer_targets if item is not None]), parent='edit_guide_facial_rcl')
-            cmds.checkBox('edit_guide_facial_grimace_cb', label=self.ar.data.lang['c064_grimace'], value=cmds.getAttr(standard.guide_base+".facialGrimace"), changeCommand=partial(standard.change_facial_element, 'facialGrimace'), parent='edit_guide_facial_rcl')
+            cmds.checkBox('edit_guide_facial_grimace_cb', label=self.ar.data.lang['c064_grimace'], value=cmds.getAttr(f"{standard.guide_base}.facialGrimace"), changeCommand=partial(standard.change_facial_element, 'facialGrimace'), parent='edit_guide_facial_rcl')
             cmds.text('edit_guide_facial_grimace_txt', label=', '.join([item for item in self.ar.data.facial_grimace_targets if item is not None]), parent='edit_guide_facial_rcl')
-            cmds.checkBox('edit_guide_facial_face_cb', label=self.ar.data.lang['c065_face'], value=cmds.getAttr(standard.guide_base+".facialFace"), changeCommand=partial(standard.change_facial_element, 'facialFace'), parent='edit_guide_facial_rcl')
+            cmds.checkBox('edit_guide_facial_face_cb', label=self.ar.data.lang['c065_face'], value=cmds.getAttr(f"{standard.guide_base}.facialFace"), changeCommand=partial(standard.change_facial_element, 'facialFace'), parent='edit_guide_facial_rcl')
             cmds.text('edit_guide_facial_face_txt', label=', '.join(self.ar.data.facial_face_targets), parent='edit_guide_facial_rcl')
             cmds.separator(style='none', height=5, parent='edit_guide_facial_rcl')
             cmds.columnLayout('edit_guide_facial_type_cl', parent='edit_guide_facial_fl')
-            current_type = cmds.getAttr(standard.guide_base+".connectUserType")
+            current_type = cmds.getAttr(f"{standard.guide_base}.connectUserType")
             cmds.radioCollection('edit_guide_facial_type_rc', parent='edit_guide_facial_type_cl')
-            cmds.radioButton('edit_guide_facial_type_bs_rb', label=self.ar.data.lang['m170_blendShapes']+" - "+self.ar.data.lang['i185_animation']+": #_Recept_BS", annotation=self.ar.data.facial_connect_types[0], onCommand=standard.change_facial_connect_type)
-            cmds.radioButton('edit_guide_facial_type_jnt_rb', label=self.ar.data.lang['i181_facialJoint']+" - "+self.ar.data.lang['i186_gaming'], annotation=self.ar.data.facial_connect_types[1], onCommand=standard.change_facial_connect_type)
+            cmds.radioButton('edit_guide_facial_type_bs_rb', label=f"{self.ar.data.lang['m170_blendShapes']} - {self.ar.data.lang['i185_animation']}: #_Recept_BS", annotation=self.ar.data.facial_connect_types[0], onCommand=standard.change_facial_connect_type)
+            cmds.radioButton('edit_guide_facial_type_jnt_rb', label=f"{self.ar.data.lang['i181_facialJoint']} - {self.ar.data.lang['i186_gaming']}", annotation=self.ar.data.facial_connect_types[1], onCommand=standard.change_facial_connect_type)
             cmds.radioCollection('edit_guide_facial_type_rc', edit=True, select='edit_guide_facial_type_bs_rb')
             if current_type:
                 cmds.radioCollection('edit_guide_facial_type_rc', edit=True, select='edit_guide_facial_type_jnt_rb')
@@ -380,24 +380,24 @@ class GuideUI:
             cmds.rowColumnLayout('edit_guide_bend_rcl', numberOfColumns=2, columnWidth=[(1, 260), (2, 80)], columnSpacing=[(1, 2), (2, 10)], parent='rig_selected_module_cl')
             cmds.rowLayout('edit_guide_bend_rl', numberOfColumns=4, columnWidth4=(100, 20, 50, 20), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (4, 'both', 10)], parent='edit_guide_bend_rcl')
             cmds.text('edit_guide_bend_txt', label=self.ar.data.lang['m044_addBend'], visible=True, parent='edit_guide_bend_rl')
-            cmds.checkBox('edit_guide_bend_cb', value=cmds.getAttr(standard.guide_base+'.hasBend'), label=' ', changeCommand=standard.change_bend, parent='edit_guide_bend_rl')
-            cmds.optionMenu('edit_guide_bend_num_om', label='Ribbon Joints', changeCommand=standard.change_bend_number, enable=cmds.getAttr(standard.guide_base+'.hasBend'), parent='edit_guide_bend_rl')
+            cmds.checkBox('edit_guide_bend_cb', value=cmds.getAttr(f"{standard.guide_base}.hasBend"), label=' ', changeCommand=standard.change_bend, parent='edit_guide_bend_rl')
+            cmds.optionMenu('edit_guide_bend_num_om', label='Ribbon Joints', changeCommand=standard.change_bend_number, enable=cmds.getAttr(f"{standard.guide_base}.hasBend"), parent='edit_guide_bend_rl')
             bend_num_menus = [3, 5, 7]
             for item in bend_num_menus:
                 cmds.menuItem(f"{item}_mi", label=item, parent='edit_guide_bend_num_om')
             for i, item in enumerate(bend_num_menus):
-                if item == cmds.getAttr(standard.guide_base+".numBendJoints"):
+                if item == cmds.getAttr(f"{standard.guide_base}.numBendJoints"):
                     cmds.optionMenu('edit_guide_bend_num_om', edit=True, select=i+1)
                     break
             # additional ribbon joint:
-            cmds.checkBox('edit_guide_additional_cb', label=self.ar.data.lang['m180_additional'], value=cmds.getAttr(standard.guide_base+".additional"), changeCommand=partial(standard.set_guide_attr, 'additional'), parent='edit_guide_bend_rcl')
+            cmds.checkBox('edit_guide_additional_cb', label=self.ar.data.lang['m180_additional'], value=cmds.getAttr(f"{standard.guide_base}.additional"), changeCommand=partial(standard.set_guide_attr, 'additional'), parent='edit_guide_bend_rcl')
                 
 
     def align_world_layout(self, standard):
         if 'alignWorld' in cmds.listAttr(standard.guide_base):
             cmds.rowLayout('edit_guide_align_world_rl', numberOfColumns=4, columnWidth4=(100, 20, 50, 20), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (4, 'both', 10)], parent='rig_selected_module_cl')
             cmds.text('edit_guide_align_world_txt', label=self.ar.data.lang['m080_alignWorld'], visible=True, parent='edit_guide_align_world_rl')
-            cmds.checkBox('edit_guide_align_world_cb', value=cmds.getAttr(standard.guide_base+'.alignWorld'), label=' ', changeCommand=partial(standard.set_guide_attr, 'alignWorld'), parent='edit_guide_align_world_rl')
+            cmds.checkBox('edit_guide_align_world_cb', value=cmds.getAttr(f"{standard.guide_base}.alignWorld"), label=' ', changeCommand=partial(standard.set_guide_attr, 'alignWorld'), parent='edit_guide_align_world_rl')
     
     
     def change_corrective(self, standard, value, *args):
@@ -405,7 +405,7 @@ class GuideUI:
         cmds.checkBox('edit_guide_corrective_cb', edit=True, enable=value)
         if not value:
             cmds.checkBox('edit_guide_corrective_cb', edit=True, value=value)
-            cmds.setAttr(standard.guide_base+".corrective", value)
+            cmds.setAttr(f"{standard.guide_base}.corrective", value)
     
 
     def change_curve_degree(self, standard, item, *args):
@@ -413,9 +413,9 @@ class GuideUI:
         """
         if standard.check_guide_integrity():
             if item == '3 - Cubic':
-                cmds.setAttr(standard.guide_base+".degree", 3)
+                cmds.setAttr(f"{standard.guide_base}.degree", 3)
             else:
-                cmds.setAttr(standard.guide_base+".degree", 1)
+                cmds.setAttr(f"{standard.guide_base}.degree", 1)
     
 
     def change_indirectskin_ui(self, value):
@@ -439,7 +439,7 @@ class GuideUI:
         if cmds.window(self.ar.data.plus_info_win_name, query=True, exists=True):
             cmds.deleteUI('plus_fl')
         else:
-            cmds.window(self.ar.data.plus_info_win_name, title='dpAutoRig - '+self.ar.data.lang['i205_guide']+" "+self.ar.data.lang['i013_info'], iconName='dpPlus', widthHeight=(win_width, win_height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
+            cmds.window(self.ar.data.plus_info_win_name, title=f"dpAutoRig - {self.ar.data.lang['i205_guide']} "+self.ar.data.lang['i013_info'], iconName='dpPlus', widthHeight=(win_width, win_height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
         cmds.formLayout('plus_fl', numberOfDivisions=100, parent=self.ar.data.plus_info_win_name)
         cmds.scrollLayout('plus_sl', parent='plus_fl')
         cmds.formLayout('plus_fl', edit=True, attachForm=(('plus_sl', 'bottom', 10), ('plus_sl', 'top', 10), ('plus_sl', 'left', 10), ('plus_sl', 'right', 10)))
@@ -451,7 +451,7 @@ class GuideUI:
             guide_instances.insert(0, instance)
         for standard in guide_instances:
             guide_name = standard.guide_namespace.split('__')[-1]
-            custom_name = cmds.getAttr(standard.guide_base+".customName")
+            custom_name = cmds.getAttr(f"{standard.guide_base}.customName")
             if not custom_name:
                 custom_name = ""
             # creating text layout:
@@ -460,11 +460,11 @@ class GuideUI:
             cmds.text(f"{standard.number_name}_plus_header_guide_txt", label=guide_name, align='left', parent=f"{standard.number_name}_plus_header_rcl")
             cmds.text(f"{standard.number_name}_plus_header_custom_txt", label=custom_name, align='left', font='boldLabelFont', parent=f"{standard.number_name}_plus_header_rcl")
             cmds.separator(style='none', height=10, parent='plus_sl')
-            cmds.checkBox(f"{standard.number_name}_plus_annotation_cb", label=self.ar.data.lang['m014_annotation'], annotation=self.ar.data.lang['m014_annotation'], value=cmds.getAttr(standard.guide_base+'.displayAnnotation'), onCommand=partial(standard.display_annotation, 1), offCommand=partial(standard.display_annotation, 0), parent='plus_sl')
+            cmds.checkBox(f"{standard.number_name}_plus_annotation_cb", label=self.ar.data.lang['m014_annotation'], annotation=self.ar.data.lang['m014_annotation'], value=cmds.getAttr(f"{standard.guide_base}.displayAnnotation"), onCommand=partial(standard.display_annotation, 1), offCommand=partial(standard.display_annotation, 0), parent='plus_sl')
             cmds.separator(style='none', height=5, parent='plus_sl')
-            cmds.floatSliderGrp(f"{standard.number_name}_plus_radius_size_fsg", label=self.ar.data.lang['c067_radius'].capitalize(), field=True, width=width_size, minValue=0.001, maxValue=10.0, fieldMinValue=0.001, fieldMaxValue=100.0, precision=2, value=cmds.getAttr(standard.radius_ctrl+".translateX"), changeCommand=standard.change_radius_size, dragCommand=standard.change_radius_size, columnWidth=[(1, 55), (2, 60), (3, 30)], parent='plus_sl')
+            cmds.floatSliderGrp(f"{standard.number_name}_plus_radius_size_fsg", label=self.ar.data.lang['c067_radius'].capitalize(), field=True, width=width_size, minValue=0.001, maxValue=10.0, fieldMinValue=0.001, fieldMaxValue=100.0, precision=2, value=cmds.getAttr(f"{standard.radius_ctrl}.translateX"), changeCommand=standard.change_radius_size, dragCommand=standard.change_radius_size, columnWidth=[(1, 55), (2, 60), (3, 30)], parent='plus_sl')
             cmds.separator(style='none', height=5, parent='plus_sl')
-            cmds.floatSliderGrp(f"{standard.number_name}_plus_shape_size_fsg", label=self.ar.data.lang['m067_shape']+" "+self.ar.data.lang['i115_size'], width=width_size, field=True, minValue=0.001, maxValue=10.0, fieldMinValue=0.001, fieldMaxValue=100.0, precision=2, value=cmds.getAttr(standard.guide_base+'.shapeSize'), changeCommand=partial(standard.set_guide_attr, 'shapeSize'), dragCommand=partial(standard.set_guide_attr, 'shapeSize'), columnWidth=[(1, 55), (2, 60), (3, 30)], parent='plus_sl')
+            cmds.floatSliderGrp(f"{standard.number_name}_plus_shape_size_fsg", label=f"{self.ar.data.lang['m067_shape']} {self.ar.data.lang['i115_size']}", width=width_size, field=True, minValue=0.001, maxValue=10.0, fieldMinValue=0.001, fieldMaxValue=100.0, precision=2, value=cmds.getAttr(f"{standard.guide_base}.shapeSize"), changeCommand=partial(standard.set_guide_attr, 'shapeSize'), dragCommand=partial(standard.set_guide_attr, 'shapeSize'), columnWidth=[(1, 55), (2, 60), (3, 30)], parent='plus_sl')
             cmds.separator(style='none', height=10, parent='plus_sl')
             cmds.button(f"{standard.number_name}_plus_color_bt", label=self.ar.data.lang['m013_color'], annotation=self.ar.data.lang['m013_color'], width=width_size, align='center', command=partial(self.colorizeUI, standard), backgroundColor=self.ar.ctrls.get_guide_rgb_colors(standard), parent='plus_sl')
             cmds.separator(style='none', height=5, parent='plus_sl')
@@ -476,7 +476,7 @@ class GuideUI:
     def delete_module_layout(self):
         if self.ar.data.ui_state:
             if cmds.frameLayout('rig_edit_selected_module_fl', query=True, exists=True):
-                cmds.frameLayout('rig_edit_selected_module_fl', edit=True, label=self.ar.data.lang['i011_editSelected']+" "+self.ar.data.lang['i143_module'])
+                cmds.frameLayout('rig_edit_selected_module_fl', edit=True, label=f"{self.ar.data.lang['i011_editSelected']} {self.ar.data.lang['i143_module']}")
             if cmds.columnLayout('rig_selected_module_cl', query=True, exists=True):
                 cmds.deleteUI('rig_selected_module_cl')
 
@@ -501,7 +501,7 @@ class GuideUI:
                     is_geo = True
         if is_geo:
             cmds.textField('edit_guide_geo_tf', edit=True, text=selected_items[0])
-            cmds.setAttr(standard.guide_base+".geo", selected_items[0], type='string')
+            cmds.setAttr(f"{standard.guide_base}.geo", selected_items[0], type='string')
 
 
     def update_select_button(self, selected_guides):
@@ -513,7 +513,7 @@ class GuideUI:
                         cmds.button(f"{instance.number_name}_select_bt", edit=True, label=' ', backgroundColor=current_colors)
                     if selected_guides:
                         for selected_guide in selected_guides:
-                            if str(instance) == cmds.getAttr(selected_guide+"."+self.ar.data.module_instance_info_attr):
+                            if str(instance) == cmds.getAttr(f"{selected_guide}.{self.ar.data.module_instance_info_attr}"):
                                 cmds.button(f"{instance.number_name}_select_bt", edit=True, label='S', backgroundColor=(1.0, 1.0, 1.0))
                                 selected_instances.append(instance)
             return selected_instances
@@ -568,7 +568,7 @@ class GuideUI:
         cmds.gridLayout('colorize_gl', numberOfColumns=8, cellWidthHeight=(20,20), parent='colorize_tl')
         # creating buttons
         for color_index, color_values in enumerate(self.ar.ctrls.colors):
-            cmds.button('index_color_'+str(color_index)+'_bt', label=str(color_index), backgroundColor=(color_values[0], color_values[1], color_values[2]), command=partial(self.ar.ctrls.color_shape, [standard.guide_base], color_index, instance=standard), parent='colorize_gl')
+            cmds.button(f"index_color_{color_index}_bt", label=str(color_index), backgroundColor=(color_values[0], color_values[1], color_values[2]), command=partial(self.ar.ctrls.color_shape, [standard.guide_base], color_index, instance=standard), parent='colorize_gl')
         # RGB layout:
         cmds.columnLayout('colorize_rgb_cl', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent='colorize_tl')
         cmds.separator(height=10, style='none', parent='colorize_rgb_cl')

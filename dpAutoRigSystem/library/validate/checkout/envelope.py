@@ -60,7 +60,7 @@ class Envelope(action.BaseAction):
                                 cmds.setAttr(f"{self.checked_items[idx]}.envelope", 1)
                                 self.found_issues[idx] = False
                             except Exception as e:
-                                mel.eval('print \"dpAR: '+e+'\\n\";')
+                                mel.eval(f'print "dpAR: {e}\n";')
             else:
                 self.found_issues.append(False)
 

@@ -52,10 +52,10 @@ class Wip(action.BaseAction):
                         try:
                             cmds.delete(children)
                             self.good_results.append(True)
-                            self.messages.append(self.ar.data.lang['v004_fixed']+": "+wip_grp)
+                            self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {wip_grp}")
                         except:
                             self.good_results.append(False)
-                            self.messages.append(self.ar.data.lang['v005_cantFix']+": "+wip_grp)
+                            self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {wip_grp}")
                 else:
                     self.found_issues.append(False)
                     self.good_results.append(True)

@@ -59,7 +59,7 @@ class ResetPose(action.BaseAction):
                 for item in check_items:
                     self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                     # conditional to check here
-                    if cmds.objExists(item+".dpControl"):
+                    if cmds.objExists(f"{item}.dpControl"):
                         self.checked_items.append(item)
                         edited_attrs = []
                         attr_data = self.get_attr_default_value_data(item)
@@ -83,7 +83,7 @@ class ResetPose(action.BaseAction):
                                 else:
                                     attr_string += '/'
                                 attr_string += attr
-                            self.checked_items[-1] = item+attr_string
+                            self.checked_items[-1] = f"{item}{attr_string}"
                         else:
                             self.found_issues.append(False)
                         
@@ -94,16 +94,16 @@ class ResetPose(action.BaseAction):
                                 try:
                                     attr_type = self.get_attr_type(attr_data[attr][2])
                                     if attr_type == 0: #boolean
-                                        cmds.setAttr(item+"."+attr, bool(attr_data[attr][0]))
+                                        cmds.setAttr(f"{item}.{attr}", bool(attr_data[attr][0]))
                                     elif attr_type == 1: #integer
-                                        cmds.setAttr(item+"."+attr, int(attr_data[attr][0]))
+                                        cmds.setAttr(f"{item}.{attr}", int(attr_data[attr][0]))
                                     elif attr_type == 2: #float
-                                        cmds.setAttr(item+"."+attr, float(format(attr_data[attr][0],".3f")))
+                                        cmds.setAttr(f"{item}.{attr}", float(format(attr_data[attr][0],".3f")))
                                     self.good_results.append(True)
-                                    self.messages.append(self.ar.data.lang['v004_fixed']+": "+item+"."+attr)
+                                    self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {item}.{attr}")
                                 except:
                                     self.good_results.append(False)
-                                    self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item+"."+attr)
+                                    self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}.{attr}")
             else:
                 self.not_found_node()
         else:
@@ -152,13 +152,13 @@ class ResetPose(action.BaseAction):
         if attributes:
             for attr in attributes:
                 attr_type = cmds.attributeQuery(attr, node=item, attributeType=True)
-                current_value = cmds.getAttr(item+"."+attr)
+                current_value = cmds.getAttr(f"{item}.{attr}")
                 if attr in self.non_dyn_zero_attrs: #translate and rotate
                     attr_data[attr] = [0.0, current_value, attr_type]
                 elif attr in self.non_dyn_one_attrs: #scale
                     attr_data[attr] = [1.0, current_value, attr_type]
                 else: #custom and visibility
-                    attr_data[attr] = [cmds.addAttr(item+"."+attr, query=True, defaultValue=True), current_value, attr_type]
+                    attr_data[attr] = [cmds.addAttr(f"{item}.{attr}", query=True, defaultValue=True), current_value, attr_type]
         return attr_data
 
 

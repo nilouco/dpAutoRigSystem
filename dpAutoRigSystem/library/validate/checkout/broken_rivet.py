@@ -244,7 +244,7 @@ class BrokenRivet(action.BaseAction):
             if closest_vertex_index == translated_closest_vertex_index:
                 cmds.xform(tweak_ctrl, piv=new_translation, ws=True)
             else:
-                mel.eval('warning \"'+self.ar.data.lang['e022_offsetClosetVertex']+'\";')
+                mel.eval(f'warning "{self.ar.data.lang['e022_offsetClosetVertex']}";')
 
 
     def randomize_new_pivot(self, rivet_controllers, attach_to_geo_list):
@@ -324,12 +324,12 @@ class BrokenRivet(action.BaseAction):
                     if len(fol_origins) == 0:
                         self.good_results.append(True)
                         for fixed in rivet_controllers:
-                            self.messages.append(self.ar.data.lang['v004_fixed']+": "+fixed)
+                            self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {fixed}")
                     else:
                         self.good_results.append(False)
                         rivet_controllers, attach_geos = self.get_connections_from_fol(fol_origins)
                         for non_fixed in rivet_controllers:
-                            self.messages.append(self.ar.data.lang['v005_cantFix']+": "+non_fixed)
+                            self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {non_fixed}")
             else:
                 self.not_found_node()
         else:

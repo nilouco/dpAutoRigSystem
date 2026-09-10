@@ -59,7 +59,7 @@ class ModelIO(action.BaseAction):
                     else:
                         self.fail_io(self.ar.data.lang['r010_notFoundPath'])
                 else:
-                    self.fail_io(self.ar.data.lang['e018_notLoadedPlugin']+"AbcExport")
+                    self.fail_io(f"{self.ar.data.lang['e018_notLoadedPlugin']}AbcExport")
             else:
                 self.fail_io(self.ar.data.lang['r027_noAssetContext'])
         else:

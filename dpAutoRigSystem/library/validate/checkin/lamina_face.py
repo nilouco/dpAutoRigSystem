@@ -53,7 +53,7 @@ class LaminaFace(action.BaseAction):
                         # verify if objName or shape_name is in check_items
                         for item in check_items:
                             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
-                            if item == shape_name and not cmds.getAttr(item+".intermediateObject"):
+                            if item == shape_name and not cmds.getAttr(f"{item}.intermediateObject"):
                                 # get faces
                                 iter_face   = OpenMaya.MItMeshPolygon(shape)
                                 con_faces_it = OpenMaya.MItMeshPolygon(shape)
@@ -78,7 +78,7 @@ class LaminaFace(action.BaseAction):
                                             # found laminaFaces
                                             if not item_name in lamina_items:
                                                 lamina_items.append(item_name)
-                                            lamina_faces.append(item_name+'.f["+str(iter_face.index())+"]')
+                                            lamina_faces.append(f"{item_name}.f['{iter_face.index()}')")
                                     iter_face.next()
                         # Move to the next selected node in the list
                         iter.next()
@@ -91,7 +91,7 @@ class LaminaFace(action.BaseAction):
                         self.found_issues.append(True)
                         if self.first_mode:
                             self.good_results.append(False)
-                            self.messages.append("Lamina faces: "+str(lamina_faces))
+                            self.messages.append(f"Lamina faces: {lamina_faces}")
                             cmds.select(lamina_faces)
                         else: #fix
                             try:
@@ -99,13 +99,13 @@ class LaminaFace(action.BaseAction):
                                 mel.eval('polyCleanupArgList 3 { \"0\",\"1\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"1e-005\",\"0\",\"1e-005\",\"0\",\"1e-005\",\"0\",\"-1\",\"1\" };')
                                 cmds.select(clear=True)
                                 self.good_results.append(True)
-                                self.messages.append(self.ar.data.lang['v004_fixed']+": "+item+" - Faces: "+", ".join(lamina_faces))
+                                self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {item} - Faces: {', '.join(lamina_faces)}")
                             except:
                                 self.good_results.append(False)
-                                self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item+" - Faces: "+", ".join(lamina_faces))
+                                self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item} - Faces: {', '.join(lamina_faces)}")
                     if self.first_mode:
-                        self.messages.append("Lamina faces: "+str(lamina_faces))
-                        self.messages.append("---\n"+self.ar.data.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(lamina_faces)+")\n---")
+                        self.messages.append(f"Lamina faces: {lamina_faces}")
+                        self.messages.append(f"---\n{self.ar.data.lang['v121_sharePythonSelect']}\nmaya.cmds.select('{lamina_faces}')\n---")
                         cmds.select(lamina_faces)
             else:
                 self.not_found_node()

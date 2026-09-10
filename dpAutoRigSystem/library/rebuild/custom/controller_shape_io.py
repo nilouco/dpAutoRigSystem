@@ -48,21 +48,21 @@ class ControllerShapeIO(action.BaseAction):
                         if self.first_mode: #export
                             try:
                                 self.ar.pipeliner.make_dir_if_not_exists(self.io_path)
-                                ctrl_filename = self.io_path+"/"+self.start_name+"_"+self.ar.pipeliner.pipe_data['currentFileName']+".ma"
+                                ctrl_filename = f"{self.io_path}/{self.start_name}_{self.ar.pipeliner.pipe_data['currentFileName']}.ma"
                                 self.ar.ctrls.export_shape(controllers, ctrl_filename, ui=False, verbose=True)
                                 self.well_done_io(ctrl_filename)
                             except Exception as e:
-                                self.fail_io(', '.join(controllers)+": "+str(e))
+                                self.fail_io(f"{', '.join(controllers)}: {e}")
                         else: #import
                             exported_items = self.get_exported_items()
                             if exported_items:
                                 try:
                                     exported_items.sort()
-                                    to_import_ctrls = self.io_path+"/"+exported_items[-1]
+                                    to_import_ctrls = f"{self.io_path}/{exported_items[-1]}"
                                     self.ar.ctrls.import_shape(controllers, to_import_ctrls, ui=False, verbose=True)
                                     self.well_done_io(exported_items[-1])
                                 except Exception as e:
-                                    self.fail_io(exported_items[-1]+": "+str(e))
+                                    self.fail_io(f"{exported_items[-1]}: {e}")
                             else:
                                 self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                     else:

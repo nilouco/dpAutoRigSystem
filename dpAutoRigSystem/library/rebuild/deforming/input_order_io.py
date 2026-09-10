@@ -47,7 +47,7 @@ class InputOrderIO(action.BaseAction):
                         if deformed_items:
                             self.export_json_file(self.get_order_data(deformed_items))
                         else:
-                            self.maybe_done_io(self.ar.data.lang['v014_notFoundNodes']+" - meshes")
+                            self.maybe_done_io(f"{self.ar.data.lang['v014_notFoundNodes']} - meshes")
                     else: #import
                         order_data = self.import_latest_json_file(self.get_exported_items())
                         if order_data:
@@ -111,4 +111,4 @@ class InputOrderIO(action.BaseAction):
             if well_imported:
                 self.well_done_io(self.latest_data_file)
         else:
-            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(not_found_meshs)))
+            self.fail_io(f"{self.ar.data.lang['v014_notFoundNodes']} {', '.join(not_found_meshs)}")

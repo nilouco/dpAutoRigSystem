@@ -56,37 +56,37 @@ class SideCalibration(action.BaseAction):
                                 if not_mirror_attrs:
                                     calibrations = list(set(calibrations) - set(not_mirror_attrs))
                                 for attr in calibrations:
-                                    if cmds.objExists(item+"."+attr) and cmds.objExists(pair_data[item]+"."+attr):
+                                    if cmds.objExists(f"{item}.{attr}") and cmds.objExists(f"{pair_data[item]}.{attr}"):
                                         # current values
-                                        item_current_value = float(format(cmds.getAttr(item+"."+attr),".3f"))
-                                        pair_current_value = float(format(cmds.getAttr(pair_data[item]+"."+attr),".3f"))
+                                        item_current_value = float(format(cmds.getAttr(f"{item}.{attr}"),".3f"))
+                                        pair_current_value = float(format(cmds.getAttr(f"{pair_data[item]}.{attr}"),".3f"))
                                         if item_current_value != pair_current_value:
                                             # found issue here
-                                            self.checked_items.append(item+"."+attr)
+                                            self.checked_items.append(f"{item}.{attr}")
                                             self.found_issues.append(True)
                                             if self.first_mode:
                                                 self.good_results.append(False)
                                             else: #fix
                                                 try:
                                                     # default values (supposed to be the same for the two sides)
-                                                    item_default_value = float(format(cmds.addAttr(item+"."+attr, query=True, defaultValue=True),".3f"))
+                                                    item_default_value = float(format(cmds.addAttr(f"{item}.{attr}", query=True, defaultValue=True),".3f"))
                                                     if pair_current_value == item_default_value:
                                                         # pair current value is equal to its default value, so we set the pair value as item current value
-                                                        cmds.setAttr(pair_data[item]+"."+attr, item_current_value)
+                                                        cmds.setAttr(f"{pair_data[item]}.{attr}", item_current_value)
                                                     else:
                                                         # check for left, top or front side to use it as priority node:
                                                         if item[0] == self.ar.data.lang['p002_left'] or item[0] == self.ar.data.lang['p004_top'] or item[0] == self.ar.data.lang['p006_front']:
-                                                            cmds.setAttr(pair_data[item]+"."+attr, item_current_value)
+                                                            cmds.setAttr(f"{pair_data[item]}.{attr}", item_current_value)
                                                         else:
-                                                            cmds.setAttr(item+"."+attr, pair_current_value)
+                                                            cmds.setAttr(f"{item}.{attr}", pair_current_value)
                                                     self.good_results.append(True)
-                                                    self.messages.append(self.ar.data.lang['v004_fixed']+": "+item+"."+attr)
+                                                    self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {item}.{attr}")
                                                 except:
                                                     self.good_results.append(False)
-                                                    self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item+"."+attr)
+                                                    self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}.{attr}")
                                     else:
                                         self.good_results.append(True)
-                                        self.messages.append(item+"."+attr+" "+self.ar.data.lang['i061_notExists'])
+                                        self.messages.append(f"{item}.{attr} {self.ar.data.lang['i061_notExists']}")
             else:
                 self.not_found_node()
         else:

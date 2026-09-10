@@ -67,10 +67,10 @@ class GeometryHistory(action.BaseAction):
                                         # Delete history
                                         cmds.delete(geo, constructionHistory=True)
                                         self.good_results.append(True)
-                                        self.messages.append(self.ar.data.lang['v004_fixed']+": "+geo)
+                                        self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {geo}")
                                     except:
                                         self.good_results.append(False)
-                                        self.messages.append(self.ar.data.lang['v005_cantFix']+": "+geo)
+                                        self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {geo}")
                     else:
                         self.not_found_node()
                 else:

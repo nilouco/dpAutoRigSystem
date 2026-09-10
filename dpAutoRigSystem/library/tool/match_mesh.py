@@ -75,8 +75,8 @@ class MatchMesh(base.BaseLibrary):
             if got_meshes:
                 # storing transformation data
                 for attr in self.ar.data.transform_attrs[:-1]:
-                    from_transform_data[attr] = cmds.getAttr(from_transform+"."+attr)
-                    to_transform_data[attr] = cmds.getAttr(to_transform+"."+attr)
+                    from_transform_data[attr] = cmds.getAttr(f"{from_transform}.{attr}")
+                    to_transform_data[attr] = cmds.getAttr(f"{to_transform}.{attr}")
 
                 # get list of mesh vertices proccess
                 # selecting meshes
@@ -106,21 +106,21 @@ class MatchMesh(base.BaseLibrary):
                     if from_father != None:
                         cmds.parent(from_transform, world=True)
                     for attr in self.ar.data.transform_attrs[:-1]:
-                        cmds.setAttr(from_transform+"."+attr, lock=False)
-                        cmds.setAttr(to_transform+"."+attr, lock=False)
+                        cmds.setAttr(f"{from_transform}.{attr}", lock=False)
+                        cmds.setAttr(f"{to_transform}.{attr}", lock=False)
                         if 'scale' in attr:
-                            cmds.setAttr(from_transform+"."+attr, 1)
-                            cmds.setAttr(to_transform+"."+attr, 1)
+                            cmds.setAttr(f"{from_transform}.{attr}", 1)
+                            cmds.setAttr(f"{to_transform}.{attr}", 1)
                         else:
-                            cmds.setAttr(from_transform+"."+attr, 0)
-                            cmds.setAttr(to_transform+"."+attr, 0)
+                            cmds.setAttr(f"{from_transform}.{attr}", 0)
+                            cmds.setAttr(f"{to_transform}.{attr}", 0)
                     cmds.matchTransform(to_transform, from_transform, position=True, rotation=True, scale=True)
                     # getting vertices as points
                     from_mesh_fn.getPoints(from_vertices)
                     to_mesh_fn.getPoints(to_vertices)
                     
                     # progress window
-                    self.ar.ui_manager.set_progress(self.ar.data.lang['i035_transfData']+': '+self.ar.data.lang['c110_start'], 'Match Mesh Data', from_vertices.length(), is_interruptable=True)
+                    self.ar.ui_manager.set_progress(f"{self.ar.data.lang['i035_transfData']}: {self.ar.data.lang['c110_start']}", 'Match Mesh Data', from_vertices.length(), is_interruptable=True)
                     cancelled = False
                     
                     # transfer vetex position from FROM mesh to TO mesh selected
@@ -132,7 +132,7 @@ class MatchMesh(base.BaseLibrary):
                         self.ar.ui_manager.set_progress(self.ar.data.lang['i035_transfData'])
                         
                         # transfer data
-                        cmds.move(from_vertices[i].x, from_vertices[i].y, from_vertices[i].z, to_mesh+".vtx["+str(i)+"]", absolute=True)
+                        cmds.move(from_vertices[i].x, from_vertices[i].y, from_vertices[i].z, f"{to_mesh}.vtx[{i}]", absolute=True)
                     
                     self.ar.ui_manager.set_progress(end_it=True)
 
@@ -140,8 +140,8 @@ class MatchMesh(base.BaseLibrary):
                         cmds.parent(from_transform, from_father)
                     # restore transformation data
                     for attr in self.ar.data.transform_attrs[:-1]:
-                        cmds.setAttr(from_transform+"."+attr, from_transform_data[attr])
-                        cmds.setAttr(to_transform+"."+attr, to_transform_data[attr])
+                        cmds.setAttr(f"{from_transform}.{attr}", from_transform_data[attr])
+                        cmds.setAttr(f"{to_transform}.{attr}", to_transform_data[attr])
 
                     if not cancelled:
                         cmds.select(selection)
@@ -151,7 +151,7 @@ class MatchMesh(base.BaseLibrary):
                     else:
                         print(self.ar.data.lang['i038_canceled'])
                 else:
-                    mel.eval("warning \""+self.ar.data.lang['i039_notMatchDif']+"\";")
+                    mel.eval(f'warning "{self.ar.data.lang['i039_notMatchDif']}";')
                 cmds.select(selection)
             else:
-                mel.eval("warning \""+self.ar.data.lang['i040_notMatchSel']+"\";")
+                mel.eval(f'warning "{self.ar.data.lang['i040_notMatchSel']}";')

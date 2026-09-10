@@ -71,7 +71,7 @@ class ShaderIO(action.BaseAction):
                             try:
                                 self.import_shader(shader_data)
                             except Exception as e:
-                                self.fail_io(self.ar.data.lang['r032_notImportedData']+": "+str(e))
+                                self.fail_io(f"{self.ar.data.lang['r032_notImportedData']}: {e}")
                         else:
                             self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                 else:
@@ -97,7 +97,7 @@ class ShaderIO(action.BaseAction):
         shader_data = {}
         self.ar.ui_manager.set_progress(max=len(shaders), add_one=False, add_number=False)
         for shader in shaders:
-            self.ar.ui_manager.set_progress(self.ar.data.lang[self.title]+": "+shader)
+            self.ar.ui_manager.set_progress(f"{self.ar.data.lang[self.title]}: {shader}")
             file_node = None
             texture = None
             color = None
@@ -109,12 +109,12 @@ class ShaderIO(action.BaseAction):
                 if not color_attr in cmds.listAttr(shader): #support standardShader
                     color_attr = 'baseColor'
                 if color_attr in cmds.listAttr(shader):
-                    shader_connections = cmds.listConnections(shader+"."+color_attr, destination=False, source=True)
+                    shader_connections = cmds.listConnections(f"{shader}.{color_attr}", destination=False, source=True)
                     if shader_connections:
                         file_node = shader_connections[0]
-                        texture = cmds.getAttr(file_node+".fileTextureName")
+                        texture = cmds.getAttr(f"{file_node}.fileTextureName")
                     else:
-                        color = cmds.getAttr(shader+"."+color_attr)[0]
+                        color = cmds.getAttr(f"{shader}.{color_attr}")[0]
                 # transparency
                 transparency_attr = 'transparency'
                 if not transparency_attr in cmds.listAttr(shader): #support standardShader
@@ -123,13 +123,13 @@ class ShaderIO(action.BaseAction):
                         transparency_attr = 'geometryOpacity'
                         if not transparency_attr in cmds.listAttr(shader): #support surfaceShader
                             transparency_attr = 'outTransparency'
-                            transparency = cmds.getAttr(shader+"."+transparency_attr)[0]
+                            transparency = cmds.getAttr(f"{shader}.{transparency_attr}")[0]
                         else:
-                            transparency = cmds.getAttr(shader+"."+transparency_attr)
+                            transparency = cmds.getAttr(f"{shader}.{transparency_attr}")
                     else:
-                        transparency = cmds.getAttr(shader+"."+transparency_attr)[0]
+                        transparency = cmds.getAttr(f"{shader}.{transparency_attr}")[0]
                 else:
-                    transparency = cmds.getAttr(shader+"."+transparency_attr)[0]
+                    transparency = cmds.getAttr(f"{shader}.{transparency_attr}")[0]
                 # data dictionary to export
                 shader_data[shader] = {'assigned'        : assigned_items,
                                     'color'            : color,
@@ -143,15 +143,15 @@ class ShaderIO(action.BaseAction):
                 # custom shader attributes
                 for attr in self.custom_attributes:
                     if attr in cmds.listAttr(shader):
-                        shader_data[shader][attr] = cmds.getAttr(shader+"."+attr)
+                        shader_data[shader][attr] = cmds.getAttr(f"{shader}.{attr}")
                 # custom vector color attributes
                 for attr in self.vector_colors:
                     if attr in cmds.listAttr(shader):
-                        shader_data[shader][attr] = cmds.getAttr(shader+"."+attr)[0]
+                        shader_data[shader][attr] = cmds.getAttr(f"{shader}.{attr}")[0]
                 # changed type shader attributes
                 for attr in self.changed_types:
                     if attr in cmds.listAttr(shader):
-                        shader_data[shader][attr] = cmds.getAttr(shader+"."+attr)
+                        shader_data[shader][attr] = cmds.getAttr(f"{shader}.{attr}")
             cmds.select(clear=True)
         return shader_data
 
@@ -166,28 +166,28 @@ class ShaderIO(action.BaseAction):
                 shader = cmds.shadingNode(shader_data[item]['material'], asShader=True, name=item)
                 if shader_data[item]['fileNode']:
                     file_node = cmds.shadingNode('file', asTexture=True, isColorManaged=True, name=shader_data[item]['file_node'])
-                    cmds.connectAttr(file_node+".outColor", shader+"."+shader_data[item]['colorAttr'], force=True)
-                    cmds.setAttr(file_node+".fileTextureName", shader_data[item]['texture'], type='string')
+                    cmds.connectAttr(f"{file_node}.outColor", f"{shader}.{shader_data[item]['colorAttr']}", force=True)
+                    cmds.setAttr(f"{file_node}.fileTextureName", shader_data[item]['texture'], type='string')
                 else:
                     colors = shader_data[item]['color']
-                    cmds.setAttr(shader+"."+shader_data[item]['colorAttr'], colors[0], colors[1], colors[2], type='double3')
+                    cmds.setAttr(f"{shader}.{shader_data[item]['colorAttr']}", colors[0], colors[1], colors[2], type='double3')
                 transparencies = shader_data[item]['transparency']
                 if shader_data[item]['transparencyAttr'] == 'geometryOpacity': #support OpenPBRShader
-                    cmds.setAttr(shader+"."+shader_data[item]['transparencyAttr'], transparencies)
+                    cmds.setAttr(f"{shader}.{shader_data[item]['transparencyAttr']}", transparencies)
                 else:
-                    cmds.setAttr(shader+"."+shader_data[item]['transparencyAttr'], transparencies[0], transparencies[1], transparencies[2], type='double3')
+                    cmds.setAttr(f"{shader}.{shader_data[item]['transparencyAttr']}", transparencies[0], transparencies[1], transparencies[2], type='double3')
                 for attr in self.custom_attributes:
                     if attr in cmds.listAttr(shader) and shader_data[item][attr]:
-                        cmds.setAttr(shader+"."+attr, shader_data[item][attr])
+                        cmds.setAttr(f"{shader}.{attr}", shader_data[item][attr])
                 for attr in self.vector_colors:
                     if attr in cmds.listAttr(shader) and shader_data[item][attr]:
-                        cmds.setAttr(shader+"."+attr, shader_data[item][attr][0], shader_data[item][attr][1], shader_data[item][attr][2], type='double3')
+                        cmds.setAttr(f"{shader}.{attr}", shader_data[item][attr][0], shader_data[item][attr][1], shader_data[item][attr][2], type='double3')
                 for attr in self.changed_types: #exception to conform Maya2024 standardSurface and Maya2026 openPBRshader - float or vector attribute types
                     if attr in cmds.listAttr(shader) and shader_data[item][attr]:
                         try:
-                            cmds.setAttr(shader+"."+attr, shader_data[item][attr])
+                            cmds.setAttr(f"{shader}.{attr}", shader_data[item][attr])
                         except:
-                            cmds.setAttr(shader+"."+attr, shader_data[item][attr][0][0], shader_data[item][attr][0][1], shader_data[item][attr][0][2], type='double3')
+                            cmds.setAttr(f"{shader}.{attr}", shader_data[item][attr][0][0], shader_data[item][attr][0][1], shader_data[item][attr][0][2], type='double3')
             # apply shader to meshes
             for mesh in shader_data[item]['assigned']:
                 if cmds.objExists(mesh):
@@ -200,6 +200,6 @@ class ShaderIO(action.BaseAction):
                     not_found_meshs.append(mesh)
         cmds.select(clear=True)
         if not_found_meshs:
-            self.fail_io(self.ar.data.lang['r011_notFoundMesh']+", ".join(not_found_meshs))
+            self.fail_io(f"{self.ar.data.lang['r011_notFoundMesh']}{', '.join(not_found_meshs)}")
         else:
             self.well_done_io(self.latest_data_file)

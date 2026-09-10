@@ -40,11 +40,11 @@ class CorrectionManager(base.BaseLibrary):
         message_attrs = []
         attributes = cmds.listAttr(self.net)
         for attr in attributes:
-            if cmds.getAttr(self.net+"."+attr, type=True) == 'message':
+            if cmds.getAttr(f"{self.net}.{attr}", type=True) == 'message':
                 message_attrs.append(attr)
         if message_attrs:
             for message_attr in message_attrs:
-                connections = cmds.listConnections(self.net+"."+message_attr)
+                connections = cmds.listConnections(f"{self.net}.{message_attr}")
                 if connections:
                     children = cmds.listRelatives(connections[0], children=True, allDescendents=True)
                     cmds.rename(connections[0], connections[0].replace(old_name, name))
@@ -61,10 +61,10 @@ class CorrectionManager(base.BaseLibrary):
     def get_distance(self):
         """ Returns the distance value read from the distance between node.
         """
-        if cmds.getAttr(self.net+".type") == self.distance_name:
-            dist_bet = cmds.listConnections(self.net+".distanceBet")[0]
+        if cmds.getAttr(f"{self.net}.type") == self.distance_name:
+            dist_bet = cmds.listConnections(f"{self.net}.distanceBet")[0]
             if dist_bet:
-                return cmds.getAttr(dist_bet+".distance")
+                return cmds.getAttr(f"{dist_bet}.distance")
 
 
     def change_name(self, name=None, *args):
@@ -72,13 +72,13 @@ class CorrectionManager(base.BaseLibrary):
             If there isn't any given name, it will try to get from the UI.
             Returns the name result.
         """
-        old_name = cmds.getAttr(self.net+".name")
+        old_name = cmds.getAttr(f"{self.net}.name")
         if not name and self.ar.data.ui_state:
             name = cmds.textFieldGrp('correction_name_tfg', query=True, text=True)
         if name:
             name = self.ar.naming.resolve_name(name, self.net_suffix)[0]
             self.rename_linked_nodes(old_name, name)
-            cmds.setAttr(self.net+".name", name, type='string')
+            cmds.setAttr(f"{self.net}.name", name, type='string')
             self.net = cmds.rename(self.net, self.net.replace(old_name, name))
             if self.ar.data.ui_state:
                 self.ar.correction_manager_ui.populate_net_ui()
@@ -91,36 +91,36 @@ class CorrectionManager(base.BaseLibrary):
     def change_axis(self, axis=None, *args):
         """ Update the setup to read the correct axis to extract angle or decompose distance vector.
         """
-        cmds.setAttr(self.net+".axis", self.ar.data.axes.index(axis.upper()))
+        cmds.setAttr(f"{self.net}.axis", self.ar.data.axes.index(axis.upper()))
         
         
     def change_axis_order(self, axisOrder=None, *args):
         """ Update the setup to set the correct axis order to extract angle.
         """
-        if cmds.getAttr(self.net+".type") == self.angle_name:
-            cmds.setAttr(self.net+".axisOrder", self.ar.data.axis_orders.index(axisOrder.upper()))
+        if cmds.getAttr(f"{self.net}.type") == self.angle_name:
+            cmds.setAttr(f"{self.net}.axisOrder", self.ar.data.axis_orders.index(axisOrder.upper()))
 
 
     def change_input_values(self, min_value=None, max_value=None, *args):
         """ Update the setup to set the choose input min and max values.
             That means we can read the angle or distance in this given range.
         """
-        cmds.setAttr(self.net+".inputStart", min_value)
-        cmds.setAttr(self.net+".inputEnd", max_value)
+        cmds.setAttr(f"{self.net}.inputStart", min_value)
+        cmds.setAttr(f"{self.net}.inputEnd", max_value)
 
 
     def change_output_values(self, min_value=None, max_value=None, *args):
         """ Update the setup to set the choose output min and max values.
             That means we can output the final value in this given range.
         """
-        cmds.setAttr(self.net+".outputStart", min_value)
-        cmds.setAttr(self.net+".outputEnd", max_value)
+        cmds.setAttr(f"{self.net}.outputStart", min_value)
+        cmds.setAttr(f"{self.net}.outputEnd", max_value)
 
 
     def change_decompose(self, value=None, *args):
         """ Update the decompose boolean attribute using the value comming from the UI checkBox.
         """
-        cmds.setAttr(self.net+".decompose", value)
+        cmds.setAttr(f"{self.net}.decompose", value)
         if self.ar.data.ui_state:
             cmds.optionMenu('correction_axis_om', edit=True, enable=value)
 
@@ -129,11 +129,11 @@ class CorrectionManager(base.BaseLibrary):
         """ Just set the interpolation method of the remapValue to this given argument.
         """
         if interp == 'Linear':
-            cmds.setAttr(self.net+".interpolation", 0)
+            cmds.setAttr(f"{self.net}.interpolation", 0)
         elif interp == 'Smooth':
-            cmds.setAttr(self.net+".interpolation", 1)
+            cmds.setAttr(f"{self.net}.interpolation", 1)
         else: #Spline
-            cmds.setAttr(self.net+".interpolation", 2)
+            cmds.setAttr(f"{self.net}.interpolation", 2)
 
 
     def delete_setup(self, *args):
@@ -174,21 +174,21 @@ class CorrectionManager(base.BaseLibrary):
             Return the locator to use it as a reader node to the system.
         """
         if cmds.objExists(to_attach):
-            loc = cmds.spaceLocator(name=name+"_Loc")[0]
+            loc = cmds.spaceLocator(name=f"{name}_Loc")[0]
             cmds.addAttr(loc, longName="inputNode", attributeType='message')
-            cmds.connectAttr(to_attach+".message", loc+".inputNode", force=True)
+            cmds.connectAttr(f"{to_attach}.message", f"{loc}.inputNode", force=True)
             grp = self.ar.utils.create_zero_out([loc])[0]
             if to_rivet:
                 rivet_node = self.rivet.create_rivet(to_attach, 'AnyUVSet', [grp], True, False, False, False, False, False, False, use_offset=False)[-1]
-                cmds.addAttr(self.net, longName=to_attach+"_Rivet", attributeType='message')
-                cmds.connectAttr(rivet_node+".message", self.net+"."+to_attach+"_Rivet", force=True)
+                cmds.addAttr(self.net, longName=f"{to_attach}_Rivet", attributeType='message')
+                cmds.connectAttr(f"{rivet_node}.message", f"{self.net}.{to_attach}_Rivet", force=True)
             else:
-                cmds.parentConstraint(to_attach, grp, maintainOffset=False, name=grp+"_PaC")
-                cmds.scaleConstraint(to_attach, grp, maintainOffset=True, name=grp+"_ScC")
+                cmds.parentConstraint(to_attach, grp, maintainOffset=False, name=f"{grp}_PaC")
+                cmds.scaleConstraint(to_attach, grp, maintainOffset=True, name=f"{grp}_ScC")
             cmds.parent(grp, self.ar.utils.get_node_by_message("correctionDataGrp", self.net))
             return loc
         else:
-            mel.eval('warning \"'+to_attach+' '+self.ar.data.lang['i061_notExists']+'\";')
+            mel.eval(f'warning "{to_attach} {self.ar.data.lang['i061_notExists']}";')
 
 
     def create_correction_manager_setup(self, nodes=None, name=None, correct_type=None, to_rivet=False, from_ui=False, *args):
@@ -212,12 +212,12 @@ class CorrectionManager(base.BaseLibrary):
                     if not cmds.objExists(self.cm_data_grp):
                         self.cm_data_grp = cmds.group(empty=True, name=self.cm_data_grp)
                         cmds.addAttr(self.cm_data_grp, longName='dpCorrectionManagerDataGrp', attributeType='bool')
-                        cmds.setAttr(self.cm_data_grp+".dpCorrectionManagerDataGrp", 1)
+                        cmds.setAttr(f"{self.cm_data_grp}.dpCorrectionManagerDataGrp", 1)
                         self.ar.ctrls.set_lock_hide([self.cm_data_grp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
                         scalable_grp = self.ar.utils.get_node_by_message('scalableGrp')
                         if scalable_grp:
                             cmds.parent(self.cm_data_grp, scalable_grp)
-                        cmds.setAttr(self.cm_data_grp+".visibility", 0)
+                        cmds.setAttr(f"{self.cm_data_grp}.visibility", 0)
 
                     # naming
                     if not name:
@@ -264,169 +264,169 @@ class CorrectionManager(base.BaseLibrary):
                     cmds.addAttr(self.net, longName='inputRigScale', attributeType='float', defaultValue=1)
                     option_ctrl = self.ar.utils.get_node_by_message('optionCtrl')
                     if option_ctrl:
-                        cmds.connectAttr(option_ctrl+".rigScaleOutput", self.net+".inputRigScale", force=True)
+                        cmds.connectAttr(f"{option_ctrl}.rigScaleOutput", f"{self.net}.inputRigScale", force=True)
                     cmds.addAttr(self.net, longName='corrective', attributeType='float', minValue=0, defaultValue=1, maxValue=1)
                     cmds.addAttr(self.net, longName='outputValue', attributeType='float')
-                    cmds.setAttr(self.net+".dpNetwork", 1)
-                    cmds.setAttr(self.net+".dpCorrectionManager", 1)
-                    cmds.setAttr(self.net+".name", correction_name, type='string')
-                    cmds.setAttr(self.net+".type", correct_type, type='string')
+                    cmds.setAttr(f"{self.net}.dpNetwork", 1)
+                    cmds.setAttr(f"{self.net}.dpCorrectionManager", 1)
+                    cmds.setAttr(f"{self.net}.name", correction_name, type='string')
+                    cmds.setAttr(f"{self.net}.type", correct_type, type='string')
                     # setup group
-                    correction_data_grp = cmds.group(empty=True, name=correction_name+"_Grp")
+                    correction_data_grp = cmds.group(empty=True, name=f"{correction_name}_Grp")
                     cmds.parent(correction_data_grp, self.cm_data_grp)
-                    cmds.connectAttr(correction_data_grp+".message", self.net+".correctionDataGrp", force=True)
-                    original_loc = self.create_corrective_locator(correction_name+"_Original", orig_node, to_rivet)
-                    action_loc = self.create_corrective_locator(correction_name+"_Action", action_node, to_rivet)
-                    cmds.connectAttr(original_loc+".message", self.net+".originalLoc", force=True)
-                    cmds.connectAttr(action_loc+".message", self.net+".actionLoc", force=True)
+                    cmds.connectAttr(f"{correction_data_grp}.message", f"{self.net}.correctionDataGrp", force=True)
+                    original_loc = self.create_corrective_locator(f"{correction_name}_Original", orig_node, to_rivet)
+                    action_loc = self.create_corrective_locator(f"{correction_name}_Action", action_node, to_rivet)
+                    cmds.connectAttr(f"{original_loc}.message", f"{self.net}.originalLoc", force=True)
+                    cmds.connectAttr(f"{action_loc}.message", f"{self.net}.actionLoc", force=True)
 
                     # create corrective, interpolation and rigScale nodes:
-                    corrective_md = cmds.createNode('multiplyDivide', name=correction_name+"_Corrective_MD")
-                    interpolation_pma = cmds.createNode('plusMinusAverage', name=correction_name+"_Interpolation_PMA")
+                    corrective_md = cmds.createNode('multiplyDivide', name=f"{correction_name}_Corrective_MD")
+                    interpolation_pma = cmds.createNode('plusMinusAverage', name=f"{correction_name}_Interpolation_PMA")
                     self.to_ids.extend([self.net, corrective_md, interpolation_pma])
-                    cmds.connectAttr(corrective_md+".message", self.net+".correctiveMD", force=True)
-                    cmds.connectAttr(interpolation_pma+".message", self.net+".interpolationPMA", force=True)
-                    cmds.connectAttr(self.net+".corrective", corrective_md+".input2X", force=True)
-                    cmds.connectAttr(self.net+".interpolation", interpolation_pma+".input1D[0]", force=True)
-                    cmds.setAttr(interpolation_pma+".input1D[1]", 1)
+                    cmds.connectAttr(f"{corrective_md}.message", f"{self.net}.correctiveMD", force=True)
+                    cmds.connectAttr(f"{interpolation_pma}.message", f"{self.net}.interpolationPMA", force=True)
+                    cmds.connectAttr(f"{self.net}.corrective", f"{corrective_md}.input2X", force=True)
+                    cmds.connectAttr(f"{self.net}.interpolation", f"{interpolation_pma}.input1D[0]", force=True)
+                    cmds.setAttr(f"{interpolation_pma}.input1D[1]", 1)
                     
                     # if rotate extration option:
                     if correct_type == self.angle_name:                        
                         # write a new self.ar.utils function to generate these matrix nodes here:
-                        extract_angle_mm = cmds.createNode('multMatrix', name=correction_name+"_ExtractAngle_MM")
-                        extract_angle_dm = cmds.createNode('decomposeMatrix', name=correction_name+"_ExtractAngle_DM")
-                        extract_angle_qte = cmds.createNode('quatToEuler', name=correction_name+"_ExtractAngle_QtE")
-                        extract_angle_md = cmds.createNode('multiplyDivide', name=correction_name+"_ExtractAngle_MD")
+                        extract_angle_mm = cmds.createNode('multMatrix', name=f"{correction_name}_ExtractAngle_MM")
+                        extract_angle_dm = cmds.createNode('decomposeMatrix', name=f"{correction_name}_ExtractAngle_DM")
+                        extract_angle_qte = cmds.createNode('quatToEuler', name=f"{correction_name}_ExtractAngle_QtE")
+                        extract_angle_md = cmds.createNode('multiplyDivide', name=f"{correction_name}_ExtractAngle_MD")
                         # workaround to generate UnitConversion nodes before connect to Choice node (passing by a temporary MultiplyDivide)
-                        angle_unit_convertion_md = cmds.createNode('multiplyDivide', name=correction_name+"_ExtractAngle_UnitConversion_MD")
-                        angle_axis_chc = cmds.createNode('choice', name=correction_name+"_ExtractAngle_Axis_Chc")
-                        smaller_than_one_cnd = cmds.createNode('condition', name=correction_name+"_ExtractAngle_SmallerThanOne_Cnd")
-                        over_zero_cnd = cmds.createNode('condition', name=correction_name+"_ExtractAngle_OverZero_Cnd")
-                        input_rmv = cmds.createNode('remapValue', name=correction_name+"_Input_RmV")
-                        output_sr = cmds.createNode('setRange', name=correction_name+"_Output_SR")
+                        angle_unit_convertion_md = cmds.createNode('multiplyDivide', name=f"{correction_name}_ExtractAngle_UnitConversion_MD")
+                        angle_axis_chc = cmds.createNode('choice', name=f"{correction_name}_ExtractAngle_Axis_Chc")
+                        smaller_than_one_cnd = cmds.createNode('condition', name=f"{correction_name}_ExtractAngle_SmallerThanOne_Cnd")
+                        over_zero_cnd = cmds.createNode('condition', name=f"{correction_name}_ExtractAngle_OverZero_Cnd")
+                        input_rmv = cmds.createNode('remapValue', name=f"{correction_name}_Input_RmV")
+                        output_sr = cmds.createNode('setRange', name=f"{correction_name}_Output_SR")
                         self.to_ids.extend([extract_angle_mm, extract_angle_dm, extract_angle_qte, extract_angle_md, angle_unit_convertion_md, angle_axis_chc, smaller_than_one_cnd, over_zero_cnd, input_rmv, output_sr])
-                        cmds.setAttr(extract_angle_md+".operation", 2)
-                        cmds.setAttr(smaller_than_one_cnd+".operation", 5) #less or equal
-                        cmds.setAttr(smaller_than_one_cnd+".secondTerm", 1)
-                        cmds.setAttr(over_zero_cnd+".secondTerm", 0)
-                        cmds.setAttr(over_zero_cnd+".colorIfFalseR", 0)
-                        cmds.setAttr(over_zero_cnd+".operation", 3) #greater or equal
-                        cmds.connectAttr(action_loc+".worldMatrix[0]", extract_angle_mm+".matrixIn[0]", force=True)
-                        cmds.connectAttr(original_loc+".worldInverseMatrix[0]", extract_angle_mm+".matrixIn[1]", force=True)
-                        cmds.connectAttr(extract_angle_mm+".matrixSum", extract_angle_dm+".inputMatrix", force=True)
+                        cmds.setAttr(f"{extract_angle_md}.operation", 2)
+                        cmds.setAttr(f"{smaller_than_one_cnd}.operation", 5) #less or equal
+                        cmds.setAttr(f"{smaller_than_one_cnd}.secondTerm", 1)
+                        cmds.setAttr(f"{over_zero_cnd}.secondTerm", 0)
+                        cmds.setAttr(f"{over_zero_cnd}.colorIfFalseR", 0)
+                        cmds.setAttr(f"{over_zero_cnd}.operation", 3) #greater or equal
+                        cmds.connectAttr(f"{action_loc}.worldMatrix[0]", f"{extract_angle_mm}.matrixIn[0]", force=True)
+                        cmds.connectAttr(f"{original_loc}.worldInverseMatrix[0]", f"{extract_angle_mm}.matrixIn[1]", force=True)
+                        cmds.connectAttr(f"{extract_angle_mm}.matrixSum", f"{extract_angle_dm}.inputMatrix", force=True)
                         # set general values and connections:
-                        cmds.setAttr(output_sr+".oldMaxX", 1)
-                        cmds.connectAttr(self.net+".inputStart", input_rmv+".inputMin", force=True)
-                        cmds.connectAttr(self.net+".inputEnd", input_rmv+".inputMax", force=True)
-                        cmds.connectAttr(self.net+".inputEnd", input_rmv+".outputMax", force=True)
-                        cmds.connectAttr(self.net+".outputStart", output_sr+".minX", force=True)
-                        cmds.connectAttr(self.net+".outputEnd", output_sr+".maxX", force=True)
-                        cmds.connectAttr(interpolation_pma+".output1D", input_rmv+".value[0].value_Interp", force=True)
+                        cmds.setAttr(f"{output_sr}.oldMaxX", 1)
+                        cmds.connectAttr(f"{self.net}.inputStart", f"{input_rmv}.inputMin", force=True)
+                        cmds.connectAttr(f"{self.net}.inputEnd", f"{input_rmv}.inputMax", force=True)
+                        cmds.connectAttr(f"{self.net}.inputEnd", f"{input_rmv}.outputMax", force=True)
+                        cmds.connectAttr(f"{self.net}.outputStart", f"{output_sr}.minX", force=True)
+                        cmds.connectAttr(f"{self.net}.outputEnd", f"{output_sr}.maxX", force=True)
+                        cmds.connectAttr(f"{interpolation_pma}.output1D", f"{input_rmv}.value[0].value_Interp", force=True)
                         # setup the rotation affection
-                        cmds.connectAttr(extract_angle_dm+".outputQuatX", extract_angle_qte+".inputQuatX", force=True)
-                        cmds.connectAttr(extract_angle_dm+".outputQuatY", extract_angle_qte+".inputQuatY", force=True)
-                        cmds.connectAttr(extract_angle_dm+".outputQuatZ", extract_angle_qte+".inputQuatZ", force=True)
-                        cmds.connectAttr(extract_angle_dm+".outputQuatW", extract_angle_qte+".inputQuatW", force=True)
+                        cmds.connectAttr(f"{extract_angle_dm}.outputQuatX", f"{extract_angle_qte}.inputQuatX", force=True)
+                        cmds.connectAttr(f"{extract_angle_dm}.outputQuatY", f"{extract_angle_qte}.inputQuatY", force=True)
+                        cmds.connectAttr(f"{extract_angle_dm}.outputQuatZ", f"{extract_angle_qte}.inputQuatZ", force=True)
+                        cmds.connectAttr(f"{extract_angle_dm}.outputQuatW", f"{extract_angle_qte}.inputQuatW", force=True)
                         # axis setup
-                        cmds.connectAttr(extract_angle_qte+".outputRotateX", angle_unit_convertion_md+".input1X", force=True)
-                        cmds.connectAttr(extract_angle_qte+".outputRotateY", angle_unit_convertion_md+".input1Y", force=True)
-                        cmds.connectAttr(extract_angle_qte+".outputRotateZ", angle_unit_convertion_md+".input1Z", force=True)
-                        cmds.connectAttr(cmds.listConnections(angle_unit_convertion_md+".input1X", source=True, destination=False, plugs=True)[0], angle_axis_chc+".input[0]", force=True)
-                        cmds.connectAttr(cmds.listConnections(angle_unit_convertion_md+".input1Y", source=True, destination=False, plugs=True)[0], angle_axis_chc+".input[1]", force=True)
-                        cmds.connectAttr(cmds.listConnections(angle_unit_convertion_md+".input1Z", source=True, destination=False, plugs=True)[0], angle_axis_chc+".input[2]", force=True)
+                        cmds.connectAttr(f"{extract_angle_qte}.outputRotateX", f"{angle_unit_convertion_md}.input1X", force=True)
+                        cmds.connectAttr(f"{extract_angle_qte}.outputRotateY", f"{angle_unit_convertion_md}.input1Y", force=True)
+                        cmds.connectAttr(f"{extract_angle_qte}.outputRotateZ", f"{angle_unit_convertion_md}.input1Z", force=True)
+                        cmds.connectAttr(cmds.listConnections(f"{angle_unit_convertion_md}.input1X", source=True, destination=False, plugs=True)[0], f"{angle_axis_chc}.input[0]", force=True)
+                        cmds.connectAttr(cmds.listConnections(f"{angle_unit_convertion_md}.input1Y", source=True, destination=False, plugs=True)[0], f"{angle_axis_chc}.input[1]", force=True)
+                        cmds.connectAttr(cmds.listConnections(f"{angle_unit_convertion_md}.input1Z", source=True, destination=False, plugs=True)[0], f"{angle_axis_chc}.input[2]", force=True)
                         cmds.delete(angle_unit_convertion_md)
-                        cmds.connectAttr(self.net+".axis", angle_axis_chc+".selector", force=True)
-                        cmds.connectAttr(angle_axis_chc+".output", input_rmv+".inputValue", force=True)
-                        cmds.connectAttr(input_rmv+".outValue", extract_angle_md+".input1X", force=True)
-                        cmds.connectAttr(angle_axis_chc+".output", self.net+".inputValue", force=True)
-                        cmds.setAttr(self.net+".inputValue", lock=True)
+                        cmds.connectAttr(f"{self.net}.axis", f"{angle_axis_chc}.selector", force=True)
+                        cmds.connectAttr(f"{angle_axis_chc}.output", f"{input_rmv}.inputValue", force=True)
+                        cmds.connectAttr(f"{input_rmv}.outValue", f"{extract_angle_md}.input1X", force=True)
+                        cmds.connectAttr(f"{angle_axis_chc}.output", f"{self.net}.inputValue", force=True)
+                        cmds.setAttr(f"{self.net}.inputValue", lock=True)
                         # axis order setup
-                        cmds.connectAttr(self.net+".inputEnd", extract_angle_md+".input2X", force=True) #it'll be updated when changing angle
-                        cmds.connectAttr(extract_angle_md+".outputX", smaller_than_one_cnd+".firstTerm", force=True)
-                        cmds.connectAttr(extract_angle_md+".outputX", smaller_than_one_cnd+".colorIfTrueR", force=True)
-                        cmds.connectAttr(smaller_than_one_cnd+".outColorR", over_zero_cnd+".firstTerm", force=True)
-                        cmds.connectAttr(smaller_than_one_cnd+".outColorR", over_zero_cnd+".colorIfTrueR", force=True)
-                        cmds.connectAttr(self.net+".axisOrder", extract_angle_dm+".inputRotateOrder", force=True)
-                        cmds.connectAttr(self.net+".axisOrder", extract_angle_qte+".inputRotateOrder", force=True)
+                        cmds.connectAttr(f"{self.net}.inputEnd", f"{extract_angle_md}.input2X", force=True) #it'll be updated when changing angle
+                        cmds.connectAttr(f"{extract_angle_md}.outputX", f"{smaller_than_one_cnd}.firstTerm", force=True)
+                        cmds.connectAttr(f"{extract_angle_md}.outputX", f"{smaller_than_one_cnd}.colorIfTrueR", force=True)
+                        cmds.connectAttr(f"{smaller_than_one_cnd}.outColorR", f"{over_zero_cnd}.firstTerm", force=True)
+                        cmds.connectAttr(f"{smaller_than_one_cnd}.outColorR", f"{over_zero_cnd}.colorIfTrueR", force=True)
+                        cmds.connectAttr(f"{self.net}.axisOrder", f"{extract_angle_dm}.inputRotateOrder", force=True)
+                        cmds.connectAttr(f"{self.net}.axisOrder", f"{extract_angle_qte}.inputRotateOrder", force=True)
                         # corrective setup:
-                        cmds.connectAttr(over_zero_cnd+".outColorR", corrective_md+".input1X", force=True)
-                        cmds.connectAttr(corrective_md+".outputX", output_sr+".valueX", force=True)
+                        cmds.connectAttr(f"{over_zero_cnd}.outColorR", f"{corrective_md}.input1X", force=True)
+                        cmds.connectAttr(f"{corrective_md}.outputX", f"{output_sr}.valueX", force=True)
                         # TODO create a way to avoid manual connection here, maybe using the UI new tab?
-                        cmds.connectAttr(output_sr+".outValueX", self.net+".outputValue", force=True)
-                        cmds.setAttr(self.net+".outputValue", lock=True)
+                        cmds.connectAttr(f"{output_sr}.outValueX", f"{self.net}.outputValue", force=True)
+                        cmds.setAttr(f"{self.net}.outputValue", lock=True)
                         # serialize angle nodes
-                        cmds.connectAttr(extract_angle_mm+".message", self.net+".extractAngleMM", force=True)
-                        cmds.connectAttr(extract_angle_dm+".message", self.net+".extractAngleDM", force=True)
-                        cmds.connectAttr(extract_angle_qte+".message", self.net+".extractAngleQtE", force=True)
-                        cmds.connectAttr(extract_angle_md+".message", self.net+".extractAngleMD", force=True)
-                        cmds.connectAttr(angle_axis_chc+".message", self.net+".angleAxisChc", force=True)
-                        cmds.connectAttr(smaller_than_one_cnd+".message", self.net+".smallerThanOneCnd", force=True)
-                        cmds.connectAttr(over_zero_cnd+".message", self.net+".overZeroCnd", force=True)
-                        cmds.connectAttr(input_rmv+".message", self.net+".inputRmV", force=True)
-                        cmds.connectAttr(output_sr+".message", self.net+".outputSR", force=True)
+                        cmds.connectAttr(f"{extract_angle_mm}.message", f"{self.net}.extractAngleMM", force=True)
+                        cmds.connectAttr(f"{extract_angle_dm}.message", f"{self.net}.extractAngleDM", force=True)
+                        cmds.connectAttr(f"{extract_angle_qte}.message", f"{self.net}.extractAngleQtE", force=True)
+                        cmds.connectAttr(f"{extract_angle_md}.message", f"{self.net}.extractAngleMD", force=True)
+                        cmds.connectAttr(f"{angle_axis_chc}.message", f"{self.net}.angleAxisChc", force=True)
+                        cmds.connectAttr(f"{smaller_than_one_cnd}.message", f"{self.net}.smallerThanOneCnd", force=True)
+                        cmds.connectAttr(f"{over_zero_cnd}.message", f"{self.net}.overZeroCnd", force=True)
+                        cmds.connectAttr(f"{input_rmv}.message", f"{self.net}.inputRmV", force=True)
+                        cmds.connectAttr(f"{output_sr}.message", f"{self.net}.outputSR", force=True)
                         
                     else: #Distance
-                        distance_scale_md = cmds.createNode('multiplyDivide', name=correction_name+"_DistanceRigScale_MD")
-                        output_rmv = cmds.createNode('remapValue', name=correction_name+"_Output_RmV")
-                        dist_bet = cmds.createNode('distanceBetween', name=correction_name+"_Distance_DB")
-                        distance_axis_extract_pma = cmds.createNode('plusMinusAverage', name=correction_name+"_DistanceAxisExtract_PMA")
-                        distance_all_cnd = cmds.createNode('condition', name=correction_name+"_ExtractDistance_Cnd")
-                        distance_axis_x_cnd = cmds.createNode('condition', name=correction_name+"_ExtractDistance_AxisX_Cnd")
-                        distance_axis_yz_cnd = cmds.createNode('condition', name=correction_name+"_ExtractDistance_AxisYZ_Cnd")
+                        distance_scale_md = cmds.createNode('multiplyDivide', name=f"{correction_name}_DistanceRigScale_MD")
+                        output_rmv = cmds.createNode('remapValue', name=f"{correction_name}_Output_RmV")
+                        dist_bet = cmds.createNode('distanceBetween', name=f"{correction_name}_Distance_DB")
+                        distance_axis_extract_pma = cmds.createNode('plusMinusAverage', name=f"{correction_name}_DistanceAxisExtract_PMA")
+                        distance_all_cnd = cmds.createNode('condition', name=f"{correction_name}_ExtractDistance_Cnd")
+                        distance_axis_x_cnd = cmds.createNode('condition', name=f"{correction_name}_ExtractDistance_AxisX_Cnd")
+                        distance_axis_yz_cnd = cmds.createNode('condition', name=f"{correction_name}_ExtractDistance_AxisYZ_Cnd")
                         self.to_ids.extend([distance_scale_md, output_rmv, dist_bet, distance_axis_extract_pma, distance_all_cnd, distance_axis_x_cnd, distance_axis_yz_cnd])
                         # connect locators source position values to extract distance from them
-                        cmds.connectAttr(original_loc+".worldPosition.worldPositionX", dist_bet+".point1X")
-                        cmds.connectAttr(original_loc+".worldPosition.worldPositionY", dist_bet+".point1Y")
-                        cmds.connectAttr(original_loc+".worldPosition.worldPositionZ", dist_bet+".point1Z")
-                        cmds.connectAttr(action_loc+".worldPosition.worldPositionX", dist_bet+".point2X")
-                        cmds.connectAttr(action_loc+".worldPosition.worldPositionY", dist_bet+".point2Y")
-                        cmds.connectAttr(action_loc+".worldPosition.worldPositionZ", dist_bet+".point2Z")
+                        cmds.connectAttr(f"{original_loc}.worldPosition.worldPositionX", f"{dist_bet}.point1X")
+                        cmds.connectAttr(f"{original_loc}.worldPosition.worldPositionY", f"{dist_bet}.point1Y")
+                        cmds.connectAttr(f"{original_loc}.worldPosition.worldPositionZ", f"{dist_bet}.point1Z")
+                        cmds.connectAttr(f"{action_loc}.worldPosition.worldPositionX", f"{dist_bet}.point2X")
+                        cmds.connectAttr(f"{action_loc}.worldPosition.worldPositionY", f"{dist_bet}.point2Y")
+                        cmds.connectAttr(f"{action_loc}.worldPosition.worldPositionZ", f"{dist_bet}.point2Z")
                         # setup distance input and output connections
-                        cmds.connectAttr(output_rmv+".outValue", corrective_md+".input1X", force=True)
-                        cmds.connectAttr(distance_scale_md+".message", self.net+".distanceScaleMD", force=True)
-                        cmds.connectAttr(self.net+".inputRigScale", distance_scale_md+".input2X", force=True)
-                        cmds.connectAttr(self.net+".inputRigScale", distance_scale_md+".input2Y", force=True)
-                        cmds.connectAttr(self.net+".inputStart", distance_scale_md+".input1X", force=True)
-                        cmds.connectAttr(distance_scale_md+".outputX", output_rmv+".inputMin", force=True)
-                        cmds.connectAttr(self.net+".inputEnd", distance_scale_md+".input1Y", force=True)
-                        cmds.connectAttr(distance_scale_md+".outputY", output_rmv+".inputMax", force=True)
-                        cmds.connectAttr(self.net+".outputStart", output_rmv+".outputMin", force=True)
-                        cmds.connectAttr(self.net+".outputEnd", output_rmv+".outputMax", force=True)
-                        cmds.connectAttr(interpolation_pma+".output1D", output_rmv+".value[0].value_Interp", force=True)
+                        cmds.connectAttr(f"{output_rmv}.outValue", f"{corrective_md}.input1X", force=True)
+                        cmds.connectAttr(f"{distance_scale_md}.message", f"{self.net}.distanceScaleMD", force=True)
+                        cmds.connectAttr(f"{self.net}.inputRigScale", f"{distance_scale_md}.input2X", force=True)
+                        cmds.connectAttr(f"{self.net}.inputRigScale", f"{distance_scale_md}.input2Y", force=True)
+                        cmds.connectAttr(f"{self.net}.inputStart", f"{distance_scale_md}.input1X", force=True)
+                        cmds.connectAttr(f"{distance_scale_md}.outputX", f"{output_rmv}.inputMin", force=True)
+                        cmds.connectAttr(f"{self.net}.inputEnd", f"{distance_scale_md}.input1Y", force=True)
+                        cmds.connectAttr(f"{distance_scale_md}.outputY", f"{output_rmv}.inputMax", force=True)
+                        cmds.connectAttr(f"{self.net}.outputStart", f"{output_rmv}.outputMin", force=True)
+                        cmds.connectAttr(f"{self.net}.outputEnd", f"{output_rmv}.outputMax", force=True)
+                        cmds.connectAttr(f"{interpolation_pma}.output1D", f"{output_rmv}.value[0].value_Interp", force=True)
                         # set default distance input values
-                        cmds.setAttr(self.net+".inputStart", 10)
-                        cmds.setAttr(self.net+".inputEnd", 0)
+                        cmds.setAttr(f"{self.net}.inputStart", 10)
+                        cmds.setAttr(f"{self.net}.inputEnd", 0)
                         # TODO create a way to avoid manual connection here, maybe using the UI new tab?
-                        cmds.connectAttr(corrective_md+".outputX", self.net+".outputValue", force=True)
-                        cmds.setAttr(self.net+".outputValue", lock=True)
+                        cmds.connectAttr(f"{corrective_md}.outputX", f"{self.net}.outputValue", force=True)
+                        cmds.setAttr(f"{self.net}.outputValue", lock=True)
                         # extract axis by decomposing distance vector:
-                        cmds.setAttr(distance_axis_extract_pma+".operation", 2) #Substract
-                        cmds.setAttr(distance_axis_yz_cnd+".secondTerm", 1) #Y
-                        cmds.connectAttr(original_loc+".worldPosition.worldPositionX", distance_axis_extract_pma+".input3D[0].input3Dx", force=True)
-                        cmds.connectAttr(original_loc+".worldPosition.worldPositionY", distance_axis_extract_pma+".input3D[0].input3Dy", force=True)
-                        cmds.connectAttr(original_loc+".worldPosition.worldPositionZ", distance_axis_extract_pma+".input3D[0].input3Dz", force=True)
-                        cmds.connectAttr(action_loc+".worldPosition.worldPositionX", distance_axis_extract_pma+".input3D[1].input3Dx", force=True)
-                        cmds.connectAttr(action_loc+".worldPosition.worldPositionY", distance_axis_extract_pma+".input3D[1].input3Dy", force=True)
-                        cmds.connectAttr(action_loc+".worldPosition.worldPositionZ", distance_axis_extract_pma+".input3D[1].input3Dz", force=True)
-                        cmds.connectAttr(self.net+".decompose", distance_all_cnd+".firstTerm", force=True)
-                        cmds.connectAttr(self.net+".axis", distance_axis_x_cnd+".firstTerm", force=True)
-                        cmds.connectAttr(self.net+".axis", distance_axis_yz_cnd+".firstTerm", force=True)
-                        cmds.connectAttr(dist_bet+".distance", distance_all_cnd+".colorIfTrueR", force=True)
-                        cmds.connectAttr(distance_axis_x_cnd+".outColorR", distance_all_cnd+".colorIfFalseR", force=True)
-                        cmds.connectAttr(distance_axis_extract_pma+".output3Dx", distance_axis_x_cnd+".colorIfTrueR", force=True)
-                        cmds.connectAttr(distance_axis_yz_cnd+".outColorR", distance_axis_x_cnd+".colorIfFalseR", force=True)
-                        cmds.connectAttr(distance_axis_extract_pma+".output3Dy", distance_axis_yz_cnd+".colorIfTrueR", force=True)
-                        cmds.connectAttr(distance_axis_extract_pma+".output3Dz", distance_axis_yz_cnd+".colorIfFalseR", force=True)
-                        cmds.connectAttr(distance_all_cnd+".outColorR", output_rmv+".inputValue", force=True)
-                        cmds.connectAttr(distance_all_cnd+".outColorR", self.net+".inputValue", force=True)
-                        cmds.setAttr(self.net+".inputValue", lock=True)
+                        cmds.setAttr(f"{distance_axis_extract_pma}.operation", 2) #Substract
+                        cmds.setAttr(f"{distance_axis_yz_cnd}.secondTerm", 1) #Y
+                        cmds.connectAttr(f"{original_loc}.worldPosition.worldPositionX", f"{distance_axis_extract_pma}.input3D[0].input3Dx", force=True)
+                        cmds.connectAttr(f"{original_loc}.worldPosition.worldPositionY", f"{distance_axis_extract_pma}.input3D[0].input3Dy", force=True)
+                        cmds.connectAttr(f"{original_loc}.worldPosition.worldPositionZ", f"{distance_axis_extract_pma}.input3D[0].input3Dz", force=True)
+                        cmds.connectAttr(f"{action_loc}.worldPosition.worldPositionX", f"{distance_axis_extract_pma}.input3D[1].input3Dx", force=True)
+                        cmds.connectAttr(f"{action_loc}.worldPosition.worldPositionY", f"{distance_axis_extract_pma}.input3D[1].input3Dy", force=True)
+                        cmds.connectAttr(f"{action_loc}.worldPosition.worldPositionZ", f"{distance_axis_extract_pma}.input3D[1].input3Dz", force=True)
+                        cmds.connectAttr(f"{self.net}.decompose", f"{distance_all_cnd}.firstTerm", force=True)
+                        cmds.connectAttr(f"{self.net}.axis", f"{distance_axis_x_cnd}.firstTerm", force=True)
+                        cmds.connectAttr(f"{self.net}.axis", f"{distance_axis_yz_cnd}.firstTerm", force=True)
+                        cmds.connectAttr(f"{dist_bet}.distance", f"{distance_all_cnd}.colorIfTrueR", force=True)
+                        cmds.connectAttr(f"{distance_axis_x_cnd}.outColorR", f"{distance_all_cnd}.colorIfFalseR", force=True)
+                        cmds.connectAttr(f"{distance_axis_extract_pma}.output3Dx", f"{distance_axis_x_cnd}.colorIfTrueR", force=True)
+                        cmds.connectAttr(f"{distance_axis_yz_cnd}.outColorR", f"{distance_axis_x_cnd}.colorIfFalseR", force=True)
+                        cmds.connectAttr(f"{distance_axis_extract_pma}.output3Dy", f"{distance_axis_yz_cnd}.colorIfTrueR", force=True)
+                        cmds.connectAttr(f"{distance_axis_extract_pma}.output3Dz", f"{distance_axis_yz_cnd}.colorIfFalseR", force=True)
+                        cmds.connectAttr(f"{distance_all_cnd}.outColorR", f"{output_rmv}.inputValue", force=True)
+                        cmds.connectAttr(f"{distance_all_cnd}.outColorR", f"{self.net}.inputValue", force=True)
+                        cmds.setAttr(f"{self.net}.inputValue", lock=True)
                         # serialize distance nodes
-                        cmds.connectAttr(dist_bet+".message", self.net+".distanceBet", force=True)
-                        cmds.connectAttr(output_rmv+".message", self.net+".outputRmV", force=True)
-                        cmds.connectAttr(distance_axis_extract_pma+".message", self.net+".distanceAxisExtractPMA", force=True)
-                        cmds.connectAttr(distance_all_cnd+".message", self.net+".distanceAllCnd", force=True)
-                        cmds.connectAttr(distance_axis_x_cnd+".message", self.net+".distanceAxisXCnd", force=True)
-                        cmds.connectAttr(distance_axis_yz_cnd+".message", self.net+".distanceAxisYZCnd", force=True)
+                        cmds.connectAttr(f"{dist_bet}.message", f"{self.net}.distanceBet", force=True)
+                        cmds.connectAttr(f"{output_rmv}.message", f"{self.net}.outputRmV", force=True)
+                        cmds.connectAttr(f"{distance_axis_extract_pma}.message", f"{self.net}.distanceAxisExtractPMA", force=True)
+                        cmds.connectAttr(f"{distance_all_cnd}.message", f"{self.net}.distanceAllCnd", force=True)
+                        cmds.connectAttr(f"{distance_axis_x_cnd}.message", f"{self.net}.distanceAxisXCnd", force=True)
+                        cmds.connectAttr(f"{distance_axis_yz_cnd}.message", f"{self.net}.distanceAxisYZCnd", force=True)
                     
                     self.ar.custom_attr.add_attr(0, self.to_ids) #dpID
                     self.ar.custom_attr.add_attr(0, [self.cm_data_grp], descendents=True) #dpID
@@ -436,7 +436,7 @@ class CorrectionManager(base.BaseLibrary):
                         self.ar.correction_manager_ui.update_edit_net_layout()
                     cmds.undoInfo(closeChunk=True)
                 else:
-                    mel.eval('warning \"'+self.ar.data.lang['m065_selOrigAction']+'\";')
+                    mel.eval(f'warning "{self.ar.data.lang['m065_selOrigAction']}";')
             else:
-                mel.eval('warning \"'+self.ar.data.lang['m066_selectTwo']+'\";')
+                mel.eval(f'warning "{self.ar.data.lang['m066_selectTwo']}";')
         return self.net

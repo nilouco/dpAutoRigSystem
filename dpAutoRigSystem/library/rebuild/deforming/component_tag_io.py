@@ -48,7 +48,7 @@ class ComponentTagIO(action.BaseAction):
                             # finding tags
                             has_tag = False
                             for node in nodes:
-                                if cmds.geometryAttrInfo(node+"."+cmds.deformableShape(node, localShapeOutAttr=True)[0], componentTagHistory=True):
+                                if cmds.geometryAttrInfo(f"{node}.{cmds.deformableShape(node, localShapeOutAttr=True)[0]}", componentTagHistory=True):
                                     has_tag = True
                                     break
                             if has_tag:
@@ -59,9 +59,9 @@ class ComponentTagIO(action.BaseAction):
                                                 }
                                 self.export_json_file(self.tag_data)
                             else:
-                                self.maybe_done_io(self.ar.data.lang['v014_notFoundNodes']+" componentTag")
+                                self.maybe_done_io(f"{self.ar.data.lang['v014_notFoundNodes']} componentTag")
                         else:
-                            self.maybe_done_io(self.ar.data.lang['v014_notFoundNodes']+" mesh, lattice")
+                            self.maybe_done_io(f"{self.ar.data.lang['v014_notFoundNodes']} mesh, lattice")
                     else: #import
                         tag_data = self.import_latest_json_file(self.get_exported_items())
                         if tag_data:
@@ -92,15 +92,15 @@ class ComponentTagIO(action.BaseAction):
         fail = False
         # import tagged (tag info into the received deformed mesh)
         if tag_data['tagged'] and not self.ar.skin.import_component_tag_info(tag_data['tagged'], nodes):
-            self.fail_io(self.latest_data_file+": tagged - "+", ".join(self.ar.skin.notWorkWellInfoList))
+            self.fail_io(f"{self.latest_data_file}: tagged - {', '.join(self.ar.skin.notWorkWellInfoList)}")
             fail = True
         # import influencers (tag info into the deformer node)
         if tag_data['influencer'] and not self.ar.skin.import_component_tag_influencer(tag_data['influencer']):
-            self.fail_io(self.latest_data_file+": influencer - "+", ".join(self.ar.skin.notWorkWellInfoList))
+            self.fail_io(f"{self.latest_data_file}: influencer - {', '.join(self.ar.skin.notWorkWellInfoList)}")
             fail = True
         # import falloffs
         if tag_data['falloff'] and not self.ar.skin.import_component_tag__falloff(tag_data['falloff']):
-            self.fail_io(self.latest_data_file+": falloff - "+", ".join(self.ar.skin.notWorkWellInfoList))
+            self.fail_io(f"{self.latest_data_file}: falloff - {', '.join(self.ar.skin.notWorkWellInfoList)}")
             fail = True
         if not fail:
             self.well_done_io(self.latest_data_file)

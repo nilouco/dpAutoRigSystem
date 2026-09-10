@@ -21,7 +21,7 @@ class PublishUI:
             # window
             win_width  = 450
             win_height = 160
-            cmds.window('dpPublisherWindow', title=self.ar.data.lang['m046_publisher']+" "+str(self.ar.data.version), widthHeight=(win_width, win_height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+            cmds.window('dpPublisherWindow', title=f"{self.ar.data.lang['m046_publisher']} {self.ar.data.version}", widthHeight=(win_width, win_height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
             # create UI layout and elements:
             cmds.columnLayout('publisher_cl', adjustableColumn=True, columnOffset=('both', 10))
             cmds.separator(style='none', height=20, parent='publisher_cl')
@@ -79,7 +79,7 @@ class PublishUI:
         # window
         win_width  = 250
         win_height = 130
-        cmds.window('dpSuccessPublishedWindow', title=self.ar.data.lang['m046_publisher']+" "+str(self.ar.data.version), widthHeight=(win_width, win_height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.window('dpSuccessPublishedWindow', title=f"{self.ar.data.lang['m046_publisher']} {self.ar.data.version}", widthHeight=(win_width, win_height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         # create UI layout and elements:
         cmds.columnLayout('success_published_cl', adjustableColumn=True, columnOffset=('both', 10))
         if published_file:
@@ -89,7 +89,7 @@ class PublishUI:
             cmds.text(label=published_file, parent='success_published_cl')
         if errors:
             cmds.separator(style='in', height=20, parent='success_published_cl')
-            cmds.text(label=self.ar.data.lang['i141_error']+":", font='boldLabelFont', parent='success_published_cl')
+            cmds.text(label=f"{self.ar.data.lang['i141_error']}:", font='boldLabelFont', parent='success_published_cl')
             cmds.text(label=self.ar.data.lang['i074_attention'], parent='success_published_cl')
             cmds.separator(style='none', height=20, parent='success_published_cl')
             for error_file in errors:

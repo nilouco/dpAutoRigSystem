@@ -13,8 +13,8 @@ WIKI = '03-‐-Guides#-nose'
 class Nose(standard.BaseStandard):
     def __init__(self, ar):
         standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.guide_left_nostril_loc = self.name_guide+"_cvLNostrilLoc"
-        self.guide_right_nostril_loc = self.name_guide+"_cvRNostrilLoc"
+        self.guide_left_nostril_loc = f"{self.name_guide}_cvLNostrilLoc"
+        self.guide_right_nostril_loc = f"{self.name_guide}_cvRNostrilLoc"
     
     
     def create_guide(self):
@@ -41,41 +41,41 @@ class Nose(standard.BaseStandard):
         """ Creates the controller locators of the standard module guide.
         """
         # locators
-        self.guide_top_loc = self.ar.ctrls.create_joint_locator(ctrl_name=self.name_guide+"_cvTopLoc1", r=0.3, d=1, guide=True)
-        self.guide_middle_loc = self.ar.ctrls.create_joint_locator(ctrl_name=self.name_guide+"_cvMiddleLoc", r=0.2, d=1, guide=True)
-        self.guide_tip_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_cvTipLoc", r=0.1, d=1, guide=True)
-        self.guide_left_side_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_cvLSideLoc", r=0.15, d=1, guide=True)
-        self.guide_right_side_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_cvRSideLoc", r=0.15, d=1, guide=True)
-        self.guide_left_nostril_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_cvLNostrilLoc", r=0.1, d=1, guide=True)
-        self.guide_right_nostril_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_cvRNostrilLoc", r=0.1, d=1, guide=True)
-        self.guide_bottom_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_cvBottomLoc", r=0.1, d=1, guide=True)
-        self.guide_end_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_JointEnd", r=0.05, d=1, guide=True)
+        self.guide_top_loc = self.ar.ctrls.create_joint_locator(ctrl_name=f"{self.name_guide}_cvTopLoc1", r=0.3, d=1, guide=True)
+        self.guide_middle_loc = self.ar.ctrls.create_joint_locator(ctrl_name=f"{self.name_guide}_cvMiddleLoc", r=0.2, d=1, guide=True)
+        self.guide_tip_loc = self.ar.ctrls.create_curve_locator(ctrl_name=f"{self.name_guide}_cvTipLoc", r=0.1, d=1, guide=True)
+        self.guide_left_side_loc = self.ar.ctrls.create_curve_locator(ctrl_name=f"{self.name_guide}_cvLSideLoc", r=0.15, d=1, guide=True)
+        self.guide_right_side_loc = self.ar.ctrls.create_curve_locator(ctrl_name=f"{self.name_guide}_cvRSideLoc", r=0.15, d=1, guide=True)
+        self.guide_left_nostril_loc = self.ar.ctrls.create_curve_locator(ctrl_name=f"{self.name_guide}_cvLNostrilLoc", r=0.1, d=1, guide=True)
+        self.guide_right_nostril_loc = self.ar.ctrls.create_curve_locator(ctrl_name=f"{self.name_guide}_cvRNostrilLoc", r=0.1, d=1, guide=True)
+        self.guide_bottom_loc = self.ar.ctrls.create_curve_locator(ctrl_name=f"{self.name_guide}_cvBottomLoc", r=0.1, d=1, guide=True)
+        self.guide_end_loc = self.ar.ctrls.create_curve_locator(ctrl_name=f"{self.name_guide}_JointEnd", r=0.05, d=1, guide=True)
         # joints
-        self.line_top1 = cmds.joint(name=self.name_guide+"_JGuideTop1", radius=0.001)
-        self.line_middle = cmds.joint(name=self.name_guide+"_JGuideMiddle", radius=0.001)
-        self.line_tip = cmds.joint(name=self.name_guide+"line_tip", radius=0.001)
-        self.line_end = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
+        self.line_top1 = cmds.joint(name=f"{self.name_guide}_JGuideTop1", radius=0.001)
+        self.line_middle = cmds.joint(name=f"{self.name_guide}_JGuideMiddle", radius=0.001)
+        self.line_tip = cmds.joint(name=f"{self.name_guide}line_tip", radius=0.001)
+        self.line_end = cmds.joint(name=f"{self.name_guide}_JGuideEnd", radius=0.001)
         cmds.select(self.line_middle)
-        self.line_side = cmds.joint(name=self.name_guide+"line_side", radius=0.001)
-        self.line_nostril = cmds.joint(name=self.name_guide+"line_nostril", radius=0.001)
+        self.line_side = cmds.joint(name=f"{self.name_guide}line_side", radius=0.001)
+        self.line_nostril = cmds.joint(name=f"{self.name_guide}line_nostril", radius=0.001)
         cmds.select(self.line_middle)
-        self.line_bottom = cmds.joint(name=self.name_guide+"line_bottom", radius=0.001)
+        self.line_bottom = cmds.joint(name=f"{self.name_guide}line_bottom", radius=0.001)
         # setup
         self.ar.utils.set_template([self.line_top1, self.line_middle, self.line_tip, self.line_end, self.line_side, self.line_nostril, self.line_bottom, self.guide_right_side_loc, self.guide_right_nostril_loc])
-        cmds.setAttr(self.guide_top_loc+".rotateX", 60)
-        cmds.setAttr(self.guide_middle_loc+".translateY", -0.6)
-        cmds.setAttr(self.guide_middle_loc+".translateZ", 0.35)
-        cmds.setAttr(self.guide_tip_loc+".translateY", -0.4)
-        cmds.setAttr(self.guide_tip_loc+".translateZ", 0.55)
-        cmds.setAttr(self.guide_end_loc+".translateZ", 0.3)
-        cmds.setAttr(self.guide_left_side_loc+".translateX", 0.35)
-        cmds.setAttr(self.guide_left_side_loc+".translateY", -0.55)
-        cmds.setAttr(self.guide_left_side_loc+".translateZ", 0.45)
-        cmds.setAttr(self.guide_left_nostril_loc+".translateX", 0.25)
-        cmds.setAttr(self.guide_left_nostril_loc+".translateY", -0.625)
-        cmds.setAttr(self.guide_left_nostril_loc+".translateZ", 0.625)
-        cmds.setAttr(self.guide_bottom_loc+".translateY", -0.9)
-        cmds.setAttr(self.guide_bottom_loc+".translateZ", 0.6)
+        cmds.setAttr(f"{self.guide_top_loc}.rotateX", 60)
+        cmds.setAttr(f"{self.guide_middle_loc}.translateY", -0.6)
+        cmds.setAttr(f"{self.guide_middle_loc}.translateZ", 0.35)
+        cmds.setAttr(f"{self.guide_tip_loc}.translateY", -0.4)
+        cmds.setAttr(f"{self.guide_tip_loc}.translateZ", 0.55)
+        cmds.setAttr(f"{self.guide_end_loc}.translateZ", 0.3)
+        cmds.setAttr(f"{self.guide_left_side_loc}.translateX", 0.35)
+        cmds.setAttr(f"{self.guide_left_side_loc}.translateY", -0.55)
+        cmds.setAttr(f"{self.guide_left_side_loc}.translateZ", 0.45)
+        cmds.setAttr(f"{self.guide_left_nostril_loc}.translateX", 0.25)
+        cmds.setAttr(f"{self.guide_left_nostril_loc}.translateY", -0.625)
+        cmds.setAttr(f"{self.guide_left_nostril_loc}.translateZ", 0.625)
+        cmds.setAttr(f"{self.guide_bottom_loc}.translateY", -0.9)
+        cmds.setAttr(f"{self.guide_bottom_loc}.translateZ", 0.6)
         # parenting
         cmds.parent(self.line_top1, self.guide_top_loc, self.guide_base, relative=True)
         cmds.parent(self.guide_middle_loc, self.guide_top_loc, relative=False)
@@ -97,48 +97,48 @@ class Nose(standard.BaseStandard):
 
 
     def create_guide_nose_side(self, name, source, destination):
-        side_t_md = cmds.createNode('multiplyDivide', name=self.name_guide+"_"+name+"_Translate_MD")
-        side_r_md = cmds.createNode('multiplyDivide', name=self.name_guide+"_"+name+"_Rotate_MD")
-        cmds.connectAttr(source+".translateX", side_t_md+".input1X", force=True)
-        cmds.connectAttr(source+".translateY", side_t_md+".input1Y", force=True)
-        cmds.connectAttr(source+".translateZ", side_t_md+".input1Z", force=True)
-        cmds.connectAttr(source+".rotateX", side_r_md+".input1X", force=True)
-        cmds.connectAttr(source+".rotateY", side_r_md+".input1Y", force=True)
-        cmds.connectAttr(source+".rotateZ", side_r_md+".input1Z", force=True)
-        cmds.connectAttr(side_t_md+".outputX", destination+".translateX", force=True)
-        cmds.connectAttr(side_t_md+".outputY", destination+".translateY", force=True)
-        cmds.connectAttr(side_t_md+".outputZ", destination+".translateZ", force=True)
-        cmds.connectAttr(side_r_md+".outputX", destination+".rotateX", force=True)
-        cmds.connectAttr(side_r_md+".outputY", destination+".rotateY", force=True)
-        cmds.connectAttr(side_r_md+".outputZ", destination+".rotateZ", force=True)
-        cmds.setAttr(side_t_md+".input2X", -1)
-        cmds.setAttr(side_r_md+".input2Y", -1)
-        cmds.setAttr(side_r_md+".input2Z", -1)
+        side_t_md = cmds.createNode('multiplyDivide', name=f"{self.name_guide}_{name}_Translate_MD")
+        side_r_md = cmds.createNode('multiplyDivide', name=f"{self.name_guide}_{name}_Rotate_MD")
+        cmds.connectAttr(f"{source}.translateX", f"{side_t_md}.input1X", force=True)
+        cmds.connectAttr(f"{source}.translateY", f"{side_t_md}.input1Y", force=True)
+        cmds.connectAttr(f"{source}.translateZ", f"{side_t_md}.input1Z", force=True)
+        cmds.connectAttr(f"{source}.rotateX", f"{side_r_md}.input1X", force=True)
+        cmds.connectAttr(f"{source}.rotateY", f"{side_r_md}.input1Y", force=True)
+        cmds.connectAttr(f"{source}.rotateZ", f"{side_r_md}.input1Z", force=True)
+        cmds.connectAttr(f"{side_t_md}.outputX", f"{destination}.translateX", force=True)
+        cmds.connectAttr(f"{side_t_md}.outputY", f"{destination}.translateY", force=True)
+        cmds.connectAttr(f"{side_t_md}.outputZ", f"{destination}.translateZ", force=True)
+        cmds.connectAttr(f"{side_r_md}.outputX", f"{destination}.rotateX", force=True)
+        cmds.connectAttr(f"{side_r_md}.outputY", f"{destination}.rotateY", force=True)
+        cmds.connectAttr(f"{side_r_md}.outputZ", f"{destination}.rotateZ", force=True)
+        cmds.setAttr(f"{side_t_md}.input2X", -1)
+        cmds.setAttr(f"{side_r_md}.input2Y", -1)
+        cmds.setAttr(f"{side_r_md}.input2Z", -1)
 
         
     def change_joint_number(self, inputted, *args):
         """ Edit the number of joints in the guide.
         """
         joint_number = self.parse_inputted_joint_number(inputted)
-        self.current_joint_number = cmds.getAttr(self.guide_base+".nJoints")
+        self.current_joint_number = cmds.getAttr(f"{self.guide_base}.nJoints")
         if joint_number and joint_number != self.current_joint_number:
             self.ar.opt.check_use_default_render_layer()
             if joint_number > self.current_joint_number:
                 for n in range(self.current_joint_number+1, joint_number+1):
-                    self.guide_top_loc = self.ar.ctrls.create_joint_locator(ctrl_name=self.name_guide+"_cvTopLoc"+str(n), r=0.3, d=1, guide=True)
-                    cmds.setAttr(self.guide_top_loc+".nJoint", n)
-                    cmds.parent(self.guide_top_loc, self.name_guide+"_cvTopLoc"+str(n-1), relative=True)
-                    dist = self.ar.math.create_dist_between(self.name_guide+"_cvTopLoc"+str(n-1), self.name_guide+"_cvMiddleLoc")[0]
-                    cmds.setAttr(self.guide_top_loc+".translateZ", (0.5*dist))
-                    self.line = cmds.joint(name=self.name_guide+"_JGuideTop"+str(n), radius=0.001)
-                    cmds.setAttr(self.line+".template", 1)
-                    cmds.parent(self.line, self.name_guide+"_JGuideTop"+str(n-1), relative=True)
-                    cmds.parentConstraint(self.guide_top_loc, self.line, maintainOffset=False, name=self.line+"_PaC")
-                    cmds.scaleConstraint(self.guide_top_loc, self.line, maintainOffset=False, name=self.line+"_ScC")
-                    self.add_node_to_guide_net([self.guide_top_loc], ["guide_top_loc"+str(n)])
+                    self.guide_top_loc = self.ar.ctrls.create_joint_locator(ctrl_name=f"{self.name_guide}_cvTopLoc{n}", r=0.3, d=1, guide=True)
+                    cmds.setAttr(f"{self.guide_top_loc}.nJoint", n)
+                    cmds.parent(self.guide_top_loc, f"{self.name_guide}_cvTopLoc{n-1}", relative=True)
+                    dist = self.ar.math.create_dist_between(f"{self.name_guide}_cvTopLoc{n-1}", f"{self.name_guide}_cvMiddleLoc")[0]
+                    cmds.setAttr(f"{self.guide_top_loc}.translateZ", (0.5*dist))
+                    self.line = cmds.joint(name=f"{self.name_guide}_JGuideTop{n}", radius=0.001)
+                    cmds.setAttr(f"{self.line}.template", 1)
+                    cmds.parent(self.line, f"{self.name_guide}_JGuideTop{n-1}", relative=True)
+                    cmds.parentConstraint(self.guide_top_loc, self.line, maintainOffset=False, name=f"{self.line}_PaC")
+                    cmds.scaleConstraint(self.guide_top_loc, self.line, maintainOffset=False, name=f"{self.line}_ScC")
+                    self.add_node_to_guide_net([self.guide_top_loc], [f"guide_top_loc{n}"])
             elif joint_number < self.current_joint_number:
                 self.guide_top_loc = self.reduce_joint_number(joint_number, 'guide_top_loc', 'Top')
-            cmds.setAttr(self.guide_base+".nJoints", joint_number)
+            cmds.setAttr(f"{self.guide_base}.nJoints", joint_number)
             self.current_joint_number = joint_number
             self.create_mirror_preview()
         cmds.select(self.guide_base)
@@ -147,9 +147,9 @@ class Nose(standard.BaseStandard):
     def change_nostril(self, value, *args):
         """ Set the attribute value for nostril.
         """
-        cmds.setAttr(self.guide_base+".nostril", value)
-        cmds.setAttr(self.guide_left_nostril_loc+".visibility", value)
-        cmds.setAttr(self.guide_right_nostril_loc+".visibility", value)
+        cmds.setAttr(f"{self.guide_base}.nostril", value)
+        cmds.setAttr(f"{self.guide_left_nostril_loc}.visibility", value)
+        cmds.setAttr(f"{self.guide_right_nostril_loc}.visibility", value)
     
 
     def rig_me(self, *args):
@@ -163,19 +163,19 @@ class Nose(standard.BaseStandard):
             nostril = self.get_guide_attr('nostril')
             # run for all sides
             for s, side in enumerate(self.sides):
-                self.base = side+self.number_name+'_Guide_Base'
-                ctrl_zero_grp = side+self.number_name+"_00_Ctrl_Zero_0_Grp"
+                self.base = f"{side}{self.number_name}_Guide_Base"
+                ctrl_zero_grp = f"{side}{self.number_name}_00_Ctrl_Zero_0_Grp"
                 skin_joints = []
                 centers, lefts, rights = [], [], []
                 # get the number of joints to be created:
-                self.n_joints = cmds.getAttr(self.base+".nJoints")
-                head_def_value = cmds.getAttr(self.base+".deformedBy")
+                self.n_joints = cmds.getAttr(f"{self.base}.nJoints")
+                head_def_value = cmds.getAttr(f"{self.base}.deformedBy")
                 # creating top nose controls and joints:
                 for n in range(self.n_joints):
                     cmds.select(clear=True)
                     # declare guide:
-                    self.guide_top_loc = side+self.number_name+"_Guide_cvTopLoc"+str(n+1)
-                    self.guide_radius = side+self.number_name+"_Guide_Base_RadiusCtrl"
+                    self.guide_top_loc = f"{side}{self.number_name}_Guide_cvTopLoc{n+1}"
+                    self.guide_radius = f"{side}{self.number_name}_Guide_Base_RadiusCtrl"
                     # create a joint:
                     self.jnt = cmds.joint(name=f"{side}{self.number_name}_{n:02d}_Jnt", scaleCompensate=False)
                     cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
@@ -183,7 +183,7 @@ class Nose(standard.BaseStandard):
                     self.ar.naming.set_joint_label(self.jnt, s+self.joint_label_add, 18, f"{self.number_name}_{n:02d}")
                     skin_joints.append(self.jnt)
                     # create a control:
-                    nose_ctrl = self.ar.ctrls.create_controller('id_075_NoseTop', ctrl_name=f"{side}{self.number_name}_{n:02d}_Ctrl", r=self.radius, d=self.curve_degree, head_def=head_def_value, guide_source=self.name_guide+"_cvTopLoc1", parent_tag=self.get_parent_to_tag(centers))
+                    nose_ctrl = self.ar.ctrls.create_controller('id_075_NoseTop', ctrl_name=f"{side}{self.number_name}_{n:02d}_Ctrl", r=self.radius, d=self.curve_degree, head_def=head_def_value, guide_source=f"{self.name_guide}_cvTopLoc1", parent_tag=self.get_parent_to_tag(centers))
                     centers.append(nose_ctrl)
                     # create_zero_out controls:
                     ctrl_zero = self.ar.utils.create_zero_out([nose_ctrl])[0]
@@ -191,15 +191,15 @@ class Nose(standard.BaseStandard):
                     cmds.matchTransform(self.jnt, self.guide_top_loc, position=True, rotation=True)
                     cmds.matchTransform(ctrl_zero, self.guide_top_loc, position=True, rotation=True)
                     # hide visibility attribute:
-                    cmds.setAttr(nose_ctrl+'.visibility', keyable=False)
+                    cmds.setAttr(f"{nose_ctrl}.visibility", keyable=False)
                     # fixing flip mirror:
                     if s == 1 and self.flip:
-                        cmds.setAttr(ctrl_zero+".scaleX", -1)
-                        cmds.setAttr(ctrl_zero+".scaleY", -1)
-                        cmds.setAttr(ctrl_zero+".scaleZ", -1)
+                        cmds.setAttr(f"{ctrl_zero}.scaleX", -1)
+                        cmds.setAttr(f"{ctrl_zero}.scaleY", -1)
+                        cmds.setAttr(f"{ctrl_zero}.scaleZ", -1)
                     if n == 0:
                         self.main_ctrls.append(nose_ctrl)
-                        self.ar.utils.set_origined_from_attr(nose_ctrl, self.base+";"+self.guide_top_loc+";"+self.guide_radius)
+                        self.ar.utils.set_origined_from_attr(nose_ctrl, f"{self.base};{self.guide_top_loc};{self.guide_radius}")
                         ctrl_zero_grp = ctrl_zero
                     else:
                         self.ar.utils.set_origined_from_attr(nose_ctrl, self.guide_top_loc)
@@ -211,25 +211,25 @@ class Nose(standard.BaseStandard):
                         # parent zeroCtrl Group to the before noseCtrl:
                         cmds.parent(ctrl_zero, f"{side}{self.number_name}_{(n-1):02d}_Ctrl", absolute=True)
                     # control drives joint:
-                    cmds.parentConstraint(nose_ctrl, self.jnt, maintainOffset=False, name=self.jnt+"_PaC")
-                    cmds.scaleConstraint(nose_ctrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScC")
+                    cmds.parentConstraint(nose_ctrl, self.jnt, maintainOffset=False, name=f"{self.jnt}_PaC")
+                    cmds.scaleConstraint(nose_ctrl, self.jnt, maintainOffset=True, name=f"{self.jnt}_ScC")
                     # add articulationJoint:
                     if n == 1 and self.articulation:
                         articulation_joints = self.ar.utils.create_articulation_joint(father_joint, self.jnt) #could call to create corrective joints. See parameters to implement it, please.
                         self.ar.naming.set_joint_label(articulation_joints[0], s+self.joint_label_add, 18, f"{self.number_name}_{n:02d}_Jar")
-                        cmds.setAttr(articulation_joints[0]+".segmentScaleCompensate", 0)
-                        cmds.setAttr(articulation_joints[0]+".segmentScaleCompensate", 0)
+                        cmds.setAttr(f"{articulation_joints[0]}.segmentScaleCompensate", 0)
+                        cmds.setAttr(f"{articulation_joints[0]}.segmentScaleCompensate", 0)
                     cmds.select(self.jnt)
                 
                 # declaring guides:
-                self.guide_middle_loc = side+self.number_name+"_Guide_cvMiddleLoc"
-                self.guide_tip_loc = side+self.number_name+"_Guide_cvTipLoc"
-                self.guide_left_side_loc = side+self.number_name+"_Guide_cvLSideLoc"
-                self.guide_right_side_loc = side+self.number_name+"_Guide_cvRSideLoc"
-                self.guide_left_nostril_loc = side+self.number_name+"_Guide_cvLNostrilLoc"
-                self.guide_right_nostril_loc = side+self.number_name+"_Guide_cvRNostrilLoc"
-                self.guide_bottom_loc = side+self.number_name+"_Guide_cvBottomLoc"
-                self.guide_end_loc = side+self.number_name+"_Guide_JointEnd"
+                self.guide_middle_loc = f"{side}{self.number_name}_Guide_cvMiddleLoc"
+                self.guide_tip_loc = f"{side}{self.number_name}_Guide_cvTipLoc"
+                self.guide_left_side_loc = f"{side}{self.number_name}_Guide_cvLSideLoc"
+                self.guide_right_side_loc = f"{side}{self.number_name}_Guide_cvRSideLoc"
+                self.guide_left_nostril_loc = f"{side}{self.number_name}_Guide_cvLNostrilLoc"
+                self.guide_right_nostril_loc = f"{side}{self.number_name}_Guide_cvRNostrilLoc"
+                self.guide_bottom_loc = f"{side}{self.number_name}_Guide_cvBottomLoc"
+                self.guide_end_loc = f"{side}{self.number_name}_Guide_JointEnd"
                 
                 # generating naming:
                 left_side_name = self.ar.data.lang['p002_left']
@@ -244,13 +244,13 @@ class Nose(standard.BaseStandard):
                 right_side_joint_name = f"{side}{self.number_name}_{(n+3):02d}_{right_side_name}_{self.ar.data.lang['c121_side']}_Jnt"
                 left_nostril_joint_name = f"{side}{self.number_name}_{(n+4):02d}_{left_side_name}_{self.ar.data.lang['m079_nostril']}_Jnt"
                 right_nostril_joint_name = f"{side}{self.number_name}_{(n+4):02d}_{right_side_name}_{self.ar.data.lang['m079_nostril']}_Jnt"
-                middle_ctrl_name = side+self.number_name+"_"+self.ar.data.lang['c029_middle']+"_Ctrl"
-                tip_ctrl_name = side+self.number_name+"_"+self.ar.data.lang['c120_tip']+"_Ctrl"
-                bottom_ctrl_name = side+self.number_name+"_"+self.ar.data.lang['c100_bottom']+"_Ctrl"
-                left_side_ctrl_name = left_side_name+"_"+side+self.number_name+"_"+self.ar.data.lang['c121_side']+"_Ctrl"
-                right_side_ctrl_name = right_side_name+"_"+side+self.number_name+"_"+self.ar.data.lang['c121_side']+"_Ctrl"
-                left_nostril_ctrl_name = left_side_name+"_"+side+self.number_name+"_"+self.ar.data.lang['m079_nostril']+"_Ctrl"
-                right_nostril_ctrl_name = right_side_name+"_"+side+self.number_name+"_"+self.ar.data.lang['m079_nostril']+"_Ctrl"
+                middle_ctrl_name = f"{side}{self.number_name}_{self.ar.data.lang['c029_middle']}_Ctrl"
+                tip_ctrl_name = f"{side}{self.number_name}_{self.ar.data.lang['c120_tip']}_Ctrl"
+                bottom_ctrl_name = f"{side}{self.number_name}_{self.ar.data.lang['c100_bottom']}_Ctrl"
+                left_side_ctrl_name = f"{left_side_name}_{side}{self.number_name}_{self.ar.data.lang['c121_side']}_Ctrl"
+                right_side_ctrl_name = f"{right_side_name}_{side}{self.number_name}_{self.ar.data.lang['c121_side']}_Ctrl"
+                left_nostril_ctrl_name = f"{left_side_name}_{side}{self.number_name}_{self.ar.data.lang['m079_nostril']}_Ctrl"
+                right_nostril_ctrl_name = f"{right_side_name}_{side}{self.number_name}_{self.ar.data.lang['m079_nostril']}_Ctrl"
                 
                 # creating joints:
                 middle_joint = cmds.joint(name=middle_joint_name, scaleCompensate=False)
@@ -282,14 +282,14 @@ class Nose(standard.BaseStandard):
                     self.ar.naming.set_joint_label(right_nostril_joint, 2, 18, f"{self.number_name}_{(n+4):02d}_{self.ar.data.lang['m079_nostril']}")
                 
                 # creating controls:
-                middle_ctrl = self.ar.ctrls.create_controller('id_076_NoseMiddle', ctrl_name=middle_ctrl_name, r=(self.radius), d=self.curve_degree, head_def=head_def_value, guide_source=self.name_guide+"_cvMiddleLoc", parent_tag=centers[-1])
-                tip_ctrl = self.ar.ctrls.create_controller('id_077_NoseTip', ctrl_name=tip_ctrl_name, r=(self.radius * 0.3), d=self.curve_degree, head_def=head_def_value, guide_source=self.name_guide+"_cvTipLoc", parent_tag=centers[-1])
-                bottom_ctrl = self.ar.ctrls.create_controller('id_080_NoseBottom', ctrl_name=bottom_ctrl_name, r=(self.radius * 0.5), d=self.curve_degree, dir='-Y', head_def=head_def_value, guide_source=self.name_guide+"_cvBottomLoc", parent_tag=centers[-1])
-                left_side_ctrl = self.ar.ctrls.create_controller('id_078_NoseSide', ctrl_name=left_side_ctrl_name, r=(self.radius * 0.5), d=self.curve_degree, rot=(0, 0, -90), head_def=head_def_value, guide_source=self.name_guide+"_cvLSideLoc", parent_tag=centers[-1])
-                right_side_ctrl = self.ar.ctrls.create_controller('id_078_NoseSide', ctrl_name=right_side_ctrl_name, r=(self.radius * 0.5), d=self.curve_degree, rot=(0, 0, -90), head_def=head_def_value, guide_source=self.name_guide+"_cvRSideLoc", parent_tag=centers[-1])
+                middle_ctrl = self.ar.ctrls.create_controller('id_076_NoseMiddle', ctrl_name=middle_ctrl_name, r=(self.radius), d=self.curve_degree, head_def=head_def_value, guide_source=f"{self.name_guide}_cvMiddleLoc", parent_tag=centers[-1])
+                tip_ctrl = self.ar.ctrls.create_controller('id_077_NoseTip', ctrl_name=tip_ctrl_name, r=(self.radius * 0.3), d=self.curve_degree, head_def=head_def_value, guide_source=f"{self.name_guide}_cvTipLoc", parent_tag=centers[-1])
+                bottom_ctrl = self.ar.ctrls.create_controller('id_080_NoseBottom', ctrl_name=bottom_ctrl_name, r=(self.radius * 0.5), d=self.curve_degree, dir='-Y', head_def=head_def_value, guide_source=f"{self.name_guide}_cvBottomLoc", parent_tag=centers[-1])
+                left_side_ctrl = self.ar.ctrls.create_controller('id_078_NoseSide', ctrl_name=left_side_ctrl_name, r=(self.radius * 0.5), d=self.curve_degree, rot=(0, 0, -90), head_def=head_def_value, guide_source=f"{self.name_guide}_cvLSideLoc", parent_tag=centers[-1])
+                right_side_ctrl = self.ar.ctrls.create_controller('id_078_NoseSide', ctrl_name=right_side_ctrl_name, r=(self.radius * 0.5), d=self.curve_degree, rot=(0, 0, -90), head_def=head_def_value, guide_source=f"{self.name_guide}_cvRSideLoc", parent_tag=centers[-1])
                 if nostril:
-                    left_nostril_ctrl = self.ar.ctrls.create_controller('id_079_Nostril', ctrl_name=left_nostril_ctrl_name, r=(self.radius * 0.2), d=self.curve_degree, head_def=head_def_value, guide_source=self.name_guide+"_cvLNostrilLoc", parent_tag=left_side_ctrl)
-                    right_nostril_ctrl = self.ar.ctrls.create_controller('id_079_Nostril', ctrl_name=right_nostril_ctrl_name, r=(self.radius * 0.2), d=self.curve_degree, head_def=head_def_value, guide_source=self.name_guide+"_cvRNostrilLoc", parent_tag=right_side_ctrl)
+                    left_nostril_ctrl = self.ar.ctrls.create_controller('id_079_Nostril', ctrl_name=left_nostril_ctrl_name, r=(self.radius * 0.2), d=self.curve_degree, head_def=head_def_value, guide_source=f"{self.name_guide}_cvLNostrilLoc", parent_tag=left_side_ctrl)
+                    right_nostril_ctrl = self.ar.ctrls.create_controller('id_079_Nostril', ctrl_name=right_nostril_ctrl_name, r=(self.radius * 0.2), d=self.curve_degree, head_def=head_def_value, guide_source=f"{self.name_guide}_cvRNostrilLoc", parent_tag=right_side_ctrl)
                     lefts.append(left_nostril_ctrl)
                     rights.append(right_nostril_ctrl)
                 centers.append(middle_ctrl)
@@ -328,44 +328,44 @@ class Nose(standard.BaseStandard):
                             to_flip_ctrls.append(left_nostril_ctrl)
                             to_flip_ctrls.append(right_nostril_ctrl)
                         for to_flip_ctrl in to_flip_ctrls:
-                            cmds.setAttr(to_flip_ctrl+".scaleX", -1)
-                            cmds.setAttr(to_flip_ctrl+".scaleY", -1)
-                            cmds.setAttr(to_flip_ctrl+".scaleZ", -1)
+                            cmds.setAttr(f"{to_flip_ctrl}.scaleX", -1)
+                            cmds.setAttr(f"{to_flip_ctrl}.scaleY", -1)
+                            cmds.setAttr(f"{to_flip_ctrl}.scaleZ", -1)
                     else:
-                        cmds.setAttr(right_side_ctrl+".scaleX", -1)
+                        cmds.setAttr(f"{right_side_ctrl}.scaleX", -1)
                         if nostril:
-                            cmds.setAttr(right_nostril_ctrl+".scaleX", -1)
+                            cmds.setAttr(f"{right_nostril_ctrl}.scaleX", -1)
 
                 # create_zero_out controls:
                 side_ctrl_zeros = self.ar.utils.create_zero_out([left_side_ctrl, right_side_ctrl])
                 if s == 0:
-                    cmds.setAttr(side_ctrl_zeros[1]+".scaleX", -1)
+                    cmds.setAttr(f"{side_ctrl_zeros[1]}.scaleX", -1)
                 elif self.flip:
-                    cmds.setAttr(side_ctrl_zeros[1]+".scaleX", 1)
+                    cmds.setAttr(f"{side_ctrl_zeros[1]}.scaleX", 1)
                 if nostril:
                     side_nostril_ctrl_zeros = self.ar.utils.create_zero_out([left_nostril_ctrl, right_nostril_ctrl])
                     if s == 0:
-                        cmds.setAttr(side_nostril_ctrl_zeros[1]+".scaleX", -1)
+                        cmds.setAttr(f"{side_nostril_ctrl_zeros[1]}.scaleX", -1)
                     elif self.flip:
-                        cmds.setAttr(side_nostril_ctrl_zeros[1]+".scaleX", 1)
+                        cmds.setAttr(f"{side_nostril_ctrl_zeros[1]}.scaleX", 1)
                 ctrl_zeros = self.ar.utils.create_zero_out([middle_ctrl, tip_ctrl, bottom_ctrl])
 
                 # make controls drive joints:
-                cmds.parentConstraint(middle_ctrl, middle_joint, maintainOffset=False, name=middle_joint+"_PaC")
-                cmds.scaleConstraint(middle_ctrl, middle_joint, maintainOffset=False, name=middle_joint+"_ScC")
-                cmds.parentConstraint(tip_ctrl, tip_joint, maintainOffset=False, name=tip_joint+"_PaC")
-                cmds.scaleConstraint(tip_ctrl, tip_joint, maintainOffset=False, name=tip_joint+"_ScC")
-                cmds.parentConstraint(bottom_ctrl, bottom_joint, maintainOffset=False, name=bottom_joint+"_PaC")
-                cmds.scaleConstraint(bottom_ctrl, bottom_joint, maintainOffset=False, name=bottom_joint+"_ScC")
-                cmds.parentConstraint(left_side_ctrl, left_side_joint, maintainOffset=False, name=left_side_joint+"_PaC")
-                cmds.scaleConstraint(left_side_ctrl, left_side_joint, maintainOffset=False, name=left_side_joint+"_ScC")
-                cmds.parentConstraint(right_side_ctrl, right_side_joint, maintainOffset=False, name=right_side_joint+"_PaC")
-                cmds.scaleConstraint(right_side_ctrl, right_side_joint, maintainOffset=False, name=right_side_joint+"_ScC")
+                cmds.parentConstraint(middle_ctrl, middle_joint, maintainOffset=False, name=f"{middle_joint}_PaC")
+                cmds.scaleConstraint(middle_ctrl, middle_joint, maintainOffset=False, name=f"{middle_joint}_ScC")
+                cmds.parentConstraint(tip_ctrl, tip_joint, maintainOffset=False, name=f"{tip_joint}_PaC")
+                cmds.scaleConstraint(tip_ctrl, tip_joint, maintainOffset=False, name=f"{tip_joint}_ScC")
+                cmds.parentConstraint(bottom_ctrl, bottom_joint, maintainOffset=False, name=f"{bottom_joint}_PaC")
+                cmds.scaleConstraint(bottom_ctrl, bottom_joint, maintainOffset=False, name=f"{bottom_joint}_ScC")
+                cmds.parentConstraint(left_side_ctrl, left_side_joint, maintainOffset=False, name=f"{left_side_joint}_PaC")
+                cmds.scaleConstraint(left_side_ctrl, left_side_joint, maintainOffset=False, name=f"{left_side_joint}_ScC")
+                cmds.parentConstraint(right_side_ctrl, right_side_joint, maintainOffset=False, name=f"{right_side_joint}_PaC")
+                cmds.scaleConstraint(right_side_ctrl, right_side_joint, maintainOffset=False, name=f"{right_side_joint}_ScC")
                 if nostril:
-                    cmds.parentConstraint(left_nostril_ctrl, left_nostril_joint, maintainOffset=False, name=left_nostril_joint+"_PaC")
-                    cmds.scaleConstraint(left_nostril_ctrl, left_nostril_joint, maintainOffset=False, name=left_nostril_joint+"_ScC")
-                    cmds.parentConstraint(right_nostril_ctrl, right_nostril_joint, maintainOffset=False, name=right_nostril_joint+"_PaC")
-                    cmds.scaleConstraint(right_nostril_ctrl, right_nostril_joint, maintainOffset=False, name=right_nostril_joint+"_ScC")
+                    cmds.parentConstraint(left_nostril_ctrl, left_nostril_joint, maintainOffset=False, name=f"{left_nostril_joint}_PaC")
+                    cmds.scaleConstraint(left_nostril_ctrl, left_nostril_joint, maintainOffset=False, name=f"{left_nostril_joint}_ScC")
+                    cmds.parentConstraint(right_nostril_ctrl, right_nostril_joint, maintainOffset=False, name=f"{right_nostril_joint}_PaC")
+                    cmds.scaleConstraint(right_nostril_ctrl, right_nostril_joint, maintainOffset=False, name=f"{right_nostril_joint}_ScC")
 
                 # mount controls hierarchy:
                 cmds.parent(ctrl_zeros[0], nose_ctrl, absolute=True) #middleCtrl
@@ -376,7 +376,7 @@ class Nose(standard.BaseStandard):
 
                 # create end joint:
                 cmds.select(tip_joint)
-                self.create_end_joint(side+self.number_name)
+                self.create_end_joint(f"{side}{self.number_name}")
 
                 # optimize control CV shapes:
                 temp_tip_cluster = cmds.cluster(tip_ctrl)[1]
@@ -387,7 +387,7 @@ class Nose(standard.BaseStandard):
                 self.create_hook_setup(side, [ctrl_zero_grp], [skin_joints[0]])
                 self.ctrl_hook_grps.append(self.ctrl_hook_grp)
                 # delete duplicated group for side (mirror):
-                cmds.delete(side+self.number_name+'_'+self.mirror_grp)
+                cmds.delete(f"{side}{self.number_name}_{self.mirror_grp}")
                 self.ar.custom_attr.add_attr(0, [self.static_hook_grp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()
@@ -402,9 +402,9 @@ class Nose(standard.BaseStandard):
         """ This method will create a dictionary with informations about integrations system between modules.
         """
         self.composed = {
-                            'controllers'     : self.ctrls,
-                            'lCtrls'          : self.left_ctrls,
-                            'rCtrls'          : self.right_ctrls,
+                            'controllers' : self.ctrls,
+                            'lCtrls' : self.left_ctrls,
+                            'rCtrls' : self.right_ctrls,
                             'ctrlHookGrpList' : self.ctrl_hook_grps,
-                            'mainCtrlList'    : self.main_ctrls
+                            'mainCtrlList' : self.main_ctrls
                         }

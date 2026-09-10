@@ -83,9 +83,9 @@ class ChannelIO(action.BaseAction):
                 data[item] = {}
                 for attr in self.ar.data.transform_attrs:
                     data[item][attr] = {
-                                        'locked' : cmds.getAttr(item+"."+attr, lock=True),
-                                        'keyable' : cmds.getAttr(item+"."+attr, keyable=True),
-                                        'channelBox' : cmds.getAttr(item+"."+attr, channelBox=True)
+                                        'locked' : cmds.getAttr(f"{item}.{attr}", lock=True),
+                                        'keyable' : cmds.getAttr(f"{item}.{attr}", keyable=True),
+                                        'channelBox' : cmds.getAttr(f"{item}.{attr}", channelBox=True)
                                         }
         return data
 
@@ -106,17 +106,17 @@ class ChannelIO(action.BaseAction):
             if cmds.objExists(item):
                 for attr in self.ar.data.transform_attrs:
                     try:
-                        cmds.setAttr(item+"."+attr, keyable=attr_data[item][attr]['keyable'])
+                        cmds.setAttr(f"{item}.{attr}", keyable=attr_data[item][attr]['keyable'])
                         if not attr_data[item][attr]['keyable']:
-                            cmds.setAttr(item+"."+attr, channelBox=attr_data[item][attr]['channelBox'])
-                        cmds.setAttr(item+"."+attr, lock=attr_data[item][attr]['locked'])
+                            cmds.setAttr(f"{item}.{attr}", channelBox=attr_data[item][attr]['channelBox'])
+                        cmds.setAttr(f"{item}.{attr}", lock=attr_data[item][attr]['locked'])
                         if not item in well_imported_items:
                             well_imported_items.append(item)
                     except Exception as e:
-                        self.fail_io(item+" - "+str(e))
+                        self.fail_io(f"{item} - {e}")
             else:
                 not_found_nodes.append(item)
         if well_imported_items:
             self.well_done_io(self.latest_data_file)
         else:
-            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(not_found_nodes))
+            self.fail_io(f"{self.ar.data.lang['v014_notFoundNodes']}: {', '.join(not_found_nodes)}")

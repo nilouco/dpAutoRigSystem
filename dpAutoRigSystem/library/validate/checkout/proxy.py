@@ -71,14 +71,14 @@ class Proxy(action.BaseAction):
                                 try:
                                     for source_transform in to_proxy_items:
                                         source_shortname = self.ar.naming.get_short_name(source_transform)
-                                        self.ar.ui_manager.set_progress(self.ar.data.lang[self.title]+": "+source_shortname)
+                                        self.ar.ui_manager.set_progress(f"{self.ar.data.lang[self.title]}: {source_shortname}")
                                         self.create_proxy(source_transform, source_shortname, proxy_grp)
                                     self.proxy_integration(proxy_grp)
                                     self.good_results.append(True)
-                                    self.messages.append(self.ar.data.lang['v004_fixed']+": "+proxy_grp)
+                                    self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {proxy_grp}")
                                 except:
                                     self.good_results.append(False)
-                                    self.messages.append(self.ar.data.lang['v005_cantFix']+": "+proxy_grp)
+                                    self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {proxy_grp}")
                         else:
                             self.found_issues.append(False)
                             self.good_results.append(True)
@@ -119,15 +119,15 @@ class Proxy(action.BaseAction):
             if weigthed_influences:
                 # get data and store it into a data
                 index_joint_data = {}
-                source_faces = cmds.ls(source+".f[*]", flatten=True, long=True)
+                source_faces = cmds.ls(f"{source}.f[*]", flatten=True, long=True)
                 for i, idx in enumerate(source_faces):
-                    percents = cmds.skinPercent(skincluster_node, source+".f["+str(i)+"]", ignoreBelow=0.1, transform=None, query=True)
+                    percents = cmds.skinPercent(skincluster_node, f"{source}.f[{i}]", ignoreBelow=0.1, transform=None, query=True)
                     if percents:
                         index_joint_data[i] = percents[0]
                         if len(percents) != 1:
                             joint_values = []
                             for item in percents:
-                                joint_values.append(cmds.skinPercent(skincluster_node, source+".f["+str(i)+"]", ignoreBelow=0.1, transform=item, query=True))
+                                joint_values.append(cmds.skinPercent(skincluster_node, f"{source}.f[{i}]", ignoreBelow=0.1, transform=item, query=True))
                             index_joint_data[i] = percents[joint_values.index(max(joint_values))]
                 for jnt in weigthed_influences:
                     node_faces = []
@@ -138,16 +138,16 @@ class Proxy(action.BaseAction):
                             skinned_faces.append(j)
                     if skinned_faces:
                         # filter lists
-                        faces = [w.replace(source+".f[", '') for w in source_faces]
+                        faces = [w.replace(f"{source}.f[", '') for w in source_faces]
                         faces = [int(w.replace(']', '')) for w in faces]
                         if faces:
                             for v in reversed(skinned_faces):
                                 faces.pop(v)
                         if faces:
                             for n in faces:
-                                node_faces.append(source+".f["+str(n)+"]")
+                                node_faces.append(f"{source}.f[{n}]")
                         # create proxy geometry
-                        dup = cmds.duplicate(source, name=shortname+"_"+str(self.repeated_names.count(shortname)).zfill(2)+"_"+jnt+"_Pxy")[0]
+                        dup = cmds.duplicate(source, name=f"{shortname}_{str(self.repeated_names.count(shortname)).zfill(2)}_{jnt}_Pxy")[0]
                         self.repeated_names.append(shortname)
                         self.ar.utils.remove_user_defined_attr(dup)
                         self.ar.utils.delete_orig_shape(dup)
@@ -162,16 +162,16 @@ class Proxy(action.BaseAction):
                         cmds.makeIdentity(dup, apply=True, translate=True, rotate=True, scale=True)
                         cmds.scriptEditorInfo(suppressWarnings=False)
                         self.check_reverse_normal(dup, jnt)
-                        cmds.connectAttr(jnt+".worldMatrix", dup+".offsetParentMatrix", force=True)
+                        cmds.connectAttr(f"{jnt}.worldMatrix", f"{dup}.offsetParentMatrix", force=True)
                         cmds.parent(dup, grp)
                         self.ar.utils.set_attr_values([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], [0, 0, 0, 0, 0, 0, 1, 1, 1])
                         self.ar.ctrls.set_lock_hide([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
-                        draw_override_items = cmds.listConnections(dup+".drawOverride", source=True, destination=False, plugs=True)
+                        draw_override_items = cmds.listConnections(f"{dup}.drawOverride", source=True, destination=False, plugs=True)
                         if draw_override_items:
                             # remove from display layer
-                            cmds.disconnectAttr(draw_override_items[0], dup+".drawOverride")
-                        cmds.setAttr(dup+".overrideEnabled", 1)
-                        cmds.setAttr(dup+".overrideDisplayType", 2) #reference
+                            cmds.disconnectAttr(draw_override_items[0], f"{dup}.drawOverride")
+                        cmds.setAttr(f"{dup}.overrideEnabled", 1)
+                        cmds.setAttr(f"{dup}.overrideDisplayType", 2) #reference
                         self.reconnect_visibility(source, dup)
             cmds.addAttr(source, longName=PROXIED, attributeType='bool', defaultValue=1)
         source_parent = cmds.listRelatives(source, parent=True, fullPath=True, type='transform')
@@ -187,11 +187,11 @@ class Proxy(action.BaseAction):
         option_ctrl = self.ar.utils.get_node_by_message('optionCtrl')
         if option_ctrl:
             # prepare option_ctrl to deformers connections
-            cmds.setAttr(option_ctrl+".proxy", channelBox=True)
+            cmds.setAttr(f"{option_ctrl}.proxy", channelBox=True)
             cmds.addAttr(option_ctrl, longName='proxyRevOutput', attributeType='bool')
             proxy_rev = cmds.createNode('reverse', name='Proxy_Rev')
-            cmds.connectAttr(option_ctrl+".proxy", proxy_rev+".inputX", force=True)
-            cmds.connectAttr(proxy_rev+".outputX", option_ctrl+".proxyRevOutput", force=True)
+            cmds.connectAttr(f"{option_ctrl}.proxy", f"{proxy_rev}.inputX", force=True)
+            cmds.connectAttr(f"{proxy_rev}.outputX", f"{option_ctrl}.proxyRevOutput", force=True)
             deformers = self.skinclusters
             defs = ['blendShape', 'wrap', 'ffd', 'wire', 'shrinkWrap', 'sculpt', 'morph']
             for deform in defs:
@@ -199,7 +199,7 @@ class Proxy(action.BaseAction):
             if deformers:
                 for deform_node in deformers:
                     try:
-                        cmds.connectAttr(option_ctrl+".proxy", deform_node+".nodeState") #don't force it please
+                        cmds.connectAttr(f"{option_ctrl}.proxy", f"{deform_node}.nodeState") #don't force it please
                     except:
                         pass #maybe it already has a connection from another node
             # hide controllers and meshes
@@ -217,32 +217,32 @@ class Proxy(action.BaseAction):
         if attr or suffix:
             if attr:
                 if attr in cmds.listAttr(ctrl):
-                    connections = cmds.listConnections(ctrl+"."+attr, source=False, destination=True, plugs=True) #list before connect on it
-                    vis_md = cmds.createNode('multiplyDivide', name="Proxy_"+(attr[0].upper()+attr[1:])+"_Vis_MD")
-                    cmds.connectAttr(ctrl+".proxyRevOutput", vis_md+".input1X", force=True)
-                    cmds.connectAttr(ctrl+"."+attr, vis_md+".input2X", force=True)
+                    connections = cmds.listConnections(f"{ctrl}.{attr}", source=False, destination=True, plugs=True) #list before connect on it
+                    vis_md = cmds.createNode('multiplyDivide', name=f"Proxy_{attr[0].upper()}{attr[1:]}_Vis_MD")
+                    cmds.connectAttr(f"{ctrl}.proxyRevOutput", f"{vis_md}.input1X", force=True)
+                    cmds.connectAttr(f"{ctrl}.{attr}", f"{vis_md}.input2X", force=True)
                     if connections:
                         for plug_dest in connections:
-                            cmds.connectAttr(vis_md+".outputX", plug_dest, force=True)
+                            cmds.connectAttr(f"{vis_md}.outputX", plug_dest, force=True)
             else:
-                suffix_items = cmds.ls("*"+suffix, selection=False)
+                suffix_items = cmds.ls(f"*{suffix}", selection=False)
                 if suffix_items:
                     for item in suffix_items:
-                        cmds.connectAttr(ctrl+".proxyRevOutput", item+".visibility", force=True)
+                        cmds.connectAttr(f"{ctrl}.proxyRevOutput", f"{item}.visibility", force=True)
 
 
     def reconnect_visibility(self, sourceMesh, proxyMesh):
         """ Check if there's sourceMesh visibility connection then connect the new proxyMesh visibility too, if so.
         """
-        vis_connections = cmds.listConnections(sourceMesh+".visibility", source=True, destination=False, plugs=True)
+        vis_connections = cmds.listConnections(f"{sourceMesh}.visibility", source=True, destination=False, plugs=True)
         if vis_connections:
-            cmds.connectAttr(vis_connections[0], proxyMesh+".visibility", force=True)
+            cmds.connectAttr(vis_connections[0], f"{proxyMesh}.visibility", force=True)
 
 
     def check_reverse_normal(self, dup, jnt):
         """ Verify if there're negative scale joint attributes and reverse the normal mesh if true.
         """
         for axis in ['sx', 'sy', 'sz']:
-            if cmds.getAttr(jnt+'.'+axis) < 0:
+            if cmds.getAttr(f"{jnt}.{axis}") < 0:
                 cmds.polyNormal(dup, normalMode=0, userNormalMode=0, constructionHistory=False)
                 break

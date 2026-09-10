@@ -53,7 +53,7 @@ class TFace(action.BaseAction):
                         # verify if objName or shape_name is in check_items
                         for item in check_items:
                             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
-                            if item == shape_name and not cmds.getAttr(item+".intermediateObject"):
+                            if item == shape_name and not cmds.getAttr(f"{item}.intermediateObject"):
                                 # get edges
                                 iter_edge = OpenMaya.MItMeshEdge(shape)
                                 # run in faces listing faces
@@ -64,7 +64,7 @@ class TFace(action.BaseAction):
                                     # verify the lenght of the connectedFaces
                                     if len(face_int_array) > 2:
                                         # found tFace
-                                        t_faces.append(item_name+".e["+str(iter_edge.index())+"]")
+                                        t_faces.append(f"{item_name}.e[{iter_edge.index()}]")
                                     iter_edge.next()
                         # Move to the next selected node in the list
                         iter.next()
@@ -83,10 +83,10 @@ class TFace(action.BaseAction):
                                 mel.eval('polyCleanupArgList 3 { \"0\",\"1\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"1e-005\",\"0\",\"1e-005\",\"0\",\"1e-005\",\"0\",\"2\",\"0\" };')
                                 cmds.select(clear=True)
                                 self.good_results.append(True)
-                                self.messages.append(self.ar.data.lang['v004_fixed']+": "+item)
+                                self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {item}")
                             except:
                                 self.good_results.append(False)
-                                self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
+                                self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}")
                     if self.first_mode:
                         cmds.select(t_faces)
             else:

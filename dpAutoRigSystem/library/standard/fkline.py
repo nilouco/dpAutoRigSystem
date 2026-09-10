@@ -40,21 +40,21 @@ class FkLine(standard.BaseStandard):
         """ Creates the controller locators of the standard module guide.
         """
         # locators
-        self.guide_loc = self.ar.ctrls.create_joint_locator(ctrl_name=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
-        self.guide_end_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
+        self.guide_loc = self.ar.ctrls.create_joint_locator(ctrl_name=f"{self.name_guide}_JointLoc1", r=0.3, d=1, guide=True)
+        self.guide_end_loc = self.ar.ctrls.create_curve_locator(ctrl_name=f"{self.name_guide}_JointEnd", r=0.1, d=1, guide=True)
         # joints
-        self.line = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
-        self.line_end = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
+        self.line = cmds.joint(name=f"{self.name_guide}_JGuide1", radius=0.001)
+        self.line_end = cmds.joint(name=f"{self.name_guide}_JGuideEnd", radius=0.001)
         # setup
         self.ar.utils.set_template([self.line, self.line_end])
-        cmds.setAttr(self.guide_end_loc+".translateZ", 1.3)
+        cmds.setAttr(f"{self.guide_end_loc}.translateZ", 1.3)
         # parenting
         cmds.parent(self.line, self.guide_base, relative=True)
         cmds.parent(self.guide_end_loc, self.guide_loc)
         cmds.parent(self.guide_loc, self.guide_base)
         # edit
-        cmds.parentConstraint(self.guide_loc, self.line, maintainOffset=False, name=self.line+"_PaC")
-        cmds.parentConstraint(self.guide_end_loc, self.line_end, maintainOffset=False, name=self.line_end+"_PaC")
+        cmds.parentConstraint(self.guide_loc, self.line, maintainOffset=False, name=f"{self.line}_PaC")
+        cmds.parentConstraint(self.guide_end_loc, self.line_end, maintainOffset=False, name=f"{self.line_end}_PaC")
         cmds.transformLimits(self.guide_end_loc, tz=(0.01, 1), etz=(True, False))
         self.ar.ctrls.set_lock_hide([self.guide_end_loc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
 
@@ -68,23 +68,23 @@ class FkLine(standard.BaseStandard):
         if joint_number and joint_number != self.current_joint_number:
             self.ar.opt.check_use_default_render_layer()
             # get the number of joints existing:
-            self.current_joint_number = cmds.getAttr(self.guide_base+".nJoints")
+            self.current_joint_number = cmds.getAttr(f"{self.guide_base}.nJoints")
             # unparent temporarely the Ends:
-            self.guide_end_loc = self.name_guide+"_JointEnd"
-            self.line_end = self.name_guide+"_JGuideEnd"
+            self.guide_end_loc = f"{self.name_guide}_JointEnd"
+            self.line_end = f"{self.name_guide}_JGuideEnd"
             cmds.parent(self.guide_end_loc, self.line_end, world=True)
             # verify if the nJoints is greather or less than the current
             if joint_number > self.current_joint_number:
                 for n in range(self.current_joint_number+1, joint_number+1):
                     # create another N create_joint_locator:
-                    self.guide_loc = self.ar.ctrls.create_joint_locator(ctrl_name=self.name_guide+"_JointLoc"+str(n), r=0.3, d=1, guide=True)
+                    self.guide_loc = self.ar.ctrls.create_joint_locator(ctrl_name=f"{self.name_guide}_JointLoc{n}", r=0.3, d=1, guide=True)
                     self.increment_joint_number(n)
-                    self.add_node_to_guide_net([self.guide_loc], ["JointLoc"+str(n)])
+                    self.add_node_to_guide_net([self.guide_loc], [f"JointLoc{n}"])
             elif joint_number < self.current_joint_number:
-                self.line = self.name_guide+"_JGuide"+str(joint_number)
+                self.line = f"{self.name_guide}_JGuide{joint_number}"
                 self.guide_loc = self.reduce_joint_number(joint_number)
             self.re_parent_guide_end()
-            cmds.setAttr(self.guide_base+".nJoints", joint_number)
+            cmds.setAttr(f"{self.guide_base}.nJoints", joint_number)
             self.current_joint_number = joint_number
             self.change_main_ctrls_number(0)
             # re-create the preview mirror:
@@ -112,8 +112,8 @@ class FkLine(standard.BaseStandard):
         # If it's JointEnd, unlock translateX and translateY attributes to allow unparenting to world with no translation issues.
         # The JointEnd will be unlocked after pressing the reorient button only.
         if target == self.guide_end_loc:
-            cmds.setAttr(target + ".translateX", lock=False, keyable=True)
-            cmds.setAttr(target + ".translateY", lock=False, keyable=True)
+            cmds.setAttr(f"{target}.translateX", lock=False, keyable=True)
+            cmds.setAttr(f"{target}.translateY", lock=False, keyable=True)
         father_loc = cmds.listRelatives(target, parent=True, type='transform')[0]
         cmds.parent(target, world=True)
         # Aim Constraint without maintain offset
@@ -141,8 +141,8 @@ class FkLine(standard.BaseStandard):
                     # Parenting nJoint to world and reset joint_loc position
                     cmds.parent(child, world=True)
                     for axis in self.ar.data.axes:
-                        cmds.setAttr(joint_loc + ".translate" + axis, 0)
-                        cmds.setAttr(joint_loc + ".rotate" + axis, 0)
+                        cmds.setAttr(f"{joint_loc}.translate{axis}", 0)
+                        cmds.setAttr(f"{joint_loc}.rotate{axis}", 0)
                     cmds.parent(child, joint_loc)
                     # Delete the temporary locators
                     cmds.delete(up_vector)
@@ -155,8 +155,8 @@ class FkLine(standard.BaseStandard):
             Each guide will point to the next guide using Radius_Ctrl position as a Object Rotation Up Vector.
         """
         # re-declaring guides names:
-        self.guide_radius = self.name_guide + "_Base_RadiusCtrl"
-        self.guide_end_loc = self.name_guide + "_JointEnd"
+        self.guide_radius = f"{self.name_guide}_Base_RadiusCtrl"
+        self.guide_end_loc = f"{self.name_guide}_JointEnd"
         # Check if the guideBase exists:
         if cmds.attributeQuery('guideBase', node=self.guide_base, exists=True):
             # Get the locs and up_vector:
@@ -171,18 +171,18 @@ class FkLine(standard.BaseStandard):
         if cmds.objExists(self.guide_base):
             # run for all sides
             for s, side in enumerate(self.sides):
-                self.base = side+self.number_name+'_Guide_Base'
-                ctrl_zero_grp = side+self.number_name+"_00_Ctrl_Zero_0_Grp"
+                self.base = f"{side}{self.number_name}_Guide_Base"
+                ctrl_zero_grp = f"{side}{self.number_name}_00_Ctrl_Zero_0_Grp"
                 skin_joints = []
                 fk_ctrls = []
                 # get the number of joints to be created:
-                self.n_joints = cmds.getAttr(self.base+".nJoints")
+                self.n_joints = cmds.getAttr(f"{self.base}.nJoints")
                 for n in range(self.n_joints):
                     cmds.select(clear=True)
                     # declare guide:
-                    self.guide = side+self.number_name+"_Guide_JointLoc"+str(n+1)
-                    self.guide_end_loc = side+self.number_name+"_Guide_JointEnd"
-                    self.guide_radius = side+self.number_name+"_Guide_Base_RadiusCtrl"
+                    self.guide = f"{side}{self.number_name}_Guide_JointLoc{n+1}"
+                    self.guide_end_loc = f"{side}{self.number_name}_Guide_JointEnd"
+                    self.guide_radius = f"{side}{self.number_name}_Guide_Base_RadiusCtrl"
                     # create a joint:
                     jnt = cmds.joint(name=f"{side}{self.number_name}_{n:02d}_Jnt", scaleCompensate=False)
                     cmds.addAttr(jnt, longName='dpAR_joint', attributeType='float', keyable=False)
@@ -190,7 +190,7 @@ class FkLine(standard.BaseStandard):
                     self.ar.naming.set_joint_label(jnt, s+self.joint_label_add, 18, f"{self.number_name}_{n:02d}")
                     skin_joints.append(jnt)
                     # create a control:
-                    ctrl = self.ar.ctrls.create_controller('id_007_FkLine', f"{side}{self.number_name}_{n:02d}_Ctrl", r=self.radius, d=self.curve_degree, head_def=cmds.getAttr(self.base+".deformedBy"), guide_source=self.name_guide+"_JointLoc"+str(n+1), parent_tag=self.get_parent_to_tag(fk_ctrls))
+                    ctrl = self.ar.ctrls.create_controller('id_007_FkLine', f"{side}{self.number_name}_{n:02d}_Ctrl", r=self.radius, d=self.curve_degree, head_def=cmds.getAttr(f"{self.base}.deformedBy"), guide_source=f"{self.name_guide}_JointLoc{n+1}", parent_tag=self.get_parent_to_tag(fk_ctrls))
                     fk_ctrls.append(ctrl)
                     # create_zero_out controls:
                     ctrl_zero = self.ar.utils.create_zero_out([ctrl])[0]
@@ -198,20 +198,20 @@ class FkLine(standard.BaseStandard):
                     cmds.matchTransform(jnt, self.guide, position=True, rotation=True)
                     cmds.matchTransform(ctrl_zero, self.guide, position=True, rotation=True)
                     # hide visibility attribute:
-                    cmds.setAttr(ctrl+'.visibility', keyable=False)
+                    cmds.setAttr(f"{ctrl}.visibility", keyable=False)
                     # fixing flip mirror:
-                    if s == 1 and cmds.getAttr(self.guide_base+".flip") == 1:
-                        cmds.setAttr(ctrl_zero+".scaleX", -1)
-                        cmds.setAttr(ctrl_zero+".scaleY", -1)
-                        cmds.setAttr(ctrl_zero+".scaleZ", -1)
+                    if s == 1 and cmds.getAttr(f"{self.guide_base}.flip") == 1:
+                        cmds.setAttr(f"{ctrl_zero}.scaleX", -1)
+                        cmds.setAttr(f"{ctrl_zero}.scaleY", -1)
+                        cmds.setAttr(f"{ctrl_zero}.scaleZ", -1)
                     cmds.addAttr(ctrl, longName='scaleCompensate', attributeType='short', minValue=0, defaultValue=1, maxValue=1, keyable=False)
-                    cmds.setAttr(ctrl+".scaleCompensate", channelBox=True)
-                    cmds.connectAttr(ctrl+".scaleCompensate", jnt+".segmentScaleCompensate", force=True)
+                    cmds.setAttr(f"{ctrl}.scaleCompensate", channelBox=True)
+                    cmds.connectAttr(f"{ctrl}.scaleCompensate", f"{jnt}.segmentScaleCompensate", force=True)
                     if n == 0:
-                        self.ar.utils.set_origined_from_attr(ctrl, self.base+";"+self.guide+";"+self.guide_radius)
+                        self.ar.utils.set_origined_from_attr(ctrl, f"{self.base};{self.guide};{self.guide_radius}")
                         ctrl_zero_grp = ctrl_zero
                     elif n == self.n_joints-1:
-                        self.ar.utils.set_origined_from_attr(ctrl, self.guide+";"+self.guide_end_loc)
+                        self.ar.utils.set_origined_from_attr(ctrl, f"{self.guide};{self.guide_end_loc}")
                     else:
                         self.ar.utils.set_origined_from_attr(ctrl, self.guide)
                     # grouping:
@@ -222,8 +222,8 @@ class FkLine(standard.BaseStandard):
                         # parent zeroCtrl Group to the before jntCtrl:
                         cmds.parent(ctrl_zero, f"{side}{self.number_name}_{(n-1):02d}_Ctrl", absolute=True)
                     # control drives joint:
-                    cmds.parentConstraint(ctrl, jnt, maintainOffset=False, name=jnt+"_PaC")
-                    cmds.scaleConstraint(ctrl, jnt, maintainOffset=True, name=jnt+"_ScC")
+                    cmds.parentConstraint(ctrl, jnt, maintainOffset=False, name=f"{jnt}_PaC")
+                    cmds.scaleConstraint(ctrl, jnt, maintainOffset=True, name=f"{jnt}_ScC")
                     # add articulationJoint:
                     if n > 0 and self.articulation:
                         articulation_joints = self.ar.utils.create_articulation_joint(father_joint, jnt) #could call to create corrective joints. See parameters to implement it, please.
@@ -231,14 +231,14 @@ class FkLine(standard.BaseStandard):
                     cmds.select(jnt)
                     # end chain:
                     if n == self.n_joints-1:
-                        self.create_end_joint(side+self.number_name)
+                        self.create_end_joint(f"{side}{self.number_name}")
                 # work with main fk controllers
-                if cmds.getAttr(self.base+".mainControls"):
+                if cmds.getAttr(f"{self.base}.mainControls"):
                     self.add_fk_main_ctrls(side, fk_ctrls)
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.create_hook_setup(side, [ctrl_zero_grp], [skin_joints[0]])
                 # delete duplicated group for side (mirror):
-                cmds.delete(side+self.number_name+'_'+self.mirror_grp)
+                cmds.delete(f"{side}{self.number_name}_{self.mirror_grp}")
                 self.ar.custom_attr.add_attr(0, [self.static_hook_grp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()

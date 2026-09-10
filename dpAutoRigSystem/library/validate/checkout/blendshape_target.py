@@ -48,7 +48,7 @@ class BlendshapeTarget(action.BaseAction):
                 exceptions = self.get_children_nodes(['supportGrp', 'renderGrp', 'proxyGrp'])
                 for item in check_items:
                     if cmds.objExists(item):
-                        if cmds.objExists(item+"."+DPKEEPITATTR) and cmds.getAttr(item+"."+DPKEEPITATTR):
+                        if cmds.objExists(f"{item}.{DPKEEPITATTR}") and cmds.getAttr(f"{item}.{DPKEEPITATTR}"):
                             if not item in exceptions:
                                 exceptions.append(item)
                         elif self.ar.naming.get_suffix_numbers(item)[1].endswith('Base'):
@@ -57,7 +57,7 @@ class BlendshapeTarget(action.BaseAction):
                             try:
                                 input_deformers = cmds.findDeformers(item)
                             except:
-                                self.messages.append(self.ar.data.lang['i075_moreOne']+": "+item)
+                                self.messages.append(f"{self.ar.data.lang['i075_moreOne']}: {item}")
                                 input_deformers = False
                             if input_deformers:
                                 for deformer_node in input_deformers:
@@ -67,7 +67,7 @@ class BlendshapeTarget(action.BaseAction):
                                         if cmds.objectType(deformer_node) == 'wrap':
                                             wrap_attrs = ['basePoints', 'driverPoints']
                                             for wrap_attr in wrap_attrs:
-                                                wrap_connections = cmds.listConnections(deformer_node+"."+wrap_attr, source=True, destination=False)
+                                                wrap_connections = cmds.listConnections(f"{deformer_node}.{wrap_attr}", source=True, destination=False)
                                                 if wrap_connections:
                                                     exceptions.append(wrap_connections[0])
                                             
@@ -89,10 +89,10 @@ class BlendshapeTarget(action.BaseAction):
                                         if not brother_items:
                                             cmds.delete(father_items[0])
                                     self.good_results.append(True)
-                                    self.messages.append(self.ar.data.lang['v004_fixed']+": "+item)
+                                    self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {item}")
                                 except:
                                     self.good_results.append(False)
-                                    self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
+                                    self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}")
                         else:
                             self.found_issues.append(False)
                             self.good_results.append(True)

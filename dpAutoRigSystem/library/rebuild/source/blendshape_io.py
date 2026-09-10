@@ -42,8 +42,8 @@ class BlendshapeIO(action.BaseAction):
                 # load alembic plugin
                 if self.ar.config.check_loaded_plugin('AbcExport') and self.ar.config.check_loaded_plugin('AbcImport'):
                     self.io_path = self.get_io_path(self.io_folder)
-                    self.target_path = self.io_path+"/"+self.target_name
-                    self.original_path = self.io_path+"/"+self.original_name
+                    self.target_path = f"{self.io_path}/{self.target_name}"
+                    self.original_path = f"{self.io_path}/{self.original_name}"
                     if self.io_path:
                         if self.first_mode: #export
                             bs_items = None
@@ -69,7 +69,7 @@ class BlendshapeIO(action.BaseAction):
                     else:
                         self.fail_io(self.ar.data.lang['r010_notFoundPath'])
                 else:
-                    self.fail_io(self.ar.data.lang['e018_notLoadedPlugin']+"AbcExport")
+                    self.fail_io(f"{self.ar.data.lang['e018_notLoadedPlugin']}AbcExport")
             else:
                 self.fail_io(self.ar.data.lang['r027_noAssetContext'])
         else:
@@ -91,13 +91,13 @@ class BlendshapeIO(action.BaseAction):
         bs_data = {}
         self.ar.ui_manager.set_progress(max=len(bs_items), add_one=False, add_number=False)
         for bs_node in bs_items:
-            self.ar.ui_manager.set_progress(self.ar.data.lang[self.title]+": "+bs_node)
+            self.ar.ui_manager.set_progress(f"{self.ar.data.lang[self.title]}: {bs_node}")
             bs_data[bs_node] = {}
             bs_data[bs_node]['targets'] = {}
             # get blendShape node info
             bs_data[bs_node]['geometry'] = cmds.blendShape(bs_node, query=True, geometry=True)
-            bs_data[bs_node]['envelope'] = cmds.getAttr(bs_node+".envelope")
-            bs_data[bs_node]['supportNegativeWeights'] = cmds.getAttr(bs_node+".supportNegativeWeights")
+            bs_data[bs_node]['envelope'] = cmds.getAttr(f"{bs_node}.envelope")
+            bs_data[bs_node]['supportNegativeWeights'] = cmds.getAttr(f"{bs_node}.supportNegativeWeights")
             targets = cmds.listAttr(f"{bs_node}.weight", multi=True)
             if targets:
                 # prepare index to deleted targets
@@ -112,19 +112,19 @@ class BlendshapeIO(action.BaseAction):
                     combinations = []
                     unit_conversion_factor = None
                     unit_conversion_input_plug = None
-                    plug = cmds.listConnections(bs_node+"."+target, destination=False, source=True, plugs=True)
+                    plug = cmds.listConnections(f"{bs_node}.{target}", destination=False, source=True, plugs=True)
                     if plug:
                         plug_node = plug[0][:plug[0].find('.')]
                         if cmds.objectType(plug_node) == 'combinationShape':
                             combination = True
-                            combination_method = cmds.getAttr(plug_node+".combinationMethod")
-                            input_weights = cmds.listAttr(plug_node+".inputWeight", multi=True)
+                            combination_method = cmds.getAttr(f"{plug_node}.combinationMethod")
+                            input_weights = cmds.listAttr(f"{plug_node}.inputWeight", multi=True)
                             if input_weights:
                                 for input_weight in input_weights:
-                                    combinations.append(cmds.listConnections(plug_node+"."+input_weight, destination=False, source=True, plugs=True)[0])
+                                    combinations.append(cmds.listConnections(f"{plug_node}.{input_weight}", destination=False, source=True, plugs=True)[0])
                         elif cmds.objectType(plug_node) == 'unitConversion':
-                            unit_conversion_factor = cmds.getAttr(plug_node+".conversionFactor")
-                            unit_conversion_input_plug = cmds.listConnections(plug_node+".input", destination=False, source=True, plugs=True)[0]
+                            unit_conversion_factor = cmds.getAttr(f"{plug_node}.conversionFactor")
+                            unit_conversion_input_plug = cmds.listConnections(f"{plug_node}.input", destination=False, source=True, plugs=True)[0]
                     # getting vertex weights if not equal to 1
                     for s, shape in enumerate(bs_data[bs_node]['geometry']):
                         # write deleted target to compose a clear target list to avoid Maya's garbage issue
@@ -144,7 +144,7 @@ class BlendshapeIO(action.BaseAction):
                     bs_data[bs_node]['targets'][i] = { 'name'           : target,
                                                     'deleted'        : False,
                                                     'regenerate'     : cmds.objExists(target),
-                                                    'value'          : cmds.getAttr(bs_node+"."+target),
+                                                    'value'          : cmds.getAttr(f"{bs_node}.{target}"),
                                                     'plug'           : plug,
                                                     'comb'           : combination,
                                                     'combMethod'     : combination_method,
@@ -164,7 +164,7 @@ class BlendshapeIO(action.BaseAction):
         try:
             self.ar.pipeliner.make_dir_if_not_exists(self.target_path)
             # export blendShape targets as compiled maya file
-            cmds.blendShape(bs_node, edit=True, export=self.target_path+"/"+self.target_name+"_"+bs_node+"."+self.extention)
+            cmds.blendShape(bs_node, edit=True, export=f"{self.target_path}/{self.target_name}_{bs_node}.{self.extention}")
         except Exception as e:
             self.fail_io(str(e))
 
@@ -186,31 +186,31 @@ class BlendshapeIO(action.BaseAction):
             for original_shape in original_shapes:
                 if not cmds.objExists(original_shape):
                     try:
-                        abc_to_import = self.original_path+"/"+self.original_name+"_"+bs_node+".abc"
-                        mel.eval("AbcImport -mode import \""+abc_to_import+"\";")
+                        abc_to_import = f"{self.original_path}/{self.original_name}_{bs_node}.abc"
+                        mel.eval(f'AbcImport -mode import "{abc_to_import}";')
                     except:
-                        self.fail_io(self.ar.data.lang['r032_notImportedData']+": "+self.original_name+"_"+bs_node+".abc")
+                        self.fail_io(f"{self.ar.data.lang['r032_notImportedData']}: {self.original_name}_{bs_node}.abc")
                         well_imported = False
             if not cmds.objExists(bs_node):
                 # create an empty blendShape node
                 cmds.blendShape(original_shapes, name=bs_node)
-                cmds.setAttr(bs_node+".envelope", bs_data[bs_node]['envelope'])
-                cmds.setAttr(bs_node+".supportNegativeWeights", bs_data[bs_node]['supportNegativeWeights'])
+                cmds.setAttr(f"{bs_node}.envelope", bs_data[bs_node]['envelope'])
+                cmds.setAttr(f"{bs_node}.supportNegativeWeights", bs_data[bs_node]['supportNegativeWeights'])
                 # import targets
                 try:
                     # OMG!
                     print("--------------------------------\nStarting Autodesk not suppressed messages, sorry!\n--------------------------------\n")
-                    cmds.blendShape(bs_node, edit=True, ip=self.target_path+"/"+self.target_name+"_"+bs_node+"."+self.extention)
+                    cmds.blendShape(bs_node, edit=True, ip=f"{self.target_path}/{self.target_name}_{bs_node}.{self.extention}")
                     #mel.eval('catchQuiet(`blendShape -edit -ip "'+self.target_path+'/'+self.target_name+'_'+bs_node+'.'+self.extention+'" '+bs_node+'`);')
                     print("--------------------------------\nEnding Autodesk not suppressed messages, sorry!\n--------------------------------\n")
                 except Exception as e:
-                    self.fail_io(self.ar.data.lang['r032_notImportedData']+": "+self.target_name+"_"+bs_node+"."+self.extention+" - "+str(e))
+                    self.fail_io(f"{self.ar.data.lang['r032_notImportedData']}: {self.target_name}_{bs_node}.{self.extention} - {e}")
                     well_imported = False
             for i in list(bs_data[bs_node]['indexTargetDic'].keys()):
                 target = bs_data[bs_node]['indexTargetDic'][i]
                 # set target value
                 try:
-                    cmds.setAttr(bs_node+"."+target, bs_data[bs_node]['targets'][i]['value'])
+                    cmds.setAttr(f"{bs_node}.{target}", bs_data[bs_node]['targets'][i]['value'])
                 except:
                     pass #connected combination target
                 # set target weights
@@ -222,15 +222,15 @@ class BlendshapeIO(action.BaseAction):
                     tgt_already_exists = cmds.objExists(target)
                     tgt = cmds.sculptTarget(bs_node, edit=True, regenerate=True, target=int(i))[0]
                     if tgt_already_exists:
-                        tgt = cmds.rename('|'+tgt, "dpTemp_"+tgt)
+                        tgt = cmds.rename(f"|{tgt}", f"dpTemp_{tgt}")
                         if cmds.listConnections(cmds.listRelatives(tgt, children=True, type='mesh')):
-                            plug_out = cmds.listConnections(cmds.listRelatives(tgt, children=True, type='mesh')[0]+".worldMesh[0]", destination=True, source=False, plugs=True)[0]
-                            cmds.connectAttr(cmds.listRelatives(target, children=True, type='mesh')[0]+".worldMesh[0]", plug_out, force=True)
+                            plug_out = cmds.listConnections(f"{cmds.listRelatives(tgt, children=True, type='mesh')[0]}.worldMesh[0]", destination=True, source=False, plugs=True)[0]
+                            cmds.connectAttr(f"{cmds.listRelatives(target, children=True, type='mesh')[0]}.worldMesh[0]", plug_out, force=True)
                         #elif cmds.listConnections(cmds.listRelatives(tgt, children=True, type='shape')):
                             #TODO edit to accept nurbsShape blendShapes like Zipper
                         cmds.delete(tgt)
                     else:
-                        cmds.rename(cmds.listRelatives(tgt, children=True, type='mesh')[0], bs_data[bs_node]['targets'][i]['name']+"Shape")
+                        cmds.rename(cmds.listRelatives(tgt, children=True, type='mesh')[0], f"{bs_data[bs_node]['targets'][i]['name']}Shape")
 
                 # TODO
                     # fix double original mesh / import double targets by group issue = Maya 2024 bug, supposed fixed on Maya 2025

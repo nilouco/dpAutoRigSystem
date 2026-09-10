@@ -76,9 +76,9 @@ class GuideIO(action.BaseAction):
                                 self.setup_guide_base_parenting(guide_data)
                             except Exception as e:
                                 if not well_imported: #guide initialization issue
-                                    self.fail_io(self.ar.data.lang['m195_couldNotBeSet']+": "+str(e))
+                                    self.fail_io(f"{self.ar.data.lang['m195_couldNotBeSet']}: {e}")
                                 else: #parenting issue
-                                    self.fail_io(self.ar.data.lang['m197_notPossibleParent']+": "+str(e))
+                                    self.fail_io(f"{self.ar.data.lang['m197_notPossibleParent']}: {e}")
                                 well_imported = False
                             if well_imported:
                                 self.well_done_io(self.latest_data_file)
@@ -117,16 +117,16 @@ class GuideIO(action.BaseAction):
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             # mount a data with all data 
             if 'afterData' in cmds.listAttr(net):
-                if 'rawGuide' in cmds.listAttr(net) and cmds.getAttr(net+".rawGuide"):
+                if 'rawGuide' in cmds.listAttr(net) and cmds.getAttr(f"{net}.rawGuide"):
                     # get data from not rendered guide (rawGuide status on)
-                    module_instance_info_string = cmds.getAttr(cmds.listConnections(net+".linkedNode")[0]+".moduleInstanceInfo")
+                    module_instance_info_string = cmds.getAttr(f"{cmds.listConnections(f"{net}.linkedNode")[0]}.moduleInstanceInfo")
                     for module_instance in self.ar.data.guide_instances:
                         if str(module_instance) == module_instance_info_string:
                             module_instance.serialize_guide(False) #serialize it without build it
-                to_export_data[net] = ast.literal_eval(cmds.getAttr(net+".afterData"))
+                to_export_data[net] = ast.literal_eval(cmds.getAttr(f"{net}.afterData"))
             elif 'dpHeadDeformerNet' in cmds.listAttr(net):
-                if not cmds.listConnections(net+".guideNet", source=True, destination=False):
-                    to_export_data[net] = ast.literal_eval(cmds.getAttr(net+".netData"))
+                if not cmds.listConnections(f"{net}.guideNet", source=True, destination=False):
+                    to_export_data[net] = ast.literal_eval(cmds.getAttr(f"{net}.netData"))
         return to_export_data
 
 
@@ -177,7 +177,7 @@ class GuideIO(action.BaseAction):
                             ]
         for item in list(self.net_data['GuideData']):
             new_item = self.get_new_name(item)
-            if cmds.objExists(new_item) and 'guideBase' in cmds.listAttr(new_item) and cmds.getAttr(new_item+".guideBase") == 1: #main
+            if cmds.objExists(new_item) and 'guideBase' in cmds.listAttr(new_item) and cmds.getAttr(f"{new_item}.guideBase") == 1: #main
                 for base_attr in list(self.net_data['GuideData'][item]):
                     if base_attr == 'customName':
                         custom_name = self.net_data['GuideData'][item]['customName']
@@ -186,10 +186,10 @@ class GuideIO(action.BaseAction):
                                 custom_name = self.ar.naming.get_translated_names(custom_name)
                             self.instance.set_guide_custom_name(custom_name)
                     elif base_attr == 'mirrorAxis':
-                        cmds.setAttr(new_item+".mirrorAxis", self.net_data['GuideData'][item]['mirrorAxis'], type='string')
+                        cmds.setAttr(f"{new_item}.mirrorAxis", self.net_data['GuideData'][item]['mirrorAxis'], type='string')
                         start = self.ar.naming.get_translated_names(self.net_data['GuideData'][item]['mirrorName'][0])
                         end = self.ar.naming.get_translated_names(self.net_data['GuideData'][item]['mirrorName'][-1])
-                        cmds.setAttr(new_item+".mirrorName", f"{start} --> {end}", type='string')
+                        cmds.setAttr(f"{new_item}.mirrorName", f"{start} --> {end}", type='string')
                         self.instance.create_mirror_preview()
                     elif base_attr == 'nJoints':
                         self.instance.change_joint_number(self.net_data['GuideData'][item]['nJoints'])
@@ -202,22 +202,22 @@ class GuideIO(action.BaseAction):
                     elif base_attr == 'fatherB': #suspention
                         father_b_data = self.net_data['GuideData'][item]['fatherB']
                         if father_b_data:
-                            cmds.setAttr(item+".fatherB", father_b_data, type='string')
+                            cmds.setAttr(f"{item}.fatherB", father_b_data, type='string')
                     elif base_attr == 'geo': #wheel
                         geo_info = self.net_data['GuideData'][item]['geo']
                         if geo_info:
-                            cmds.setAttr(new_item+".geo", geo_info, type='string')
+                            cmds.setAttr(f"{new_item}.geo", geo_info, type='string')
                     #TODO: modernize rigType to rigStyle new code
                     elif base_attr == 'rigType': #all
                         rigTypeData = self.net_data['GuideData'][item]['rigType']
                         if rigTypeData:
-                            cmds.setAttr(new_item+".rigType", rigTypeData, type='string')
+                            cmds.setAttr(f"{new_item}.rigType", rigTypeData, type='string')
                             self.instance.rigType = rigTypeData
                     elif base_attr == 'style':  #to be compatible with old versions of style value 4 (quadruped extra control)
-                        cmds.setAttr(new_item+"."+base_attr, min(self.net_data['GuideData'][item][base_attr], 2))
+                        cmds.setAttr(f"{new_item}.{base_attr}", min(self.net_data['GuideData'][item][base_attr], 2))
                     else: #just set simple attributes
                         if base_attr in custom_attributes:
-                            cmds.setAttr(new_item+"."+base_attr, self.net_data['GuideData'][item][base_attr])
+                            cmds.setAttr(f"{new_item}.{base_attr}", self.net_data['GuideData'][item][base_attr])
                     cmds.refresh()
 
 
@@ -227,11 +227,11 @@ class GuideIO(action.BaseAction):
         for item in list(self.net_data['GuideData']):
             if item in self.net_data['GuideData']:
                 new_item = self.get_new_name(item)
-                if 'guideBase' in cmds.listAttr(new_item) and cmds.getAttr(new_item+".guideBase") == 1 and cmds.listRelatives(new_item, parent=True): #main
+                if 'guideBase' in cmds.listAttr(new_item) and cmds.getAttr(f"{new_item}.guideBase") == 1 and cmds.listRelatives(new_item, parent=True): #main
                     cmds.parent(new_item, world=True)
                 for attr in list(self.net_data['GuideData'][item]):
-                    if attr in self.ar.data.transform_attrs and not cmds.getAttr(new_item+"."+attr, lock=True) and not cmds.listConnections(new_item+"."+attr, destination=False, source=True): #unlocked attribute / without input connection
-                        cmds.setAttr(new_item+"."+attr, self.net_data['GuideData'][item][attr])
+                    if attr in self.ar.data.transform_attrs and not cmds.getAttr(f"{new_item}.{attr}", lock=True) and not cmds.listConnections(f"{new_item}.{attr}", destination=False, source=True): #unlocked attribute / without input connection
+                        cmds.setAttr(f"{new_item}.{attr}", self.net_data['GuideData'][item][attr])
                     cmds.refresh()
 
 
@@ -243,7 +243,7 @@ class GuideIO(action.BaseAction):
             if 'GuideData' in net_data:
                 for item in list(net_data['GuideData']):
                     new_item = self.get_new_name(item)
-                    if cmds.objExists(new_item) and 'guideBase' in cmds.listAttr(new_item) and cmds.getAttr(new_item+".guideBase") == 1: #main
+                    if cmds.objExists(new_item) and 'guideBase' in cmds.listAttr(new_item) and cmds.getAttr(f"{new_item}.guideBase") == 1: #main
                         father_node_data = net_data['GuideData'][item]['FatherNode']
                         if father_node_data:
                             new_father = self.get_new_name(father_node_data)
@@ -283,7 +283,7 @@ class GuideIO(action.BaseAction):
             else:
                 if rebuilding:
                     if cmds.objExists(net):
-                        if cmds.getAttr(net+".rawGuide"):
+                        if cmds.getAttr(f"{net}.rawGuide"):
                            to_initialize_guide = False
                         else:
                            cmds.lockNode(net, lock=False)
@@ -299,7 +299,7 @@ class GuideIO(action.BaseAction):
                                         # open dialog to confirm repeated net name:
                                         yes_text = self.ar.data.lang['i071_yes']
                                         no_text = self.ar.data.lang['i072_no']
-                                        result = cmds.confirmDialog(title=self.name, message=f"{self.ar.data.lang['i364_repeatedNetName']}\n{net_custom_name}", 
+                                        result = cmds.confirmDialog(title=self.name, message=f"{self.ar.data.lang['i033_repeatedNetName']}\n{net_custom_name}", 
                                                                     button=[yes_text, no_text], defaultButton=yes_text, cancelButton=no_text, dismissString=no_text)
                                         if result == yes_text: #skip them
                                             to_initialize_guide = False
@@ -310,7 +310,7 @@ class GuideIO(action.BaseAction):
                 if to_initialize_guide:
                     try:
                         self.net_data = guide_data[net]
-                        self.ar.ui_manager.set_progress(self.ar.data.lang[self.title]+': '+guide_data[net]['ModuleType'])
+                        self.ar.ui_manager.set_progress(f"{self.ar.data.lang[self.title]}: {guide_data[net]['ModuleType']}")
                         # create a module instance:
                         self.instance = self.ar.lib.initialize_library(self.net_data['ModuleType'], self.ar.data.standard_folder)[0]
                         self.correlations[f"{self.net_data['ModuleType']}__dpAR_{self.net_data['GuideNumber']}"] = self.instance.guide_namespace
@@ -320,7 +320,7 @@ class GuideIO(action.BaseAction):
                         cmds.select(clear=True)
                     except Exception as e:
                         well_imported = False
-                        self.fail_io(net+": "+str(e))
+                        self.fail_io(f"{net}: {e}")
                         break
         if self.ar.data.ui_state:
             self.ar.data.collapse_edit_sel_mod = False

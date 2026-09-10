@@ -43,19 +43,19 @@ class HideDataGrp(action.BaseAction):
                 self.ar.ui_manager.set_progress(max=1)
                 self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                 self.checked_items.append(data_grp)
-                vis_status = cmds.getAttr(data_grp+".visibility")
+                vis_status = cmds.getAttr(f"{data_grp}.visibility")
                 if vis_status:
                     self.found_issues.append(True)
                     if self.first_mode:
                         self.good_results.append(False)
                     else: #fix
                         try:
-                            cmds.setAttr(data_grp+".visibility", 0)
+                            cmds.setAttr(f"{data_grp}.visibility", 0)
                             self.good_results.append(True)
-                            self.messages.append(self.ar.data.lang['v004_fixed']+": "+data_grp)
+                            self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {data_grp}")
                         except:
                             self.good_results.append(False)
-                            self.messages.append(self.ar.data.lang['v005_cantFix']+": "+data_grp)
+                            self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {data_grp}")
                 else:
                     self.found_issues.append(False)
                     self.good_results.append(True)

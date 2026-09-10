@@ -75,7 +75,7 @@ class Lib:
                                             'names' : class_names
                                             }
                 if self.ar.data.verbose:
-                    print(f"{folder}: {modules!s}")
+                    print(f"{folder}: {modules}")
     
 
     def start_templates(self):
@@ -88,7 +88,7 @@ class Lib:
                                                                 'instances' : libs
                                                               }
             if self.ar.data.verbose:
-                print(self.ar.data.template_folder+" : "+str(templates))
+                print(f"{self.ar.data.template_folder} : {templates}")
 
     
     def initialize_templates(self, templates, content):
@@ -126,7 +126,7 @@ class Lib:
             if self.ar.dev:
                 reload(imported_module)
         except Exception as e:
-            mel.eval('warning \"'+self.ar.data.lang['e017_loadingExtension']+" "+str(module).replace("\"", "")+" : "+str(e)+'\";')
+            mel.eval(f'warning "{self.ar.data.lang['e017_loadingExtension']} {str(module).replace('"', '')} : {e}";')
             return
         return imported_module
 
@@ -141,7 +141,7 @@ class Lib:
         """ Load the Validator's presets from the pipeline path.
         """
         if self.ar.pipeliner.pipe_data['presetsPath'] and os.path.exists(self.ar.pipeliner.pipe_data['presetsPath']):
-            studio_preset, studio_preset_data = self.ar.config.get_json_file_content(self.ar.pipeliner.pipe_data['presetsPath']+'/', True)
+            studio_preset, studio_preset_data = self.ar.config.get_json_file_content(f"{self.ar.pipeliner.pipe_data['presetsPath']}/", True)
             if studio_preset:
                 self.ar.data.validator_preset = studio_preset_data[studio_preset[0]]
                 self.ar.data.validator_preset_data.update(studio_preset_data)

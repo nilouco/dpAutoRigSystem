@@ -81,7 +81,7 @@ class TransformationIO(action.BaseAction):
         for item in items:
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             use_this_transform = True
-            if cmds.objExists(item+".dpNotTransformIO") and cmds.getAttr(item+".dpNotTransformIO") == 1:
+            if cmds.objExists(f"{item}.dpNotTransformIO") and cmds.getAttr(f"{item}.dpNotTransformIO") == 1:
                 use_this_transform = False
             if use_this_transform:
                 data = self.get_transformation(item)
@@ -97,15 +97,15 @@ class TransformationIO(action.BaseAction):
         data = {}
         need_run_get = True
         for attr, default in zip(['tx', 'ty',  'tz',  'rx',  'ry',  'rz',  'sx',  'sy',  'sz'], [0, 0, 0, 0, 0, 0, 1, 1, 1]):
-            value = cmds.getAttr(item+"."+attr)
-            if value != default and not cmds.listConnections(item+"."+attr, destination=False, source=True):
+            value = cmds.getAttr(f"{item}.{attr}")
+            if value != default and not cmds.listConnections(f"{item}.{attr}", destination=False, source=True):
                 if need_run_get:
                     data = { 
                             'transform' : {},
                             'matrix' : cmds.xform(item, query=True, worldSpace=False, matrix=True)
                             }
                     need_run_get = False
-                data['transform'][attr] = cmds.getAttr(item+"."+attr)
+                data['transform'][attr] = cmds.getAttr(f"{item}.{attr}")
         return data
 
 
@@ -166,19 +166,19 @@ class TransformationIO(action.BaseAction):
                 if 'transform' in transform_data[item]:
                     ran = True
                     for attr in transform_data[item]['transform']:
-                        if not cmds.listConnections(item+"."+attr, destination=False, source=True):
+                        if not cmds.listConnections(f"{item}.{attr}", destination=False, source=True):
                             # unlock attribute
-                            was_locked = cmds.getAttr(item+"."+attr, lock=True)
-                            cmds.setAttr(item+"."+attr, lock=False)
+                            was_locked = cmds.getAttr(f"{item}.{attr}", lock=True)
+                            cmds.setAttr(f"{item}.{attr}", lock=False)
                             try:
                                 # set transformation value
-                                cmds.setAttr(item+"."+attr, transform_data[item]['transform'][attr])
+                                cmds.setAttr(f"{item}.{attr}", transform_data[item]['transform'][attr])
                                 # lock attribute again if it was locked
-                                cmds.setAttr(item+"."+attr, lock=was_locked)
+                                cmds.setAttr(f"{item}.{attr}", lock=was_locked)
                                 if not item in well_imported_items:
                                     well_imported_items.append(item)
                             except Exception as e:
-                                self.fail_io(item+" - "+str(e))
+                                self.fail_io(f"{item} - {e}")
                     cmds.xform(item, worldSpace=False, matrix=transform_data[item]['matrix'])
                 if 'limit' in transform_data[item]:
                     ran = True
@@ -203,7 +203,7 @@ class TransformationIO(action.BaseAction):
                             elif limit_attr == 'enableScaleZ':
                                 cmds.transformLimits(item, enableScaleZ=[transform_data[item]['limit'][limit_attr][0], transform_data[item]['limit'][limit_attr][1]], scaleZ=[transform_data[item]['limit'][limit_attr][2], transform_data[item]['limit'][limit_attr][3]])
                         except Exception as e:
-                            self.fail_io(item+" - "+str(e))
+                            self.fail_io(f"{item} - {e}")
                 if not ran:
                     self.maybe_done_io(self.ar.data.lang['v014_notFoundNodes'])
             else:
@@ -211,4 +211,4 @@ class TransformationIO(action.BaseAction):
         if well_imported_items:
             self.well_done_io(self.latest_data_file)
         else:
-            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(not_found_nodes))
+            self.fail_io(f"{self.ar.data.lang['v014_notFoundNodes']}: {', '.join(not_found_nodes)}")

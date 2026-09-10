@@ -62,13 +62,13 @@ class DuplicatedName(action.BaseAction):
                                         continue
                                     if cmds.objExists(path):
                                         for i in range(1, len(paths)+1):
-                                            if not cmds.objExists(name+"_"+str(i)):
+                                            if not cmds.objExists(f"{name}_{i}"):
                                                 self.rename_node_and_children(path, i)
                                     self.good_results.append(True)
-                                    self.messages.append(self.ar.data.lang['v004_fixed']+": "+name)
+                                    self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {name}")
                             except:
                                 self.good_results.append(False)
-                                self.messages.append(self.ar.data.lang['v005_cantFix']+": "+name)
+                                self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {name}")
             else:
                 self.not_found_node()
         else:
@@ -93,6 +93,6 @@ class DuplicatedName(action.BaseAction):
                     children = self.reorder_list(children)
                     for child in children:
                         if cmds.objExists(child):
-                            cmds.rename(child, child[child.rfind('|')+1:]+"_"+str(i))
-                cmds.rename(item, item[item.rfind('|')+1:]+"_"+str(i))
+                            cmds.rename(child, f"{child[child.rfind('|')+1:]}_{i}")
+                cmds.rename(item, f"{item[item.rfind('|')+1:]}_{i}")
             return True

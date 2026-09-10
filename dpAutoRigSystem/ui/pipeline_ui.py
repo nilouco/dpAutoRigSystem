@@ -17,14 +17,14 @@ class PipelineUI:
         if self.ar.data.ui_state:
             win_width  = 380
             win_height = 480
-            cmds.window('dpPipelinerWindow', title="Pipeliner "+str(self.ar.data.version), widthHeight=(win_width, win_height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+            cmds.window('dpPipelinerWindow', title=f"Pipeliner {self.ar.data.version}", widthHeight=(win_width, win_height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
             cmds.showWindow('dpPipelinerWindow')
             # create UI layout and elements:
             cmds.columnLayout('pipeline_cl', adjustableColumn=True, columnOffset=('both', 10))
             # pipeline info
             cmds.columnLayout('pipeline_info_cl', adjustableColumn=True, columnOffset=('left', 10), parent='pipeline_cl')
             cmds.separator(style='in', height=20, parent='pipeline_info_cl')
-            cmds.text('pipeline_info_txt', label="Pipeline "+self.ar.data.lang['i013_info'], height=30, font='boldLabelFont', parent='pipeline_info_cl')
+            cmds.text('pipeline_info_txt', label=f"Pipeline {self.ar.data.lang['i013_info']}", height=30, font='boldLabelFont', parent='pipeline_info_cl')
             cmds.textFieldButtonGrp('pipeline_path_data_tfbg', label=self.ar.data.lang['i220_filePath'], text=self.ar.pipeliner.get_path_data(), buttonLabel=self.ar.data.lang['i187_load'], buttonCommand=self.ar.pipeliner.load_pipe_info, changeCommand=partial(self.ar.pipeliner.load_pipe_info, True), adjustableColumn=2, parent='pipeline_info_cl')
             cmds.separator(style='in', height=20, parent='pipeline_info_cl')
             # pipeline data
@@ -108,7 +108,7 @@ class PipelineUI:
         """
         if self.ar.pipeliner.check_asset_context():
             # declaring variables:
-            saveVersion_title = 'dpAutoRig - '+self.ar.data.lang['i222_save']+" "+self.ar.data.lang['i303_asset']+" "+self.ar.data.lang['m205_version'].lower()
+            saveVersion_title = f"dpAutoRig - {self.ar.data.lang['i222_save']} {self.ar.data.lang['i303_asset']} {self.ar.data.lang['m205_version'].lower()}"
             saveVersion_winWidth = 380
             saveVersion_winHeight = 220
             saveVersion_align = 'left'
@@ -120,8 +120,8 @@ class PipelineUI:
             cmds.separator(style='none', height=10, parent='save_version_cl')
             cmds.textFieldGrp('save_version_current_path_tfg', label='Path', text=self.ar.pipeliner.pipe_data['wipPath'], columnWidth2=(80, 150), editable=False, adjustableColumn=2, parent='save_version_cl')
             cmds.textFieldGrp('save_version_current_filename_tfg', label=self.ar.data.lang['i276_current'], text=self.ar.pipeliner.get_current_filename(), columnWidth2=(80, 150), editable=False, adjustableColumn=2, parent='save_version_cl')
-            cmds.textFieldGrp('save_version_model_tfg', label="Model "+self.ar.data.lang['m205_version'].lower(), text=str(int(self.ar.pipeliner.get_model_version())), columnWidth2=(80, 50), textChangedCommand=self.ar.pipeliner.get_save_version_preview_text, parent='save_version_cl')
-            cmds.textFieldGrp('save_version_rig_tfg', label="WIP "+self.ar.data.lang['m205_version'].lower(), text=str(int(self.ar.pipeliner.get_wip_rig_version())+1), columnWidth2=(80, 50), textChangedCommand=self.ar.pipeliner.get_save_version_preview_text, parent='save_version_cl')
+            cmds.textFieldGrp('save_version_model_tfg', label=f"Model {self.ar.data.lang['m205_version'].lower()}", text=str(int(self.ar.pipeliner.get_model_version())), columnWidth2=(80, 50), textChangedCommand=self.ar.pipeliner.get_save_version_preview_text, parent='save_version_cl')
+            cmds.textFieldGrp('save_version_rig_tfg', label=f"WIP {self.ar.data.lang['m205_version'].lower()}", text=str(int(self.ar.pipeliner.get_wip_rig_version())+1), columnWidth2=(80, 50), textChangedCommand=self.ar.pipeliner.get_save_version_preview_text, parent='save_version_cl')
             cmds.separator(style='none', height=10, parent='save_version_cl')
             cmds.text('save_version_preview_header_txt', label='Preview:', font='obliqueLabelFont', align=saveVersion_align, parent='save_version_cl')
             cmds.scrollLayout('save_version_preview_sl', height=35, parent='save_version_cl')
@@ -131,7 +131,7 @@ class PipelineUI:
             cmds.showWindow('dpSaveVersionWindow')
             self.ar.pipeliner.get_save_version_preview_text()
         else:
-            cmds.confirmDialog(title=self.ar.data.lang['i222_save']+" "+self.ar.data.lang['i303_asset']+" "+self.ar.data.lang['m205_version'].lower(), message=self.ar.data.lang['r069_noAssetToSaveVersion'], button='Ok')
+            cmds.confirmDialog(title=f"{self.ar.data.lang['i222_save']} {self.ar.data.lang['i303_asset']} {self.ar.data.lang['m205_version'].lower()}", message=self.ar.data.lang['r069_noAssetToSaveVersion'], button='Ok')
 
 
     def select_asset_ui(self, assets, path, mode, *args):
@@ -140,7 +140,7 @@ class PipelineUI:
             Works well for load and replace data.
         """
         # declaring variables:
-        selectAsset_title = 'dpAutoRig - '+self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i303_asset']
+        selectAsset_title = f"dpAutoRig - {self.ar.data.lang['m004_select']} {self.ar.data.lang['i303_asset']}"
         select_winWidth = 240
         select_winHeight = 285
         select_align = 'center'
@@ -149,7 +149,7 @@ class PipelineUI:
         # creating layout:
         cmds.columnLayout('select_asset_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=10, parent='dpSelectAssetWindow')
         cmds.separator(style='none', height=10, parent='select_asset_cl')
-        cmds.text(label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i303_asset']+":", align='left', parent='select_asset_cl')
+        cmds.text(label=f"{self.ar.data.lang['m004_select']} {self.ar.data.lang['i303_asset']}:", align='left', parent='select_asset_cl')
         cmds.textScrollList('select_asset_tsl', allowMultiSelection=False, append=assets, parent='select_asset_cl')
         cmds.button('run_select_asset_bt', label=self.ar.data.lang['m004_select'], align=select_align, command=partial(self.load_selected_asset, path, mode), parent='select_asset_cl')
         # call Window:
@@ -177,7 +177,7 @@ class PipelineUI:
         """ Let user select the assets to publish in batch.
         """
         # declaring variables:
-        selectAssetCB_title = 'dpAutoRig - '+self.ar.data.lang['m046_publisher']+" "+self.ar.data.lang['i358_batch']
+        selectAssetCB_title = f"dpAutoRig - {self.ar.data.lang['m046_publisher']} {self.ar.data.lang['i358_batch']}"
         selectCB_winWidth = 240
         selectCB_winHeight = 285
         selectCB_align = 'center'
@@ -186,16 +186,16 @@ class PipelineUI:
         # creating layout:
         cmds.columnLayout('select_asset_batch_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=10, parent='dpSelectAssetCBWindow')
         cmds.separator(style='none', height=10, parent='select_asset_batch_cl')
-        cmds.text(label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i303_asset']+"s:", align='left', parent='select_asset_batch_cl')
+        cmds.text(label=f"{self.ar.data.lang['m004_select']} {self.ar.data.lang['i303_asset']}s:", align='left', parent='select_asset_batch_cl')
         if len(assets) > 1:
-            cmds.checkBox(label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i211_all'], value=False, changeCommand=self.select_all_assets, parent='select_asset_batch_cl')
+            cmds.checkBox(label=f"{self.ar.data.lang['m004_select']} {self.ar.data.lang['i211_all']}", value=False, changeCommand=self.select_all_assets, parent='select_asset_batch_cl')
         cmds.separator(style='in', height=10, parent='select_asset_batch_cl')
         cmds.scrollLayout('select_asset_batch_sl', parent='select_asset_batch_cl')
         cmds.columnLayout('select_asset_batch_checkbox_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=10, parent='select_asset_batch_sl')
         # assets checkboxes
         self.select_asset_checkboxes = []
         for asset in assets:
-            self.select_asset_checkboxes.append(cmds.checkBox(asset+"_cb", label=asset, parent='select_asset_batch_checkbox_cl'))
+            self.select_asset_checkboxes.append(cmds.checkBox(f"{asset}_cb", label=asset, parent='select_asset_batch_checkbox_cl'))
         cmds.separator(style='in', height=10, parent='select_asset_batch_cl')
         cmds.textFieldGrp('comment_batch_tfg', label=self.ar.data.lang['i219_comments'], text='', adjustableColumn=2, editable=True, columnAlign2=('left', 'left'), columnAttach2=('left', 'left'), columnWidth=[(1, 55), (2, 50)], parent='select_asset_batch_cl')
         cmds.button('run_select_assets_bt', label=self.ar.data.lang['i216_publish'], align=selectCB_align, command=partial(self.ar.publisher.load_publishing_batch, path), height=30, backgroundColor=(0.75, 0.75, 0.75), parent='select_asset_batch_cl')
@@ -223,7 +223,7 @@ class PipelineUI:
         """ A simple UI to get the asset info like name, model version, wip rig version in order to create a new asset context.
         """
         # declaring variables:
-        title     = 'dpAutoRig - '+self.ar.data.lang['i158_create']+" "+self.ar.data.lang['i304_new']+" "+self.ar.data.lang['i303_asset']
+        title     = f"dpAutoRig - {self.ar.data.lang['i158_create']} {self.ar.data.lang['i304_new']} {self.ar.data.lang['i303_asset']}"
         win_width  = 380
         win_height = 220
         align     = 'left'
@@ -233,10 +233,10 @@ class PipelineUI:
         # creating text layout:
         cmds.columnLayout('new_asset_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=3, parent='dpNewAssetWindow')
         cmds.separator(style='none', height=10, parent='new_asset_cl')
-        cmds.textFieldGrp('new_asset_name_tfg', label=self.ar.data.lang['i303_asset']+" "+self.ar.data.lang['m006_name'].lower(), columnWidth2=(80, 150), textChangedCommand=self.get_new_asset_preview_text, adjustableColumn=2, parent='new_asset_cl')
-        cmds.textFieldGrp('new_model_version_tfg', label="Model "+self.ar.data.lang['m205_version'].lower(), text='0', columnWidth2=(80, 50), textChangedCommand=self.get_new_asset_preview_text, parent='new_asset_cl')
-        cmds.textFieldGrp('new_wip_version_tfg', label="WIP "+self.ar.data.lang['m205_version'].lower(), text='0', columnWidth2=(80, 50), textChangedCommand=self.get_new_asset_preview_text, parent='new_asset_cl')
-        cmds.textFieldButtonGrp('project_path_tfbg', label=self.ar.data.lang['i301_project']+" path", text='', columnWidth3=(80, 150, 30), buttonLabel=self.ar.data.lang['i187_load'], buttonCommand=self.load_project_path, adjustableColumn=2, textChangedCommand=self.get_new_asset_preview_text, parent='new_asset_cl')
+        cmds.textFieldGrp('new_asset_name_tfg', label=f"{self.ar.data.lang['i303_asset']} {self.ar.data.lang['m006_name'].lower()}", columnWidth2=(80, 150), textChangedCommand=self.get_new_asset_preview_text, adjustableColumn=2, parent='new_asset_cl')
+        cmds.textFieldGrp('new_model_version_tfg', label=f"Model {self.ar.data.lang['m205_version'].lower()}", text='0', columnWidth2=(80, 50), textChangedCommand=self.get_new_asset_preview_text, parent='new_asset_cl')
+        cmds.textFieldGrp('new_wip_version_tfg', label=f"WIP {self.ar.data.lang['m205_version'].lower()}", text='0', columnWidth2=(80, 50), textChangedCommand=self.get_new_asset_preview_text, parent='new_asset_cl')
+        cmds.textFieldButtonGrp('project_path_tfbg', label=f"{self.ar.data.lang['i301_project']} path", text='', columnWidth3=(80, 150, 30), buttonLabel=self.ar.data.lang['i187_load'], buttonCommand=self.load_project_path, adjustableColumn=2, textChangedCommand=self.get_new_asset_preview_text, parent='new_asset_cl')
         if 'projectPath' in list(self.ar.pipeliner.pipe_data.keys()):
             cmds.textFieldButtonGrp('project_path_tfbg', edit=True, text=self.ar.pipeliner.pipe_data['projectPath'])
         cmds.separator(style='none', height=10, parent='new_asset_cl')
@@ -259,12 +259,12 @@ class PipelineUI:
         project_path = cmds.textFieldButtonGrp('project_path_tfbg', query=True, text=True)
         if project_path:
             if not project_path.endswith('/'):
-                project_path = project_path+"/"
+                project_path = f"{project_path}/"
             wip_folder = self.ar.pipeliner.pipe_data['f_wip']
             if wip_folder and not wip_folder.endswith('/'):
-                wip_folder = wip_folder+"/"
+                wip_folder = f"{wip_folder}/"
             if new_wip_version and new_model_version and new_asset_name:
-                self.ar.pipeliner.new_asset_file = project_path+wip_folder+new_asset_name+"/"+new_asset_name+self.ar.pipeliner.pipe_data['s_model']+new_model_version.zfill(self.ar.pipeliner.pipe_data['i_padding'])+self.ar.pipeliner.pipe_data['s_rig']+new_wip_version.zfill(self.ar.pipeliner.pipe_data['i_padding'])+".ma"
+                self.ar.pipeliner.new_asset_file = f"{project_path}{wip_folder}{new_asset_name}/{new_asset_name}{self.ar.pipeliner.pipe_data['s_model']}{new_model_version.zfill(self.ar.pipeliner.pipe_data['i_padding'])}{self.ar.pipeliner.pipe_data['s_rig']}{new_wip_version.zfill(self.ar.pipeliner.pipe_data['i_padding'])}.ma"
         if self.ar.pipeliner.new_asset_file:
             cmds.text('new_asset_preview_txt', edit=True, label=self.ar.pipeliner.new_asset_file)
         return self.ar.pipeliner.new_asset_file
@@ -274,7 +274,7 @@ class PipelineUI:
         """ UI to list exist items as a checkboxes to let the user choose what to replace in the dpData.
         """
         # declaring variables:
-        title     = 'dpAutoRig - '+self.ar.data.lang['m219_replace']+" "+self.ar.data.dp_data+" - "+self.ar.data.lang['i303_asset']
+        title     = f"dpAutoRig - {self.ar.data.lang['m219_replace']} {self.ar.data.dp_data} - {self.ar.data.lang['i303_asset']}"
         win_width  = 220
         win_height = 330+(len(self.ar.pipeliner.ios)*16)
         align     = "left"
@@ -285,15 +285,15 @@ class PipelineUI:
         cmds.columnLayout('replace_data_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent='dpReplaceDPDataWindow')
         cmds.separator(style='none', height=10, parent='replace_data_cl')
         cmds.text('replace_data_txt', label=self.ar.data.lang['i308_toReplaceDPData'], parent='replace_data_cl')
-        cmds.text('replace_data_asset_txt', label="\n"+self.ar.pipeliner.pipe_data['assetName'], font='boldLabelFont', parent='replace_data_cl')
+        cmds.text('replace_data_asset_txt', label=f"\n{self.ar.pipeliner.pipe_data['assetName']}", font='boldLabelFont', parent='replace_data_cl')
         cmds.separator(style='none', height=10, parent='replace_data_cl')
         for item in self.ar.pipeliner.ios:
-            cmds.checkBox(item+"_cb", label=item, value=True)
+            cmds.checkBox(f"{item}_cb", label=item, value=True)
         cmds.separator(style='none', height=10, parent='replace_data_cl')
         if len(self.ar.pipeliner.ios) > 1:
-            cmds.checkBox(label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i211_all'], value=True, changeCommand=self.select_all_data_to_replace, parent='replace_data_cl')
+            cmds.checkBox(label=f"{self.ar.data.lang['m004_select']} {self.ar.data.lang['i211_all']}", value=True, changeCommand=self.select_all_data_to_replace, parent='replace_data_cl')
             cmds.separator(style='none', height=10, parent='replace_data_cl')
-        cmds.button('run_replace_data_bt', label=self.ar.data.lang['m219_replace'].upper()+"\n"+fromAssetName+" -> "+self.ar.pipeliner.pipe_data['assetName'], align=align, command=self.set_replace_data, parent='replace_data_cl')
+        cmds.button('run_replace_data_bt', label=f"{self.ar.data.lang['m219_replace'].upper()}\n{fromAssetName} -> {self.ar.pipeliner.pipe_data['assetName']}", align=align, command=self.set_replace_data, parent='replace_data_cl')
         # call New Asset Window:
         cmds.showWindow('dpReplaceDPDataWindow')
         
@@ -302,7 +302,7 @@ class PipelineUI:
         """ Set all existing data checkbox values.
         """
         for item in self.ar.pipeliner.ios:
-            cmds.checkBox(item+"_cb", edit=True, value=cb_value)
+            cmds.checkBox(f"{item}_cb", edit=True, value=cb_value)
 
 
     def set_replace_data(self, *args):
@@ -310,7 +310,7 @@ class PipelineUI:
         """
         self.to_replace_datas = []
         for item in self.ar.pipeliner.ios:
-            if cmds.checkBox(item+"_cb", query=True, value=True):
+            if cmds.checkBox(f"{item}_cb", query=True, value=True):
                 self.to_replace_datas.append(item)
         if self.to_replace_datas:
             self.ar.pipeliner.replace_data()

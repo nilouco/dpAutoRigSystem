@@ -50,7 +50,7 @@ class InvertedNormals(action.BaseAction):
                     parent_node = fn_shape_node.parent(0)
                     fn_parent_node = OpenMaya.MFnDagNode(parent_node)
                     item_name = fn_parent_node.name()
-                    self.ar.ui_manager.set_progress(self.ar.data.lang[self.title]+": "+shape_name)
+                    self.ar.ui_manager.set_progress(f"{self.ar.data.lang[self.title]}: {shape_name}")
                     # verify if item_name or shape_name is in meshes
                     for item in meshes:
                         if item_name in item or shape_name in item:
@@ -80,9 +80,9 @@ class InvertedNormals(action.BaseAction):
                                 con_vtx_int_array.append(con_vtx_int_array[0])
                                 # compare vertex in order to find double consecutive vertices
                                 for i in range(len(vtx_int_array)-1):
-                                    i_pair = str(vtx_int_array[i])+","+str(vtx_int_array[i+1])
+                                    i_pair = f"{vtx_int_array[i]},{vtx_int_array[i+1]}"
                                     for c in range(len(con_vtx_int_array)-1):
-                                        c_pair = str(con_vtx_int_array[c])+","+str(con_vtx_int_array[c+1])
+                                        c_pair = f"{con_vtx_int_array[c]},{con_vtx_int_array[c+1]}"
                                         if i_pair == c_pair:
                                             # found inverted normals
                                             inverted_items.append(item_name)
@@ -103,10 +103,10 @@ class InvertedNormals(action.BaseAction):
                             # conform normals to fix
                             cmds.polyNormal(mesh, normalMode=2, userNormalMode=0, constructionHistory=False)
                             self.good_results.append(True)
-                            self.messages.append(self.ar.data.lang['v004_fixed']+": "+mesh)
+                            self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {mesh}")
                         except:
                             self.good_results.append(False)
-                            self.messages.append(self.ar.data.lang['v005_cantFix']+": "+mesh)
+                            self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {mesh}")
             else:
                 self.not_found_node()
         else:

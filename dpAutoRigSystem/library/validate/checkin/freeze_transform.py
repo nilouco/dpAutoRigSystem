@@ -61,7 +61,7 @@ class FreezeTransform(action.BaseAction):
                                 else:
                                     self.found_issues.append(True)
                                     self.good_results.append(False)
-                                    self.messages.append(self.ar.data.lang['v018_foundTransform']+item)
+                                    self.messages.append(f"{self.ar.data.lang['v018_foundTransform']}{item}")
                                     to_fix_items.append((item, idx))
                         if not self.first_mode and len(to_fix_items) > 0: #one item to fix
                             for item in to_fix_items:
@@ -72,16 +72,16 @@ class FreezeTransform(action.BaseAction):
                                         if self.check_frozen_item(item[0], zero_attrs, 0) and self.check_frozen_item(item[0], one_attrs, 1):
                                             self.found_issues[item[1]] = False
                                             self.good_results[item[1]] = True
-                                            self.messages.append(self.ar.data.lang['v019_frozenTransform']+item[0])
+                                            self.messages.append(f"{self.ar.data.lang['v019_frozenTransform']}{item[0]}")
                                         else:
                                             raise Exception('Freeze Tranform Failed')
                                     except:
-                                        self.messages.append(self.ar.data.lang['v017_freezeError'] + item+'.')
+                                        self.messages.append(f"{self.ar.data.lang['v017_freezeError']}{item}.")
                                 else:
-                                    self.messages.append(self.ar.data.lang['v017_freezeError'] + item+'.')
+                                    self.messages.append(f"{self.ar.data.lang['v017_freezeError']}{item}.")
                                 if self.locked_attrs:
                                     for attr in self.locked_attrs:
-                                        cmds.setAttr(item[0]+'.'+attr, lock=True)
+                                        cmds.setAttr(f"{item[0]}.{attr}", lock=True)
                 else:
                     self.fail_io(self.ar.data.lang['r072_noReferenceAllowed'])
             else:
@@ -104,7 +104,7 @@ class FreezeTransform(action.BaseAction):
         """
         cmds.lockNode(item, lock=False, lockUnpublished=False)
         for attr in attributes:
-            if cmds.getAttr(item+'.'+attr) != comp_value:
+            if cmds.getAttr(f"{item}.{attr}") != comp_value:
                 return False
         return True
 
@@ -114,10 +114,10 @@ class FreezeTransform(action.BaseAction):
         """
         for attr in attributes:
             if self.anim_curves:
-                if item+'_'+attr in self.anim_curves:
+                if f"{item}_{attr}" in self.anim_curves:
                     return False
                 else:
-                    cmds.setAttr(item+'.'+attr, lock=False)
+                    cmds.setAttr(f"{item}.{attr}", lock=False)
             else:
-                cmds.setAttr(item+'.'+attr, lock=False)
+                cmds.setAttr(f"{item}.{attr}", lock=False)
         return True

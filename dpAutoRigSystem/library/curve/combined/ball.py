@@ -15,7 +15,7 @@ class Ball(curve.BaseCurve):
         self.dependences = ['Circle']
     
     
-    def cv_main(self, use_ui, cv_id=None, cv_name=CLASS_NAME+'_Ctrl', cv_size=1.0, cv_degree=1, cv_direction='+Y', cv_rot=(0, 0, 0), cv_action=1, guide=False):
+    def cv_main(self, use_ui, cv_id=None, cv_name=f"{CLASS_NAME}_Ctrl", cv_size=1.0, cv_degree=1, cv_direction='+Y', cv_rot=(0, 0, 0), cv_action=1, guide=False):
         """ The principal method to call all other methods in order to build the create_controller curve.
             Return the result: new control curve or the destination list depending of action.
         """
@@ -26,7 +26,7 @@ class Ball(curve.BaseCurve):
             return self.cv_create(use_ui, cv_id, cv_name, cv_size, cv_degree, cv_direction, cv_rot, cv_action, guide, True)
         else:
             # error checking modules in the folder:
-            mel.eval('error \"'+ self.ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(missing_modules) +'\";')
+            mel.eval(f'error "{self.ar.data.lang['e001_guideNotChecked']} - {(", ").join(missing_modules)}";')
     
     
     def create_combined_curves(self, cv_id, cv_name, cv_size, cv_degree):
@@ -36,6 +36,6 @@ class Ball(curve.BaseCurve):
         curve1 = circle.cv_main(False, cv_id, cv_name, cv_size, cv_degree)
         curve2 = circle.cv_main(False, cv_id, cv_name, cv_size, cv_degree)
         curve3 = circle.cv_main(False, cv_id, cv_name, cv_size, cv_degree)
-        cmds.setAttr(curve2+".rotateY", -90)
-        cmds.setAttr(curve3+".rotateX", 90)
+        cmds.setAttr(f"{curve2}.rotateY", -90)
+        cmds.setAttr(f"{curve3}.rotateX", 90)
         return self.combine_curves([curve1, curve2, curve3])

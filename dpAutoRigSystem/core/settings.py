@@ -166,7 +166,7 @@ class Configuration:
     
 
     def load_icons(self):
-        self.ar.data.icon = {i[:-4]: self.ar.data.dp_auto_rig_path+"/"+self.ar.data.icons_folder+"/"+i for i in os.listdir(self.ar.data.dp_auto_rig_path+"/"+self.ar.data.icons_folder) if i.endswith('.png')}
+        self.ar.data.icon = {i[:-4]: f"{self.ar.data.dp_auto_rig_path}/{self.ar.data.icons_folder}/{i}" for i in os.listdir(f"{self.ar.data.dp_auto_rig_path}/{self.ar.data.icons_folder}") if i.endswith('.png')}
 
 
     def check_option_data(self, name, default, folder):
@@ -200,7 +200,7 @@ class Configuration:
                 name = file.partition('.json')[0]
                 # clear the old variable content and open the json file as read:
                 loaded_content = None
-                opened_file = open(path + file, 'r', encoding='utf-8')
+                opened_file = open(f"{path}{file}", 'r', encoding='utf-8')
                 try:
                     # read the json file content and store it in a dictionary:
                     loaded_content = json.loads(opened_file.read())
@@ -259,10 +259,10 @@ class Configuration:
             if set_option_var:
                 self.ar.opt.set_option_var(preset_option_var, preset_name)
             # show preset creation result window:
-            button_label = self.ar.data.lang['c108_open']+" "+self.ar.data.lang['i298_folder']
+            button_label = f"{self.ar.data.lang['c108_open']} {self.ar.data.lang['i298_folder']}"
             button_command = self.ar.packager.open_folder
             button_argument = os.path.join(self.ar.data.dp_auto_rig_path, preset_folder.replace('.', '/'))
-            self.ar.logger.infoWin('i129_createPreset', 'i133_presetCreated', '\n'+preset_name+'\n\n'+self.ar.data.lang['i134_rememberPublish']+'\n\n'+self.ar.data.lang['i018_thanks'], 'center', 205, 270, buttonList=[button_label, button_command, button_argument])
+            self.ar.logger.infoWin('i129_createPreset', 'i133_presetCreated', f"\n{preset_name}\n\n{self.ar.data.lang['i134_rememberPublish']}\n\n{self.ar.data.lang['i018_thanks']}", 'center', 205, 270, buttonList=[button_label, button_command, button_argument])
             # close and reload dpAR UI in order to avoid Maya crash
             self.ar.ui_manager.reload_ui()
 
@@ -282,7 +282,7 @@ class Configuration:
                                                 dismissString=self.ar.data.lang['i132_cancel'])
             if result_dialog == self.ar.data.lang['i131_ok']:
                 result_name = cmds.promptDialog(query=True, text=True)
-                result_name = result_name[0].upper()+result_name[1:]
+                result_name = f"{result_name[0].upper()}{result_name[1:]}"
                 author = getpass.getuser()
                 date = str(datetime.datetime.now().date())
                 result = '{"_preset":"'+result_name+'","_author":"'+author+'","_date":"'+date+'","_updated":"'+date+'"'
@@ -302,7 +302,7 @@ class Configuration:
         # hack in order to avoid "\\" from os.sep, them we need to use the replace string method:
         path = os.path.join(self.ar.data.dp_auto_rig_path, folder.replace('.', '/'), "").replace('\\', '/')
         # write json file in the HD:
-        with open(path+result_data[file_name_id]+'.json', 'w') as json_file:
+        with open(f"{path}{result_data[file_name_id]}.json", 'w') as json_file:
             json.dump(result_data, json_file, indent=4, sort_keys=True)
         return result_data
 
@@ -369,7 +369,7 @@ class Configuration:
         if not (cmds.pluginInfo(plugin_name, query=True, loaded=True)):
             loaded_plugin = False
             try:
-                cmds.loadPlugin(plugin_name+".mll")
+                cmds.loadPlugin(f"{plugin_name}.mll")
                 loaded_plugin = True
             except:
                 pass
@@ -408,7 +408,7 @@ class Option:
         self.ar.data.degree_option = int(value[-1])
         for module_instance in self.ar.data.guide_instances:
             if 'degree' in cmds.listAttr(module_instance.guide_base):
-                cmds.setAttr(module_instance.guide_base+".degree", self.ar.data.degree_option)
+                cmds.setAttr(f"{module_instance.guide_base}.degree", self.ar.data.degree_option)
 
 
     def change_validator_preset(self, value, *args):
@@ -449,9 +449,9 @@ class Option:
         """
         self.ar.data.display_temp_grp = not value #invert value (True -> False or False -> True)
         if cmds.objExists(self.ar.data.temp_grp):
-            cmds.setAttr(self.ar.data.temp_grp+".hiddenInOutliner", self.ar.data.display_temp_grp)
+            cmds.setAttr(f"{self.ar.data.temp_grp}.hiddenInOutliner", self.ar.data.display_temp_grp)
         if cmds.objExists(self.ar.data.guide_mirror_grp):
-            cmds.setAttr(self.ar.data.guide_mirror_grp+".hiddenInOutliner", self.ar.data.display_temp_grp)
+            cmds.setAttr(f"{self.ar.data.guide_mirror_grp}.hiddenInOutliner", self.ar.data.display_temp_grp)
         mel.eval('source AEdagNodeCommon;')
         mel.eval('AEdagNodeCommonRefreshOutliners();')
         self.set_option_var(self.ar.data.display_temp_grp_option_var, value, False)
@@ -488,7 +488,7 @@ class Option:
             if not prefix:
                 self.ar.data.prefix = ""
                 if self.ar.data.verbose:
-                    mel.eval('warning \"'+self.ar.data.lang['p001_prefixText']+'\";')
+                    mel.eval(f'warning "{self.ar.data.lang['p001_prefixText']}";')
             else:
                 if not prefix.endswith('_'):
                     prefix = f"{prefix}_"
@@ -522,7 +522,7 @@ class Option:
         self.set_agree_terms_cond(1)
         self.set_auto_check_update(1)
         # reload UI
-        cmds.evalDeferred("ar = dpAutoRig.Start("+str(self.ar.dev)+", intro=False); ar.ui();", lowestPriority=True)
+        cmds.evalDeferred(f'ar = dpAutoRig.Start("{self.ar.dev}", intro=False); ar.ui();', lowestPriority=True)
 
 
     def set_agree_terms_cond(self, value):
@@ -587,10 +587,10 @@ class Agreement:
             terms_height = 200
             # creating Terms and Conditions Window:
             self.ar.ui_manager.close_ui('dpTermsCondWindow')
-            cmds.window('dpTermsCondWindow', title='dpAutoRigSystem - '+self.ar.data.lang['i281_termsCond'], iconName='dpInfo', widthHeight=(terms_width, terms_height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
+            cmds.window('dpTermsCondWindow', title=f"dpAutoRigSystem - {self.ar.data.lang['i281_termsCond']}", iconName='dpInfo', widthHeight=(terms_width, terms_height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
             # creating text layout:
             cmds.columnLayout('terms_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent='dpTermsCondWindow')
-            cmds.text("\n"+self.ar.data.lang['i282_termsCondDesc'], align='center', parent='terms_cl')
+            cmds.text(f"\n{self.ar.data.lang['i282_termsCondDesc']}", align='center', parent='terms_cl')
             # agreement:
             cmds.separator(height=30)
             cmds.checkBox('terms_cond_cb', label=self.ar.data.lang['i280_iAgreeTermsCond'], align='left', value=self.ar.data.agree_terms, changeCommand=self.ar.opt.set_agree_terms_cond, parent='terms_cl')
@@ -627,13 +627,13 @@ class Environment:
                         pass
                     if len(env) < 4:
                         env_path = self.ar.data.dp_auto_rig_path.split(env)[1][0:].split(path)[0][:-1].replace('/','.')
-                        return env_path+"."+path
+                        return f"{env_path}.{path}"
                     break
         # if we are here, we must return a default path:
         split_envs = env.rpartition(path)
         if os.name == 'posix':
             if env_path != "":
-                env_path = env_path+".dpAutoRigSystem"
+                env_path = f"{env_path}.dpAutoRigSystem"
             else:
                 env_path = 'dpAutoRigSystem'
         else:
@@ -648,7 +648,7 @@ class Environment:
         """ Find all files in the directory with the extension.
             Return a list of all module names (without the given extension).
         """
-        file_dir = path + '/' + folder.replace('.', '/')
+        file_dir = f"{path}/{folder.replace('.', '/')}"
         all_files = os.listdir(file_dir)
         # select only files with extension:
         files = []
@@ -670,7 +670,7 @@ class Environment:
                 desired_order_items = []
                 dups = modules.copy()
                 modules = []
-                with open(path+"/"+folder+"/"+text+".txt", encoding='utf8') as filename:
+                with open(f"{path}/{folder}/{text}.txt", encoding='utf8') as filename:
                     for line in filename:
                         desired_order_items.append(line.strip())
                 if desired_order_items:
@@ -689,9 +689,9 @@ class Environment:
         """
         valid_modules = self.find_modules_by_folder(path, folder)
         valid_module_names = []
-        guide_folder = self.find_env('PYTHONPATH', 'dpAutoRigSystem')+"."+self.ar.data.standard_folder
+        guide_folder = f"{self.find_env('PYTHONPATH', 'dpAutoRigSystem')}.{self.ar.data.standard_folder}"
         for m in valid_modules:
-            mod = __import__(guide_folder+"."+m, {}, {}, [m])
+            mod = __import__(f"{guide_folder}.{m}", {}, {}, [m])
             if self.ar.dev:
                 reload(mod)
             valid_module_names.append(mod.CLASS_NAME)
@@ -714,4 +714,5 @@ class Web:
     def mount_wh(self, start, end):
         """ Mount and return path.
         """
-        return "{}{}{}".format(start, "/", end)
+        #return "{}{}{}".format(start, "/", end)
+        return f"{start}/{end}"

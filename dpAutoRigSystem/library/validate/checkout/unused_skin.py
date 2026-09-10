@@ -60,10 +60,10 @@ class UnusedSkin(action.BaseAction):
                                     if to_remove_joints:
                                         cmds.skinCluster(item, edit=True, removeInfluence=to_remove_joints, toSelectedBones=True)
                                     self.good_results.append(True)
-                                    self.messages.append(self.ar.data.lang['v004_fixed']+": "+item+" = "+str(len(to_remove_joints))+" joints")
+                                    self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {item} = {len(to_remove_joints)} joints")
                                 except:
                                     self.good_results.append(False)
-                                    self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
+                                    self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}")
                     else:
                         self.checked_items.append(item)
                         self.found_issues.append(True)
@@ -74,10 +74,10 @@ class UnusedSkin(action.BaseAction):
                                 cmds.lockNode(item, lock=False)
                                 cmds.delete(item)
                                 self.good_results.append(True)
-                                self.messages.append(self.ar.data.lang['v004_fixed']+": "+item+" = deleted")
+                                self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {item} = deleted")
                             except:
                                 self.good_results.append(False)
-                                self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
+                                self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}")
             else:
                 self.not_found_node()
         else:

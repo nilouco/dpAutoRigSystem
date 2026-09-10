@@ -41,7 +41,7 @@ class ExitEditMode(action.BaseAction):
                 for item in check_items:
                     self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                     # conditional to check here
-                    if 'editMode' in cmds.listAttr(item) and cmds.getAttr(item+".editMode") == 1:
+                    if 'editMode' in cmds.listAttr(item) and cmds.getAttr(f"{item}.editMode") == 1:
                         self.checked_items.append(item)
                         self.found_issues.append(True)
                         if self.first_mode:
@@ -54,14 +54,14 @@ class ExitEditMode(action.BaseAction):
                                 shapes = cmds.listRelatives(item, shapes=True, children=True, fullPath=True)
                                 if shapes:
                                     for shape in shapes:
-                                        cmds.setAttr(shape+".overrideRGBColors", 0)
+                                        cmds.setAttr(f"{shape}.overrideRGBColors", 0)
                                 # set edit mode off
-                                cmds.setAttr(item+".editMode", 0)
+                                cmds.setAttr(f"{item}.editMode", 0)
                                 self.good_results.append(True)
-                                self.messages.append(self.ar.data.lang['v004_fixed']+": "+item)
+                                self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {item}")
                             except:
                                 self.good_results.append(False)
-                                self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
+                                self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}")
             else:
                 self.not_found_node()
         else:

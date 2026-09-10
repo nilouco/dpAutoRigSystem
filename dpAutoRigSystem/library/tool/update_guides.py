@@ -41,7 +41,7 @@ class UpdateGuides(base.BaseLibrary):
                 # Update existing outdated guides.
                 self.do_update()
         else:
-            mel.eval('print \"dpAR: '+self.ar.data.lang['e000_guideNotFound']+'\\n\";')
+            mel.eval(f'print "dpAR: {self.ar.data.lang['e000_guideNotFound']}\n";')
     
 
     def filter_not_nurbs_curve_and_transform(self, items):
@@ -70,12 +70,12 @@ class UpdateGuides(base.BaseLibrary):
     def get_attr_value(self, guide, attr, locked=False):
         if locked:
             try:
-                return cmds.getAttr(guide+'.'+attr, lock=True)
+                return cmds.getAttr(f"{guide}.{attr}", lock=True)
             except:
                 return False
         else:
             try:
-                return cmds.getAttr(guide+'.'+attr, silent=True)
+                return cmds.getAttr(f"{guide}.{attr}", silent=True)
             except:
                 return ''
     
@@ -115,45 +115,45 @@ class UpdateGuides(base.BaseLibrary):
 
     def set_attr_value(self, guide, attr, value):
         try:
-            cmds.setAttr(guide+'.'+attr, value)
+            cmds.setAttr(f"{guide}.{attr}", value)
         except:
-            mel.eval('print \"dpAR: '+self.ar.data.lang['m195_couldNotBeSet']+' '+guide+'.'+attr+'\\n\";')
+            mel.eval(f'print "dpAR: {self.ar.data.lang['m195_couldNotBeSet']} {guide}.{attr}\n";')
 
 
     def set_attr_string_value(self, guide, attr, value):
         try:
-            cmds.setAttr(guide+'.'+attr, value, type='string')
+            cmds.setAttr(f"{guide}.{attr}", value, type='string')
         except:
-            mel.eval('print \"dpAR: '+self.ar.data.lang['m195_couldNotBeSet']+' '+guide+'.'+attr+'\\n\";')
+            mel.eval(f'print "dpAR: {self.ar.data.lang['m195_couldNotBeSet']} {guide}.{attr}\n";')
     
 
     def set_eyelid_guide_attr(self, guide, value):
         current_instance = self.get_new_guide_instance(guide)
-        cmds.setAttr(guide+".eyelid", value)
-        cmds.setAttr(current_instance.name_guide+"_UpperEyelidLoc.visibility", value)
-        cmds.setAttr(current_instance.name_guide+"_LowerEyelidLoc.visibility", value)
-        cmds.setAttr(current_instance.name_guide+"_JEyelid.visibility", value)
-        cmds.setAttr(current_instance.name_guide+"_JUpperEyelid.visibility", value)
-        cmds.setAttr(current_instance.name_guide+"_JLowerEyelid.visibility", value)
+        cmds.setAttr(f"{guide}.eyelid", value)
+        cmds.setAttr(f"{current_instance.name_guide}_UpperEyelidLoc.visibility", value)
+        cmds.setAttr(f"{current_instance.name_guide}_LowerEyelidLoc.visibility", value)
+        cmds.setAttr(f"{current_instance.name_guide}_JEyelid.visibility", value)
+        cmds.setAttr(f"{current_instance.name_guide}_JUpperEyelid.visibility", value)
+        cmds.setAttr(f"{current_instance.name_guide}_JLowerEyelid.visibility", value)
 
 
     def set_iris_guide_attr(self, guide, value):
         current_instance = self.get_new_guide_instance(guide)
-        cmds.setAttr(guide+".iris", value)
-        cmds.setAttr(current_instance.name_guide+"_IrisLoc.visibility", value)
+        cmds.setAttr(f"{guide}.iris", value)
+        cmds.setAttr(f"{current_instance.name_guide}_IrisLoc.visibility", value)
 
 
     def set_pupil_guide_attr(self, guide, value):
         current_instance = self.get_new_guide_instance(guide)
-        cmds.setAttr(guide+".pupil", value)
-        cmds.setAttr(current_instance.name_guide+"_PupilLoc.visibility", value)
+        cmds.setAttr(f"{guide}.pupil", value)
+        cmds.setAttr(f"{current_instance.name_guide}_PupilLoc.visibility", value)
 
 
     def set_nostril_guide_attr(self, guide, value):
         current_instance = self.get_new_guide_instance(guide)
-        cmds.setAttr(guide+".nostril", value)
-        cmds.setAttr(current_instance.cvLNostrilLoc+".visibility", value)
-        cmds.setAttr(current_instance.cvRNostrilLoc+".visibility", value)
+        cmds.setAttr(f"{guide}.nostril", value)
+        cmds.setAttr(f"{current_instance.cvLNostrilLoc}.visibility", value)
+        cmds.setAttr(f"{current_instance.cvRNostrilLoc}.visibility", value)
     
 
     def check_set_new_guide_to_attr(self, guide, attr, value):
@@ -270,7 +270,7 @@ class UpdateGuides(base.BaseLibrary):
         guides_to_rig = self.ar.utils.get_guides_to_rig()
         instance_modules_strings = list(map(str, guides_to_rig))
         for base_guide in self.guides_directory:
-            guide_version = cmds.getAttr(base_guide+'.dpARVersion', silent=True)
+            guide_version = cmds.getAttr(f"{base_guide}.dpARVersion", silent=True)
             if guide_version != self.ar.data.version:
                 # Create the database holder where the key is the base_guide
                 self.update_data[base_guide] = {}
@@ -308,16 +308,16 @@ class UpdateGuides(base.BaseLibrary):
         for guide in self.update_data:
             current_custom_name = self.update_data[guide]['attributes']['customName']
             if current_custom_name == '' or current_custom_name == None:
-                self.update_data[guide]['instance'].set_guide_custom_name(self.update_data[guide]['instance'].guide_base.split(':')[0]+'_OLD')
+                self.update_data[guide]['instance'].set_guide_custom_name(f"{self.update_data[guide]['instance'].guide_base.split(':')[0]}_OLD")
             else:
-                self.update_data[guide]['instance'].set_guide_custom_name(current_custom_name+'_OLD')
+                self.update_data[guide]['instance'].set_guide_custom_name(f"{current_custom_name}_OLD")
 
 
     def retrieve_new_parent(self, current_parent):
-        current_parent_base = current_parent.split(':')[0]+":Guide_Base"
+        current_parent_base = f"{current_parent.split(':')[0]}:Guide_Base"
         if current_parent_base in self.update_data:
             new_parent_base = self.update_data[current_parent_base]['new_guide']
-            new_parent_final = new_parent_base.split(':')[0]+':'+current_parent.split(':')[1]
+            new_parent_final = f"{new_parent_base.split(':')[0]}:{current_parent.split(':')[1]}"
             return new_parent_final
         else:
             return current_parent
@@ -331,7 +331,7 @@ class UpdateGuides(base.BaseLibrary):
                 try:
                     cmds.parent(self.update_data[guide]['new_guide'], new_parent_final)
                 except:
-                    mel.eval('print \"dpAR: '+self.ar.data.lang['m196_parentNotFound']+' '+self.update_data[guide]['new_guide']+'\\n\";')
+                    mel.eval(f'print "dpAR: {self.ar.data.lang['m196_parentNotFound']} {self.update_data[guide]['new_guide']}\n";')
             if self.ar.data.ui_state:
                 cmds.refresh()
 
@@ -345,7 +345,7 @@ class UpdateGuides(base.BaseLibrary):
                     try:
                         cmds.parent(retain_guide, new_parent_final)
                     except:
-                        mel.eval('print \"dpAR: '+self.ar.data.lang['m197_notPossibleParent']+' '+retain_guide+'\\n\";')
+                        mel.eval(f'print "dpAR: {self.ar.data.lang['m197_notPossibleParent']} {retain_guide}\n";')
     
 
     def copy_attr_from_guides(self, new_guide, old_guide_attr_data):
@@ -389,7 +389,7 @@ class UpdateGuides(base.BaseLibrary):
             old_guide_children_only = [name.split(':')[1] for name in old_guide_children]
             for i, new_child in enumerate(new_guide_children):
                 if new_guide_children_only[i] in old_guide_children_only:
-                    name_guide = self.update_data[guide]['children'][guide.split(':')[0]+':'+new_guide_children_only[i]]
+                    name_guide = self.update_data[guide]['children'][f"{guide.split(':')[0]}:{new_guide_children_only[i]}"]
                     self.copy_attr_from_guides(new_child, name_guide['attributes'])
                     self.copy_attr_from_guides(new_child, name_guide['transformAttributes'])
     
@@ -423,7 +423,7 @@ class UpdateGuides(base.BaseLibrary):
         try:
             cmds.delete(*self.update_data.keys())
         except:
-            mel.eval('print \"dpAR: '+self.ar.data.lang['e000_guideNotFound']+'\\n\";')
+            mel.eval(f'print "dpAR: {self.ar.data.lang['e000_guideNotFound']}\n";')
         for guide in self.update_data:
              if self.update_data[guide]['instance'].guide_namespace in cmds.namespaceInfo(listOnlyNamespaces=True):
                 cmds.namespace(moveNamespace=(self.update_data[guide]['instance'].guide_namespace, ':'), force=True)
@@ -436,27 +436,27 @@ class UpdateGuides(base.BaseLibrary):
         """
         reverse_foot_e = 'Guide_RfE'
         reverse_foot_f = 'Guide_RfF'
-        reverse_foot_e_items = cmds.ls("*:"+reverse_foot_e)
-        reverse_foot_f_items = cmds.ls("*:"+reverse_foot_f)
+        reverse_foot_e_items = cmds.ls(f"*:{reverse_foot_e}")
+        reverse_foot_f_items = cmds.ls(f"*:{reverse_foot_f}")
         if reverse_foot_f_items:
             need_patch = False
             if reverse_foot_e_items:
                 for rf_e in reverse_foot_e_items:
-                    guide_version = cmds.getAttr(rf_e+".version")
-                    if int(guide_version.split('.')[0]) == 4 and float(guide_version.split('.')[1]+"."+guide_version.split('.')[2]) < 4.25:
+                    guide_version = cmds.getAttr(f"{rf_e}.version")
+                    if int(guide_version.split('.')[0]) == 4 and float(f"{guide_version.split('.')[1]}.{guide_version.split('.')[2]}") < 4.25:
                         need_patch = True
                         break
             if need_patch:
                 for f in reverse_foot_f_items:
                     e = f.replace(reverse_foot_f, reverse_foot_e)
                     for attr in ['tx', 'ty', 'tz']:
-                        cmds.setAttr(f+"."+attr, cmds.getAttr(e+"."+attr))
+                        cmds.setAttr(f"{f}.{attr}", cmds.getAttr(f"{e}.{attr}"))
                     toes = cmds.listRelatives(e, children=True, type='transform')
                     if toes:
                         cmds.matchTransform(e, f, position=True, rotation=True)
                         cmds.parent(toes, f)
                     for attr in ['tx', 'ty', 'tz']:
-                        cmds.setAttr(e+"."+attr, 0)
+                        cmds.setAttr(f"{e}.{attr}", 0)
 
 
     def do_update(self, *args):

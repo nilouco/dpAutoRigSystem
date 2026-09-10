@@ -83,7 +83,7 @@ class CalibrationIO(action.BaseAction):
             if calibrations:
                 data[ctrl] = {}
                 for attr in calibrations:
-                    data[ctrl][attr] = cmds.getAttr(ctrl+"."+attr)
+                    data[ctrl][attr] = cmds.getAttr(f"{ctrl}.{attr}")
         return data
 
 
@@ -101,22 +101,22 @@ class CalibrationIO(action.BaseAction):
                 item = item[item.rfind('|')+1:] #short name (after last '|')
             if cmds.objExists(item):
                 for attr in calibration_data[item]:
-                    if not cmds.listConnections(item+"."+attr, destination=False, source=True):
+                    if not cmds.listConnections(f"{item}.{attr}", destination=False, source=True):
                         # unlock attribute
-                        was_locked = cmds.getAttr(item+"."+attr, lock=True)
-                        cmds.setAttr(item+"."+attr, lock=False)
+                        was_locked = cmds.getAttr(f"{item}.{attr}", lock=True)
+                        cmds.setAttr(f"{item}.{attr}", lock=False)
                         try:
                             # set calibration value
-                            cmds.setAttr(item+"."+attr, calibration_data[item][attr])
+                            cmds.setAttr(f"{item}.{attr}", calibration_data[item][attr])
                             # lock attribute again if it was locked
-                            cmds.setAttr(item+"."+attr, lock=was_locked)
+                            cmds.setAttr(f"{item}.{attr}", lock=was_locked)
                             if not item in well_imported_items:
                                 well_imported_items.append(item)
                         except Exception as e:
-                            self.fail_io(item+" - "+str(e))
+                            self.fail_io(f"{item} - {e}")
             else:
                 not_found_nodes.append(item)
         if well_imported_items:
             self.well_done_io(self.latest_data_file)
         else:
-            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(not_found_nodes))
+            self.fail_io(f"{self.ar.data.lang['v014_notFoundNodes']}: {', '.join(not_found_nodes)}")

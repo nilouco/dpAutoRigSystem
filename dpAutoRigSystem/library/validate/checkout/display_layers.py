@@ -54,12 +54,12 @@ class DisplayLayers(action.BaseAction):
                 if not self.to_delete_extra_layers:
                     if cmds.objExists(self.geo_layer_name) and cmds.objExists(self.ctrl_layer_name):
                         layers_config_checks = [True, False, 2, True, False, 0]
-                        geo_layer_vis = cmds.getAttr(self.geo_layer_name+".visibility") #True
-                        geo_layer_hide_on_playback = cmds.getAttr(self.geo_layer_name+".hideOnPlayback") #False
-                        geo_layer_display_type = cmds.getAttr(self.geo_layer_name+".displayType") #2 = ref
-                        ctrl_layer_vis = cmds.getAttr(self.ctrl_layer_name+".visibility") #True
-                        ctrl_layer_hide_on_playback = cmds.getAttr(self.ctrl_layer_name+".hideOnPlayback") #False
-                        ctrl_layer_display_type = cmds.getAttr(self.ctrl_layer_name+".displayType") #0 = none
+                        geo_layer_vis = cmds.getAttr(f"{self.geo_layer_name}.visibility") #True
+                        geo_layer_hide_on_playback = cmds.getAttr(f"{self.geo_layer_name}.hideOnPlayback") #False
+                        geo_layer_display_type = cmds.getAttr(f"{self.geo_layer_name}.displayType") #2 = ref
+                        ctrl_layer_vis = cmds.getAttr(f"{self.ctrl_layer_name}.visibility") #True
+                        ctrl_layer_hide_on_playback = cmds.getAttr(f"{self.ctrl_layer_name}.hideOnPlayback") #False
+                        ctrl_layer_display_type = cmds.getAttr(f"{self.ctrl_layer_name}.displayType") #0 = none
                         layer_configs = [geo_layer_vis, geo_layer_hide_on_playback, geo_layer_display_type, ctrl_layer_vis, ctrl_layer_hide_on_playback, ctrl_layer_display_type]
                         # Check layers configuration
                         if layer_configs == layers_config_checks:
@@ -131,11 +131,11 @@ class DisplayLayers(action.BaseAction):
                 cmds.delete(layer_name)
                 new_layer = cmds.rename(new_layer, layer_name)
                 if geo_type:
-                    cmds.setAttr(new_layer+".displayType", 2)
+                    cmds.setAttr(f"{new_layer}.displayType", 2)
                 cmds.select(clear=True)
             else:
                 if geo_type:
-                    cmds.setAttr(layer_name+".displayType", 2)
+                    cmds.setAttr(f"{layer_name}.displayType", 2)
                 cmds.select(clear=True)
 
 
@@ -186,7 +186,7 @@ class DisplayLayers(action.BaseAction):
                         if i == len(items) - 1:
                             self.create_display_layers()    
                         self.good_results.append(True)
-                        self.messages.append(self.ar.data.lang['v004_fixed']+": "+item)
+                        self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {item}")
                     except:#fix
                         self.good_results.append(False)
-                        self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
+                        self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}")

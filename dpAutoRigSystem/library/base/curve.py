@@ -52,34 +52,34 @@ class BaseCurve(base.BaseLibrary):
         """ Add some information in the curve transform node of the control.
         """
         cmds.addAttr(item, longName='dpControl', attributeType='bool')
-        cmds.setAttr(item+".dpControl", 1)
+        cmds.setAttr(f"{item}.dpControl", 1)
         if guide:
             cmds.addAttr(item, longName='dpGuide', attributeType='bool')
-            cmds.setAttr(item+".dpGuide", 1)
+            cmds.setAttr(f"{item}.dpGuide", 1)
         cmds.addAttr(item, longName='version', dataType='string')
-        cmds.setAttr(item+".version", self.ar.data.version, type='string')
+        cmds.setAttr(f"{item}.version", self.ar.data.version, type='string')
         if self.cv_id:
             cmds.addAttr(item, longName='controlID', dataType='string')
-            cmds.setAttr(item+".controlID", self.cv_id, type='string')
+            cmds.setAttr(f"{item}.controlID", self.cv_id, type='string')
         if class_name:
             cmds.addAttr(item, longName='className', dataType='string')
-            cmds.setAttr(item+".className", self.name, type='string')
+            cmds.setAttr(f"{item}.className", self.name, type='string')
         if size:
             cmds.addAttr(item, longName='size', attributeType='float')
-            cmds.setAttr(item+".size", self.cv_size)
+            cmds.setAttr(f"{item}.size", self.cv_size)
         if degree:
             cmds.addAttr(item, longName='degree', attributeType='short')
-            cmds.setAttr(item+".degree", self.cv_degree)
+            cmds.setAttr(f"{item}.degree", self.cv_degree)
         if direction:
             cmds.addAttr(item, longName='direction', dataType='string')
-            cmds.setAttr(item+".direction", self.cv_direction, type='string')
+            cmds.setAttr(f"{item}.direction", self.cv_direction, type='string')
         if rot:
             cmds.addAttr(item, longName='cvRotX', attributeType='double')
             cmds.addAttr(item, longName='cvRotY', attributeType='double')
             cmds.addAttr(item, longName='cvRotZ', attributeType='double')
-            cmds.setAttr(item+".cvRotX", self.cv_rot[0])
-            cmds.setAttr(item+".cvRotY", self.cv_rot[1])
-            cmds.setAttr(item+".cvRotZ", self.cv_rot[2])
+            cmds.setAttr(f"{item}.cvRotX", self.cv_rot[0])
+            cmds.setAttr(f"{item}.cvRotY", self.cv_rot[1])
+            cmds.setAttr(f"{item}.cvRotZ", self.cv_rot[2])
         if not guide:
             cmds.addAttr(item, longName='parentTag', attributeType='message')
     
@@ -102,7 +102,7 @@ class BaseCurve(base.BaseLibrary):
         for item in curves[1:]:
             cmds.makeIdentity(item, translate=True, rotate=True, scale=True, apply=True)
             self.ar.ctrls.transfer_shape(True, False, item, [curves[0]])
-        cmds.setAttr(curves[0]+".className", self.name, type='string')
+        cmds.setAttr(f"{curves[0]}.className", self.name, type='string')
         return curves[0]
 
         
@@ -111,17 +111,17 @@ class BaseCurve(base.BaseLibrary):
         """ Rotate the node given to have the correct direction orientation.
         """
         if cv_direction == '-X':
-            cmds.setAttr(item+".rotateX", 90)
-            cmds.setAttr(item+".rotateY", -90)
+            cmds.setAttr(f"{item}.rotateX", 90)
+            cmds.setAttr(f"{item}.rotateY", -90)
         elif cv_direction == '+X':
-            cmds.setAttr(item+".rotateX", -90)
-            cmds.setAttr(item+".rotateY", -90)
+            cmds.setAttr(f"{item}.rotateX", -90)
+            cmds.setAttr(f"{item}.rotateY", -90)
         elif cv_direction == '-Y':
-            cmds.setAttr(item+".rotateZ", 180)
+            cmds.setAttr(f"{item}.rotateZ", 180)
         elif cv_direction == '-Z':
-            cmds.setAttr(item+".rotateX", -90)
+            cmds.setAttr(f"{item}.rotateX", -90)
         elif cv_direction == '+Z':
-            cmds.setAttr(item+".rotateX", 90)
+            cmds.setAttr(f"{item}.rotateX", 90)
         else:
             pass #default +Y, just pass
         cmds.makeIdentity(item, rotate=True, apply=True)
@@ -146,7 +146,7 @@ class BaseCurve(base.BaseLibrary):
                     self.ar.ctrls.transfer_shape(True, True, self.cv_curve, destinations, True)
             else:
                 cmds.delete(self.cv_curve)
-                mel.eval("warning \""+self.ar.data.lang['e011_notSelShape']+"\";")
+                mel.eval(f'warning "{self.ar.data.lang['e011_notSelShape']}";')
     
     
     def cv_create(self, use_ui, cv_id, cv_name='Controller_Ctrl', cv_size=1.0, cv_degree=1, cv_direction='+Y', cv_rot=(0, 0, 0), cv_action=1, guide=False, combine=False):

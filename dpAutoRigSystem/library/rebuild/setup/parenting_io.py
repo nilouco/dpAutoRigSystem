@@ -61,7 +61,7 @@ class ParentingIO(action.BaseAction):
                                     self.import_parenting_data(parent_data) #double run to first put broken nodes in place
                                 self.import_parenting_data(parent_data)
                             except Exception as e:
-                                self.fail_io(self.ar.data.lang['r032_notImportedData']+": "+str(e))
+                                self.fail_io(f"{self.ar.data.lang['r032_notImportedData']}: {e}")
                         else:
                             self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                 else:
@@ -156,11 +156,11 @@ class ParentingIO(action.BaseAction):
                                         cmds.parent(short_item, short_father_node)
                                         well_imported_items.append(short_item)
                                     else:
-                                        self.fail_io(self.ar.data.lang['i075_moreOne']+" "+self.ar.data.lang['i076_sameName']+" "+short_father_node)
+                                        self.fail_io(f"{self.ar.data.lang['i075_moreOne']} {self.ar.data.lang['i076_sameName']} {short_father_node}")
                             else: #root here
                                 model_changed_items.append(item)
                         else:
-                            self.fail_io(self.ar.data.lang['i075_moreOne']+" "+self.ar.data.lang['i076_sameName']+" "+short_item)
+                            self.fail_io(f"{self.ar.data.lang['i075_moreOne']} {self.ar.data.lang['i076_sameName']} {short_item}")
                     else:
                         if not self.check_its_from_modeling(parent_data, 'transform', item):
                             model_changed_items.append(item)
@@ -172,7 +172,7 @@ class ParentingIO(action.BaseAction):
                 elif well_imported_items:
                     self.well_done_io(self.latest_data_file)
                 else:
-                    self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(not_found_nodes))
+                    self.fail_io(f"{self.ar.data.lang['v014_notFoundNodes']}: {', '.join(not_found_nodes)}")
             else:
                 self.well_done_io(self.latest_data_file)
         else:

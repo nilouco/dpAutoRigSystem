@@ -72,6 +72,7 @@ class Start:
         self.load_components()
         self.load_library()
         self.load_ui()
+        self.opening.close_opening_ui()
 
 
     def load_opening(self, intro:bool=True):

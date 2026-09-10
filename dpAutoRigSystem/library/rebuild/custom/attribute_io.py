@@ -88,7 +88,7 @@ class AttributeIO(action.BaseAction):
         for node in inputs:
             meshes = cmds.listRelatives(node, allDescendents=True, children=True, type='mesh')
             if meshes:
-                items.extend([m for m in meshes if not cmds.getAttr(m+".intermediateObject")] or [])
+                items.extend([m for m in meshes if not cmds.getAttr(f"{m}.intermediateObject")] or [])
                 items.extend([t for t in cmds.listRelatives(node, allDescendents=True, children=True, type='transform') or [] if cmds.listRelatives(t, children=True, type='mesh')] or [])
         items = list(set(items))
         items.sort()
@@ -99,19 +99,19 @@ class AttributeIO(action.BaseAction):
                 data[item] = {'attributes' : {},
                                 'order' : attributes}
                 for attr in attributes:
-                    if cmds.getAttr(item + "." + attr, type=True) != 'message':
-                        attr_type = cmds.getAttr(item+"."+attr, type=True)
+                    if cmds.getAttr(f"{item}.{attr}", type=True) != 'message':
+                        attr_type = cmds.getAttr(f"{item}.{attr}", type=True)
                         data[item]['attributes'][attr] = {
                                             'type' : attr_type,
-                                            'value' : cmds.getAttr(item+"."+attr),
-                                            'locked' : cmds.getAttr(item+"."+attr, lock=True),
-                                            'keyable' : cmds.getAttr(item+"."+attr, keyable=True),
-                                            'channelBox' : cmds.getAttr(item+"."+attr, channelBox=True)
+                                            'value' : cmds.getAttr(f"{item}.{attr}"),
+                                            'locked' : cmds.getAttr(f"{item}.{attr}", lock=True),
+                                            'keyable' : cmds.getAttr(f"{item}.{attr}", keyable=True),
+                                            'channelBox' : cmds.getAttr(f"{item}.{attr}", channelBox=True)
                                             }
                         if attr_type in self.default_value_types:
                             if attr_type == 'enum':
                                 data[item]['attributes'][attr]['enumName'] = cmds.attributeQuery(attr, node=item, listEnum=True)[0]
-                            data[item]['attributes'][attr]['default'] = cmds.addAttr(item+"."+attr, query=True, defaultValue=True)
+                            data[item]['attributes'][attr]['default'] = cmds.addAttr(f"{item}.{attr}", query=True, defaultValue=True)
                             data[item]['attributes'][attr]['maxExists'] = cmds.attributeQuery(attr, node=item, maxExists=True) or False
                             if data[item]['attributes'][attr]['maxExists']:
                                 data[item]['attributes'][attr]['maximum'] = cmds.attributeQuery(attr, node=item, maximum=True)[0]
@@ -136,12 +136,12 @@ class AttributeIO(action.BaseAction):
                 item = item[item.rfind('|')+1:] #short name (after last '|')
             if cmds.objExists(item):
                 for attr in attr_data[item]['attributes']:
-                    if not cmds.objExists(item+"."+attr):
+                    if not cmds.objExists(f"{item}.{attr}"):
                         try:
                             # add and set attribute value
                             if attr_data[item]['attributes'][attr]['type'] == 'string':
                                 cmds.addAttr(item, longName=attr, dataType='string')
-                                cmds.setAttr(item+"."+attr, attr_data[item]['attributes'][attr]['value'], type='string')
+                                cmds.setAttr(f"{item}.{attr}", attr_data[item]['attributes'][attr]['value'], type='string')
                             elif attr_data[item]['attributes'][attr]['type'] == 'enum':
                                 cmds.addAttr(item, longName=attr, attributeType='enum', enumName=attr_data[item]['attributes'][attr]['enumName'])
                             else:
@@ -155,15 +155,15 @@ class AttributeIO(action.BaseAction):
                                 else:
                                     cmds.addAttr(item, longName=attr, attributeType=attr_data[item]['attributes'][attr]['type'], defaultValue=attr_data[item]['attributes'][attr]['default'])
                             if attr_data[item]['attributes'][attr]['type'] in self.default_value_types:
-                                cmds.setAttr(item+"."+attr, attr_data[item]['attributes'][attr]['value'])
-                                cmds.setAttr(item+"."+attr, keyable=attr_data[item]['attributes'][attr]['keyable'])
+                                cmds.setAttr(f"{item}.{attr}", attr_data[item]['attributes'][attr]['value'])
+                                cmds.setAttr(f"{item}.{attr}", keyable=attr_data[item]['attributes'][attr]['keyable'])
                                 if not attr_data[item]['attributes'][attr]['keyable']:
-                                    cmds.setAttr(item+"."+attr, channelBox=attr_data[item]['attributes'][attr]['channelBox'])
-                                cmds.setAttr(item+"."+attr, lock=attr_data[item]['attributes'][attr]['locked'])
+                                    cmds.setAttr(f"{item}.{attr}", channelBox=attr_data[item]['attributes'][attr]['channelBox'])
+                                cmds.setAttr(f"{item}.{attr}", lock=attr_data[item]['attributes'][attr]['locked'])
                             if not item in well_imported_items:
                                 well_imported_items.append(item)
                         except Exception as e:
-                            self.fail_io(item+" - "+str(e))
+                            self.fail_io(f"{item} - {e}")
                     else:
                         well_imported_items.append(item)
                         # TODO: should we set the attribute value here?
@@ -174,4 +174,4 @@ class AttributeIO(action.BaseAction):
         if well_imported_items:
             self.well_done_io(self.latest_data_file)
         else:
-            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(not_found_nodes))
+            self.fail_io(f"{self.ar.data.lang['v014_notFoundNodes']}: {', '.join(not_found_nodes)}")

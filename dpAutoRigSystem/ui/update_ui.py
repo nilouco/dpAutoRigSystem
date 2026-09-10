@@ -19,18 +19,18 @@ class UpdateUI:
         win_height = 300
         # creating Update Window:
         self.ar.ui_manager.close_ui('dpUpdateWindow')
-        cmds.window('dpUpdateWindow', title='dpAutoRigSystem - '+self.ar.data.lang['i089_update'], iconName='dpInfo', widthHeight=(win_width, win_height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
+        cmds.window('dpUpdateWindow', title=f"dpAutoRigSystem - {self.ar.data.lang['i089_update']}", iconName='dpInfo', widthHeight=(win_width, win_height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
         # creating text layout:
         cmds.columnLayout('update_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent='dpUpdateWindow')
-        cmds.text('update_description_txt', label="\n"+self.ar.data.lang[text], align='center', parent='update_cl')
-        cmds.text('update_current_version_txt', label="\n"+self.ar.data.version+self.ar.data.lang['i090_currentVersion'], align='left', parent='update_cl')
+        cmds.text('update_description_txt', label=f"\n{self.ar.data.lang[text]}", align='center', parent='update_cl')
+        cmds.text('update_current_version_txt', label=f"\n{self.ar.data.version}{self.ar.data.lang['i090_currentVersion']}", align='left', parent='update_cl')
         if remote_version:
             remote_version = remote_version.replace('\\n', '\n')
-            cmds.text('update_remote_version_txt', label=remote_version+self.ar.data.lang['i091_onlineVersion'], align='left', parent='update_cl')
+            cmds.text('update_remote_version_txt', label=f"{remote_version}{self.ar.data.lang['i091_onlineVersion']}", align='left', parent='update_cl')
             cmds.separator(height=30)
             if remote_log:
                 remote_log = remote_log.replace('\\n', '\n')
-                cmds.text('update_log_txt', label=self.ar.data.lang['i171_updateLog']+":\n", align='center', parent='update_cl')
+                cmds.text('update_log_txt', label=f"{self.ar.data.lang['i171_updateLog']}:\n", align='center', parent='update_cl')
                 cmds.text('update_remote_log_txt', label=remote_log, align='left', parent='update_cl')
                 cmds.separator(height=30)
             cmds.button('update_whats_changed_bt', label=self.ar.data.lang['i117_whatsChanged'], align='center', command=partial(self.ar.web.visit_website, self.ar.data.whats_changed_url), parent='update_cl')

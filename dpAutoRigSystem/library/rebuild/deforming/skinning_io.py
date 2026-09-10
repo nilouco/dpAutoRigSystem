@@ -87,11 +87,11 @@ class SkinningIO(action.BaseAction):
             wip_files.sort()
             if len(self.exported_items) > 1:
                 self.ref_path_name = self.exported_items[-2][len(self.start_name)+1:-5]
-                if os.path.isfile(self.ar.pipeliner.pipe_data['assetPath']+"/"+self.ref_path_name+".ma"):
-                    self.ref_path_name = self.ref_path_name+".ma"
+                if os.path.isfile(f"{self.ar.pipeliner.pipe_data['assetPath']}/{self.ref_path_name}.ma"):
+                    self.ref_path_name = f"{self.ref_path_name}.ma"
                 else:
-                    self.ref_path_name = self.ref_path_name+".mb"
-                self.ref_path_name = self.ar.pipeliner.pipe_data['assetPath']+"/"+wip_files[-2]
+                    self.ref_path_name = f"{self.ref_path_name}.mb"
+                self.ref_path_name = f"{self.ar.pipeliner.pipe_data['assetPath']}/{wip_files[-2]}"
                 cmds.file(self.ref_path_name, reference=True, namespace=self.import_ref_name)
                 ref_node = cmds.file(self.ref_path_name, referenceNode=True, query=True)
                 ref_nodes = cmds.referenceQuery(ref_node, nodes=True)
@@ -118,7 +118,7 @@ class SkinningIO(action.BaseAction):
                             if cmds.polyCompare(item, ref_node_name, vertices=True) > 0 or cmds.polyCompare(item, ref_node_name, edges=True) > 0: #check if shape changes
                                 changed_shape_meshes.append(item)
                                 well_imported = False
-                            elif len(cmds.ls(item + ".vtx[*]", flatten=True)) != len(cmds.ls(ref_node_name + ".vtx[*]", flatten=True)): #check if poly count changes
+                            elif len(cmds.ls(f"{item}.vtx[*]", flatten=True)) != len(cmds.ls(f"{ref_node_name}.vtx[*]", flatten=True)): #check if poly count changes
                                 changed_topo_meshes.append(item)
                                 well_imported = False
                             else:
@@ -135,13 +135,13 @@ class SkinningIO(action.BaseAction):
                 self.ar.skin.import_skin_weights_from_file(to_import_items, self.io_path, self.latest_data_file, False)
                 self.well_done_io(self.latest_data_file)
             except Exception as e:
-                self.fail_io(self.latest_data_file+": "+str(e))
+                self.fail_io(f"{self.latest_data_file}: {e}")
         else:
-            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(skin_weight_data.keys())))
+            self.fail_io(f"{self.ar.data.lang['v014_notFoundNodes']} {', '.join(skin_weight_data.keys())}")
         if not well_imported:
             if changed_shape_meshes:
-                self.fail_io(self.ar.data.lang['r018_changedMesh']+" shape "+str(', '.join(changed_shape_meshes)))
+                self.fail_io(f"{self.ar.data.lang['r018_changedMesh']} shape {', '.join(changed_shape_meshes)}")
             elif changed_topo_meshes:
-                self.fail_io(self.ar.data.lang['r018_changedMesh']+" topology "+str(', '.join(changed_topo_meshes)))
+                self.fail_io(f"{self.ar.data.lang['r018_changedMesh']} topology {', '.join(changed_topo_meshes)}")
             elif not_found_meshs:
-                self.fail_io(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(not_found_meshs)))
+                self.fail_io(f"{self.ar.data.lang['v014_notFoundNodes']} {', '.join(not_found_meshs)}")

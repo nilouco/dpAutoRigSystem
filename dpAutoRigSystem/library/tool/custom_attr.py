@@ -99,10 +99,10 @@ class CustomAttr(base.BaseLibrary):
                             if attr:
                                 if attr != self.start_attr:
                                     if not attr.startswith(self.start_attr):
-                                        attr = self.start_attr+attr[0].capitalize()+attr[1:]
+                                        attr = f"{self.start_attr}{attr[0].capitalize()}{attr[1:]}"
                                     else:
                                         point = len(self.start_attr)
-                                        attr = attr[:point]+attr[point].capitalize()+attr[point+1:]
+                                        attr = f"{attr[:point]+attr[point].capitalize()}{attr[point+1:]}"
                                 else:
                                     attr = None
                     elif attr_index == 0: #dpID
@@ -111,7 +111,7 @@ class CustomAttr(base.BaseLibrary):
                         if not cmds.attributeQuery(self.dpid_attr, node=item, exists=True):
                             id = self.ar.math.generate_id(item)
                             cmds.addAttr(item, longName=self.dpid_attr, dataType='string')
-                            cmds.setAttr(item+"."+self.dpid_attr, id, type='string', lock=True)
+                            cmds.setAttr(f"{item}.{self.dpid_attr}", id, type='string', lock=True)
                             ids.append(id)
                         elif not self.ar.math.validate_id(item):
                             ids.extend(self.update_id([item]))
@@ -119,7 +119,7 @@ class CustomAttr(base.BaseLibrary):
                         attr = self.attributes[attr_index]
                     if attr and not cmds.attributeQuery(attr, node=item, exists=True):
                         cmds.addAttr(item, longName=attr, attributeType='bool', defaultValue=1, keyable=False)
-                        cmds.setAttr(item+"."+attr, edit=True, channelBox=False)
+                        cmds.setAttr(f"{item}.{attr}", edit=True, channelBox=False)
             if self.ar.data.ui_state and cmds.textFieldButtonGrp('addCustomAttrTFG', exists=True):
                 cmds.textFieldButtonGrp('custom_attr_add_tfbg', edit=True, text='')
         return ids
@@ -132,10 +132,10 @@ class CustomAttr(base.BaseLibrary):
         if items:
             for item in items:
                 if cmds.attributeQuery(attr, node=item, exists=True):
-                    cmds.setAttr(item+"."+attr, edit=True, lock=False)
-                    cmds.deleteAttr(item+"."+attr)
-                    if self.ar.data.ui_state and cmds.button("custom_attr_remove_"+attr+"_bt", query=True, exists=True):
-                        cmds.deleteUI("custom_attr_remove_"+attr+"_bt")
+                    cmds.setAttr(f"{item}.{attr}", edit=True, lock=False)
+                    cmds.deleteAttr(f"{item}.{attr}")
+                    if self.ar.data.ui_state and cmds.button(f"custom_attr_remove_{attr}_bt", query=True, exists=True):
+                        cmds.deleteUI(f"custom_attr_remove_{attr}_bt")
 
 
     def get_custom_attrs(self, items=None, *args):
@@ -150,7 +150,7 @@ class CustomAttr(base.BaseLibrary):
                     if self.dpid_attr in current_item_attrs:
                         custom_attributes.append(self.dpid_attr)
                     for attr in current_item_attrs:
-                        if attr.startswith(self.start_attr) and cmds.getAttr(item+"."+attr, type=True) == 'bool':
+                        if attr.startswith(self.start_attr) and cmds.getAttr(f"{item}.{attr}", type=True) == 'bool':
                             custom_attributes.append(attr)
         return custom_attributes
 
@@ -181,7 +181,7 @@ class CustomAttr(base.BaseLibrary):
             for item in items:
                 decomposed_ids = self.ar.math.decompose_id(item)
                 id_data[item] = {
-                                self.dpid_attr : cmds.getAttr(item+"."+self.dpid_attr),
+                                self.dpid_attr : cmds.getAttr(f"{item}.{self.dpid_attr}"),
                                 'name' : decomposed_ids[1],
                                 'date' : decomposed_ids[2]
                                }

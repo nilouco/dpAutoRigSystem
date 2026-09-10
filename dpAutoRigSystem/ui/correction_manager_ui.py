@@ -16,7 +16,7 @@ class CorrectionManagerUI:
         # window
         width = 380
         height = 300
-        cmds.window('dpCorrectionManagerWindow', title=self.ar.data.lang['m068_correctionManager']+" "+str(self.ar.data.version), widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.window('dpCorrectionManagerWindow', title=f"{self.ar.data.lang['m068_correctionManager']} {self.ar.data.version}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         cmds.showWindow('dpCorrectionManagerWindow')
         # create UI layout and elements:
         cmds.columnLayout('correction_cl', adjustableColumn=True, columnOffset=('both', 10))
@@ -60,45 +60,45 @@ class CorrectionManagerUI:
             # name:
             cmds.columnLayout('correction_selected_cl', adjustableColumn=True, parent='correction_edit_selected_net_fl')
             cmds.rowLayout('correction_name_rl', numberOfColumns=2, columnWidth2=(220, 50), columnAlign=[(1, 'left'), (2, 'right')], adjustableColumn=1, columnAttach=[(1, 'right', 50), (2, 'right', 2)], height=30, parent='correction_selected_cl')
-            cmds.textFieldGrp('correction_name_tfg', label=self.ar.data.lang['m006_name'], text=cmds.getAttr(self.app.net+".name"), editable=True, columnWidth2=(40, 180), columnAttach=[(1, 'right', 2), (2, 'left', 2)], adjustableColumn2=2, changeCommand=self.app.change_name, parent='correction_name_rl')
+            cmds.textFieldGrp('correction_name_tfg', label=self.ar.data.lang['m006_name'], text=cmds.getAttr(f"{self.app.net}.name"), editable=True, columnWidth2=(40, 180), columnAttach=[(1, 'right', 2), (2, 'left', 2)], adjustableColumn2=2, changeCommand=self.app.change_name, parent='correction_name_rl')
             cmds.button('correction_delete_bt', label=self.ar.data.lang['m005_delete'], command=self.app.delete_setup, backgroundColor=(1.0, 0.7, 0.7), parent='correction_name_rl')
             # type:
             cmds.rowLayout('correction_type_rl', numberOfColumns=2, columnWidth2=(220, 50), columnAlign=[(1, 'left'), (2, 'right')], adjustableColumn=1, columnAttach=[(1, 'right', 50), (2, 'right', 2)], height=30, parent='correction_selected_cl')
-            cmds.textFieldGrp('correction_type_tfg', label=self.ar.data.lang['i138_type'], text=cmds.getAttr(self.app.net+".type"), editable=False, columnWidth2=(40, 100), columnAttach=[(1, 'right', 2), (2, 'left', 2)], adjustableColumn2=2, changeCommand=self.app.change_name, parent='correction_type_rl')
+            cmds.textFieldGrp('correction_type_tfg', label=self.ar.data.lang['i138_type'], text=cmds.getAttr(f"{self.app.net}.type"), editable=False, columnWidth2=(40, 100), columnAttach=[(1, 'right', 2), (2, 'left', 2)], adjustableColumn2=2, changeCommand=self.app.change_name, parent='correction_type_rl')
             # axis:
             cmds.rowLayout('correction_axis_rl', numberOfColumns=5, columnWidth5=(85, 80, 80, 50, 10), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right'), (4, 'left'), (5, 'left')], adjustableColumn=5, columnAttach=[(1, 'right', 2), (2, 'right', 2), (3, 'right', 2), (4, 'left', 2), (5, 'left', 10)], height=30, parent='correction_selected_cl')
-            if cmds.getAttr(self.app.net+".type") == self.app.distance_name:
-                cmds.checkBox('correction_decompose_cb', label=self.ar.data.lang['m185_decompose'], value=cmds.getAttr(self.app.net+".decompose"), changeCommand=self.app.change_decompose, parent='correction_axis_rl')
+            if cmds.getAttr(f"{self.app.net}.type") == self.app.distance_name:
+                cmds.checkBox('correction_decompose_cb', label=self.ar.data.lang['m185_decompose'], value=cmds.getAttr(f"{self.app.net}.decompose"), changeCommand=self.app.change_decompose, parent='correction_axis_rl')
             cmds.optionMenu('correction_axis_om', label=self.ar.data.lang['i052_axis'], changeCommand=self.app.change_axis, parent='correction_axis_rl')
             for axis in self.ar.data.axes:
                 cmds.menuItem(label=axis, parent='correction_axis_om')
-            cmds.optionMenu('correction_axis_om', edit=True, value=self.ar.data.axes[cmds.getAttr(self.app.net+".axis")])
-            if cmds.getAttr(self.app.net+".type") == self.app.angle_name:
+            cmds.optionMenu('correction_axis_om', edit=True, value=self.ar.data.axes[cmds.getAttr(f"{self.app.net}.axis")])
+            if cmds.getAttr(f"{self.app.net}.type") == self.app.angle_name:
                 # axis order:
-                cmds.text('correction_axis_order_txt', label=self.ar.data.lang['i052_axis']+" "+self.ar.data.lang['m045_order'], parent='correction_axis_rl')
+                cmds.text('correction_axis_order_txt', label=f"{self.ar.data.lang['i052_axis']} {self.ar.data.lang['m045_order']}", parent='correction_axis_rl')
                 cmds.optionMenu('correction_axis_order_om', label='', changeCommand=self.app.change_axis_order, parent='correction_axis_rl')
                 for axis_order in self.ar.data.axis_orders:
                     cmds.menuItem(label=axis_order, parent='correction_axis_order_om')
-                cmds.optionMenu('correction_axis_order_om', edit=True, value=self.ar.data.axis_orders[cmds.getAttr(self.app.net+".axisOrder")])
+                cmds.optionMenu('correction_axis_order_om', edit=True, value=self.ar.data.axis_orders[cmds.getAttr(f"{self.app.net}.axisOrder")])
             else: #Distance
                 cmds.columnLayout('correction_distance_cl', adjustableColumn=True, height=30, parent='correction_selected_cl')
                 cmds.textFieldButtonGrp('correction_distance_tfbg', label=self.ar.data.lang['m182_distance'], text=str(round(self.app.get_distance(), 4)), buttonLabel=self.ar.data.lang['m183_readValue'], buttonCommand=self.read_distance, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnWidth=[(1, 50), (2, 60), (3, 80)], parent='correction_distance_cl')
-                if not cmds.getAttr(self.app.net+".decompose"):
+                if not cmds.getAttr(f"{self.app.net}.decompose"):
                     cmds.optionMenu('correction_axis_om', edit=True, enable=False)
             # interpolation:
             cmds.columnLayout('correction_interpolation_cl', adjustableColumn=False, columnAlign='left', parent='correction_selected_cl')
             cmds.optionMenu('correction_interpolation_om', label=self.ar.data.lang['m210_interpolation'], changeCommand=self.app.change_interpolation, parent='correction_interpolation_cl')
             for interp in self.ar.data.interpolations:
                 cmds.menuItem(label=interp, parent='correction_interpolation_om')
-            cmds.optionMenu('correction_interpolation_om', edit=True, value=self.ar.data.interpolations[cmds.getAttr(self.app.net+".interpolation")])
+            cmds.optionMenu('correction_interpolation_om', edit=True, value=self.ar.data.interpolations[cmds.getAttr(f"{self.app.net}.interpolation")])
             # range:
             cmds.columnLayout('correction_range_cl', adjustableColumn=True, columnAlign='right', parent='correction_selected_cl')
             cmds.rowLayout('correction_range_rl', numberOfColumns=3, adjustableColumn=1, columnWidth=[(1, 10), (2, 58), (3, 80)], columnAttach=[(1, 'right', 0), (2, 'right', 20), (3, 'right', 30)], parent='correction_range_cl')
             cmds.text('correction_range_txt', label=self.ar.data.lang['m072_range'], align='right', parent='correction_range_rl')
             cmds.text('correction_start_txt', label=self.ar.data.lang['c110_start'], align='right', parent='correction_range_rl')
             cmds.text('correction_end_txt', label=self.ar.data.lang['m184_end'], align='right', parent='correction_range_rl')
-            cmds.floatFieldGrp('correction_input_ffg', label=self.ar.data.lang['m137_input'], numberOfFields=2, value1=cmds.getAttr(self.app.net+".inputStart"), value2=cmds.getAttr(self.app.net+".inputEnd"), columnWidth3=(40, 70, 70), columnAttach=[(1, 'right', 5), (2, 'left', 2), (3, 'left', 0)], adjustableColumn3=1, changeCommand=self.app.change_input_values, parent='correction_range_cl')
-            cmds.floatFieldGrp('correction_output_ffg', label=self.ar.data.lang['m138_output'], numberOfFields=2, value1=cmds.getAttr(self.app.net+".outputStart"), value2=cmds.getAttr(self.app.net+".outputEnd"), columnWidth3=(40, 70, 70), columnAttach=[(1, 'right', 5), (2, 'left', 2), (3, 'left', 0)], adjustableColumn3=1, changeCommand=self.app.change_output_values, parent='correction_range_cl')
+            cmds.floatFieldGrp('correction_input_ffg', label=self.ar.data.lang['m137_input'], numberOfFields=2, value1=cmds.getAttr(f"{self.app.net}.inputStart"), value2=cmds.getAttr(f"{self.app.net}.inputEnd"), columnWidth3=(40, 70, 70), columnAttach=[(1, 'right', 5), (2, 'left', 2), (3, 'left', 0)], adjustableColumn3=1, changeCommand=self.app.change_input_values, parent='correction_range_cl')
+            cmds.floatFieldGrp('correction_output_ffg', label=self.ar.data.lang['m138_output'], numberOfFields=2, value1=cmds.getAttr(f"{self.app.net}.outputStart"), value2=cmds.getAttr(f"{self.app.net}.outputEnd"), columnWidth3=(40, 70, 70), columnAttach=[(1, 'right', 5), (2, 'left', 2), (3, 'left', 0)], adjustableColumn3=1, changeCommand=self.app.change_output_values, parent='correction_range_cl')
 
     
     def update_edit_net_layout(self):
@@ -128,7 +128,7 @@ class CorrectionManagerUI:
                     self.clear_edit_net_layout()
                     current_nets = self.ar.naming.filter_name(filter_name, current_nets, ' ')
                 for item in current_nets:
-                    if 'dpNetwork' in cmds.listAttr(item) and cmds.getAttr(item+".dpNetwork") == 1 and 'dpCorrectionManager' in cmds.listAttr(item) and cmds.getAttr(item+".dpCorrectionManager") == 1:
+                    if 'dpNetwork' in cmds.listAttr(item) and cmds.getAttr(f"{item}.dpNetwork") == 1 and 'dpCorrectionManager' in cmds.listAttr(item) and cmds.getAttr(f"{item}.dpCorrectionManager") == 1:
                         #TODO validate correctionManager node integrity here
                         self.nets.append(item)
                 if self.nets:
@@ -147,5 +147,5 @@ class CorrectionManagerUI:
     def read_distance(self, *args):
         """ Update the UI text field with the current distance.
         """
-        if cmds.getAttr(self.app.net+".type") == self.app.distance_name:
+        if cmds.getAttr(f"{self.app.net}.type") == self.app.distance_name:
             cmds.textFieldButtonGrp('correction_distance_tfbg', edit=True, text=str(round(self.app.get_distance(), 4)))

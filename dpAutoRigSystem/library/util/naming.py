@@ -19,7 +19,7 @@ class Naming:
             numbers = []
             for node in nodes:
                 if attr in cmds.listAttr(node):
-                    numbers.append(int(cmds.getAttr(node+"."+attr)))
+                    numbers.append(int(cmds.getAttr(f"{node}.{attr}")))
             if not numbers:
                 return str(0).zfill(pad)
             else:
@@ -39,12 +39,12 @@ class Naming:
             nodes = cmds.ls(selection=False, transforms=True)
         if nodes:
             for node in nodes:
-                if cmds.objExists(node+"."+type_name) and cmds.getAttr(node+"."+type_name) == class_name:
+                if cmds.objExists(f"{node}.{type_name}") and cmds.getAttr(f"{node}.{type_name}") == class_name:
                     numbers.append(class_name)
         # try check if there is a masterGrp and get its counter:
         all_grp = self.ar.utils.get_all_grp()
         if all_grp:
-            guide_type_count = cmds.getAttr(all_grp+'.dp'+class_name+'Count') #v5
+            guide_type_count = cmds.getAttr(f"{all_grp}.dp{class_name}Count") #v5
         if guide_type_count > len(numbers):
             return guide_type_count
         else:
@@ -66,7 +66,7 @@ class Naming:
                 inputted_text = inputted_text.replace(' ', '_')
                 while re.search(r'\W', inputted_text): #special character
                     span = re.search(r'\W', inputted_text).span()[0]
-                    inputted_text = inputted_text[:span]+"_"+inputted_text[span+1:]
+                    inputted_text = f"{inputted_text[:span]}_{inputted_text[span+1:]}"
                 if not len(inputted_text) < prefixMax:
                     inputted_text = inputted_text[:prefixMax]
                 normal_text = inputted_text
@@ -92,10 +92,10 @@ class Naming:
             type:
                 18 = Other
         """
-        cmds.setAttr(joint_name+".side", side_number)
-        cmds.setAttr(joint_name+".type", type_number)
+        cmds.setAttr(f"{joint_name}.side", side_number)
+        cmds.setAttr(f"{joint_name}.type", type_number)
         if type_number == 18: #other
-            cmds.setAttr(joint_name+".otherType", label, type='string')
+            cmds.setAttr(f"{joint_name}.otherType", label, type='string')
 
 
     def extract_suffix(self, item):
@@ -137,7 +137,7 @@ class Naming:
         """
         if cmds.objExists(item):
             need_restore_suffix = False
-            if suffix and item.endswith("_"+suffix):
+            if suffix and item.endswith(f"_{suffix}"):
                 need_restore_suffix = True
                 item = item[:item.rfind('_')]
             # find numering:
@@ -146,13 +146,13 @@ class Naming:
                 while cmds.objExists(item+str(i)):
                     i += 1
             else:
-                while cmds.objExists(item+str(i)+"_"+suffix):
+                while cmds.objExists(f"{item}{i}_{suffix}"):
                     i += 1
             # add number:
             item = item+str(i)
             if need_restore_suffix:
                 # restore suffix
-                item = item+"_"+suffix
+                item = f"{item}_{suffix}"
         return item
 
 
@@ -162,15 +162,15 @@ class Naming:
         """
         name = name[0].upper()+name[1:].replace(' ', '_')
         base_name = name
-        name = name+"_00_"+suffix
+        name = f"{name}_00_{suffix}"
         if cmds.objExists(name):
             i = 1
             while cmds.objExists(name):
-                name = base_name+"_"+str(i).zfill(2)+"_"+suffix
+                name = f"{base_name}_{str(i).zfill(2)}_{suffix}"
                 i = i+1
-            base_name = base_name+"_"+str(i-1).zfill(2)
+            base_name = f"{base_name}_{str(i-1).zfill(2)}"
         else:
-            base_name = base_name+"_00"
+            base_name = f"{base_name}_00"
         return base_name, name
 
 
@@ -179,8 +179,8 @@ class Naming:
         """
         attr_name_lower = name
         if side:
-            attr_name_lower = side[0]+name
-        attr_name_lower = attr_name_lower[0].lower()+attr_name_lower[1:]
+            attr_name_lower = f"{side[0]}{name}"
+        attr_name_lower = f"{attr_name_lower[0].lower()}{attr_name_lower[1:]}"
         return attr_name_lower
 
 
@@ -196,12 +196,12 @@ class Naming:
             for item in items:
                 if not item.endswith(suffix):
                     if cmds.attributeQuery("input", node=item, exists=True):
-                        new_name = self.get_capitals_name(cmds.listConnections(item+".input", plugs=True, source=True, destination=False)[0])
+                        new_name = self.get_capitals_name(cmds.listConnections(f"{item}.input", plugs=True, source=True, destination=False)[0])
                     elif cmds.attributeQuery("input1", node=item, exists=True):
-                        new_name = self.get_capitals_name(cmds.listConnections(item+".input1", plugs=True, source=True, destination=False)[0])
+                        new_name = self.get_capitals_name(cmds.listConnections(f"{item}.input1", plugs=True, source=True, destination=False)[0])
                     new_name += '_'
-                    if cmds.listConnections(item+".output", plugs=True, source=False, destination=True):
-                        new_name += self.get_capitals_name(cmds.listConnections(item+".output", plugs=True, source=False, destination=True)[0])
+                    if cmds.listConnections(f"{item}.output", plugs=True, source=False, destination=True):
+                        new_name += self.get_capitals_name(cmds.listConnections(f"{item}.output", plugs=True, source=False, destination=True)[0])
                     new_name += suffix
                     cmds.rename(item, new_name)
 

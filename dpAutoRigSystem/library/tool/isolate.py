@@ -74,15 +74,15 @@ class Isolate(base.BaseLibrary):
         # get father zero out transform node
         zero_grp = cmds.listRelatives(nodes[2], allParents=True, type='transform')[0]
         # create parent constraint
-        pac = cmds.parentConstraint(nodes[0], nodes[1], zero_grp, maintainOffset=True, skipTranslate=['x', 'y', 'z'], name=zero_grp+"_PaC")[0]
-        cmds.setAttr(pac+".interpType", 0) #noFlip
+        pac = cmds.parentConstraint(nodes[0], nodes[1], zero_grp, maintainOffset=True, skipTranslate=['x', 'y', 'z'], name=f"{zero_grp}_PaC")[0]
+        cmds.setAttr(f"{pac}.interpType", 0) #noFlip
         # add isolate attribute to selected control
         cmds.addAttr(nodes[2], longName=attr_name, defaultValue=1.0, minValue=0, maxValue=1, keyable=True) 
         # create reverse node
-        rev = cmds.createNode('reverse', name=nodes[2]+"_"+attr_name.capitalize()+"_Rev")
+        rev = cmds.createNode('reverse', name=f"{nodes[2]}_{attr_name.capitalize()}_Rev")
         self.ar.custom_attr.add_attr(0, [pac, rev]) #dpID
         # do isolate connections
-        cmds.connectAttr(nodes[2]+"."+attr_name, pac+"."+nodes[0]+"W0", force=True)
-        cmds.connectAttr(nodes[2]+"."+attr_name, rev+".inputX", force=True)
-        cmds.connectAttr(rev+".outputX", pac+"."+nodes[1]+"W1", force=True)
+        cmds.connectAttr(f"{nodes[2]}.{attr_name}", f"{pac}.{nodes[0]}W0", force=True)
+        cmds.connectAttr(f"{nodes[2]}.{attr_name}", f"{rev}.inputX", force=True)
+        cmds.connectAttr(f"{rev}.outputX", f"{pac}.{nodes[1]}W1", force=True)
         cmds.select(nodes[2])

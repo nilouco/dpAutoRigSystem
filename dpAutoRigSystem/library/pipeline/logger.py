@@ -12,6 +12,10 @@ class Logger:
         self.ar = ar
         self.ar.data.verbose = verbose
         self.lang = ar.data.lang
+        #
+        # TODO: implement Python Logger
+        # TODO: only open windows if self.ar.data.ui_state
+        #
         
 
     def infoWin(self, title, description, text, align, width, height, buttonList=False, wiki=None, *args):
@@ -26,7 +30,7 @@ class Logger:
         self.info_align       = align
         # creating Info Window:
         self.ar.ui_manager.close_ui('dpInfoWindow')
-        cmds.window('dpInfoWindow', title='dpAutoRig - v'+self.ar.data.version+' - '+self.lang['i013_info']+' - '+self.lang[self.info_title], iconName='dpInfo', widthHeight=(self.info_winWidth, self.info_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
+        cmds.window('dpInfoWindow', title=f"dpAutoRig - v{self.ar.data.version} - {self.lang['i013_info']} - {self.lang[self.info_title]}", iconName='dpInfo', widthHeight=(self.info_winWidth, self.info_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
         # creating text layout:
         infoColumnLayout = cmds.columnLayout('infoColumnLayout', adjustableColumn=True, columnOffset=['both', 20], parent='dpInfoWindow')
         cmds.separator(style='none', height=10, parent=infoColumnLayout)
@@ -42,7 +46,7 @@ class Logger:
                     cmds.text(self.lang['i305_none'], align=self.info_align, parent=infoLayout) #noneText
         if wiki:
             cmds.separator(style='none', height=20, parent=infoLayout)
-            cmds.button(label='Wiki', command=partial(self.ar.web.visit_website, self.ar.data.wiki_url+wiki), backgroundColor=[1, 1, 1], align=self.info_align, parent=infoLayout)
+            cmds.button(label='Wiki', command=partial(self.ar.web.visit_website, f"{self.ar.data.wiki_url}{wiki}"), backgroundColor=[1, 1, 1], align=self.info_align, parent=infoLayout)
         # call Info Window:
         cmds.showWindow('dpInfoWindow')
 
@@ -51,8 +55,8 @@ class Logger:
         """ Just create a window with all information log and print the principal result.
         """
         # create the log_text:
-        log_text = self.lang['i014_logStart'] + '\n'
-        log_text += str( time.asctime( time.localtime(time.time()) ) ) + '\n\n'
+        log_text = f"{self.lang['i014_logStart']}\n"
+        log_text += f"{time.asctime(time.localtime(time.time()))}\n\n"
         # get the number of riggedModules:
         nRiggedModule = len(self.ar.maker.guides_to_rig)
         # pass for rigged module to add informations in log_text:
@@ -60,15 +64,15 @@ class Logger:
             success = 'i016_success'
             if nRiggedModule == 1:
                 success = 'i015_success'
-            log_text += str(nRiggedModule).zfill(3) + ' ' + self.lang[success] + ':\n\n'
-            print('\ndpAutoRigSystem Log: ' + str(nRiggedModule).zfill(3) + ' ' + self.lang[success] + ', thanks!\n')
+            log_text += f"{str(nRiggedModule).zfill(3)} {self.lang[success]}:\n\n"
+            print(f"\ndpAutoRigSystem Log: {str(nRiggedModule).zfill(3)} {self.lang[success]} , thanks!\n")
             for item in self.ar.maker.guides_to_rig:
                 log_text += item.guide_namespace
                 if item.custom_name:
-                    log_text += " as " + item.custom_name
+                    log_text += f" as {item.custom_name}"
                 log_text += '\n'
         else:
-            log_text += self.lang['i017_nothing'] + '\n'
-        log_text += '\n' + self.lang['i018_thanks']
+            log_text += f"{self.lang['i017_nothing']} \n"
+        log_text += f"\n{self.lang['i018_thanks']}"
         # creating a info window to show the log:
         self.infoWin('i019_log', None, log_text, 'center', 250, min((350, 150+(nRiggedModule*13))))

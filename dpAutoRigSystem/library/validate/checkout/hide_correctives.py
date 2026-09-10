@@ -41,7 +41,7 @@ class HideCorrectives(action.BaseAction):
                 if check_items:
                     self.ar.ui_manager.set_progress(max=1)
                     self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
-                    item = option_ctrl+".correctiveCtrls"
+                    item = f"{option_ctrl}.correctiveCtrls"
                     # conditional to check here
                     check_channel_box = cmds.getAttr(item, channelBox=True)
                     if check_channel_box:
@@ -54,10 +54,10 @@ class HideCorrectives(action.BaseAction):
                                 cmds.setAttr(item, 0)
                                 cmds.setAttr(item, lock=True, channelBox=False)
                                 self.good_results.append(True)
-                                self.messages.append(self.ar.data.lang['v004_fixed']+": "+item)
+                                self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {item}")
                             except:
                                 self.good_results.append(False)
-                                self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
+                                self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}")
                     else:
                         self.not_found_node()
             else:

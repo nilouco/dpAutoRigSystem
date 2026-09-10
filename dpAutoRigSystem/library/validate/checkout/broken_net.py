@@ -42,15 +42,15 @@ class BrokenNet(action.BaseAction):
                     self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                     # conditional to check here
                     if 'originalLoc' in cmds.listAttr(item) and 'actionLoc' in cmds.listAttr(item): #correctionManater
-                        if not cmds.listConnections(item+".originalLoc", source=True, destination=False) or not cmds.listConnections(item+".actionLoc", source=True, destination=False):
+                        if not cmds.listConnections(f"{item}.originalLoc", source=True, destination=False) or not cmds.listConnections(f"{item}.actionLoc", source=True, destination=False):
                             self.cleanup_network(item)
                     elif 'worldRef' in cmds.listAttr(item): #ikFkSnap
-                        if not cmds.listConnections(item+".worldRef", source=True, destination=False):
+                        if not cmds.listConnections(f"{item}.worldRef", source=True, destination=False):
                             self.cleanup_network(item)
                     elif 'follicle' in cmds.listAttr(item): #rivet
-                        if not cmds.listConnections(item+".follicle", source=True, destination=False):
+                        if not cmds.listConnections(f"{item}.follicle", source=True, destination=False):
                             self.cleanup_network(item)
-                    elif 'linkedNode' in cmds.listAttr(item) and not cmds.listConnections(item+".linkedNode", source=True, destination=False): #guide
+                    elif 'linkedNode' in cmds.listAttr(item) and not cmds.listConnections(f"{item}.linkedNode", source=True, destination=False): #guide
                         self.cleanup_network(item)
             else:
                 self.not_found_node()
@@ -77,7 +77,7 @@ class BrokenNet(action.BaseAction):
                 cmds.delete(item)
                 cmds.select(clear=True)
                 self.good_results.append(True)
-                self.messages.append(self.ar.data.lang['v004_fixed']+": "+item)
+                self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {item}")
             except:
                 self.good_results.append(False)
-                self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
+                self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}")

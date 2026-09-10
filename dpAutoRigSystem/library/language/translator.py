@@ -10,7 +10,7 @@ class Translator:
         """
         # declaring variables
         self.ar = ar
-        self.translator_title = "dpAutoRigSystem - "+self.ar.data.lang['t000_translator']
+        self.translator_title = f"dpAutoRigSystem - {self.ar.data.lang['t000_translator']}"
         self.source_langs = list(self.ar.data.lang)
         self.key_len = len(self.source_langs) - 1
         self.lang_index_start = 7 #after userInfo
@@ -50,22 +50,22 @@ class Translator:
                 
                 if sourceText.startswith('\n'):
                     if not current_text.startswith('\n'):
-                        current_text = "\n"+current_text
+                        current_text = f"\n{current_text}"
                 elif sourceText[0].isupper():
-                    current_text = current_text[0].upper()+current_text[1:]
+                    current_text = f"{current_text[0].upper()}{current_text[1:]}"
                 elif sourceText[0].islower():
-                    current_text = current_text[0].lower()+current_text[1:]
+                    current_text = f"{current_text[0].lower()}{current_text[1:]}"
                 if sourceText.endswith('\n'):
                     if not current_text.endswith('\n'):
-                        current_text = current_text+"\n"
+                        current_text = f"{current_text}\n"
                 else:
                     if current_text.endswith('\n'):
                         current_text = current_text[:-1]
                     elif sourceText.endswith('.'):
                         if not current_text.endswith('.'):
-                            current_text = current_text+"."
+                            current_text = f"{current_text}."
                     elif sourceText.endswith(':') and not current_text.endswith(':'):
-                        current_text = current_text+":"
+                        current_text = f"{current_text}:"
                 
                 if self.source_langs[self.lang_index].startswith('c'): #control
                     if not self.check_no_special_char.search(current_text): #no special char
@@ -129,7 +129,7 @@ class Translator:
         # closes translator UI:
         self.clear_translator_ui(2)
         # show preset creation result window:
-        self.ar.logger.infoWin('i149_createLanguage', 'i150_languageCreated', '\n'+result_data['_preset']+'\n\n'+self.ar.data.lang['i134_rememberPublish']+'\n\n'+self.author_name+' '+self.ar.data.lang['t008_finishMessage'].lower(), 'center', 205, 270)
+        self.ar.logger.infoWin('i149_createLanguage', 'i150_languageCreated', f"\n{result_data['_preset']}\n\n{self.ar.data.lang['i134_rememberPublish']}\n\n{self.author_name} {self.ar.data.lang['t008_finishMessage'].lower()}", 'center', 205, 270)
         # close and reload dpAR UI in order to avoid Maya crash:
         self.ar.ui_manager.reload_ui()
     
@@ -153,8 +153,8 @@ class Translator:
     def clear_translator_ui(self, win, *args):
         """ Check if the window exists then delete it if true.
         """
-        if cmds.window('dpARTranslatorWin'+str(win), query=True, exists=True):
-            cmds.deleteUI('dpARTranslatorWin'+str(win), window=True)
+        if cmds.window(f"dpARTranslatorWin{win}", query=True, exists=True):
+            cmds.deleteUI(f"dpARTranslatorWin{win}", window=True)
     
     
     def collect_user_info(self, *args):
@@ -174,8 +174,8 @@ class Translator:
         if self.author_name and self.new_lang_name:
             contact_name = ''
             if email_name and website_name:
-                contact_name = email_name+"\n"+website_name
-            self.new_lang_name = self.new_lang_name[0].upper()+self.new_lang_name[1:]
+                contact_name = f"{email_name}\n{website_name}"
+            self.new_lang_name = f"{self.new_lang_name[0].upper()}{self.new_lang_name[1:]}"
             date = str(datetime.datetime.now().date())
             
             # verify if we have an existing language with the same name:
@@ -195,7 +195,7 @@ class Translator:
                 self.new_langs.append(contact_name)
                 self.new_langs.append(date)
                 self.new_langs.append(self.new_lang_name)
-                self.new_langs.append("dpTranslator v"+str(self.ar.data.version))
+                self.new_langs.append(f"dpTranslator v{self.ar.data.version}")
                 self.new_langs.append(date)
                 # fill new_langs it "" (nothing) in order to generate all list array and just update its values:
                 for i in range(self.lang_index, self.key_len+1):
@@ -279,21 +279,21 @@ class Translator:
         cmds.columnLayout('translator_lang_cl', adjustableColumn=True, columnOffset=('both', 10), rowSpacing=10, parent='translator_lang_win')
         cmds.separator(style='none', parent='translator_lang_cl')
         cmds.rowColumnLayout('lang_name_rcl', numberOfColumns=2, columnWidth=[(1, 70), (2, 200)], columnAlign=[(1, 'right'), (2, 'left')], columnAttach=[(1, 'right', 5), (2, 'left', 0)], parent='translator_lang_cl')
-        cmds.text('langNameTxt', label=self.ar.data.lang['i151_language']+":", parent='lang_name_rcl')
+        cmds.text('langNameTxt', label=f"{self.ar.data.lang['i151_language']}:", parent='lang_name_rcl')
         cmds.text('newLangNameTxt', label=self.new_lang_name, parent='lang_name_rcl')
         # counter:
         cmds.rowColumnLayout('counter_rcl', numberOfColumns=4, columnWidth=[(1, 70), (2, 30), (3, 10), (4, 30)], columnAlign=[(1, 'right'), (2, 'right'), (3, 'center'), (4, 'left')], columnAttach=[(1, 'right', 5), (2, 'left', 0), (3, 'left', 5), (4, 'left', 5)], parent='translator_lang_cl')
-        cmds.text('sentenceTxt', label=self.ar.data.lang['i136_sentence']+":", parent='counter_rcl')
+        cmds.text('sentenceTxt', label=f"{self.ar.data.lang['i136_sentence']}:", parent='counter_rcl')
         cmds.text('current_index_txt', label='0', parent='counter_rcl')
         cmds.text('counterHifenTxt', label='/', parent='counter_rcl')
         cmds.text('keyLenTxt', label=self.key_len, parent='counter_rcl')
         # lang Key Type:
         cmds.rowColumnLayout('lang_key_type_rcl', numberOfColumns=2, columnWidth=[(1, 70), (2, 200)], columnAlign=[(1, 'right'), (2, 'left')], columnAttach=[(1, 'right', 5), (2, 'left', 0)], parent='translator_lang_cl')
-        cmds.text('langKeyTypeTxt', label=self.ar.data.lang['i138_type']+":", parent='lang_key_type_rcl')
+        cmds.text('langKeyTypeTxt', label=f"{self.ar.data.lang['i138_type']}:", parent='lang_key_type_rcl')
         cmds.text('key_type_txt', label='0', parent='lang_key_type_rcl')
         # lang Key ID:
         cmds.rowColumnLayout('lang_key_rcl', numberOfColumns=2, columnWidth=[(1, 70), (2, 200)], columnAlign=[(1, 'right'), (2, 'left')], columnAttach=[(1, 'right', 5), (2, 'left', 0)], parent='translator_lang_cl')
-        cmds.text('langKeyIDTxt', label=self.ar.data.lang['i137_id']+":", parent='lang_key_rcl')
+        cmds.text('langKeyIDTxt', label=f"{self.ar.data.lang['i137_id']}:", parent='lang_key_rcl')
         cmds.text('key_id_txt', label='0', parent='lang_key_rcl')
         # translator text scrollFields:
         cmds.paneLayout('texts_pl', configuration='horizontal2', parent='translator_lang_cl')

@@ -96,10 +96,10 @@ class PassthroughAttributes(action.BaseAction):
                                         break
                                 if optimized_items:
                                     self.good_results.append(True)
-                                    self.messages.append(self.ar.data.lang['v004_fixed']+": "+f"\n{self.ar.data.lang['v004_fixed']}: ".join(optimized_items))
+                                    self.messages.append(f"{self.ar.data.lang['v004_fixed']}:\n{self.ar.data.lang['v004_fixed']}: ".join(optimized_items))
                             except:
                                 self.good_results.append(False)
-                                self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
+                                self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}")
             else:
                 self.not_found_node()
         else:

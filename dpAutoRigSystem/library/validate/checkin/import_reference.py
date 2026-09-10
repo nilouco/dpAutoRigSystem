@@ -70,12 +70,12 @@ class ImportReference(action.BaseAction):
                         try:
                             cmds.file(ref, importReference=True)
                             self.good_results.append(True)
-                            self.messages.append(self.ar.data.lang['v004_fixed']+": "+ref)
+                            self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {ref}")
                             self.import_reference()
                             break
                         except:
                             self.good_results.append(False)
-                            self.messages.append(self.ar.data.lang['v005_cantFix']+": "+ref)
+                            self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {ref}")
                     else:
                         self.good_results.append(False)
-                        self.messages.append(self.ar.data.lang['v005_cantFix']+": "+ref)
+                        self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {ref}")

@@ -46,20 +46,20 @@ class Chain(standard.BaseStandard):
         """ Creates the controller locators of the standard module guide.
         """
         # locators
-        self.guide_loc = self.ar.ctrls.create_joint_locator(ctrl_name=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
-        self.guide_end_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
+        self.guide_loc = self.ar.ctrls.create_joint_locator(ctrl_name=f"{self.name_guide}_JointLoc1", r=0.3, d=1, guide=True)
+        self.guide_end_loc = self.ar.ctrls.create_curve_locator(ctrl_name=f"{self.name_guide}_JointEnd", r=0.1, d=1, guide=True)
         # joints
-        self.line = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
-        self.line_end = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
+        self.line = cmds.joint(name=f"{self.name_guide}_JGuide1", radius=0.001)
+        self.line_end = cmds.joint(name=f"{self.name_guide}_JGuideEnd", radius=0.001)
         # setup
         self.ar.utils.set_template([self.line, self.line_end])
-        cmds.setAttr(self.guide_end_loc+".translateZ", 1.3)
+        cmds.setAttr(f"{self.guide_end_loc}.translateZ", 1.3)
         # parenting
         cmds.parent(self.line, self.guide_base, relative=True)
         cmds.parent(self.guide_end_loc, self.guide_loc)
         cmds.parent(self.guide_loc, self.guide_base)
-        cmds.parentConstraint(self.guide_loc, self.line, maintainOffset=False, name=self.line+"_PaC")
-        cmds.parentConstraint(self.guide_end_loc, self.line_end, maintainOffset=False, name=self.line_end+"_PaC")
+        cmds.parentConstraint(self.guide_loc, self.line, maintainOffset=False, name=f"{self.line}_PaC")
+        cmds.parentConstraint(self.guide_end_loc, self.line_end, maintainOffset=False, name=f"{self.line_end}_PaC")
         # edit
         cmds.transformLimits(self.guide_end_loc, tz=(0.01, 1), etz=(True, False))
         self.ar.ctrls.set_lock_hide([self.guide_end_loc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
@@ -71,21 +71,21 @@ class Chain(standard.BaseStandard):
         joint_number = self.parse_inputted_joint_number(inputted)
         if joint_number and joint_number >= 5: #min for chain
             self.ar.opt.check_use_default_render_layer()
-            self.current_joint_number = cmds.getAttr(self.guide_base+".nJoints")
+            self.current_joint_number = cmds.getAttr(f"{self.guide_base}.nJoints")
             if joint_number != self.current_joint_number:
-                self.guide_end_loc = self.name_guide+"_JointEnd"
-                self.line_end = self.name_guide+"_JGuideEnd"
+                self.guide_end_loc = f"{self.name_guide}_JointEnd"
+                self.line_end = f"{self.name_guide}_JGuideEnd"
                 cmds.parent(self.guide_end_loc, self.line_end, world=True)
                 if joint_number > self.current_joint_number:
                     for n in range(self.current_joint_number+1, joint_number+1):
-                        self.guide_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_JointLoc"+str(n), r=0.3, d=1, guide=True)
+                        self.guide_loc = self.ar.ctrls.create_curve_locator(ctrl_name=f"{self.name_guide}_JointLoc{n}", r=0.3, d=1, guide=True)
                         self.increment_joint_number(n)
-                        self.add_node_to_guide_net([self.guide_loc], ["JointLoc"+str(n)])
+                        self.add_node_to_guide_net([self.guide_loc], [f"JointLoc{n}"])
                 elif joint_number < self.current_joint_number:
-                    self.line = self.name_guide+"_JGuide"+str(joint_number)
+                    self.line = f"{self.name_guide}_JGuide{joint_number}"
                     self.guide_loc = self.reduce_joint_number(joint_number)
                 self.re_parent_guide_end()
-                cmds.setAttr(self.guide_base+".nJoints", joint_number)
+                cmds.setAttr(f"{self.guide_base}.nJoints", joint_number)
                 self.current_joint_number = joint_number
                 self.change_main_ctrls_number(0)
                 self.create_mirror_preview()
@@ -103,14 +103,14 @@ class Chain(standard.BaseStandard):
         up_loc = cmds.spaceLocator(name=f"{side}{self.number_name}_{ik_numb:02d}_Up_Loc")[0]
         cmds.matchTransform(up_loc, to_up_parent, position=True, rotation=True)
         cmds.parent(up_loc, to_up_parent, relative=False)
-        cmds.setAttr(up_loc+".translateY", 2*self.radius)
-        cmds.setAttr(up_loc+".visibility", 0)    
+        cmds.setAttr(f"{up_loc}.translateY", 2*self.radius)
+        cmds.setAttr(f"{up_loc}.visibility", 0)    
         if has_fake:
             # fake aim locator:
             fake_loc = cmds.spaceLocator(name=f"{side}{self.number_name}_{ik_numb:02d}_Fake_Loc")[0]
             cmds.matchTransform(fake_loc, ik_fake_ctrl, position=True, rotation=True)
             cmds.parent(fake_loc, to_fake_parent, relative=False)
-            cmds.setAttr(fake_loc+".visibility", 0)
+            cmds.setAttr(f"{fake_loc}.visibility", 0)
         return [up_loc, fake_loc]
     
 
@@ -118,12 +118,12 @@ class Chain(standard.BaseStandard):
         """ Creates an aim constraint to extrem ik controls use auto_orient attributes.
         """
         # look at aim constraint:
-        aic = cmds.aimConstraint(ik_to_aim_ctrl, fake_loc, ik_ctrl_zero, worldUpType='object', worldUpObject=up_loc, aimVector=(0, 0, z_dir), upVector=(0, 1, 0), maintainOffset=True, name=ik_ctrl_zero+"_AiC")[0]
+        aic = cmds.aimConstraint(ik_to_aim_ctrl, fake_loc, ik_ctrl_zero, worldUpType='object', worldUpObject=up_loc, aimVector=(0, 0, z_dir), upVector=(0, 1, 0), maintainOffset=True, name=f"{ik_ctrl_zero}_AiC")[0]
         if auto_orient:
-            cmds.connectAttr(ik_ctrl+"."+self.ar.data.lang['c033_autoOrient'], aic+"."+ik_to_aim_ctrl+"W0", force=True)
-            rev = cmds.createNode('reverse', name=ik_ctrl_zero+"_Aim_Rev")
-            cmds.connectAttr(ik_ctrl+"."+self.ar.data.lang['c033_autoOrient'], rev+".inputX", force=True)
-            cmds.connectAttr(rev+".outputX", aic+"."+fake_loc+"W1", force=True)
+            cmds.connectAttr(f"{ik_ctrl}.{self.ar.data.lang['c033_autoOrient']}", f"{aic}.{ik_to_aim_ctrl}W0", force=True)
+            rev = cmds.createNode('reverse', name=f"{ik_ctrl_zero}_Aim_Rev")
+            cmds.connectAttr(f"{ik_ctrl}.{self.ar.data.lang['c033_autoOrient']}", f"{rev}.inputX", force=True)
+            cmds.connectAttr(f"{rev}.outputX", f"{aic}.{fake_loc}W1", force=True)
             self.to_ids.append(rev)
 
 
@@ -135,7 +135,7 @@ class Chain(standard.BaseStandard):
         for item in reversed(joints):
             if cmds.objectType(item) == 'joint':
                 if self.ar.data.joint_end_attr in cmds.listAttr(item):
-                    result.append(cmds.rename(item, item[item.rfind('|')+1:].replace("_"+self.ar.data.joint_end_attr, to_name+"_"+self.ar.data.joint_end_attr)))
+                    result.append(cmds.rename(item, item[item.rfind('|')+1:].replace(f"_{self.ar.data.joint_end_attr}", f"{to_name}_{self.ar.data.joint_end_attr}")))
                     continue
                 elif '_Jax' in item:
                     if clear:
@@ -152,53 +152,53 @@ class Chain(standard.BaseStandard):
     def create_dynamic_chain(self, dyn_name, world_ref, rebuild_curve_spans=20):
         """ This is like a patch to add a dynamic setup to the Chain.
         """
-        dyn_name_lower = dyn_name[0].lower()+dyn_name[1:]
+        dyn_name_lower = f"{dyn_name[0].lower()}{dyn_name[1:]}"
         if dyn_name_lower[1] == '_':
-            dyn_name_lower = dyn_name[0].lower()+dyn_name[2:]
+            dyn_name_lower = f"{dyn_name[0].lower()}{dyn_name[2:]}"
         # curve
-        main_crv = cmds.duplicate(self.ik_spline_items[2], name=dyn_name+"_Main_Crv")[0]
-        cmds.delete(main_crv+"ShapeOrig")
+        main_crv = cmds.duplicate(self.ik_spline_items[2], name=f"{dyn_name}_Main_Crv")[0]
+        cmds.delete(f"{main_crv}ShapeOrig")
         cmds.rebuildCurve(main_crv, constructionHistory=False, replaceOriginal=True, rebuildType=False, endKnots=True, keepRange=False, keepControlPoints=False, keepEndPoints=True, keepTangents=False, spans=rebuild_curve_spans, degree=3, tolerance=0.01)
-        cmds.skinCluster(self.skin_joints, main_crv, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=dyn_name+"_Main_Crv_SC")
+        cmds.skinCluster(self.skin_joints, main_crv, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=f"{dyn_name}_Main_Crv_SC")
 
         # dynamic joints
-        first_dyn_jnt = dyn_name+"_00_Dyn_Jnt"
-        dyn_joints = cmds.duplicate(dyn_name+"_00_Fk_Jxt", name=first_dyn_jnt, fullPath=True)
-        new_skin_joints = cmds.duplicate(dyn_name+"_00_Jnt", name=dyn_name+"_00_Jnt_First", fullPath=True)
+        first_dyn_jnt = f"{dyn_name}_00_Dyn_Jnt"
+        dyn_joints = cmds.duplicate(f"{dyn_name}_00_Fk_Jxt", name=first_dyn_jnt, fullPath=True)
+        new_skin_joints = cmds.duplicate(f"{dyn_name}_00_Jnt", name=f"{dyn_name}_00_Jnt_First", fullPath=True)
         skin_joints = cmds.ls(self.skin_joints[0], long=True)
         skin_joints.extend(sorted(cmds.listRelatives(self.skin_joints[0], children=True, allDescendents=True, fullPath=True, type='joint')))
         dyn_joints = self.clear_rename_joint_chain(dyn_joints, '_Fk', '_Dyn')
         dyn_joints.insert(0, first_dyn_jnt)
         self.skin_joints = self.clear_rename_joint_chain(skin_joints, '_Jn', '_IkFk_Jx', False)
         self.ar.utils.add_joint_end_attr([self.skin_joints[-1]])
-        cmds.rename(self.skin_joints[-1], dyn_name+"_IkFk_"+self.ar.data.joint_end_attr)
+        cmds.rename(self.skin_joints[-1], f"{dyn_name}_IkFk_{self.ar.data.joint_end_attr}")
         self.ar.utils.remove_user_defined_attr(self.skin_joints[:-1])
         new_skin_joints = self.clear_rename_joint_chain(new_skin_joints, "", "")
-        cmds.rename(dyn_name+"_00_Jnt_First", dyn_name+"_00_Jnt")
-        new_skin_joints = [dyn_name+"_00_Jnt"]
-        new_skin_joints.extend(sorted(cmds.listRelatives(dyn_name+"_00_Jnt", children=True, allDescendents=True)))
+        cmds.rename(f"{dyn_name}_00_Jnt_First", f"{dyn_name}_00_Jnt")
+        new_skin_joints = [f"{dyn_name}_00_Jnt"]
+        new_skin_joints.extend(sorted(cmds.listRelatives(f"{dyn_name}_00_Jnt", children=True, allDescendents=True)))
         self.ar.utils.clear_joint_label(self.skin_joints)
-        cmds.setAttr(self.skin_joints[0]+".visibility", 0)
+        cmds.setAttr(f"{self.skin_joints[0]}.visibility", 0)
         
         # setup new blend joints
         self.ar.utils.create_joint_blend(self.skin_joints[:-1], dyn_joints[:-1], new_skin_joints[:-1], 'Dyn_ikFkBlend', dyn_name_lower, world_ref, False)
-        dyn_stretch_bc = cmds.createNode('blendColors', name=dyn_name+"_DynStretch_BC")
+        dyn_stretch_bc = cmds.createNode('blendColors', name=f"{dyn_name}_DynStretch_BC")
         self.to_ids.append(dyn_stretch_bc)
-        cmds.connectAttr(dyn_joints[0]+".scaleX", dyn_stretch_bc+".color1R", force=True)
-        cmds.connectAttr(dyn_joints[0]+".scaleY", dyn_stretch_bc+".color1G", force=True)
-        cmds.connectAttr(dyn_joints[0]+".scaleZ", dyn_stretch_bc+".color1B", force=True)
-        cmds.connectAttr(self.skin_joints[0]+".scaleX", dyn_stretch_bc+".color2R", force=True)
-        cmds.connectAttr(self.skin_joints[0]+".scaleY", dyn_stretch_bc+".color2G", force=True)
-        cmds.connectAttr(self.skin_joints[0]+".scaleZ", dyn_stretch_bc+".color2B", force=True)
-        cmds.connectAttr(world_ref+"."+dyn_name_lower+"Dyn_ikFkBlend", dyn_stretch_bc+".blender", force=True)
+        cmds.connectAttr(f"{dyn_joints[0]}.scaleX", f"{dyn_stretch_bc}.color1R", force=True)
+        cmds.connectAttr(f"{dyn_joints[0]}.scaleY", f"{dyn_stretch_bc}.color1G", force=True)
+        cmds.connectAttr(f"{dyn_joints[0]}.scaleZ", f"{dyn_stretch_bc}.color1B", force=True)
+        cmds.connectAttr(f"{self.skin_joints[0]}.scaleX", f"{dyn_stretch_bc}.color2R", force=True)
+        cmds.connectAttr(f"{self.skin_joints[0]}.scaleY", f"{dyn_stretch_bc}.color2G", force=True)
+        cmds.connectAttr(f"{self.skin_joints[0]}.scaleZ", f"{dyn_stretch_bc}.color2B", force=True)
+        cmds.connectAttr(f"{world_ref}.{dyn_name_lower}Dyn_ikFkBlend", f"{dyn_stretch_bc}.blender", force=True)
         for j, jnt in enumerate(new_skin_joints[:-1]):
-            cmds.connectAttr(dyn_stretch_bc+".outputR", new_skin_joints[j]+".scaleX", force=True)
-            cmds.connectAttr(dyn_stretch_bc+".outputG", new_skin_joints[j]+".scaleY", force=True)
-            cmds.connectAttr(dyn_stretch_bc+".outputB", new_skin_joints[j]+".scaleZ", force=True)
+            cmds.connectAttr(f"{dyn_stretch_bc}.outputR", f"{new_skin_joints[j]}.scaleX", force=True)
+            cmds.connectAttr(f"{dyn_stretch_bc}.outputG", f"{new_skin_joints[j]}.scaleY", force=True)
+            cmds.connectAttr(f"{dyn_stretch_bc}.outputB", f"{new_skin_joints[j]}.scaleZ", force=True)
 
         # hairSystem
         mel.eval('DynCreateHairMenu MayaWindow|mainHairMenu; HairAssignHairSystemMenu MayaWindow|mainHairMenu|hairAssignHairSystemItem;')
-        cmds.select(main_crv+"Shape")
+        cmds.select(f"{main_crv}Shape")
         dp_hair_system_node = None
         transforms = cmds.ls(selection=False, type='transform')
         if transforms:
@@ -226,14 +226,14 @@ class Chain(standard.BaseStandard):
             if cmds.objExists('hairSystem1Follicles'):
                 cmds.delete('hairSystem1Follicles')
         else:
-            mel.eval('assignHairSystem '+dp_hair_system_node+';')
+            mel.eval(f"assignHairSystem {dp_hair_system_node};")
             if cmds.objExists('dpHairSystemFollicles'):
                 cmds.delete('dpHairSystemFollicles')
-        cmds.rename(cmds.listRelatives(cmds.listRelatives(self.ik_static_grp, children=True, allDescendents=True, type='follicle')[0], parent=True)[0], dyn_name+"_Dyn_Fol")
-        dyn_crv = cmds.rename('dpHairSystemOutputCurves|curve1', dyn_name+"_Dyn_Crv")
+        cmds.rename(cmds.listRelatives(cmds.listRelatives(self.ik_static_grp, children=True, allDescendents=True, type='follicle')[0], parent=True)[0], f"{dyn_name}_Dyn_Fol")
+        dyn_crv = cmds.rename('dpHairSystemOutputCurves|curve1', f"{dyn_name}_Dyn_Crv")
         # ikHandle
-        ik_spline_items = cmds.ikHandle(startJoint=first_dyn_jnt, endEffector=dyn_joints[-2], name=dyn_name+"_Dyn_IkH", solver='ikSplineSolver', parentCurve=False, curve=dyn_crv, createCurve=False) #[Handle, Effector]
-        ik_spline_items[1] = cmds.rename(ik_spline_items[1], dyn_name+"_Dyn_Eff")
+        ik_spline_items = cmds.ikHandle(startJoint=first_dyn_jnt, endEffector=dyn_joints[-2], name=f"{dyn_name}_Dyn_IkH", solver='ikSplineSolver', parentCurve=False, curve=dyn_crv, createCurve=False) #[Handle, Effector]
+        ik_spline_items[1] = cmds.rename(ik_spline_items[1], f"{dyn_name}_Dyn_Eff")
         cmds.parent(ik_spline_items[0], self.ik_static_grp)
         cmds.select(clear=True)
 
@@ -245,24 +245,24 @@ class Chain(standard.BaseStandard):
             # run for all sides
             for s, side in enumerate(self.sides):
                 attr_name_lower = self.ar.naming.get_attr_name_lower(side, self.number_name)
-                self.base = side+self.number_name+'_Guide_Base'
-                self.guide_end_loc = side+self.number_name+"_Guide_JointEnd"
-                self.guide_radius = side+self.number_name+"_Guide_Base_RadiusCtrl"
+                self.base = f"{side}{self.number_name}_Guide_Base"
+                self.guide_end_loc = f"{side}{self.number_name}_Guide_JointEnd"
+                self.guide_radius = f"{side}{self.number_name}_Guide_Base_RadiusCtrl"
                 self.skin_joints, ik_joints, fk_joints = [], [], []
                 # get the number of joints to be created:
-                self.n_joints = cmds.getAttr(self.base+".nJoints")
-                head_def_value = cmds.getAttr(self.base+".deformedBy")
+                self.n_joints = cmds.getAttr(f"{self.base}.nJoints")
+                head_def_value = cmds.getAttr(f"{self.base}.deformedBy")
                 
                 # creating joint chains:
                 chain_data = {}
                 suffixes = ['_Jnt', '_Ik_Jxt', '_Fk_Jxt']
-                end_suffixes = ['_'+self.ar.data.joint_end_attr, '_Ik_'+self.ar.data.joint_end_attr, '_Fk_'+self.ar.data.joint_end_attr]
+                end_suffixes = [f"_{self.ar.data.joint_end_attr}", f"_Ik_{self.ar.data.joint_end_attr}", f"_Fk_{self.ar.data.joint_end_attr}"]
                 for t, suffix in enumerate(suffixes):
                     wips = []
                     cmds.select(clear=True)
                     for n in range(self.n_joints):
                         wips.append(cmds.joint(name=f"{side}{self.number_name}_{n:02d}{suffix}"))
-                    joint_end = cmds.joint(name=side+self.number_name+end_suffixes[t], radius=0.5)
+                    joint_end = cmds.joint(name=f"{side}{self.number_name}{end_suffixes[t]}", radius=0.5)
                     self.ar.utils.add_joint_end_attr([joint_end])
                     wips.append(joint_end)
                     chain_data[suffix] = wips
@@ -272,8 +272,8 @@ class Chain(standard.BaseStandard):
                 fk_joints = chain_data[suffixes[2]]
                 
                 # hide not skin joints in order to be more Rigger friendly when working the Skinning:
-                cmds.setAttr(ik_joints[0]+".visibility", 0)
-                cmds.setAttr(fk_joints[0]+".visibility", 0)
+                cmds.setAttr(f"{ik_joints[0]}.visibility", 0)
+                cmds.setAttr(f"{fk_joints[0]}.visibility", 0)
 
                 for b, skin_joint in enumerate(self.skin_joints):
                     if b < len(self.skin_joints) - 1:
@@ -284,10 +284,10 @@ class Chain(standard.BaseStandard):
                 for n in range(self.n_joints):
                     cmds.select(clear=True)
                     # declare guide:
-                    self.guide = side+self.number_name+"_Guide_JointLoc"+str(n+1)
+                    self.guide = f"{side}{self.number_name}_Guide_JointLoc{n+1}"
                     
                     # create a Fk control:
-                    fk_ctrl = self.ar.ctrls.create_controller('id_082_ChainFk', f"{side}{self.number_name}_{n:02d}_Fk_Ctrl", r=self.radius, d=self.curve_degree, head_def=head_def_value, guide_source=self.name_guide+"_JointLoc"+str(n+1), parent_tag=self.get_parent_to_tag(fk_ctrls))
+                    fk_ctrl = self.ar.ctrls.create_controller('id_082_ChainFk', f"{side}{self.number_name}_{n:02d}_Fk_Ctrl", r=self.radius, d=self.curve_degree, head_def=head_def_value, guide_source=f"{self.name_guide}_JointLoc{n+1}", parent_tag=self.get_parent_to_tag(fk_ctrls))
                     fk_ctrls.append(fk_ctrl)
                     # position and orientation of joint and control:
                     cmds.matchTransform(fk_joints[n], self.guide, position=True, rotation=True)
@@ -296,18 +296,18 @@ class Chain(standard.BaseStandard):
                     
                     fk_zeros.append(self.ar.utils.create_zero_out([fk_ctrl])[0]) #zeroOutCtrlGrp
                     # hide visibility attribute:
-                    cmds.setAttr(fk_ctrl+'.visibility', keyable=False)
+                    cmds.setAttr(f"{fk_ctrl}.visibility", keyable=False)
 
                     # creating the originedFrom attributes (in order to permit composed parents in the future):
                     orig_grp = cmds.group(empty=True, name=f"{side}{self.number_name}_{n:02d}_OrigFrom_Grp")
                     orig_from_items.append(orig_grp)
                     if n == 0:
-                        self.ar.utils.set_origined_from_attr(orig_grp, self.guide[self.guide.find('__') + 1:].replace(':', '_')+";"+self.guide_end_loc+";"+self.guide_radius)
+                        self.ar.utils.set_origined_from_attr(orig_grp, f"{self.guide[self.guide.find('__') + 1:].replace(':', '_')};{self.guide_end_loc};{self.guide_radius}")
                     elif n == (self.n_joints-1):
-                        self.ar.utils.set_origined_from_attr(orig_grp, self.guide[self.guide.find('__') + 1:].replace(':', '_')+";"+self.base)
+                        self.ar.utils.set_origined_from_attr(orig_grp, f"{self.guide[self.guide.find('__') + 1:].replace(':', '_')};{self.base}")
                     else:
                         self.ar.utils.set_origined_from_attr(orig_grp, self.guide[self.guide.find('__') + 1:].replace(':', '_'))
-                    self.to_ids.extend(cmds.parentConstraint(self.skin_joints[n], orig_grp, maintainOffset=False, name=orig_grp+"_PaC"))
+                    self.to_ids.extend(cmds.parentConstraint(self.skin_joints[n], orig_grp, maintainOffset=False, name=f"{orig_grp}_PaC"))
                     
                     if n > 0:
                         cmds.parent(fk_zeros[n], fk_ctrls[n - 1])
@@ -315,15 +315,15 @@ class Chain(standard.BaseStandard):
 
                 # add extrem_toParent_Ctrl
                 if n == (self.n_joints-1):
-                    to_parent_extrem_ctrl = self.ar.ctrls.create_controller('id_083_ChainToParent', ctrl_name=side+self.number_name+"_ToParent_Ctrl", r=(self.radius * 0.1), d=self.curve_degree, head_def=head_def_value, guide_source=self.name_guide+"_JointEnd", parent_tag=fk_ctrls[-1])
+                    to_parent_extrem_ctrl = self.ar.ctrls.create_controller('id_083_ChainToParent', ctrl_name=f"{side}{self.number_name}_ToParent_Ctrl", r=(self.radius * 0.1), d=self.curve_degree, head_def=head_def_value, guide_source=f"{self.name_guide}_JointEnd", parent_tag=fk_ctrls[-1])
                     cmds.addAttr(to_parent_extrem_ctrl, longName='stretchable', minValue=0, maxValue=1, attributeType='float', defaultValue=1, keyable=True)
                     cmds.addAttr(to_parent_extrem_ctrl, longName=self.ar.data.lang['c031_volumeVariation'], attributeType='float', minValue=0, defaultValue=1, keyable=True)
-                    cmds.addAttr(to_parent_extrem_ctrl, longName="min"+self.ar.data.lang['c031_volumeVariation'], attributeType='float', minValue=0, defaultValue=0.01, maxValue=1, keyable=True)
-                    cmds.addAttr(to_parent_extrem_ctrl, longName=self.ar.data.lang['c118_active']+self.ar.data.lang['c031_volumeVariation'], attributeType='short', minValue=0, defaultValue=1, maxValue=1, keyable=True)
+                    cmds.addAttr(to_parent_extrem_ctrl, longName=f"min{self.ar.data.lang['c031_volumeVariation']}", attributeType='float', minValue=0, defaultValue=0.01, maxValue=1, keyable=True)
+                    cmds.addAttr(to_parent_extrem_ctrl, longName=f"{self.ar.data.lang['c118_active']}{self.ar.data.lang['c031_volumeVariation']}", attributeType='short', minValue=0, defaultValue=1, maxValue=1, keyable=True)
                     cmds.parent(to_parent_extrem_ctrl, orig_grp)
-                    cmds.setAttr(to_parent_extrem_ctrl+".translateZ", self.radius)
+                    cmds.setAttr(f"{to_parent_extrem_ctrl}.translateZ", self.radius)
                     if s == 1 and self.flip:
-                        cmds.setAttr(to_parent_extrem_ctrl+".translateZ", -self.radius)
+                        cmds.setAttr(f"{to_parent_extrem_ctrl}.translateZ", -self.radius)
                     self.ar.utils.create_zero_out([to_parent_extrem_ctrl])
                     self.ar.ctrls.set_lock_hide([to_parent_extrem_ctrl], ['v'])
 
@@ -331,39 +331,39 @@ class Chain(standard.BaseStandard):
                 if s == 1 and self.flip:
                     # fix flipping issue for FK right side:
                     for f in range(1, len(fk_ctrls)):
-                        cmds.setAttr(fk_zeros[0]+".scaleX", -1)
-                        cmds.setAttr(fk_zeros[0]+".scaleY", -1)
-                        cmds.setAttr(fk_zeros[0]+".scaleZ", -1)
+                        cmds.setAttr(f"{fk_zeros[0]}.scaleX", -1)
+                        cmds.setAttr(f"{fk_zeros[0]}.scaleY", -1)
+                        cmds.setAttr(f"{fk_zeros[0]}.scaleZ", -1)
                         attributes = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz']
                         for attr in attributes:
-                            attr_value = cmds.getAttr(fk_zeros[f]+"."+attr)
-                            cmds.setAttr(fk_zeros[f]+"."+attr, -1*attr_value)
+                            attr_value = cmds.getAttr(f"{fk_zeros[f]}.{attr}")
+                            cmds.setAttr(f"{fk_zeros[f]}.{attr}", -1*attr_value)
                 
                 # working with position, orientation of joints and make an orientConstraint for Fk controls:
                 for n in range(self.n_joints):
-                    cmds.matchTransform(self.skin_joints[n], side+self.number_name+"_Guide_JointLoc"+str(n+1), position=True, rotation=True)
-                    cmds.matchTransform(ik_joints[n], side+self.number_name+"_Guide_JointLoc"+str(n+1), position=True, rotation=True)
+                    cmds.matchTransform(self.skin_joints[n], f"{side}{self.number_name}_Guide_JointLoc{n+1}", position=True, rotation=True)
+                    cmds.matchTransform(ik_joints[n], f"{side}{self.number_name}_Guide_JointLoc{n+1}", position=True, rotation=True)
                     # freezeTransformations (rotates):
                     cmds.makeIdentity(self.skin_joints[n], ik_joints[n], fk_joints[n], apply=True, rotate=True)
                     # fk control leads fk joint:
                     cmds.parentConstraint(fk_ctrls[n], fk_joints[n], maintainOffset=True, name=f"{side}{self.number_name}_{n:02d}_Fk_PaC")
                     if n == self.n_joints-1:
-                        cmds.connectAttr(fk_ctrls[n]+".scaleX", fk_joints[n]+".scaleX", force=True)
-                        cmds.connectAttr(fk_ctrls[n]+".scaleY", fk_joints[n]+".scaleY", force=True)
-                        cmds.connectAttr(fk_ctrls[n]+".scaleZ", fk_joints[n]+".scaleZ", force=True)
+                        cmds.connectAttr(f"{fk_ctrls[n]}.scaleX", f"{fk_joints[n]}.scaleX", force=True)
+                        cmds.connectAttr(f"{fk_ctrls[n]}.scaleY", f"{fk_joints[n]}.scaleY", force=True)
+                        cmds.connectAttr(f"{fk_ctrls[n]}.scaleZ", f"{fk_joints[n]}.scaleZ", force=True)
                     else:
                         self.ar.ctrls.set_lock_hide([fk_ctrls[n]], ['sx', 'sy', 'sz'])
 
                 if self.mirror_axis == 'Z':
-                    cmds.setAttr(ik_joints[0]+".rotateZ", 180)
+                    cmds.setAttr(f"{ik_joints[0]}.rotateZ", 180)
                 # puting endJoints in the correct position:
                 cmds.matchTransform(self.skin_joints[-1], self.guide_end_loc, position=True, rotation=True)
                 cmds.matchTransform(ik_joints[-1], self.guide_end_loc, position=True, rotation=True)
                 cmds.matchTransform(fk_joints[-1], self.guide_end_loc, position=True, rotation=True)
                 
                 # creating a group reference to recept the attributes:
-                world_ref = self.ar.ctrls.create_controller('id_084_ChainWorldRef', side+self.number_name+"_WorldRef_Ctrl", r=self.radius, d=self.curve_degree, dir='+Z', head_def=head_def_value, guide_source=self.name_guide+"_Base")
-                if not cmds.objExists(world_ref+'.globalStretch'):
+                world_ref = self.ar.ctrls.create_controller('id_084_ChainWorldRef', f"{side}{self.number_name}_WorldRef_Ctrl", r=self.radius, d=self.curve_degree, dir='+Z', head_def=head_def_value, guide_source=f"{self.name_guide}_Base")
+                if not cmds.objExists(f"{world_ref}.globalStretch"):
                     cmds.addAttr(world_ref, longName='globalStretch', attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
                 self.world_refs.append(world_ref)
                 self.world_ref_shapes.append(cmds.listRelatives(world_ref, children=True, type='nurbsCurve')[0])
@@ -372,33 +372,33 @@ class Chain(standard.BaseStandard):
                 self.ar.utils.create_joint_blend(ik_joints, fk_joints, self.skin_joints, 'Fk_ikFkBlend', attr_name_lower, world_ref)
 
                 # ik spline:
-                self.ik_spline_items = cmds.ikHandle(startJoint=ik_joints[0], endEffector=ik_joints[-2], name=side+self.number_name+"_IkH", solver='ikSplineSolver', parentCurve=False, numSpans=4) #[Handle, Effector, Curve]
-                self.ik_spline_items[1] = cmds.rename(self.ik_spline_items[1], side+self.number_name+"_Eff")
-                self.ik_spline_items[2] = cmds.rename(self.ik_spline_items[2], side+self.number_name+"_IkC")
+                self.ik_spline_items = cmds.ikHandle(startJoint=ik_joints[0], endEffector=ik_joints[-2], name=f"{side}{self.number_name}_IkH", solver='ikSplineSolver', parentCurve=False, numSpans=4) #[Handle, Effector, Curve]
+                self.ik_spline_items[1] = cmds.rename(self.ik_spline_items[1], f"{side}{self.number_name}_Eff")
+                self.ik_spline_items[2] = cmds.rename(self.ik_spline_items[2], f"{side}{self.number_name}_IkC")
                 ik_spline_handle = self.ik_spline_items[0]
                 ik_spline_curve = self.ik_spline_items[2]
                 # ik clusters:
                 ik_clusters = []
                 for p, i in zip(['0:1', '2', '3', '4', '5:6'], range(5)):
-                    clusters = cmds.cluster(ik_spline_curve+".cv["+p+"]", name=side+self.number_name+"_Ik_"+str(i)+"_Cls") #[Deform, Handle]
+                    clusters = cmds.cluster(f"{ik_spline_curve}.cv[{p}]", name=f"{side}{self.number_name}_Ik_{i}_Cls") #[Deform, Handle]
                     self.to_ids.append(clusters[0]) #Deformer
                     ik_clusters.append(clusters[1]) #Handle
                 # ik cluster positions:
                 cmds.xform(ik_clusters[0], worldSpace=True, rotatePivot=cmds.xform(ik_joints[0], query=True, worldSpace=True, rotatePivot=True)) #firstIkJointPos
                 cmds.xform(ik_clusters[-1], worldSpace=True, rotatePivot=cmds.xform(ik_joints[-2], query=True, worldSpace=True, rotatePivot=True)) #endIkJointPos
                 # ik cluster group:
-                ik_cluster_grp = cmds.group(ik_clusters, name=side+self.number_name+"_Ik_Cluster_Grp")
+                ik_cluster_grp = cmds.group(ik_clusters, name=f"{side}{self.number_name}_Ik_Cluster_Grp")
                 option_ctrl = self.ar.utils.get_node_by_message('optionCtrl')
                 if option_ctrl:
                     for axis in ['X', 'Y', 'Z']:
-                        cmds.connectAttr(option_ctrl+".rigScaleOutput", ik_cluster_grp+".scale"+axis)
+                        cmds.connectAttr(f"{option_ctrl}.rigScaleOutput", f"{ik_cluster_grp}.scale{axis}")
 
                 # ik controls:
                 ik_ctrls, ik_ctrl_zeros = [], []
-                ik_ctrl_grp = cmds.group(name=side+self.number_name+"_Ik_Ctrl_Grp", empty=True)
+                ik_ctrl_grp = cmds.group(name=f"{side}{self.number_name}_Ik_Ctrl_Grp", empty=True)
                 for c, cluster_node in enumerate(ik_clusters):
                     if c == 0: #first
-                        ik_ctrl_main = self.ar.ctrls.create_controller('id_086_ChainIkMain', ctrl_name=side+self.number_name+"_Ik_Main_Ctrl", r=self.radius, d=self.curve_degree, head_def=head_def_value, guide_source=self.name_guide+"_Base")
+                        ik_ctrl_main = self.ar.ctrls.create_controller('id_086_ChainIkMain', ctrl_name=f"{side}{self.number_name}_Ik_Main_Ctrl", r=self.radius, d=self.curve_degree, head_def=head_def_value, guide_source=f"{self.name_guide}_Base")
                         cmds.matchTransform(ik_ctrl_main, cluster_node, position=True, rotation=True)
                         ik_ctrl_main_zero = self.ar.utils.create_zero_out([ik_ctrl_main])[0]
                         cmds.parent(ik_ctrl_main_zero, ik_ctrl_grp)
@@ -406,9 +406,9 @@ class Chain(standard.BaseStandard):
                         # orienting controls
                         if s == 1:
                             cmds.parent(self.base, world=True)
-                        cmds.setAttr(ik_ctrl_main_zero+".rotateX", cmds.getAttr(self.base+".rotateX"))
-                        cmds.setAttr(ik_ctrl_main_zero+".rotateY", cmds.getAttr(self.base+".rotateY"))
-                        cmds.setAttr(ik_ctrl_main_zero+".rotateZ", cmds.getAttr(self.base+".rotateZ"))
+                        cmds.setAttr(f"{ik_ctrl_main_zero}.rotateX", cmds.getAttr(f"{self.base}.rotateX"))
+                        cmds.setAttr(f"{ik_ctrl_main_zero}.rotateY", cmds.getAttr(f"{self.base}.rotateY"))
+                        cmds.setAttr(f"{ik_ctrl_main_zero}.rotateZ", cmds.getAttr(f"{self.base}.rotateZ"))
                         self.fix_mirror_flipping(ik_ctrl_main_zero, s, -1)
 
                         # loading Maya matrix node
@@ -416,45 +416,45 @@ class Chain(standard.BaseStandard):
                         loaded_matrix_plugin = self.ar.config.check_loaded_plugin('matrixNodes', self.ar.data.lang['e002_matrixPluginNotFound'])
                         if loaded_quaternion_plugin and loaded_matrix_plugin:
                             # setup extract rotateZ from ikCtrlMain using worldSpace matrix by quaternion:
-                            ik_main_loc = cmds.spaceLocator(name=side+self.number_name+"_Ik_Main_Loc")[0]
-                            ik_main_loc_grp = cmds.group(ik_main_loc, name=side+self.number_name+"_Ik_MainLoc_Grp")
+                            ik_main_loc = cmds.spaceLocator(name=f"{side}{self.number_name}_Ik_Main_Loc")[0]
+                            ik_main_loc_grp = cmds.group(ik_main_loc, name=f"{side}{self.number_name}_Ik_MainLoc_Grp")
                             # need to keep ik_main_loc_grp at the world without any transformation to use it to extract ikMainCtrl rotateZ properly:
-                            cmds.setAttr(ik_main_loc_grp+".inheritsTransform", 0)
-                            cmds.setAttr(ik_main_loc_grp+".visibility", 0)
+                            cmds.setAttr(f"{ik_main_loc_grp}.inheritsTransform", 0)
+                            cmds.setAttr(f"{ik_main_loc_grp}.visibility", 0)
                             cmds.delete(cmds.parentConstraint(ik_ctrl_main, ik_main_loc_grp, maintainOffset=False, skipTranslate=('x', 'y', 'z')))
                             self.ar.ctrls.set_lock_hide([ik_main_loc_grp], ['rx', 'ry', 'rz'], l=True, k=True)
-                            cmds.parentConstraint(ik_ctrl_main, ik_main_loc, maintainOffset=False, skipTranslate=('x', 'y', 'z'), name=ik_main_loc+"_PaC")
+                            cmds.parentConstraint(ik_ctrl_main, ik_main_loc, maintainOffset=False, skipTranslate=('x', 'y', 'z'), name=f"{ik_main_loc}_PaC")
                             main_twist_matrix_md = self.ar.math.create_twist_bone_matrix(ik_main_loc_grp, ik_main_loc, "ikCtrlMain_TwistMatrix")
-                            cmds.setAttr(main_twist_matrix_md+".input1Z", 1)
+                            cmds.setAttr(f"{main_twist_matrix_md}.input1Z", 1)
                             if s == 1:
-                                cmds.setAttr(main_twist_matrix_md+".input1Z", -1)
+                                cmds.setAttr(f"{main_twist_matrix_md}.input1Z", -1)
                             # connect output of rotate in Z to ikSplineHandle roll attribute:
-                            cmds.connectAttr(main_twist_matrix_md+".outputZ", ik_spline_handle+".roll", force=True)
+                            cmds.connectAttr(f"{main_twist_matrix_md}.outputZ", f"{ik_spline_handle}.roll", force=True)
 
-                    ik_ctrl = self.ar.ctrls.create_controller('id_085_ChainIk', ctrl_name=side+self.number_name+"_Ik_"+str(c)+"_Ctrl", r=self.radius, d=self.curve_degree, head_def=head_def_value, guide_source=self.name_guide+"_JointLoc"+str(c), parent_tag=self.get_parent_to_tag(ik_ctrls, ik_ctrl_main))
+                    ik_ctrl = self.ar.ctrls.create_controller('id_085_ChainIk', ctrl_name=f"{side}{self.number_name}_Ik_{c}_Ctrl", r=self.radius, d=self.curve_degree, head_def=head_def_value, guide_source=f"{self.name_guide}_JointLoc{c}", parent_tag=self.get_parent_to_tag(ik_ctrls, ik_ctrl_main))
                     ik_ctrls.append(ik_ctrl)
                     cmds.matchTransform(ik_ctrl, cluster_node, position=True, rotation=True)
                     ik_ctrl_zero = self.ar.utils.create_zero_out([ik_ctrl])[0]
                     ik_ctrl_zeros.append(ik_ctrl_zero)
                     cmds.parent(ik_ctrl_zero, ik_ctrl_main)
                     cmds.rotate(0, 0, 0, ik_ctrl_zero)
-                    cmds.parentConstraint(ik_ctrl, cluster_node, maintainOffset=True, name=cluster_node+"_PaC")
+                    cmds.parentConstraint(ik_ctrl, cluster_node, maintainOffset=True, name=f"{cluster_node}_PaC")
                     self.fix_mirror_flipping(ik_ctrl_zero, s, 1)
 
                     if c == 4: #last
                         cmds.addAttr(ik_ctrl, longName=self.ar.data.lang['c033_autoOrient'], attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
                         self.ar.ctrls.set_lock_hide([ik_ctrl], ['sx', 'sy', 'sz', 'v'])
                         # last ik control:
-                        ik_ctrl_last = self.ar.ctrls.create_controller('id_087_ChainIkLast', ctrl_name=side+self.number_name+"_Ik_"+self.ar.data.lang['c125_last']+"_Ctrl", r=0.75*self.radius, d=self.curve_degree, head_def=head_def_value, guide_source=self.name_guide+"_JointEnd", parent_tag=ik_ctrls[-1])
+                        ik_ctrl_last = self.ar.ctrls.create_controller('id_087_ChainIkLast', ctrl_name=f"{side}{self.number_name}_Ik_{self.ar.data.lang['c125_last']}_Ctrl", r=0.75*self.radius, d=self.curve_degree, head_def=head_def_value, guide_source=f"{self.name_guide}_JointEnd", parent_tag=ik_ctrls[-1])
                         self.ar.ctrls.color_shape([ik_ctrl_last], 'cyan')
                         cmds.matchTransform(ik_ctrl_last, ik_ctrl, position=True, rotation=True)
                         ik_ctrl_last_zero = self.ar.utils.create_zero_out([ik_ctrl_last])[0]
                         cmds.parent(ik_ctrl_last_zero, ik_ctrl_main)
                         self.ar.ctrls.set_lock_hide([ik_ctrl_last], ['v'])
-                        cmds.orientConstraint(ik_ctrl_last, ik_joints[-2], maintainOffset=True, name=ik_joints[-2]+"_OrC")
-                        cmds.connectAttr(ik_ctrl_last+".scaleX", ik_joints[-2]+".scaleX", force=True)
-                        cmds.connectAttr(ik_ctrl_last+".scaleY", ik_joints[-2]+".scaleY", force=True)
-                        cmds.connectAttr(ik_ctrl_last+".scaleZ", ik_joints[-2]+".scaleZ", force=True)
+                        cmds.orientConstraint(ik_ctrl_last, ik_joints[-2], maintainOffset=True, name=f"{ik_joints[-2]}_OrC")
+                        cmds.connectAttr(f"{ik_ctrl_last}.scaleX", f"{ik_joints[-2]}.scaleX", force=True)
+                        cmds.connectAttr(f"{ik_ctrl_last}.scaleY", f"{ik_joints[-2]}.scaleY", force=True)
+                        cmds.connectAttr(f"{ik_ctrl_last}.scaleZ", f"{ik_joints[-2]}.scaleZ", force=True)
                         self.fix_mirror_flipping(ik_ctrl_last_zero, s, -1, 'X')
                         self.fix_mirror_flipping(ik_ctrl_last_zero, s, -1, 'Y')
                         self.fix_mirror_flipping(ik_ctrl_last_zero, s, 1, 'Z')
@@ -470,152 +470,152 @@ class Chain(standard.BaseStandard):
                         cmds.addAttr(ik_ctrl, longName=self.ar.data.lang['c033_autoOrient'], attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
                         self.ar.ctrls.set_lock_hide([ik_ctrl], ['sx', 'sy', 'sz', 'v'])
                         # first ik control:
-                        ik_ctrl_first = self.ar.ctrls.create_controller('id_087_ChainIkLast', ctrl_name=side+self.number_name+"_Ik_"+self.ar.data.lang['c114_first']+"_Ctrl", r=0.75*self.radius, d=self.curve_degree, head_def=head_def_value, guide_source=self.name_guide+"_Base", parent_tag=ik_ctrl_main)
+                        ik_ctrl_first = self.ar.ctrls.create_controller('id_087_ChainIkLast', ctrl_name=f"{side}{self.number_name}_Ik_{self.ar.data.lang['c114_first']}_Ctrl", r=0.75*self.radius, d=self.curve_degree, head_def=head_def_value, guide_source=f"{self.name_guide}_Base", parent_tag=ik_ctrl_main)
                         self.ar.ctrls.color_shape([ik_ctrl_first], 'cyan')
                         cmds.matchTransform(ik_ctrl_first, ik_ctrl, position=True, rotation=True)
                         ik_ctrl_first_zero = self.ar.utils.create_zero_out([ik_ctrl_first])[0]
                         cmds.parent(ik_ctrl_first_zero, ik_ctrl_main)
                         self.ar.ctrls.set_lock_hide([ik_ctrl_first], ['v'])
-                        cmds.connectAttr(ik_ctrl_first+".scaleX", ik_joints[0]+".scaleX", force=True)
-                        cmds.connectAttr(ik_ctrl_first+".scaleY", ik_joints[0]+".scaleY", force=True)
-                        cmds.connectAttr(ik_ctrl_first+".scaleZ", ik_joints[0]+".scaleZ", force=True)
+                        cmds.connectAttr(f"{ik_ctrl_first}.scaleX", f"{ik_joints[0]}.scaleX", force=True)
+                        cmds.connectAttr(f"{ik_ctrl_first}.scaleY", f"{ik_joints[0]}.scaleY", force=True)
+                        cmds.connectAttr(f"{ik_ctrl_first}.scaleZ", f"{ik_joints[0]}.scaleZ", force=True)
                         self.fix_mirror_flipping(ik_ctrl_first_zero, s, -1, 'X')
                         self.fix_mirror_flipping(ik_ctrl_first_zero, s, -1, 'Y')
                         self.fix_mirror_flipping(ik_ctrl_first_zero, s, 1, 'Z')
                         if self.mirror_axis == 'Y':
                             self.fix_mirror_flipping(ik_ctrl_first_zero, s, -1, 'Z')
                         cmds.parent(ik_ctrl_zero, ik_ctrl_first)
-                cmds.connectAttr(ik_ctrl_first+".message", ik_ctrls[0]+".parentTag", force=True)
+                cmds.connectAttr(f"{ik_ctrl_first}.message", f"{ik_ctrls[0]}.parentTag", force=True)
                 
                 # ik controls position:
-                cmds.pointConstraint(ik_ctrl_first, ik_ctrls[2], ik_ctrl_zeros[1], maintainOffset=True, name=ik_ctrl_zeros[1]+"_PoC")
-                cmds.pointConstraint(ik_ctrl_first, ik_ctrl_last, ik_ctrl_zeros[2], maintainOffset=True, name=ik_ctrl_zeros[2]+"_PoC")
-                cmds.pointConstraint(ik_ctrls[2], ik_ctrl_last, ik_ctrl_zeros[3], maintainOffset=True, name=ik_ctrl_zeros[3]+"_PoC")
+                cmds.pointConstraint(ik_ctrl_first, ik_ctrls[2], ik_ctrl_zeros[1], maintainOffset=True, name=f"{ik_ctrl_zeros[1]}_PoC")
+                cmds.pointConstraint(ik_ctrl_first, ik_ctrl_last, ik_ctrl_zeros[2], maintainOffset=True, name=f"{ik_ctrl_zeros[2]}_PoC")
+                cmds.pointConstraint(ik_ctrls[2], ik_ctrl_last, ik_ctrl_zeros[3], maintainOffset=True, name=f"{ik_ctrl_zeros[3]}_PoC")
                 
                 # ik controls orientation:
                 first_up_loc, first_fake_loc = self.setup_aim_locators(side, ik_ctrl_first, 0, ik_ctrls[1], ik_ctrl_first)
                 last_up_loc, last_fake_loc = self.setup_aim_locators(side, ik_ctrl_last, 4, ik_ctrls[-2], ik_ctrl_last)
                 mid_up_loc, mid_fake_loc = self.setup_aim_locators(side, ik_ctrls[2], 13, ik_ctrls[2], ik_ctrls[2], False)
                 last_mid_loc = cmds.duplicate(last_fake_loc, name=last_fake_loc.replace('Fake', 'Middle'))[0]
-                cmds.setAttr(last_mid_loc+".translateZ", 0)
+                cmds.setAttr(f"{last_mid_loc}.translateZ", 0)
                 if s == 0:
                     self.setup_aim_constraint(ik_ctrls[0], ik_ctrls[1], first_up_loc, first_fake_loc, ik_ctrl_zeros[0], 1)
                     self.setup_aim_constraint(ik_ctrls[-1], ik_ctrls[-2], last_up_loc, last_fake_loc, ik_ctrl_zeros[-1], -1)
                     self.setup_aim_constraint(ik_ctrls[1], ik_ctrls[2], mid_up_loc, mid_fake_loc, ik_ctrl_zeros[1], 1, False)
                     self.setup_aim_constraint(ik_ctrls[3], ik_ctrls[2], mid_up_loc, mid_fake_loc, ik_ctrl_zeros[3], -1, False)
-                    cmds.aimConstraint(last_mid_loc, ik_ctrl_zeros[2], worldUpType='object', worldUpObject=last_up_loc, aimVector=(0, 0, 1), upVector=(0, 1, 0), maintainOffset=True, name=ik_ctrl_zeros[2]+"_AiC")
+                    cmds.aimConstraint(last_mid_loc, ik_ctrl_zeros[2], worldUpType='object', worldUpObject=last_up_loc, aimVector=(0, 0, 1), upVector=(0, 1, 0), maintainOffset=True, name=f"{ik_ctrl_zeros[2]}_AiC")
                 else:
                     self.setup_aim_constraint(ik_ctrls[0], ik_ctrls[1], first_up_loc, first_fake_loc, ik_ctrl_zeros[0], -1)
                     self.setup_aim_constraint(ik_ctrls[-1], ik_ctrls[-2], last_up_loc, last_fake_loc, ik_ctrl_zeros[-1], -1)
                     self.setup_aim_constraint(ik_ctrls[1], ik_ctrls[2], mid_up_loc, mid_fake_loc, ik_ctrl_zeros[1], -1, False)
                     self.setup_aim_constraint(ik_ctrls[3], ik_ctrls[2], mid_up_loc, mid_fake_loc, ik_ctrl_zeros[3], 1, False)
-                    cmds.aimConstraint(last_mid_loc, ik_ctrl_zeros[2], worldUpType='object', worldUpObject=last_up_loc, aimVector=(0, 0, -1), upVector=(0, 1, 0), maintainOffset=True, name=ik_ctrl_zeros[2]+"_AiC")
+                    cmds.aimConstraint(last_mid_loc, ik_ctrl_zeros[2], worldUpType='object', worldUpObject=last_up_loc, aimVector=(0, 0, -1), upVector=(0, 1, 0), maintainOffset=True, name=f"{ik_ctrl_zeros[2]}_AiC")
                 
-                self.ik_static_grp = cmds.group(self.ik_spline_items[0], self.ik_spline_items[2], name=side+self.number_name+"_IkH_Grp")
+                self.ik_static_grp = cmds.group(self.ik_spline_items[0], self.ik_spline_items[2], name=f"{side}{self.number_name}_IkH_Grp")
 
                 # ik stretch:
                 curve_info_node = cmds.arclen(self.ik_spline_items[2], constructionHistory=True)
-                curve_info_node = cmds.rename(curve_info_node, side+self.number_name+"_Ik_CurveInfo")
+                curve_info_node = cmds.rename(curve_info_node, f"{side}{self.number_name}_Ik_CurveInfo")
                 # create stretch nodes:
-                ik_normalize_md = cmds.createNode('multiplyDivide', name=side+self.number_name+"_Normalize_MD")
-                global_stretch_bc = cmds.createNode('blendColors', name=side+self.number_name+"_GlobalStretch_BC")
-                stretchable_bc = cmds.createNode('blendColors', name=side+self.number_name+"_Stretchable_BC")
-                stretch_bc = cmds.createNode('blendColors', name=side+self.number_name+"_Stretch_BC")
-                ik_stretch_rev = cmds.createNode('reverse', name=side+self.number_name+"_Stretch_Rev")
+                ik_normalize_md = cmds.createNode('multiplyDivide', name=f"{side}{self.number_name}_Normalize_MD")
+                global_stretch_bc = cmds.createNode('blendColors', name=f"{side}{self.number_name}_GlobalStretch_BC")
+                stretchable_bc = cmds.createNode('blendColors', name=f"{side}{self.number_name}_Stretchable_BC")
+                stretch_bc = cmds.createNode('blendColors', name=f"{side}{self.number_name}_Stretch_BC")
+                ik_stretch_rev = cmds.createNode('reverse', name=f"{side}{self.number_name}_Stretch_Rev")
                 # get and set stretch attribute values:
-                cmds.setAttr(ik_normalize_md+".operation", 2)
-                cmds.setAttr(ik_normalize_md+".input2X", cmds.getAttr(curve_info_node+".arcLength")) #initialDistance
+                cmds.setAttr(f"{ik_normalize_md}.operation", 2)
+                cmds.setAttr(f"{ik_normalize_md}.input2X", cmds.getAttr(f"{curve_info_node}.arcLength")) #initialDistance
                 # connect stretch attributes:
-                cmds.connectAttr(curve_info_node+".arcLength", ik_normalize_md+".input1X", force=True)
-                cmds.connectAttr(ik_normalize_md+".outputX", global_stretch_bc+".color1.color1R", force=True)
-                cmds.connectAttr(global_stretch_bc+".output.outputR", stretchable_bc+".color1.color1R", force=True)
-                cmds.connectAttr(stretchable_bc+".output.outputR", stretch_bc+".color1.color1R", force=True)
-                cmds.connectAttr(to_parent_extrem_ctrl+".stretchable", stretchable_bc+".blender", force=True)
-                cmds.connectAttr(ik_stretch_rev+".outputX", stretch_bc+".blender", force=True)
+                cmds.connectAttr(f"{curve_info_node}.arcLength", f"{ik_normalize_md}.input1X", force=True)
+                cmds.connectAttr(f"{ik_normalize_md}.outputX", f"{global_stretch_bc}.color1.color1R", force=True)
+                cmds.connectAttr(f"{global_stretch_bc}.output.outputR", f"{stretchable_bc}.color1.color1R", force=True)
+                cmds.connectAttr(f"{stretchable_bc}.output.outputR", f"{stretch_bc}.color1.color1R", force=True)
+                cmds.connectAttr(f"{to_parent_extrem_ctrl}.stretchable", f"{stretchable_bc}.blender", force=True)
+                cmds.connectAttr(f"{ik_stretch_rev}.outputX", f"{stretch_bc}.blender", force=True)
                 # work with world_ref node:
                 if cmds.objExists(world_ref):
-                    cmds.connectAttr(world_ref+"."+attr_name_lower+"Fk_ikFkBlend", ik_stretch_rev+".inputX", force=True)
-                    cmds.connectAttr(world_ref+".globalStretch", global_stretch_bc+".blender", force=True)
-                    cmds.connectAttr(world_ref+".scaleX", global_stretch_bc+".color2.color2R", force=True)
-                    cmds.connectAttr(world_ref+".scaleX", stretchable_bc+".color2.color2R", force=True)
-                    cmds.connectAttr(world_ref+".scaleX", stretch_bc+".color2.color2R", force=True)
+                    cmds.connectAttr(f"{world_ref}.{attr_name_lower}Fk_ikFkBlend", f"{ik_stretch_rev}.inputX", force=True)
+                    cmds.connectAttr(f"{world_ref}.globalStretch", f"{global_stretch_bc}.blender", force=True)
+                    cmds.connectAttr(f"{world_ref}.scaleX", f"{global_stretch_bc}.color2.color2R", force=True)
+                    cmds.connectAttr(f"{world_ref}.scaleX", f"{stretchable_bc}.color2.color2R", force=True)
+                    cmds.connectAttr(f"{world_ref}.scaleX", f"{stretch_bc}.color2.color2R", force=True)
                 # output stretch values to joint scale:
                 for j in range(len(ik_joints)-2):
-                    cmds.connectAttr(stretch_bc+".output.outputR", ik_joints[j]+".scaleX", force=True)
-                    cmds.connectAttr(stretch_bc+".output.outputR", ik_joints[j]+".scaleY", force=True)
-                    cmds.connectAttr(stretch_bc+".output.outputR", ik_joints[j]+".scaleZ", force=True)
-                    cmds.connectAttr(stretch_bc+".output.outputR", self.skin_joints[j]+".scaleZ", force=True)
+                    cmds.connectAttr(f"{stretch_bc}.output.outputR", f"{ik_joints[j]}.scaleX", force=True)
+                    cmds.connectAttr(f"{stretch_bc}.output.outputR", f"{ik_joints[j]}.scaleY", force=True)
+                    cmds.connectAttr(f"{stretch_bc}.output.outputR", f"{ik_joints[j]}.scaleZ", force=True)
+                    cmds.connectAttr(f"{stretch_bc}.output.outputR", f"{self.skin_joints[j]}.scaleZ", force=True)
 
                 # volumeVariation:
-                vv_bc = cmds.createNode('blendColors', name=side+self.number_name+"_VV_BC")
-                vv_cond = cmds.createNode('condition', name=side+self.number_name+'_VV_Cond')
-                vv_md = cmds.createNode('multiplyDivide', name=side+self.number_name+"_VV_MD")
-                vv_scale_compensate_md = cmds.createNode('multiplyDivide', name=side+self.number_name+"_VV_ScaleCompensate_MD")
-                vv_clp = cmds.createNode('clamp', name=side+self.number_name+"_VV_Clp")
-                cmds.setAttr(vv_clp+".maxR", 1000)
-                cmds.connectAttr(to_parent_extrem_ctrl+'.'+self.ar.data.lang['c031_volumeVariation'], vv_bc+'.blender', force=True)
-                cmds.connectAttr(to_parent_extrem_ctrl+"."+self.ar.data.lang['c118_active']+self.ar.data.lang['c031_volumeVariation'], vv_cond+'.firstTerm', force=True)
-                cmds.connectAttr(to_parent_extrem_ctrl+".min"+self.ar.data.lang['c031_volumeVariation'], vv_clp+'.min.minR', force=True)
-                cmds.connectAttr(vv_bc+'.outputR', vv_clp+'.input.inputR', force=True)
-                cmds.connectAttr(vv_clp+'.output.outputR', vv_cond+'.colorIfTrueR', force=True)
-                cmds.connectAttr(vv_scale_compensate_md+".outputX", vv_bc+'.color1R', force=True)
-                cmds.connectAttr(vv_md+".outputX", vv_scale_compensate_md+'.input1X', force=True)
-                cmds.connectAttr(world_ref+".scaleX", vv_md+'.input1X', force=True)
-                cmds.connectAttr(world_ref+".scaleX", vv_cond+'.colorIfFalseR', force=True)
-                cmds.connectAttr(world_ref+".scaleX", vv_scale_compensate_md+'.input2X', force=True)
-                cmds.connectAttr(world_ref+".scaleX", vv_bc+'.color2.color2R', force=True)
-                cmds.connectAttr(stretch_bc+".output.outputR", vv_md+'.input2X', force=True)
-                cmds.setAttr(vv_md+'.operation', 2)
-                cmds.setAttr(vv_cond+".secondTerm", 1)
+                vv_bc = cmds.createNode('blendColors', name=f"{side}{self.number_name}_VV_BC")
+                vv_cond = cmds.createNode('condition', name=f"{side}{self.number_name}_VV_Cond")
+                vv_md = cmds.createNode('multiplyDivide', name=f"{side}{self.number_name}_VV_MD")
+                vv_scale_compensate_md = cmds.createNode('multiplyDivide', name=f"{side}{self.number_name}_VV_ScaleCompensate_MD")
+                vv_clp = cmds.createNode('clamp', name=f"{side}{self.number_name}_VV_Clp")
+                cmds.setAttr(f"{vv_clp}.maxR", 1000)
+                cmds.connectAttr(f"{to_parent_extrem_ctrl}.{self.ar.data.lang['c031_volumeVariation']}", f"{vv_bc}.blender", force=True)
+                cmds.connectAttr(f"{to_parent_extrem_ctrl}.{self.ar.data.lang['c118_active']}{self.ar.data.lang['c031_volumeVariation']}", f"{vv_cond}.firstTerm", force=True)
+                cmds.connectAttr(f"{to_parent_extrem_ctrl}.min{self.ar.data.lang['c031_volumeVariation']}", f"{vv_clp}.min.minR", force=True)
+                cmds.connectAttr(f"{vv_bc}.outputR", f"{vv_clp}.input.inputR", force=True)
+                cmds.connectAttr(f"{vv_clp}.output.outputR", f"{vv_cond}.colorIfTrueR", force=True)
+                cmds.connectAttr(f"{vv_scale_compensate_md}.outputX", f"{vv_bc}.color1R", force=True)
+                cmds.connectAttr(f"{vv_md}.outputX", f"{vv_scale_compensate_md}.input1X", force=True)
+                cmds.connectAttr(f"{world_ref}.scaleX", f"{vv_md}.input1X", force=True)
+                cmds.connectAttr(f"{world_ref}.scaleX", f"{vv_cond}.colorIfFalseR", force=True)
+                cmds.connectAttr(f"{world_ref}.scaleX", f"{vv_scale_compensate_md}.input2X", force=True)
+                cmds.connectAttr(f"{world_ref}.scaleX", f"{vv_bc}.color2.color2R", force=True)
+                cmds.connectAttr(f"{stretch_bc}.output.outputR", f"{vv_md}.input2X", force=True)
+                cmds.setAttr(f"{vv_md}.operation", 2)
+                cmds.setAttr(f"{vv_cond}.secondTerm", 1)
                 #output volumeVariation values to joint scale axis:
                 for j in range(len(self.skin_joints)-2):
-                    cmds.connectAttr(vv_cond+".outColorR", self.skin_joints[j]+".scaleX", force=True)
-                    cmds.connectAttr(vv_cond+".outColorR", self.skin_joints[j]+".scaleY", force=True)
+                    cmds.connectAttr(f"{vv_cond}.outColorR", f"{self.skin_joints[j]}.scaleX", force=True)
+                    cmds.connectAttr(f"{vv_cond}.outColorR", f"{self.skin_joints[j]}.scaleY", force=True)
 
                 # connecting visibilities:
-                cmds.connectAttr(world_ref+"."+attr_name_lower+"Fk_ikFkBlend", fk_zeros[0] + ".visibility", force=True)
-                cmds.connectAttr(world_ref+"."+attr_name_lower+"Fk_ikFkBlendRevOutputX", ik_ctrl_grp+".visibility", force=True)
+                cmds.connectAttr(f"{world_ref}.{attr_name_lower}Fk_ikFkBlend", f"{fk_zeros[0]}.visibility", force=True)
+                cmds.connectAttr(f"{world_ref}.{attr_name_lower}Fk_ikFkBlendRevOutputX", f"{ik_ctrl_grp}.visibility", force=True)
                 self.ar.ctrls.set_lock_hide(fk_ctrls, ['v'], l=False)
                 self.ar.ctrls.set_lock_hide(ik_ctrls, ['v'], l=False)
                 
                 # last controls drive scale of last joints:
-                fk_last_scale_compensate_md = cmds.createNode('multiplyDivide', name=side+self.number_name+"_LastScale_Fk_MD")
-                ik_last_scale_compensate_md = cmds.createNode('multiplyDivide', name=side+self.number_name+"_LastScale_Ik_MD")
-                last_scale_bc = cmds.createNode('blendColors', name=side+self.number_name+"_LastScale_BC")
-                cmds.connectAttr(world_ref+"."+attr_name_lower+"Fk_ikFkBlend", last_scale_bc+".blender", force=True)
-                cmds.connectAttr(fk_joints[-2]+".scaleX", fk_last_scale_compensate_md+'.input1X', force=True)
-                cmds.connectAttr(fk_joints[-2]+".scaleY", fk_last_scale_compensate_md+'.input1Y', force=True)
-                cmds.connectAttr(fk_joints[-2]+".scaleZ", fk_last_scale_compensate_md+'.input1Z', force=True)
-                cmds.connectAttr(ik_joints[-2]+".scaleX", ik_last_scale_compensate_md+'.input1X', force=True)
-                cmds.connectAttr(ik_joints[-2]+".scaleY", ik_last_scale_compensate_md+'.input1Y', force=True)
-                cmds.connectAttr(ik_joints[-2]+".scaleZ", ik_last_scale_compensate_md+'.input1Z', force=True)
-                cmds.connectAttr(world_ref+".scaleX", fk_last_scale_compensate_md+'.input2X', force=True)
-                cmds.connectAttr(world_ref+".scaleX", fk_last_scale_compensate_md+'.input2Y', force=True)
-                cmds.connectAttr(world_ref+".scaleX", fk_last_scale_compensate_md+'.input2Z', force=True)
-                cmds.connectAttr(world_ref+".scaleX", ik_last_scale_compensate_md+'.input2X', force=True)
-                cmds.connectAttr(world_ref+".scaleX", ik_last_scale_compensate_md+'.input2Y', force=True)
-                cmds.connectAttr(world_ref+".scaleX", ik_last_scale_compensate_md+'.input2Z', force=True)
-                cmds.connectAttr(fk_last_scale_compensate_md+".outputX", last_scale_bc+'.color1R', force=True)
-                cmds.connectAttr(fk_last_scale_compensate_md+".outputY", last_scale_bc+'.color1G', force=True)
-                cmds.connectAttr(fk_last_scale_compensate_md+".outputZ", last_scale_bc+'.color1B', force=True)
-                cmds.connectAttr(ik_last_scale_compensate_md+".outputX", last_scale_bc+'.color2R', force=True)
-                cmds.connectAttr(ik_last_scale_compensate_md+".outputY", last_scale_bc+'.color2G', force=True)
-                cmds.connectAttr(ik_last_scale_compensate_md+".outputZ", last_scale_bc+'.color2B', force=True)
-                cmds.connectAttr(last_scale_bc+".outputR", self.skin_joints[-2]+'.scaleX', force=True)
-                cmds.connectAttr(last_scale_bc+".outputG", self.skin_joints[-2]+'.scaleY', force=True)
-                cmds.connectAttr(last_scale_bc+".outputB", self.skin_joints[-2]+'.scaleZ', force=True)
+                fk_last_scale_compensate_md = cmds.createNode('multiplyDivide', name=f"{side}{self.number_name}_LastScale_Fk_MD")
+                ik_last_scale_compensate_md = cmds.createNode('multiplyDivide', name=f"{side}{self.number_name}_LastScale_Ik_MD")
+                last_scale_bc = cmds.createNode('blendColors', name=f"{side}{self.number_name}_LastScale_BC")
+                cmds.connectAttr(f"{world_ref}.{attr_name_lower}Fk_ikFkBlend", f"{last_scale_bc}.blender", force=True)
+                cmds.connectAttr(f"{fk_joints[-2]}.scaleX", f"{fk_last_scale_compensate_md}.input1X", force=True)
+                cmds.connectAttr(f"{fk_joints[-2]}.scaleY", f"{fk_last_scale_compensate_md}.input1Y", force=True)
+                cmds.connectAttr(f"{fk_joints[-2]}.scaleZ", f"{fk_last_scale_compensate_md}.input1Z", force=True)
+                cmds.connectAttr(f"{ik_joints[-2]}.scaleX", f"{ik_last_scale_compensate_md}.input1X", force=True)
+                cmds.connectAttr(f"{ik_joints[-2]}.scaleY", f"{ik_last_scale_compensate_md}.input1Y", force=True)
+                cmds.connectAttr(f"{ik_joints[-2]}.scaleZ", f"{ik_last_scale_compensate_md}.input1Z", force=True)
+                cmds.connectAttr(f"{world_ref}.scaleX", f"{fk_last_scale_compensate_md}.input2X", force=True)
+                cmds.connectAttr(f"{world_ref}.scaleX", f"{fk_last_scale_compensate_md}.input2Y", force=True)
+                cmds.connectAttr(f"{world_ref}.scaleX", f"{fk_last_scale_compensate_md}.input2Z", force=True)
+                cmds.connectAttr(f"{world_ref}.scaleX", f"{ik_last_scale_compensate_md}.input2X", force=True)
+                cmds.connectAttr(f"{world_ref}.scaleX", f"{ik_last_scale_compensate_md}.input2Y", force=True)
+                cmds.connectAttr(f"{world_ref}.scaleX", f"{ik_last_scale_compensate_md}.input2Z", force=True)
+                cmds.connectAttr(f"{fk_last_scale_compensate_md}.outputX", f"{last_scale_bc}.color1R", force=True)
+                cmds.connectAttr(f"{fk_last_scale_compensate_md}.outputY", f"{last_scale_bc}.color1G", force=True)
+                cmds.connectAttr(f"{fk_last_scale_compensate_md}.outputZ", f"{last_scale_bc}.color1B", force=True)
+                cmds.connectAttr(f"{ik_last_scale_compensate_md}.outputX", f"{last_scale_bc}.color2R", force=True)
+                cmds.connectAttr(f"{ik_last_scale_compensate_md}.outputY", f"{last_scale_bc}.color2G", force=True)
+                cmds.connectAttr(f"{ik_last_scale_compensate_md}.outputZ", f"{last_scale_bc}.color2B", force=True)
+                cmds.connectAttr(f"{last_scale_bc}.outputR", f"{self.skin_joints[-2]}.scaleX", force=True)
+                cmds.connectAttr(f"{last_scale_bc}.outputG", f"{self.skin_joints[-2]}.scaleY", force=True)
+                cmds.connectAttr(f"{last_scale_bc}.outputB", f"{self.skin_joints[-2]}.scaleZ", force=True)
 
                 # work with main fk controllers
-                if cmds.getAttr(self.base+".mainControls"):
+                if cmds.getAttr(f"{self.base}.mainControls"):
                     self.add_fk_main_ctrls(side, fk_ctrls)
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.create_hook_setup(side, [fk_zeros[0], ik_ctrl_grp, orig_from_items[0], world_ref], [self.skin_joints[0], ik_joints[0], fk_joints[0], ik_cluster_grp], [self.ik_static_grp, ik_main_loc_grp])
                 # dynamic
                 if self.get_guide_attr('dynamic'):
-                    self.create_dynamic_chain(side+self.number_name, world_ref)
+                    self.create_dynamic_chain(f"{side}{self.number_name}", world_ref)
                     cmds.xform(self.ctrl_hook_grp, pivots=cmds.xform(ik_ctrl_main, worldSpace=True, rotatePivot=True, query=True))
                 # delete duplicated group for side (mirror):
-                cmds.delete(self.base, side+self.number_name+'_'+self.mirror_grp)
+                cmds.delete(self.base, f"{side}{self.number_name}_{self.mirror_grp}")
                 self.ar.utils.add_attr_to_items(orig_from_items, self.ar.utils.ignore_transform_io_attr)
                 self.ar.utils.add_attr_to_items([ik_cluster_grp, ik_ctrl_grp, ik_main_loc_grp, self.ik_static_grp], self.ar.utils.ignore_transform_io_attr)
                 self.to_ids.extend([curve_info_node, ik_normalize_md, global_stretch_bc, stretchable_bc, stretch_bc, ik_stretch_rev, vv_bc, vv_cond, vv_md, vv_scale_compensate_md, vv_clp, fk_last_scale_compensate_md, ik_last_scale_compensate_md, last_scale_bc])
@@ -636,13 +636,13 @@ class Chain(standard.BaseStandard):
         if s == 1 and self.flip:
             if not axis:
                 if self.mirror_axis == 'X':
-                    cmds.setAttr(item+".scaleZ", value)
+                    cmds.setAttr(f"{item}.scaleZ", value)
                 elif self.mirror_axis == 'Y':
-                    cmds.setAttr(item+".scaleZ", -value)
+                    cmds.setAttr(f"{item}.scaleZ", -value)
                 elif self.mirror_axis == 'Z':
-                    cmds.setAttr(item+".scaleZ", value)
+                    cmds.setAttr(f"{item}.scaleZ", value)
             else:
-                cmds.setAttr(item+".scale"+axis, value)
+                cmds.setAttr(f"{item}.scale{axis}", value)
 
 
     def composing_info(self):

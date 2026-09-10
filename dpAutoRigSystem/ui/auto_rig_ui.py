@@ -16,10 +16,10 @@ class MainUI:
         if cmds.workspaceControl(self.ar.data.workspace_control_name, query=True, exists=True):
             cmds.workspaceControl(self.ar.data.workspace_control_name, edit=True, close=True)
         label_text = 'dpAutoRigSystem'
-        label_text += " - "+self.ar.data.version
+        label_text += f" - {self.ar.data.version}"
         if self.ar.dev:
             label_text += ' ~ dev'
-        ui_call_script = "import dpAutoRigSystem; from dpAutoRigSystem.core import main; ar = main.Start("+str(self.ar.dev)+", intro=False); ar.auto_rig_ui.show_ui();"
+        ui_call_script = f"import dpAutoRigSystem; from dpAutoRigSystem.core import main; ar = main.Start({self.ar.dev}, intro=False); ar.auto_rig_ui.show_ui();"
         cmds.workspaceControl(
                                 self.ar.data.workspace_control_name, 
                                 retain=False,
@@ -50,7 +50,7 @@ class MainUI:
         self.ar.job.start_jobs()
         self.ar.opening.close_opening_ui()
         cmds.select(start_selections)
-        print("dpAutoRigSystem "+self.ar.data.lang['i346_loadedSuccess'])
+        print(f"dpAutoRigSystem {self.ar.data.lang['i346_loadedSuccess']}")
 
 
     def create_main_ui(self):
@@ -116,7 +116,7 @@ class MainUI:
         cmds.menu('help_menu', label='Help', helpMenu=True, parent='main_menu_bar')
         cmds.menuItem('about_mi', label='About', command=partial(self.ar.logger.infoWin, 'm015_about', 'i006_aboutDesc', self.ar.data.version, 'center', 305, 250), parent='help_menu')
         cmds.menuItem('author_mi', label='Author', command=partial(self.ar.logger.infoWin, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250), parent='help_menu')
-        cmds.menuItem('collaborators_mi', label='Collaborators', command=partial(self.ar.logger.infoWin, 'i165_collaborators', 'i166_collabDesc', "\n\n"+self.ar.data.lang['_collaborators'], 'center', 305, 250), parent='help_menu')
+        cmds.menuItem('collaborators_mi', label='Collaborators', command=partial(self.ar.logger.infoWin, 'i165_collaborators', 'i166_collabDesc', f"\n\n{self.ar.data.lang['_collaborators']}", 'center', 305, 250), parent='help_menu')
         cmds.menuItem('donate_mi', label='Donate', command=partial(self.ar.donate_ui.create_ui), parent='help_menu')
         cmds.menuItem('idiom_mi', label='Idioms', command=partial(self.ar.logger.infoWin, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250), parent='help_menu')
         cmds.menuItem('terms_mi', label='Terms and Conditions', command=self.ar.agree.ask_terms_cond, parent='help_menu')
@@ -187,7 +187,7 @@ class MainUI:
         cmds.columnLayout('rig_guides_inst_cl', adjustableColumn=True, width=120, parent='rig_guides_inst_sl')
         # -> rig_guides_inst_cl it will be populated here by created instances of modules...
         # edit selected module layout
-        cmds.frameLayout('rig_edit_selected_module_fl', label=self.ar.data.lang['i011_editSelected']+" "+self.ar.data.lang['i143_module'], collapsable=True, collapse=self.ar.data.collapse_edit_sel_mod, parent='rigging_tab')
+        cmds.frameLayout('rig_edit_selected_module_fl', label=f"{self.ar.data.lang['i011_editSelected']} {self.ar.data.lang['i143_module']}", collapsable=True, collapse=self.ar.data.collapse_edit_sel_mod, parent='rigging_tab')
         cmds.columnLayout('rig_selected_module_cl', adjustableColumn=True, parent='rig_edit_selected_module_fl')
         # footer
         cmds.columnLayout('rig_footer_cl', adjustableColumn=True, parent='rigging_tab')
@@ -195,7 +195,7 @@ class MainUI:
         cmds.button('rig_all_bt', label=self.ar.data.lang['i020_rigAll'], annotation=self.ar.data.lang['i021_rigAllDesc'], backgroundColor=(0.6, 1.0, 0.6), command=self.ar.maker.rig_all, parent='rig_footer_cl')
         cmds.separator(style='none', height=5, parent='rig_footer_cl')
         # this text will be actualized by the number of module instances created in the scene...
-        cmds.text('rig_footer_txt', label="# "+self.ar.data.lang['i005_footerRigging'], align='center', parent='rig_footer_cl')
+        cmds.text('rig_footer_txt', label=f"# {self.ar.data.lang['i005_footerRigging']}", align='center', parent='rig_footer_cl')
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout('rigging_tab', edit=True,
                         attachForm=[
@@ -228,7 +228,7 @@ class MainUI:
         cmds.formLayout('skinning_tab', numberOfDivisions=100, parent='main_tab')
         cmds.scrollLayout('skin_main_sl', parent='skinning_tab')
         cmds.columnLayout('skin_main_cl', adjustableColumn=True, rowSpacing=10, parent='skin_main_sl')
-        cmds.frameLayout('skin_create_fl', label=self.ar.data.lang['i158_create']+" SkinCluster", collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent='skin_main_cl')
+        cmds.frameLayout('skin_create_fl', label=f"{self.ar.data.lang['i158_create']} SkinCluster", collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent='skin_main_cl')
         cmds.paneLayout('skin_create_v2_pl', configuration='vertical2', separatorThickness=2.0, parent='skin_create_fl')
         # left
         cmds.columnLayout('skin_joint_cl', adjustableColumn=True, width=170, parent='skin_create_v2_pl')
@@ -268,16 +268,16 @@ class MainUI:
         cmds.button('skin_remove_bt', label=self.ar.data.lang['i064_skinRemBtn'], backgroundColor=(0.1, 0.3, 0.3), command=partial(self.skin_from_ui, 'Remove'), parent='skin_add_remove_v2_pl')
         cmds.separator(style='none', height=5, parent='skin_footer_cl')
         # this text will be actualized by the number of joints and geometries in the textScrollLists for skinning:
-        cmds.text('skin_footer_txt', align='center', label="0 "+self.ar.data.lang['i025_joints']+" 0 "+self.ar.data.lang['i024_geometries'], parent='skin_footer_cl')
+        cmds.text('skin_footer_txt', align='center', label=f"0 {self.ar.data.lang['i025_joints']} 0 {self.ar.data.lang['i024_geometries']}", parent='skin_footer_cl')
         # skin copy
-        cmds.frameLayout('skin_copy_fl', label=self.ar.data.lang['i287_copy']+" Skinning", collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent='skin_main_cl')
+        cmds.frameLayout('skin_copy_fl', label=f"{self.ar.data.lang['i287_copy']} Skinning", collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent='skin_main_cl')
         cmds.rowLayout('skin_copy_rl', numberOfColumns=3, columnWidth3=(90, 90, 150), adjustableColumn=2, columnAlign=(1, 'right'), columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)], parent='skin_copy_fl')
         cmds.radioCollection('skin_surface_association_rc', parent='skin_copy_rl')
         cmds.radioButton('skin_closest_point_rb', label='closestPoint', annotation='closestPoint', parent='skin_copy_rl')
         cmds.radioButton('skin_uvspace_rb', label='uvSpace', annotation='uvSpace', parent='skin_copy_rl') #uvSpace
         cmds.paneLayout('skin_copy_v2_pl', configuration='vertical2', separatorThickness=2.0, parent='skin_copy_rl')
         cmds.button('skin_copy_one_source_bt', label=self.ar.data.lang['i290_oneSource'], backgroundColor=(0.4, 0.8, 0.9), command=partial(self.ar.skin.copy_skin_from_one_source, None, True), annotation=self.ar.data.lang['i288_copySkinDesc'], parent='skin_copy_v2_pl')
-        cmds.button('skin_copy_multi_source_bt', label=self.ar.data.lang['i146_same']+" "+self.ar.data.lang['m222_name'], backgroundColor=(0.5, 0.8, 0.9), command=partial(self.ar.skin.copy_skin_same_name, None, True), annotation=self.ar.data.lang['i289_sameNameSkinDesc'], parent='skin_copy_v2_pl')
+        cmds.button('skin_copy_multi_source_bt', label=f"{self.ar.data.lang['i146_same']} {self.ar.data.lang['m222_name']}", backgroundColor=(0.5, 0.8, 0.9), command=partial(self.ar.skin.copy_skin_same_name, None, True), annotation=self.ar.data.lang['i289_sameNameSkinDesc'], parent='skin_copy_v2_pl')
         cmds.radioCollection('skin_surface_association_rc', edit=True, select='skin_closest_point_rb')
         # skin weights IO
         cmds.frameLayout('skin_weights_io_fl', label='SkinCluster weights IO', collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent='skin_main_cl')
@@ -305,7 +305,7 @@ class MainUI:
         cmds.gridLayout('ctr_color_index_gl', numberOfColumns=16, cellWidthHeight=(20, 20), parent='ctr_color_tab')
         # creating color buttons
         for color_index, color_values in enumerate(self.ar.ctrls.get_colors()):
-            cmds.button('index_color_'+str(color_index)+'_bt', label=str(color_index), backgroundColor=(color_values[0], color_values[1], color_values[2]), command=partial(self.ar.ctrls.color_shape, color=color_index), parent='ctr_color_index_gl')
+            cmds.button(f"index_color_{color_index}_bt", label=str(color_index), backgroundColor=(color_values[0], color_values[1], color_values[2]), command=partial(self.ar.ctrls.color_shape, color=color_index), parent='ctr_color_index_gl')
         # RGB layout:
         cmds.columnLayout('ctr_color_rgb_cl', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent='ctr_color_tab')
         cmds.separator(height=10, style='none', parent='ctr_color_rgb_cl')
@@ -350,7 +350,7 @@ class MainUI:
         cmds.gridLayout('ctr_combined_module_gl', numberOfColumns=8, cellWidthHeight=(40, 50), backgroundColor=(0.3, 0.3, 0.3), parent='ctr_combined_shapes_fl')
         # -> ctr_combined_module_gl here we'll populate the control module layout with the items from Controllers folder:
         # edit seleted controller
-        cmds.frameLayout('ctr_edit_selected_fl', label=self.ar.data.lang['i011_editSelected']+" "+self.ar.data.lang['i111_controller'], collapsable=True, collapse=True, marginHeight=10, marginWidth=10, parent='ctr_main_cl')
+        cmds.frameLayout('ctr_edit_selected_fl', label=f"{self.ar.data.lang['i011_editSelected']} {self.ar.data.lang['i111_controller']}", collapsable=True, collapse=True, marginHeight=10, marginWidth=10, parent='ctr_main_cl')
         cmds.paneLayout('ctr_edit_selected_v3_pl', configuration='vertical3', separatorThickness=2.0, parent='ctr_edit_selected_fl')
         cmds.button('ctr_add_shape_bt', label=self.ar.data.lang['i113_addShapes'], backgroundColor=(1.0, 0.6, 0.7), command=partial(self.ar.ctrls.transfer_shape, False, False), parent='ctr_edit_selected_v3_pl')
         cmds.button('ctr_copy_shape_bt', label=self.ar.data.lang['i112_copyShapes'], backgroundColor=(1.0, 0.6, 0.5), command=partial(self.ar.ctrls.transfer_shape, False, True), parent='ctr_edit_selected_v3_pl')
@@ -366,29 +366,29 @@ class MainUI:
         cmds.button('ctr_transfer_calibration_bt', label=self.ar.data.lang['i194_transfer'], backgroundColor=(0.5, 1.0, 1.0), height=30, command=self.ar.ctrls.transfer_calibration, parent='ctr_calibration_v2_pl')
         cmds.button('ctr_import_calibration_bt', label=self.ar.data.lang['i196_import'], backgroundColor=(0.5, 0.8, 1.0), height=30, command=self.ar.ctrls.import_calibration, parent='ctr_calibration_v2_pl')
         # mirror calibration
-        cmds.frameLayout('ctr_mirror_calibration_fl', label=self.ar.data.lang['m010_mirror']+" "+self.ar.data.lang['i193_calibration'], collapsable=True, collapse=True, marginHeight=10, marginWidth=10, parent='ctr_calibration_fl')
+        cmds.frameLayout('ctr_mirror_calibration_fl', label=f"{self.ar.data.lang['m010_mirror']} {self.ar.data.lang['i193_calibration']}", collapsable=True, collapse=True, marginHeight=10, marginWidth=10, parent='ctr_calibration_fl')
         cmds.rowColumnLayout('ctr_mirror_calibration_rcl', numberOfColumns=6, columnWidth=[(1, 60), (2, 40), (3, 40), (4, 40), (5, 40), (6, 70)], columnAlign=[(1, 'left'), (2, 'right'), (3, 'left'), (4, 'right'), (5, 'left'), (6, 'right')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2), (6, 'both', 20)], parent='ctr_calibration_fl')
         cmds.text('ctr_mirror_calibration_prefix_txt', label=self.ar.data.lang['i144_prefix'], parent='ctr_mirror_calibration_rcl')
         cmds.text('ctr_mirror_calibration_from_prefix_txt', label=self.ar.data.lang['i036_from'], parent='ctr_mirror_calibration_rcl')
-        cmds.textField('ctr_mirror_calibration_from_prefix_tf', text=self.ar.data.lang['p002_left']+"_", parent='ctr_mirror_calibration_rcl')
+        cmds.textField('ctr_mirror_calibration_from_prefix_tf', text=f"{self.ar.data.lang['p002_left']}_", parent='ctr_mirror_calibration_rcl')
         cmds.text('ctr_mirror_calibration_to_prefix_txt', label=self.ar.data.lang['i037_to'], parent='ctr_mirror_calibration_rcl')
-        cmds.textField('ctr_mirror_calibration_to_prefix_tf', text=self.ar.data.lang['p003_right']+"_", parent='ctr_mirror_calibration_rcl')
+        cmds.textField('ctr_mirror_calibration_to_prefix_tf', text=f"{self.ar.data.lang['p003_right']}_", parent='ctr_mirror_calibration_rcl')
         cmds.button('ctr_mirror_calibration_bt', label=self.ar.data.lang['m010_mirror'], backgroundColor=(0.5, 0.7, 1.0), height=30, width=70, command=self.ar.ctrls.mirror_calibration, parent='ctr_mirror_calibration_rcl')
         # control shape IO
-        cmds.frameLayout('ctr_shape_io_fl', label=self.ar.data.lang['m067_shape']+" "+self.ar.data.lang['i199_io'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent='ctr_main_cl')
+        cmds.frameLayout('ctr_shape_io_fl', label=f"{self.ar.data.lang['m067_shape']} {self.ar.data.lang['i199_io']}", collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent='ctr_main_cl')
         cmds.paneLayout('ctr_shape_io_v4_pl', configuration='vertical4', separatorThickness=2.0, parent='ctr_shape_io_fl')
         cmds.button('ctr_shape_io_export_bt', label=self.ar.data.lang['i164_export'], backgroundColor=(1.0, 0.8, 0.8), height=30, command=self.ar.ctrls.export_shape, parent='ctr_shape_io_v4_pl')
         cmds.button('ctr_shape_io_import_bt', label=self.ar.data.lang['i196_import'], backgroundColor=(1.0, 0.9, 0.9), height=30, command=self.ar.ctrls.import_shape, parent='ctr_shape_io_v4_pl')
         # mirror control shape
-        cmds.frameLayout('ctr_mirror_shape_fl', label=self.ar.data.lang['m010_mirror']+" "+self.ar.data.lang['m067_shape'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent='ctr_shape_io_fl')
+        cmds.frameLayout('ctr_mirror_shape_fl', label=f"{self.ar.data.lang['m010_mirror']} {self.ar.data.lang['m067_shape']}", collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent='ctr_shape_io_fl')
         cmds.rowColumnLayout('ctr_mirror_shape_rcl', numberOfColumns=6, columnWidth=[(1, 60), (2, 40), (3, 40), (4, 40), (5, 40), (6, 70)], columnAlign=[(1, 'left'), (2, 'right'), (3, 'left'), (4, 'right'), (5, 'left'), (6, 'right')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2), (6, 'both', 20)], parent='ctr_shape_io_fl')
         cmds.optionMenu('ctr_mirror_shape_axis_om', label='', parent='ctr_mirror_shape_rcl')
         for x in self.ar.data.axes:
-            cmds.menuItem('ctr_mirror_axis_'+x+'_mi', label=x, parent='ctr_mirror_shape_axis_om')
+            cmds.menuItem(f"ctr_mirror_axis_{x}_mi", label=x, parent='ctr_mirror_shape_axis_om')
         cmds.text('ctr_mirror_shape_from_prefix_txt', label=self.ar.data.lang['i036_from'], parent='ctr_mirror_shape_rcl')
-        cmds.textField('ctr_mirror_shape_from_prefix_tf', text=self.ar.data.lang['p002_left']+"_", parent='ctr_mirror_shape_rcl')
+        cmds.textField('ctr_mirror_shape_from_prefix_tf', text=f"{self.ar.data.lang['p002_left']}_", parent='ctr_mirror_shape_rcl')
         cmds.text('ctr_mirror_shape_to_prefix_txt', label=self.ar.data.lang['i037_to'], parent='ctr_mirror_shape_rcl')
-        cmds.textField('ctr_mirror_shape_to_prefix_tf', text=self.ar.data.lang['p003_right']+"_", parent='ctr_mirror_shape_rcl')
+        cmds.textField('ctr_mirror_shape_to_prefix_tf', text=f"{self.ar.data.lang['p003_right']}_", parent='ctr_mirror_shape_rcl')
         cmds.button('ctr_mirror_shape_bt', label=self.ar.data.lang['m010_mirror'], backgroundColor=(1.0, 0.5, 0.5), height=30, width=70, command=self.ar.ctrls.reset_mirror_shape, parent='ctr_mirror_shape_rcl')
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout('controllers_tab', edit=True,
@@ -434,20 +434,20 @@ class MainUI:
         # project pipeline asset
         cmds.columnLayout('asset_main_cl', adjustableColumn=False, parent='rebuilder_tab')
         cmds.frameLayout('asset_fl', label=self.ar.data.lang['i303_asset'], collapsable=True, collapse=False, width=370, parent='asset_main_cl')
-        cmds.textFieldGrp('asset_maya_project_tfg', label="Maya "+self.ar.data.lang['i301_project']+":", text=self.ar.pipeliner.pipe_data['mayaProject'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent='asset_fl')
+        cmds.textFieldGrp('asset_maya_project_tfg', label=f"Maya {self.ar.data.lang['i301_project']}:", text=self.ar.pipeliner.pipe_data['mayaProject'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent='asset_fl')
         cmds.textFieldGrp('asset_pipeline_tfg', label='Pipeline:', text=self.ar.pipeliner.pipe_data['projectPath'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent='asset_fl')
-        cmds.textFieldGrp('asset_name_tfg', label=self.ar.data.lang['i303_asset']+":", text=self.ar.pipeliner.pipe_data['assetName'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent='asset_fl')
+        cmds.textFieldGrp('asset_name_tfg', label=f"{self.ar.data.lang['i303_asset']}:", text=self.ar.pipeliner.pipe_data['assetName'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent='asset_fl')
         # asset buttons
         cmds.rowColumnLayout('asset_buttons_rcl', numberOfColumns=5, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 10), (3, 'left', 10), (4, 'left', 10), (5, 'left', 10)], parent='asset_fl')
-        cmds.button('asset_save_version_bt', label=self.ar.data.lang['i222_save']+" "+self.ar.data.lang['m205_version'], command=self.ar.pipeline_ui.save_version_ui, parent='asset_buttons_rcl')
+        cmds.button('asset_save_version_bt', label=f"{self.ar.data.lang['i222_save']} {self.ar.data.lang['m205_version']}", command=self.ar.pipeline_ui.save_version_ui, parent='asset_buttons_rcl')
         cmds.button('asset_load_bt', label=self.ar.data.lang['i187_load'], command=self.ar.pipeliner.load_asset, parent='asset_buttons_rcl')
         cmds.button('asset_new_bt', label=self.ar.data.lang['i304_new'], command=self.ar.pipeline_ui.create_new_asset_ui, parent='asset_buttons_rcl')
-        cmds.button('asset_open_folder_bt', label=self.ar.data.lang['c108_open']+" "+self.ar.data.lang['i298_folder'], command=partial(self.ar.packager.open_folder, self.ar.pipeliner.pipe_data['projectPath']), parent='asset_buttons_rcl')
-        cmds.button('asset_replace_data_bt', label=self.ar.data.lang['m219_replace']+" "+self.ar.data.dp_data, command=partial(self.ar.pipeliner.load_asset, mode=1), parent='asset_buttons_rcl')
+        cmds.button('asset_open_folder_bt', label=f"{self.ar.data.lang['c108_open']} {self.ar.data.lang['i298_folder']}", command=partial(self.ar.packager.open_folder, self.ar.pipeliner.pipe_data['projectPath']), parent='asset_buttons_rcl')
+        cmds.button('asset_replace_data_bt', label=f"{self.ar.data.lang['m219_replace']} {self.ar.data.dp_data}", command=partial(self.ar.pipeliner.load_asset, mode=1), parent='asset_buttons_rcl')
         cmds.separator(style='in', height=20, width=370, parent='asset_main_cl')
         # processes
         cmds.rowColumnLayout('processes_rcl', adjustableColumn=1, numberOfColumns=2, columnAlign=[(1, 'left'), (2, 'right')], columnWidth=[(1, 360), (2, 17)], columnAttach=[(1, 'both', 10), (2, 'right', 10)], parent='rebuilder_tab')
-        cmds.text('processes_io_txt', label=self.ar.data.lang['i292_processes'].upper()+" IO", font='boldLabelFont', parent='processes_rcl')
+        cmds.text('processes_io_txt', label=f"{self.ar.data.lang['i292_processes'].upper()} IO", font='boldLabelFont', parent='processes_rcl')
         cmds.iconTextButton('rebuilder_tri_collapse_itb', image=self.ar.data.icon['tri_right'], annotation=self.ar.data.lang['i348_triangleIconAnn'], command=partial(self.ar.ui_manager.collapse_all_fl, 'rebuilder_tri_collapse_itb', 1), width=17, height=17, style='iconOnly', align='right', parent='processes_rcl')
         cmds.scrollLayout('rebuilder_main_sl', parent='rebuilder_tab')
         cmds.columnLayout('rebuilder_cl', adjustableColumn=True, rowSpacing=3, parent='rebuilder_main_sl')
@@ -463,7 +463,7 @@ class MainUI:
         # rebuilder
         cmds.columnLayout('rebuilder_footer_cl', adjustableColumn=False, parent='rebuilder_tab')
         cmds.separator(style='in', height=20, width=370, parent='rebuilder_footer_cl')
-        cmds.checkBox('rebuilder_select_all_cb', label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i211_all']+" "+self.ar.data.lang['i292_processes'].lower(), value=True, changeCommand=partial(self.ar.ui_manager.change_active_modules, self.ar.config.get_rebuilder_instances()), parent='rebuilder_footer_cl')
+        cmds.checkBox('rebuilder_select_all_cb', label=f"{self.ar.data.lang['m004_select']} {self.ar.data.lang['i211_all']} {self.ar.data.lang['i292_processes'].lower()}", value=True, changeCommand=partial(self.ar.ui_manager.change_active_modules, self.ar.config.get_rebuilder_instances()), parent='rebuilder_footer_cl')
         cmds.separator(style='none', height=10, parent='rebuilder_footer_cl')
         cmds.paneLayout('rebuilder_selected_pl', configuration='vertical2', separatorThickness=7.0, width=370, parent='rebuilder_footer_cl')
         cmds.button('rebuilder_split_data_bt', label=self.ar.data.lang['r002_splitData'].upper(), command=partial(self.ar.ui_manager.run_selected_actions, self.ar.config.get_rebuilder_instances(), True, True, action_type='r000_rebuilder'), parent='rebuilder_selected_pl')
@@ -480,15 +480,15 @@ class MainUI:
 
 
     def create_check_layout(self, name, instances, layout, visible=True):
-        cmds.frameLayout(name+"_fl", label=self.ar.data.lang[name].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, visible=visible, parent=layout)
-        cmds.columnLayout(name+"_module_cl", adjustableColumn=True, parent=name+"_fl") #rowSpacing=3
+        cmds.frameLayout(f"{name}_fl", label=self.ar.data.lang[name].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, visible=visible, parent=layout)
+        cmds.columnLayout(f"{name}_module_cl", adjustableColumn=True, parent=f"{name}_fl") #rowSpacing=3
         # it'll be filled further...
-        cmds.separator(style='none', parent=name+"_fl")
-        cmds.checkBox(name+"_select_all_cb", label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i211_all']+" "+self.ar.data.lang[name], value=False, changeCommand=partial(self.ar.ui_manager.change_active_modules, instances), parent=name+"_fl")
-        cmds.paneLayout(name+"_select_v2_pl", configuration='vertical2', separatorThickness=7.0, parent=name+"_fl")
-        cmds.button(name+"_veryfy_all_bt", label=self.ar.data.lang['i210_verify'].upper(), command=partial(self.ar.ui_manager.run_selected_actions, instances, True, True), parent=name+"_select_v2_pl")
-        cmds.button(name+"_fix_all_bt", label=self.ar.data.lang['c052_fix'].upper(), command=partial(self.ar.ui_manager.run_selected_actions, instances, False, True), parent=name+"_select_v2_pl")
-        cmds.separator(height=30, parent=name+"_fl")
+        cmds.separator(style='none', parent=f"{name}_fl")
+        cmds.checkBox(f"{name}_select_all_cb", label=f"{self.ar.data.lang['m004_select']} {self.ar.data.lang['i211_all']} {self.ar.data.lang[name]}", value=False, changeCommand=partial(self.ar.ui_manager.change_active_modules, instances), parent=f"{name}_fl")
+        cmds.paneLayout(f"{name}_select_v2_pl", configuration='vertical2', separatorThickness=7.0, parent=f"{name}_fl")
+        cmds.button(f"{name}_veryfy_all_bt", label=self.ar.data.lang['i210_verify'].upper(), command=partial(self.ar.ui_manager.run_selected_actions, instances, True, True), parent=f"{name}_select_v2_pl")
+        cmds.button(f"{name}_fix_all_bt", label=self.ar.data.lang['c052_fix'].upper(), command=partial(self.ar.ui_manager.run_selected_actions, instances, False, True), parent=f"{name}_select_v2_pl")
+        cmds.separator(height=30, parent=f"{name}_fl")
 
 
     def skin_from_ui(self, mode=None, *args):

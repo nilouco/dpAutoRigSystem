@@ -17,7 +17,7 @@ class JointDisplayUI:
         self.ar.ui_manager.close_ui('dpJointDisplayWindow')
         width  = 660
         height = 410
-        cmds.window('dpJointDisplayWindow', title=self.ar.data.lang['m233_jointDisplay']+" "+str(self.ar.data.version), widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        cmds.window('dpJointDisplayWindow', title=f"{self.ar.data.lang['m233_jointDisplay']} {self.ar.data.version}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating Main layout:
         cmds.columnLayout('joint_display_cl', columnOffset=('both', 5), adjustableColumn=True)
         cmds.separator(style='none', height=10, parent='joint_display_cl')
@@ -48,13 +48,13 @@ class JointDisplayUI:
         cmds.separator(style='none', height=10, parent='joint_display_cl')
         cmds.rowColumnLayout('joint_display_button_rcl', childArray=True, numberOfColumns=3, columnWidth=[(1, 160), (2, 100), (3, 160)], columnOffset=[(1, 'both', 5), (2, 'both', 80), (3, 'both', 5)], adjustableColumn=2, parent='joint_display_cl')
         # defining move buttons
-        cmds.button('joint_display_move_to_right_bt', label=self.ar.data.lang['c034_move']+' >>', backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.app.move_to_right, parent='joint_display_button_rcl')
-        cmds.optionMenu('joint_display_change_om',label=self.ar.data.lang['i359_changeTo']+' :', width = 200, parent='joint_display_button_rcl', changeCommand= self.app.change_all_joints)
+        cmds.button('joint_display_move_to_right_bt', label=f"{self.ar.data.lang['c034_move']} >>", backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.app.move_to_right, parent='joint_display_button_rcl')
+        cmds.optionMenu('joint_display_change_om',label=f"{self.ar.data.lang['i359_changeTo']} :", width = 200, parent='joint_display_button_rcl', changeCommand= self.app.change_all_joints)
         cmds.menuItem('joint_display_bone_mi', label='Bone', parent='joint_display_change_om')
         cmds.menuItem('joint_display_multichild_mi', label='Multi-Child as box', parent='joint_display_change_om' )
         cmds.menuItem('joint_display_none_mi', label='None', parent='joint_display_change_om' )
         cmds.menuItem('joint_display_joint_mi', label='Joint', parent='joint_display_change_om' )
-        cmds.button('joint_display_move_to_left_bt', label='<< '+self.ar.data.lang['c034_move'], backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.app.move_to_left, parent='joint_display_button_rcl')
+        cmds.button('joint_display_move_to_left_bt', label=f"<< {self.ar.data.lang['c034_move']}", backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.app.move_to_left, parent='joint_display_button_rcl')
         cmds.showWindow('dpJointDisplayWindow')
         self.app.clear_items()
         self.refresh_ui()

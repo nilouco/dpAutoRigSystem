@@ -51,8 +51,8 @@ class OneVertex(action.BaseAction):
                                     self.good_results.append(False)
                                 else: #fix
                                     self.good_results.append(False)
-                                    self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
-                            self.messages.append("---\n"+self.ar.data.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(one_vertices)+")\n---")
+                                    self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}")
+                            self.messages.append(f"---\n{self.ar.data.lang['v121_sharePythonSelect']}\nmaya.cmds.select('{one_vertices}')\n---")
                             cmds.select(one_vertices)
                     else:
                         self.not_found_node()

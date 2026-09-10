@@ -22,7 +22,7 @@ class IkFkSnap:
         self.ar = ar
         self.net_name = net_name
         self.world_ref = world_ref
-        self.ikfk_blend_attr = cmds.getAttr(self.world_ref+".ikFkBlendAttrName")
+        self.ikfk_blend_attr = cmds.getAttr(f"{self.world_ref}.ikFkBlendAttrName")
         self.ik_before_ctrl = fk_ctrls[0]
         self.ik_pole_vector_ctrl = ik_ctrls[0]
         self.ik_extreme_ctrl = ik_ctrls[1]
@@ -37,17 +37,17 @@ class IkFkSnap:
             # calculate the initial ikFk extrem offset
             self.extreme_offset_matrix = self.get_offset_matrix(self.ik_extreme_ctrl, self.fk_ctrls[-1])
             # store data
-            self.ikfk_state = round(cmds.getAttr(self.world_ref+"."+self.ikfk_blend_attr), 0)
-            self.ikfk_snap_net = cmds.createNode('network', name=self.net_name+"_IkFkSnap_Net")
+            self.ikfk_state = round(cmds.getAttr(f"{self.world_ref}.{self.ikfk_blend_attr}"), 0)
+            self.ikfk_snap_net = cmds.createNode('network', name=f"{self.net_name}_IkFkSnap_Net")
             self.ar.custom_attr.add_attr(0, [self.ikfk_snap_net]) #dpID
-            self.id = cmds.getAttr(self.ikfk_snap_net+"."+self.ar.data.dp_id)
+            self.id = cmds.getAttr(f"{self.ikfk_snap_net}.{self.ar.data.dp_id}")
             self.store_ikfk_snap_data()
             if dp_dev:
-                cmds.scriptJob(attributeChange=(self.world_ref+"."+self.ikfk_blend_attr, self.job_changed_ikfk), killWithScene=False, compressUndo=True)
+                cmds.scriptJob(attributeChange=(f"{self.world_ref}.{self.ikfk_blend_attr}", self.job_changed_ikfk), killWithScene=False, compressUndo=True)
             self.generate_script_node()
         else:
-            self.ik_before_ctrl = cmds.listConnections(net_name+".ikBeforeCtrl")[0]
-            self.extreme_offset_matrix = cmds.getAttr(net_name+".extremOffset")
+            self.ik_before_ctrl = cmds.listConnections(f"{net_name}.ikBeforeCtrl")[0]
+            self.extreme_offset_matrix = cmds.getAttr(f"{net_name}.extremOffset")
     
 
     ###
@@ -58,8 +58,8 @@ class IkFkSnap:
     def get_offset_matrix(self, wm, wim):
         """ Return the offset matrix (multiplied matrices) from given world and inverse matrices.
         """
-        a_matrix = OpenMaya.MMatrix(cmds.getAttr(wm+".worldMatrix[0]"))
-        b_matrix = OpenMaya.MMatrix(cmds.getAttr(wim+".worldInverseMatrix[0]"))
+        a_matrix = OpenMaya.MMatrix(cmds.getAttr(f"{wm}.worldMatrix[0]"))
+        b_matrix = OpenMaya.MMatrix(cmds.getAttr(f"{wim}.worldInverseMatrix[0]"))
         return (a_matrix * b_matrix)
 
 
@@ -84,25 +84,25 @@ class IkFkSnap:
         cmds.addAttr(self.ikfk_snap_net, longName='extremOffset', attributeType='matrix')
         cmds.addAttr(self.world_ref, longName='ikFkSnapNet', attributeType='message')
         # set
-        cmds.setAttr(self.ikfk_snap_net+".dpNetwork", 1)
-        cmds.setAttr(self.ikfk_snap_net+".dpIkFkSnapNet", 1)
-        cmds.setAttr(self.ikfk_snap_net+".dpIkFkSnapNetName", self.net_name, type='string')
-        cmds.setAttr(self.ikfk_snap_net+".ikFkState", self.ikfk_state)
-        cmds.setAttr(self.ikfk_snap_net+".ikFkBlendAttr", self.ikfk_blend_attr, type='string')
-        cmds.setAttr(self.ikfk_snap_net+".extremOffset", self.extreme_offset_matrix, type='matrix')
-        cmds.setAttr(self.ikfk_snap_net+".rev_foot_attrs", ';'.join(self.rev_foot_attrs), type='string')
-        cmds.setAttr(self.ikfk_snap_net+".uniform_scale_attr", self.uniform_scale_attr, type='string')
+        cmds.setAttr(f"{self.ikfk_snap_net}.dpNetwork", 1)
+        cmds.setAttr(f"{self.ikfk_snap_net}.dpIkFkSnapNet", 1)
+        cmds.setAttr(f"{self.ikfk_snap_net}.dpIkFkSnapNetName", self.net_name, type='string')
+        cmds.setAttr(f"{self.ikfk_snap_net}.ikFkState", self.ikfk_state)
+        cmds.setAttr(f"{self.ikfk_snap_net}.ikFkBlendAttr", self.ikfk_blend_attr, type='string')
+        cmds.setAttr(f"{self.ikfk_snap_net}.extremOffset", self.extreme_offset_matrix, type='matrix')
+        cmds.setAttr(f"{self.ikfk_snap_net}.rev_foot_attrs", ';'.join(self.rev_foot_attrs), type='string')
+        cmds.setAttr(f"{self.ikfk_snap_net}.uniform_scale_attr", self.uniform_scale_attr, type='string')
         # connect
-        cmds.connectAttr(self.ikfk_snap_net+".message", self.world_ref+".ikFkSnapNet", force=True)
-        cmds.connectAttr(self.world_ref+".message", self.ikfk_snap_net+".worldRef", force=True)
-        cmds.connectAttr(self.ik_before_ctrl+".message", self.ikfk_snap_net+".ikBeforeCtrl", force=True)
-        cmds.connectAttr(self.ik_pole_vector_ctrl+".message", self.ikfk_snap_net+".ikPoleVectorCtrl", force=True)
-        cmds.connectAttr(self.ik_extreme_ctrl+".message", self.ikfk_snap_net+".ikExtremCtrl", force=True)
-        cmds.connectAttr(self.ik_extreme_sub_ctrl+".message", self.ikfk_snap_net+".ikExtremSubCtrl", force=True)
+        cmds.connectAttr(f"{self.ikfk_snap_net}.message", f"{self.world_ref}.ikFkSnapNet", force=True)
+        cmds.connectAttr(f"{self.world_ref}.message", f"{self.ikfk_snap_net}.worldRef", force=True)
+        cmds.connectAttr(f"{self.ik_before_ctrl}.message", f"{self.ikfk_snap_net}.ikBeforeCtrl", force=True)
+        cmds.connectAttr(f"{self.ik_pole_vector_ctrl}.message", f"{self.ikfk_snap_net}.ikPoleVectorCtrl", force=True)
+        cmds.connectAttr(f"{self.ik_extreme_ctrl}.message", f"{self.ikfk_snap_net}.ikExtremCtrl", force=True)
+        cmds.connectAttr(f"{self.ik_extreme_sub_ctrl}.message", f"{self.ikfk_snap_net}.ikExtremSubCtrl", force=True)
         for f, fk_ctrl in enumerate(self.fk_ctrls):
-            cmds.connectAttr(fk_ctrl+".message", self.ikfk_snap_net+".fk_ctrls["+str(f)+"]", force=True)
+            cmds.connectAttr(f"{fk_ctrl}.message", f"{self.ikfk_snap_net}.fk_ctrls[{f}]", force=True)
         for i, ik_joint in enumerate(self.ik_joints):
-            cmds.connectAttr(ik_joint+".message", self.ikfk_snap_net+".ik_joints["+str(i)+"]", force=True)
+            cmds.connectAttr(f"{ik_joint}.message", f"{self.ikfk_snap_net}.ik_joints[{i}]", force=True)
 
 
     ###
@@ -113,10 +113,10 @@ class IkFkSnap:
     def job_changed_ikfk(self, *args):
         """ Just call snap function to set as well or update the ikFkState.
         """
-        self.world_ref = cmds.listConnections(self.ikfk_snap_net+".worldRef")[0]
-        current_value = cmds.getAttr(self.world_ref+"."+self.ikfk_blend_attr)
-        if cmds.getAttr(self.world_ref+".ikFkSnap"):
-            self.ikfk_state = cmds.getAttr(self.ikfk_snap_net+".ikFkState")
+        self.world_ref = cmds.listConnections(f"{self.ikfk_snap_net}.worldRef")[0]
+        current_value = cmds.getAttr(f"{self.world_ref}.{self.ikfk_blend_attr}")
+        if cmds.getAttr(f"{self.world_ref}.ikFkSnap"):
+            self.ikfk_state = cmds.getAttr(f"{self.ikfk_snap_net}.ikFkState")
             if self.ikfk_state == 0: #ik
                 if current_value >= 0.001:
                     self.change_ikfk_attr(0, False)
@@ -130,23 +130,23 @@ class IkFkSnap:
             self.reset_shear(list(set([self.ik_extreme_ctrl] + self.fk_ctrls)))
         else:
             if current_value <= 0.5: #ik
-                cmds.setAttr(self.ikfk_snap_net+".ikFkState", 0)
+                cmds.setAttr(f"{self.ikfk_snap_net}.ikFkState", 0)
             else: #fk
-                cmds.setAttr(self.ikfk_snap_net+".ikFkState", 1)
+                cmds.setAttr(f"{self.ikfk_snap_net}.ikFkState", 1)
 
 
     def change_ikfk_attr(self, ikfk_value, set_state):
         """ 0 = ik
             1 = fk
         """
-        plugged = cmds.listConnections(self.world_ref+"."+self.ikfk_blend_attr, source=True, destination=False, plugs=True)
+        plugged = cmds.listConnections(f"{self.world_ref}.{self.ikfk_blend_attr}", source=True, destination=False, plugs=True)
         if plugged:
             cmds.setAttr(plugged[0], ikfk_value)
         else:
-            cmds.setAttr(self.world_ref+"."+self.ikfk_blend_attr, ikfk_value)
+            cmds.setAttr(f"{self.world_ref}.{self.ikfk_blend_attr}", ikfk_value)
         if set_state:
             self.ikfk_state = ikfk_value
-            cmds.setAttr(self.ikfk_snap_net+".ikFkState", ikfk_value)
+            cmds.setAttr(f"{self.ikfk_snap_net}.ikFkState", ikfk_value)
 
 
     def snap_ik_to_fk(self):
@@ -171,15 +171,15 @@ class IkFkSnap:
         self.transfer_attr_from_to(self.fk_ctrls[2], self.ik_extreme_ctrl, [self.uniform_scale_attr])
         
         # extrem ctrl
-        fk_matrix = OpenMaya.MMatrix(cmds.getAttr(self.fk_ctrls[-1]+".worldMatrix[0]"))
+        fk_matrix = OpenMaya.MMatrix(cmds.getAttr(f"{self.fk_ctrls[-1]}.worldMatrix[0]"))
         to_ik_matrix = OpenMaya.MMatrix(self.extreme_offset_matrix) * fk_matrix #need redefine to load matrix in scriptNode
         cmds.xform(self.ik_extreme_ctrl, matrix=list(to_ik_matrix), worldSpace=True)
         # poleVector ctrl
         start_pos, corner_pos, end_pos, chain_len, pv_ratio = self.get_chain_position()
         # calculate the position of the base middle locator
-        pv_base_pos_x = (end_pos[0] - start_pos[0]) * pv_ratio+start_pos[0]
-        pv_base_pos_y = (end_pos[1] - start_pos[1]) * pv_ratio+start_pos[1]
-        pv_base_pos_z = (end_pos[2] - start_pos[2]) * pv_ratio+start_pos[2]
+        pv_base_pos_x = (end_pos[0] - start_pos[0]) * pv_ratio + start_pos[0]
+        pv_base_pos_y = (end_pos[1] - start_pos[1]) * pv_ratio + start_pos[1]
+        pv_base_pos_z = (end_pos[2] - start_pos[2]) * pv_ratio + start_pos[2]
         # working with vectors
         corner_base_pos_x = corner_pos[0] - pv_base_pos_x
         corner_base_pos_y = corner_pos[1] - pv_base_pos_y
@@ -195,9 +195,9 @@ class IkFkSnap:
         pv_dist_y = normal_dir_y * chain_len
         pv_dist_z = normal_dir_z * chain_len
         # get the poleVector position
-        pv_pos_x = pv_base_pos_x+pv_dist_x
-        pv_pos_y = pv_base_pos_y+pv_dist_y
-        pv_pos_z = pv_base_pos_z+pv_dist_z
+        pv_pos_x = pv_base_pos_x + pv_dist_x
+        pv_pos_y = pv_base_pos_y + pv_dist_y
+        pv_pos_z = pv_base_pos_z + pv_dist_z
         # place poleVector controller in the correct position
         cmds.move(pv_pos_x, pv_pos_y, pv_pos_z, self.ik_pole_vector_ctrl, objectSpace=False, worldSpaceDistance=True)
         # reset footRoll attributes
@@ -206,14 +206,14 @@ class IkFkSnap:
             for attr in user_def_attrs:
                 for rev_foot_attr in self.rev_foot_attrs:
                     if rev_foot_attr in attr:
-                        cmds.setAttr(self.ik_extreme_ctrl+"."+attr, 0)
+                        cmds.setAttr(f"{self.ik_extreme_ctrl}.{attr}", 0)
 
 
     def get_offset_xform(self, wm, wim):
         """ Return the offset xform matrix (multiplied matrices) from given xform matrices.
         """
-        a_matrix = OpenMaya.MMatrix(cmds.getAttr(wm+".xformMatrix"))
-        b_matrix = OpenMaya.MMatrix(cmds.getAttr(wim+".xformMatrix"))
+        a_matrix = OpenMaya.MMatrix(cmds.getAttr(f"{wm}.xformMatrix"))
+        b_matrix = OpenMaya.MMatrix(cmds.getAttr(f"{wim}.xformMatrix"))
         return (a_matrix * b_matrix)
 
 
@@ -221,33 +221,33 @@ class IkFkSnap:
         """ Set clavicle rotation from offset xform calculus.
             Also set rotation keyframe.
         """
-        if cmds.objExists(ctrl+".followAttrName"): #stored attribute name to avoid run procedure without dpAR language dictionary
-            follow_attr = cmds.getAttr(ctrl+".followAttrName")
-            if cmds.getAttr(ctrl+"."+follow_attr):
+        if cmds.objExists(f"{ctrl}.followAttrName"): #stored attribute name to avoid run procedure without dpAR language dictionary
+            follow_attr = cmds.getAttr(f"{ctrl}.followAttrName")
+            if cmds.getAttr(f"{ctrl}.{follow_attr}"):
                 father = cmds.listRelatives(ctrl, parent=True, type='transform')[0]
-                negative_scale = cmds.getAttr(father+".scaleX")
+                negative_scale = cmds.getAttr(f"{father}.scaleX")
                 if negative_scale == -1:
-                    cmds.setAttr(father+".scaleX", 1)
-                    cmds.setAttr(father+".scaleY", 1)
-                    cmds.setAttr(father+".scaleZ", 1)
+                    cmds.setAttr(f"{father}.scaleX", 1)
+                    cmds.setAttr(f"{father}.scaleY", 1)
+                    cmds.setAttr(f"{father}.scaleZ", 1)
                 ctrl_offset = self.get_offset_xform(ctrl, father)
                 cmds.xform(ctrl, matrix=list(ctrl_offset), worldSpace=False)
                 cmds.xform(ctrl, translation=[0, 0, 0], worldSpace=False)
                 # disable autoClavicle and keyframe it
-                cmds.setAttr(ctrl+"."+follow_attr, 0)
+                cmds.setAttr(f"{ctrl}.{follow_attr}", 0)
                 cmds.setKeyframe(ctrl, attribute=("rotateX", "rotateY", "rotateZ", follow_attr))
                 if negative_scale == -1:
-                    cmds.setAttr(father+".scaleX", -1)
-                    cmds.setAttr(father+".scaleY", -1)
-                    cmds.setAttr(father+".scaleZ", -1)
+                    cmds.setAttr(f"{father}.scaleX", -1)
+                    cmds.setAttr(f"{father}.scaleY", -1)
+                    cmds.setAttr(f"{father}.scaleZ", -1)
 
 
     def zero_key_attr_value(self, ctrl, attributes):
         """ Set zero value and keyframe the given attributes in the controller.
         """
         for attr in attributes:
-            if cmds.objExists(ctrl+"."+attr) and cmds.getAttr(ctrl+"."+attr):
-                cmds.setAttr(ctrl+"."+attr, 0)
+            if cmds.objExists(f"{ctrl}.{attr}") and cmds.getAttr(f"{ctrl}.{attr}"):
+                cmds.setAttr(f"{ctrl}.{attr}", 0)
                 cmds.setKeyframe(ctrl, attribute=attr)
 
 
@@ -255,24 +255,24 @@ class IkFkSnap:
         """ It compares the attributes to transfer values from/to given controllers and keyframe them.
         """
         for attr in attributes:
-            if cmds.objExists(from_ctrl+"."+attr) and cmds.objExists(to_ctrl+"."+attr):
-                from_value = cmds.getAttr(from_ctrl+"."+attr)
-                to_value = cmds.getAttr(to_ctrl+"."+attr)
+            if cmds.objExists(f"{from_ctrl}.{attr}") and cmds.objExists(f"{to_ctrl}.{attr}"):
+                from_value = cmds.getAttr(f"{from_ctrl}.{attr}")
+                to_value = cmds.getAttr(f"{to_ctrl}.{attr}")
                 if from_value != to_value:
-                    cmds.setAttr(to_ctrl+"."+attr, from_value)
+                    cmds.setAttr(f"{to_ctrl}.{attr}", from_value)
                     cmds.setKeyframe(to_ctrl, attribute=attr)
 
 
     def reset_shear(self, controllers):
         """ Set zero to all shear attributes in main controllers affected by possible stretch.
         """
-        start_length = cmds.getAttr(self.ik_extreme_ctrl+".startChainLength")
+        start_length = cmds.getAttr(f"{self.ik_extreme_ctrl}.startChainLength")
         current_length = self.get_chain_position()[3] #chain_len
         if current_length == start_length:
             for ctrl in controllers:
-                cmds.setAttr(ctrl+".shearXY", 0)
-                cmds.setAttr(ctrl+".shearXZ", 0)
-                cmds.setAttr(ctrl+".shearYZ", 0)
+                cmds.setAttr(f"{ctrl}.shearXY", 0)
+                cmds.setAttr(f"{ctrl}.shearXZ", 0)
+                cmds.setAttr(f"{ctrl}.shearYZ", 0)
     
 
     def get_chain_position(self):
@@ -320,7 +320,7 @@ class IkFkSnap(object):
     def __init__(self, ikFkSnapNet):
         self.ikfk_snap_net = ikFkSnapNet
         self.reloadNetData()
-        cmds.scriptJob(attributeChange=(self.world_ref+"."+self.ikfk_blend_attr, self.job_changed_ikfk), killWithScene=False, compressUndo=True)
+        cmds.scriptJob(attributeChange=(self.world_ref+".ikFkBlendAttrName", self.job_changed_ikfk), killWithScene=False, compressUndo=True)
 
     def reloadNetData(self):
         self.world_ref = cmds.listConnections(self.ikfk_snap_net+".worldRef")[0]
@@ -340,7 +340,7 @@ class IkFkSnap(object):
         """ Just call snap function to set as well or update the ikFkState.
         """
         self.world_ref = cmds.listConnections(self.ikfk_snap_net+".worldRef")[0]
-        current_value = cmds.getAttr(self.world_ref+"."+self.ikfk_blend_attr)
+        current_value = cmds.getAttr(self.world_ref+".ikFkBlendAttrName")
         if cmds.getAttr(self.world_ref+".ikFkSnap"):
             self.ikfk_state = cmds.getAttr(self.ikfk_snap_net+".ikFkState")
             if self.ikfk_state == 0: #ik
@@ -364,11 +364,11 @@ class IkFkSnap(object):
         """ 0 = ik
             1 = fk
         """
-        plugged = cmds.listConnections(self.world_ref+"."+self.ikfk_blend_attr, source=True, destination=False, plugs=True)
+        plugged = cmds.listConnections(self.world_ref+".ikFkBlendAttrName", source=True, destination=False, plugs=True)
         if plugged:
             cmds.setAttr(plugged[0], ikfk_value)
         else:
-            cmds.setAttr(self.world_ref+"."+self.ikfk_blend_attr, ikfk_value)
+            cmds.setAttr(self.world_ref+".ikFkBlendAttrName", ikfk_value)
         if set_state:
             self.ikfk_state = ikfk_value
             cmds.setAttr(self.ikfk_snap_net+".ikFkState", ikfk_value)
@@ -518,10 +518,10 @@ for net in cmds.ls(type="network"):
             if cmds.objExists(net+".dpID") and cmds.getAttr(net+".dpID") == "'''+self.id+'''":
                 IkFkSnap(net)
 '''
-        sn = cmds.scriptNode(name=self.net_name+'_IkFkSnap_SN', sourceType='python', scriptType=2, beforeScript=ikfk_snap_code)
+        sn = cmds.scriptNode(name=f"{self.net_name}_IkFkSnap_SN", sourceType='python', scriptType=2, beforeScript=ikfk_snap_code)
         self.ar.custom_attr.add_attr(0, [sn]) #dpID
         cmds.addAttr(self.ikfk_snap_net, longName="ikFkSnapScriptNode", attributeType='message')
         cmds.addAttr(sn, longName='ikFkSnapNet', attributeType='message')
-        cmds.connectAttr(sn+".message", self.ikfk_snap_net+".ikFkSnapScriptNode", force=True)
-        cmds.connectAttr(self.ikfk_snap_net+".message", sn+".ikFkSnapNet", force=True)
+        cmds.connectAttr(f"{sn}.message", f"{self.ikfk_snap_net}.ikFkSnapScriptNode", force=True)
+        cmds.connectAttr(f"{self.ikfk_snap_net}.message", f"{sn}.ikFkSnapNet", force=True)
         cmds.scriptNode(sn, executeBefore=True)

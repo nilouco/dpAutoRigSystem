@@ -40,19 +40,19 @@ class HideJoints(action.BaseAction):
                 self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
                 for item in check_items:
                     self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
-                    if cmds.getAttr(item + '.drawStyle') != 2:
+                    if cmds.getAttr(f"{item}.drawStyle") != 2:
                         self.checked_items.append(item)
                         self.found_issues.append(True)
                         if self.first_mode:
                             self.good_results.append(False)
                         else: #fix
                             try:
-                                cmds.setAttr(item +'.drawStyle', 2)
+                                cmds.setAttr(f"{item}.drawStyle", 2)
                                 self.good_results.append(True)
-                                self.messages.append(self.ar.data.lang['v004_fixed']+": "+item)
+                                self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {item}")
                             except:
                                 self.good_results.append(False)
-                                self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
+                                self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}")
             else:
                 self.not_found_node()
         else:

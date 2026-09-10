@@ -34,7 +34,7 @@ class PrintSelection(base.BaseLibrary):
             if data:
                 self.run_printing(data)
         else:
-            mel.eval("warning \""+self.ar.data.lang['i042_notSelection']+"\";")
+            mel.eval(f'warning "{self.ar.data.lang['i042_notSelection']}";')
     
     
     def get_data(self, selection):
@@ -44,9 +44,9 @@ class PrintSelection(base.BaseLibrary):
         if selection:
             text = ''
             for i, item in enumerate(selection):
-                text = text + str(item)
+                text = f"{text}{item}"
                 if i < len(selection):
-                    text = text + ";"
+                    text = f"{text};"
             data['string'] = text
             data['list'] = selection
         return data
@@ -65,4 +65,4 @@ class PrintSelection(base.BaseLibrary):
             print(data['string'])
             print('-------')
         else:
-            mel.eval("warning \""+self.ar.data.lang['i042_notSelection']+"\";")
+            mel.eval(f'warning "{self.ar.data.lang['i042_notSelection']}";')

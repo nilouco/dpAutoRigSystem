@@ -16,7 +16,7 @@ class ReorderAttrUI:
         self.ar.ui_manager.close_ui('dpReorderAttrWindow')
         width  = 175
         height = 75
-        cmds.window('dpReorderAttrWindow', title=self.ar.data.lang['m087_reorderAttr']+" "+str(self.ar.data.version), widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        cmds.window('dpReorderAttrWindow', title=f"{self.ar.data.lang['m087_reorderAttr']} {self.ar.data.version}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         cmds.columnLayout('reorder_attr_cl', columnOffset=('left', 30))
         cmds.separator(style='none', height=7, parent='reorder_attr_cl')

@@ -53,7 +53,7 @@ class NonQuadFace(action.BaseAction):
                         # verify if objName or shape_name is in check_items
                         for item in check_items:
                             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
-                            if item == shape_name and not cmds.getAttr(item+".intermediateObject"):
+                            if item == shape_name and not cmds.getAttr(f"{item}.intermediateObject"):
                                 iter_polys = OpenMaya.MItMeshPolygon(shape)
                                 # Iterate through polys on current mesh
                                 while not iter_polys.isDone():
@@ -61,19 +61,19 @@ class NonQuadFace(action.BaseAction):
                                     if n_vertex > 4:
                                         if not item_name in poly_items:
                                             poly_items.append(item_name)
-                                        poly_faces.append(item_name+'.f["+str(iter_polys.index())+"]')
+                                        poly_faces.append(f"{item_name}.f['{iter_polys.index()}']")
                                     elif n_vertex == 3:
                                         if not item_name in tris_items:
                                             tris_items.append(item_name)
-                                        tris_faces.append(item_name+'.f["+str(iter_polys.index())+"]')
+                                        tris_faces.append(f"{item_name}.f['{iter_polys.index()}']")
                                     # Move to next polygon in the mesh list
                                     iter_polys.next()
                         # Move to the next selected node in the list
                         iter.next()
                 # conditional to check here
                 if poly_items or tris_items:
-                    non_quad_items = list(set(poly_items+tris_items))
-                    non_quad_faces = list(set(poly_faces+tris_faces))
+                    non_quad_items = list(set(poly_items + tris_items))
+                    non_quad_faces = list(set(poly_faces + tris_faces))
                     non_quad_items.sort()
                     non_quad_faces.sort()
                     for item in non_quad_items:
@@ -83,9 +83,9 @@ class NonQuadFace(action.BaseAction):
                             self.good_results.append(False)
                         else: #fix
                             self.good_results.append(False)
-                            self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
-                    self.messages.append("Tris:    "+str(tris_faces)+"\nPolys: "+str(poly_faces))
-                    self.messages.append("---\n"+self.ar.data.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(non_quad_faces)+")\n---")
+                            self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}")
+                    self.messages.append(f"Tris:    {tris_faces}\nPolys: {poly_faces}")
+                    self.messages.append(f"---\n{self.ar.data.lang['v121_sharePythonSelect']}\nmaya.cmds.select('{non_quad_faces}')\n---")
                     cmds.select(non_quad_faces)
             else:
                 self.not_found_node()

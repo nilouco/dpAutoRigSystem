@@ -77,8 +77,8 @@ class Utils:
                     del_it = False
                 if del_it:
                     try:
-                        cmds.setAttr(node+"."+user_def_attr, lock=False)
-                        cmds.deleteAttr(node+"."+user_def_attr)
+                        cmds.setAttr(f"{node}.{user_def_attr}", lock=False)
+                        cmds.deleteAttr(f"{node}.{user_def_attr}")
                     except:
                         pass
 
@@ -104,15 +104,15 @@ class Utils:
                             node_number = str(int(transform_name[transform_name.rfind('_')+1:])+1)
                             transform_name = (transform_name[:transform_name.rfind('_')+1])+node_number
                             suffix = '_Grp'
-                            if not cmds.objExists(transform_name+suffix):
+                            if not cmds.objExists(f"{transform_name}{suffix}"):
                                 need_add_number = False
-                zero_grp = cmds.duplicate(transform, name=transform_name+suffix)[0]
+                zero_grp = cmds.duplicate(transform, name=f"{transform_name}{suffix}")[0]
                 self.remove_user_defined_attr(zero_grp)
                 children = cmds.listRelatives(zero_grp, allDescendents=True, children=True, fullPath=True)
                 if children:
                     cmds.delete(children)
                 if offset:
-                    offset_grp = cmds.duplicate(zero_grp, name=transform+'_Offset_Grp')[0]
+                    offset_grp = cmds.duplicate(zero_grp, name=f"{transform}_Offset_Grp")[0]
                     self.ar.custom_attr.add_attr(0, [offset_grp]) #dpID
                     cmds.parent(transform, offset_grp, absolute=True)
                     cmds.parent(offset_grp, zero_grp, absolute=True)
@@ -140,9 +140,9 @@ class Utils:
         """ Add attribute as string and set is as attr_name got.
         """
         if item != "" and attr != "":
-            if not cmds.objExists(item+".originedFrom"):
+            if not cmds.objExists(f"{item}.originedFrom"):
                 cmds.addAttr(item, longName='originedFrom', dataType='string')
-            cmds.setAttr(item+".originedFrom", attr, type='string')
+            cmds.setAttr(f"{item}.originedFrom", attr, type='string')
 
 
     def get_origined_from_data(self):
@@ -153,8 +153,8 @@ class Utils:
         transforms = cmds.ls(selection=False, type='transform')
         if transforms:
             for transform in transforms:
-                if cmds.objExists(transform+".originedFrom"):
-                    temp_origined_from = cmds.getAttr(transform+".originedFrom")
+                if cmds.objExists(f"{transform}.originedFrom"):
+                    temp_origined_from = cmds.getAttr(f"{transform}.originedFrom")
                     if temp_origined_from:
                         if not ';' in temp_origined_from:
                             origined_from_data[temp_origined_from] = transform
@@ -171,7 +171,7 @@ class Utils:
         if item != '' and cmds.objExists(item):
             if not hook_type in cmds.listAttr(item):
                 cmds.addAttr(item, longName=hook_type, attributeType='bool')
-                cmds.setAttr(item+"."+hook_type, 1)
+                cmds.setAttr(f"{item}.{hook_type}", 1)
             if add_not_transform_io:
                 self.add_attr_to_items([item], self.ignore_transform_io_attr)
 
@@ -184,21 +184,21 @@ class Utils:
         hook = {}
         transforms = cmds.ls(type='transform')
         for item in transforms:
-            if 'guideBase' in cmds.listAttr(item) and cmds.getAttr(item+".guideBase") == 1:
+            if 'guideBase' in cmds.listAttr(item) and cmds.getAttr(f"{item}.guideBase") == 1:
                 # module info:
                 guide_module_namespace = item[:item.find(':')]
                 name = item[:item.find('__')]
                 guide_instance = item[item.rfind('__')+2:item.find(':')]
-                guide_custom_name = cmds.getAttr(item+".customName")
-                guide_mirror_axis = cmds.getAttr(item+".mirrorAxis")
-                current_mirror_name = cmds.getAttr(item+".mirrorName")
-                guide_mirror_name = [current_mirror_name[0]+"_" , current_mirror_name[len(current_mirror_name)-1:]+"_"]
+                guide_custom_name = cmds.getAttr(f"{item}.customName")
+                guide_mirror_axis = cmds.getAttr(f"{item}.mirrorAxis")
+                current_mirror_name = cmds.getAttr(f"{item}.mirrorName")
+                guide_mirror_name = [f"{current_mirror_name[0]}_" , f"{current_mirror_name[len(current_mirror_name)-1:]}_"]
                 # get children:
                 guide_children = []
                 children = cmds.listRelatives(item, allDescendents=True, type='transform')
                 if children:
                     for child in children:
-                        if cmds.objExists(child+".guideBase") and cmds.getAttr(child+".guideBase") == 1:
+                        if cmds.objExists(f"{child}.guideBase") and cmds.getAttr(f"{child}.guideBase") == 1:
                             guide_children.append(child)                
                 # get father:
                 guide_parents = []
@@ -208,7 +208,7 @@ class Utils:
                 if parents:
                     next_loop = True
                     while next_loop:
-                        if cmds.objExists(parents[0]+".guideBase") and cmds.getAttr(parents[0]+".guideBase") == 1:
+                        if cmds.objExists(f"{parents[0]}.guideBase") and cmds.getAttr(f"{parents[0]}.guideBase") == 1:
                             guide_parents.append(parents[0])
                             next_loop = False
                         else:
@@ -224,17 +224,17 @@ class Utils:
                         guide_parent      = guide_parents[0]
                         father_module     = guide_parent[:guide_parent.find('__')]
                         father_instance   = guide_parent[guide_parent.rfind('__')+2:guide_parent.find(':')]
-                        father_custom_name = cmds.getAttr(guide_parent+".customName")
-                        father_mirror_axis = cmds.getAttr(guide_parent+".mirrorAxis")
-                        current_father_mirror_name  = cmds.getAttr(guide_parent+".mirrorName")
-                        father_mirror_name = [current_father_mirror_name[0]+"_" , current_father_mirror_name[len(current_father_mirror_name)-1:]+"_"]
+                        father_custom_name = cmds.getAttr(f"{guide_parent}.customName")
+                        father_mirror_axis = cmds.getAttr(f"{guide_parent}.mirrorAxis")
+                        current_father_mirror_name  = cmds.getAttr(f"{guide_parent}.mirrorName")
+                        father_mirror_name = [f"{current_father_mirror_name[0]}_" , f"{current_father_mirror_name[len(current_father_mirror_name)-1:]}_"]
                         if father_nodes:
                             father_guide_loc = father_nodes[0][father_nodes[0].find('Guide_')+6:]
                         else:
                             guide_parent_children = cmds.listRelatives(guide_parent, children=True, type='transform')
                             if guide_parent_children:
                                 for guide_parent_child in guide_parent_children:
-                                    if cmds.objExists(guide_parent_child+'.nJoint') and cmds.getAttr(guide_parent_child+'.nJoint') == 1 and guide_parent[:guide_parent.rfind(':')] in guide_parent_child:
+                                    if cmds.objExists(f"{guide_parent_child}.nJoint") and cmds.getAttr(f"{guide_parent_child}.nJoint") == 1 and guide_parent[:guide_parent.rfind(':')] in guide_parent_child:
                                         father_nodes = [guide_parent_child]
                                         father_guide_loc = guide_parent_child[guide_parent_child.find('Guide_')+6:]
                     
@@ -258,7 +258,7 @@ class Utils:
         """
         if cmds.objExists(item):
             if cmds.listRelatives(item, children=True, allDescendents=True, type='transform'):
-                children = [child for child in cmds.listRelatives(item, children=True, allDescendents=True, type='transform') if attr in cmds.listAttr(child) and cmds.getAttr(child+"."+attr) == 1]
+                children = [child for child in cmds.listRelatives(item, children=True, allDescendents=True, type='transform') if attr in cmds.listAttr(child) and cmds.getAttr(f"{child}.{attr}") == 1]
                 if unparent and children:
                     fathers = cmds.listRelatives(item, parent=True)
                     for child in children:
@@ -285,7 +285,7 @@ class Utils:
             children = cmds.listRelatives(item, allDescendents=True, type='transform')
             if children:
                 for child in children:
-                    if cmds.objExists(child+".guideBase") and cmds.getAttr(child+".guideBase") == 1:
+                    if cmds.objExists(f"{child}.guideBase") and cmds.getAttr(f"{child}.guideBase") == 1:
                         guide_children.append(child)
         return guide_children
 
@@ -298,7 +298,7 @@ class Utils:
         if parents:
             next_loop = True
             while next_loop:
-                if cmds.objExists(parents[0]+".guideBase") and cmds.getAttr(parents[0]+".guideBase") == 1 and cmds.getAttr(parents[0]+".mirrorEnable") == 1 and cmds.getAttr(parents[0]+".mirrorAxis") != 'off':
+                if cmds.objExists(f"{parents[0]}.guideBase") and cmds.getAttr(f"{parents[0]}.guideBase") == 1 and cmds.getAttr(f"{parents[0]}.mirrorEnable") == 1 and cmds.getAttr(f"{parents[0]}.mirrorAxis") != 'off':
                     next_loop = False
                     return parents[0]
                 else:
@@ -338,7 +338,7 @@ class Utils:
                 guide_namespace = guide_module.guide_namespace
                 if guide_namespace in cmds.namespaceInfo(listOnlyNamespaces=True):
                     number_name = guide_module.number_name
-                    if not cmds.objExists(number_name+'_Static_Grp'):
+                    if not cmds.objExists(f"{number_name}_Static_Grp"):
                         if not 'dpHead' in str(guide_module):
                             guides_to_rig.append(guide_module)
                         else:
@@ -359,7 +359,7 @@ class Utils:
         if joints:
             for jnt in joints:
                 if cmds.objExists(jnt):
-                    jxt_name = jnt.replace('_Jnt', '').replace("_"+suffix, '')
+                    jxt_name = jnt.replace('_Jnt', '').replace(f"_{suffix}", '')
                     if not suffix in jxt_name:
                         jxt_name += suffix
                     dup = cmds.duplicate(jnt, name=jxt_name)[0]
@@ -368,7 +368,7 @@ class Utils:
                     self.clear_joint_label([dup])
                     cmds.parent(jnt, dup)
                     if not display_bone:
-                        cmds.setAttr(dup+".drawStyle", 2) #none
+                        cmds.setAttr(f"{dup}.drawStyle", 2) #none
                     self.ar.custom_attr.add_attr(0, [dup]) #dpID
                     results.append(dup)
         return results
@@ -381,8 +381,8 @@ class Utils:
         if items:
             for item in items:
                 for dpar_attr in dpar_attrs:
-                    if cmds.objExists(item+"."+dpar_attr):
-                        cmds.deleteAttr(item+"."+dpar_attr)
+                    if cmds.objExists(f"{item}.{dpar_attr}"):
+                        cmds.deleteAttr(f"{item}.{dpar_attr}")
 
 
     def delete_children(self, item):
@@ -403,8 +403,8 @@ class Utils:
         """
         joints = []
         if father and brother and cmds.objExists(father) and cmds.objExists(brother):
-            jax_name = brother[:brother.rfind('_')]+"_Jax"
-            jar_name = brother[:brother.rfind('_')]+"_Jar"
+            jax_name = f"{brother[:brother.rfind('_')]}_Jax"
+            jar_name = f"{brother[:brother.rfind('_')]}_Jar"
             cmds.select(clear=True)
             jax = cmds.joint(name=jax_name, radius=0.5*jar_radius)
             jar = cmds.joint(name=jar_name, radius=jar_radius)
@@ -412,31 +412,31 @@ class Utils:
             cmds.matchTransform(jax, brother, position=True, rotation=True)
             cmds.parent(jax, father)
             cmds.makeIdentity(jax, apply=True)
-            cmds.setAttr(jax+".segmentScaleCompensate", 0)
-            cmds.setAttr(jar+".segmentScaleCompensate", 1)
+            cmds.setAttr(f"{jax}.segmentScaleCompensate", 0)
+            cmds.setAttr(f"{jar}.segmentScaleCompensate", 1)
             joints.append(jar)
             for i in range(jcr_number):
                 cmds.select(jar)
-                jcr = cmds.joint(name=brother[:brother.rfind('_')+1]+str(i)+"_Jcr")
-                cmds.setAttr(jcr+".segmentScaleCompensate", 0)
+                jcr = cmds.joint(name=f"{brother[:brother.rfind('_')+1]}{i}_Jcr")
+                cmds.setAttr(f"{jcr}.segmentScaleCompensate", 0)
                 cmds.addAttr(jcr, longName='dpAR_joint', attributeType='float', keyable=False)
                 if jcr_pos:
-                    cmds.setAttr(jcr+".translateX", jcr_pos[i][0]*dist)
-                    cmds.setAttr(jcr+".translateY", jcr_pos[i][1]*dist)
-                    cmds.setAttr(jcr+".translateZ", jcr_pos[i][2]*dist)
+                    cmds.setAttr(f"{jcr}.translateX", jcr_pos[i][0]*dist)
+                    cmds.setAttr(f"{jcr}.translateY", jcr_pos[i][1]*dist)
+                    cmds.setAttr(f"{jcr}.translateZ", jcr_pos[i][2]*dist)
                 if jcr_rot:
-                    cmds.setAttr(jcr+".rotateX", jcr_rot[i][0])
-                    cmds.setAttr(jcr+".rotateY", jcr_rot[i][1])
-                    cmds.setAttr(jcr+".rotateZ", jcr_rot[i][2])
+                    cmds.setAttr(f"{jcr}.rotateX", jcr_rot[i][0])
+                    cmds.setAttr(f"{jcr}.rotateY", jcr_rot[i][1])
+                    cmds.setAttr(f"{jcr}.rotateZ", jcr_rot[i][2])
                 joints.append(jcr)
-            cmds.pointConstraint(brother, jax, maintainOffset=True, name=jar_name+"_PoC")[0]
+            cmds.pointConstraint(brother, jax, maintainOffset=True, name=f"{jar_name}_PoC")[0]
             if orient_ctrl:
-                orc = cmds.orientConstraint(father, orient_ctrl, jax, maintainOffset=True, name=jar_name+"_OrC")[0]
+                orc = cmds.orientConstraint(father, orient_ctrl, jax, maintainOffset=True, name=f"{jar_name}_OrC")[0]
             else:
-                orc = cmds.orientConstraint(father, brother, jax, maintainOffset=True, name=jar_name+"_OrC")[0]
-            cmds.setAttr(orc+".interpType", 2) #shortest
+                orc = cmds.orientConstraint(father, brother, jax, maintainOffset=True, name=f"{jar_name}_OrC")[0]
+            cmds.setAttr(f"{orc}.interpType", 2) #shortest
             if do_scale:
-                cmds.scaleConstraint(father, brother, jax, maintainOffset=True, name=jar_name+"_ScC")
+                cmds.scaleConstraint(father, brother, jax, maintainOffset=True, name=f"{jar_name}_ScC")
             return joints
 
 
@@ -459,9 +459,9 @@ class Utils:
         old_attrs = ['modelsGrp', None, None, None, None, None, None, None, None, None, None]
         for m, master_attr in enumerate(master_grp_attrs):
             if not master_attr in cmds.listAttr(item) and (not old_attrs[m] or not old_attrs[m] in cmds.listAttr(item)):
-                cmds.setAttr(item+"."+self.ar.data.master_attr, 0)
+                cmds.setAttr(f"{item}.{self.ar.data.master_attr}", 0)
                 return False
-        return cmds.getAttr(item+"."+self.ar.data.master_attr)
+        return cmds.getAttr(f"{item}.{self.ar.data.master_attr}")
     
 
     def get_node_by_message(self, attr_name, node=None):
@@ -473,7 +473,7 @@ class Utils:
         if not node:
             node = self.get_all_grp()
         if node and attr_name in cmds.listAttr(node):
-                found_items = cmds.listConnections(node+"."+attr_name, source=True, destination=False)
+                found_items = cmds.listConnections(f"{node}.{attr_name}", source=True, destination=False)
                 if found_items:
                     result = found_items[0]
         return result
@@ -485,8 +485,8 @@ class Utils:
             Returns the created motion path node.
         """
         mop = cmds.pathAnimation(item, curve=curve_name, fractionMode=True, name=mop_name)
-        cmds.delete(cmds.listConnections(mop+".u", source=True, destination=False)[0])
-        cmds.setAttr(mop+".u", u_value)
+        cmds.delete(cmds.listConnections(f"{mop}.u", source=True, destination=False)[0])
+        cmds.setAttr(f"{mop}.u", u_value)
         return mop
         
 
@@ -535,7 +535,7 @@ class Utils:
         for item in items:
             if cmds.objExists(item):
                 for attr in self.ar.data.transform_attrs:
-                    cmds.setAttr(item+"."+attr, lock=False)
+                    cmds.setAttr(f"{item}.{attr}", lock=False)
 
 
     def export_log_dic_to_json(self, data, name=None, path=None, sub_folder=None):
@@ -547,12 +547,12 @@ class Utils:
         if path:
             dp_folder = path[:path.rfind('/')]
             if sub_folder:
-                dp_folder = dp_folder+"/"+sub_folder
+                dp_folder = f"{dp_folder}/{sub_folder}"
             if not os.path.exists(dp_folder):
                 os.makedirs(dp_folder)
             if not name:
                 name = path[path.rfind('/')+1:path.rfind('.')]
-            path_file = dp_folder+"/dpLog_"+name+"_"+current_time+".json"
+            path_file = f"{dp_folder}/dpLog_{name}_{current_time}.json"
         else:
             return False
         print('Log file', path_file)
@@ -576,32 +576,32 @@ class Utils:
         """
         for jnt in joints:
             if cmds.objExists(jnt):
-                cmds.setAttr(jnt+".side", 3) #None
-                cmds.setAttr(jnt+".type", 0) #None
-                cmds.setAttr(jnt+".otherType", "", type='string')
+                cmds.setAttr(f"{jnt}.side", 3) #None
+                cmds.setAttr(f"{jnt}.type", 0) #None
+                cmds.setAttr(f"{jnt}.otherType", "", type='string')
 
 
     def create_joint_blend(self, joints_a, joints_b, joints_c, attr_name, start_attr, world_ref, store_name=True):
         """ Create an Ik Fk Blend setup for joint chain.
             Return the created reverse node.
         """
-        attr_comp_name = start_attr[0].lower()+start_attr[1:]+attr_name
+        attr_comp_name = f"{start_attr[0].lower()}{start_attr[1:]}{attr_name}"
         for n in range(len(joints_a)):
-            pac = cmds.parentConstraint(joints_a[n], joints_b[n], joints_c[n], maintainOffset=True, name=joints_c[n]+"_"+attr_name+"_PaC")[0]
-            cmds.setAttr(pac+".interpType", 2) #shortest
+            pac = cmds.parentConstraint(joints_a[n], joints_b[n], joints_c[n], maintainOffset=True, name=f"{joints_c[n]}_{attr_name}_PaC")[0]
+            cmds.setAttr(f"{pac}.interpType", 2) #shortest
             if n == 0:
-                rev = cmds.createNode('reverse', name=joints_c[n]+"_"+attr_name+"_Rev")
+                rev = cmds.createNode('reverse', name=f"{joints_c[n]}_{attr_name}_Rev")
                 self.ar.custom_attr.add_attr(0, [rev]) #dpID
                 cmds.addAttr(world_ref, longName=attr_comp_name, attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
-                cmds.addAttr(world_ref, longName=attr_comp_name+"RevOutputX", attributeType='float', keyable=False)
+                cmds.addAttr(world_ref, longName=f"{attr_comp_name}RevOutputX", attributeType='float', keyable=False)
                 if store_name:
                     cmds.addAttr(world_ref, longName='ikFkBlendAttrName', dataType='string')
-                    cmds.setAttr(world_ref+".ikFkBlendAttrName", attr_comp_name, type='string')
-                cmds.connectAttr(world_ref+"."+attr_comp_name, rev+".inputX", force=True)
-                cmds.connectAttr(rev+".outputX", world_ref+"."+attr_comp_name+"RevOutputX", force=True)
+                    cmds.setAttr(f"{world_ref}.ikFkBlendAttrName", attr_comp_name, type='string')
+                cmds.connectAttr(f"{world_ref}.{attr_comp_name}", f"{rev}.inputX", force=True)
+                cmds.connectAttr(f"{rev}.outputX", f"{world_ref}.{attr_comp_name}RevOutputX", force=True)
             # connecting ikFkBlend using the reverse node:
-            cmds.connectAttr(world_ref+"."+attr_comp_name, pac+"."+joints_b[n]+"W1", force=True)
-            cmds.connectAttr(world_ref+"."+attr_comp_name+"RevOutputX", pac+"."+joints_a[n]+"W0", force=True)
+            cmds.connectAttr(f"{world_ref}.{attr_comp_name}", f"{pac}.{joints_b[n]}W1", force=True)
+            cmds.connectAttr(f"{world_ref}.{attr_comp_name}RevOutputX", f"{pac}.{joints_a[n]}W0", force=True)
         return rev
 
 
@@ -611,9 +611,9 @@ class Utils:
         for item in items:
             for attr, value in zip(attributes, values):
                 if is_string:
-                    cmds.setAttr(item+"."+attr, value, type='string')
+                    cmds.setAttr(f"{item}.{attr}", value, type='string')
                 else:
-                    cmds.setAttr(item+"."+attr, value)
+                    cmds.setAttr(f"{item}.{attr}", value)
 
 
     def get_network_by_attr(self, net_attr):
@@ -623,7 +623,7 @@ class Utils:
         all_nets = cmds.ls(selection=False, type='network')
         if all_nets:
             for item in all_nets:
-                if 'dpNetwork' in cmds.listAttr(item) and cmds.getAttr(item+".dpNetwork") == 1 and net_attr in cmds.listAttr(item) and cmds.getAttr(item+"."+net_attr) == 1:
+                if 'dpNetwork' in cmds.listAttr(item) and cmds.getAttr(f"{item}.dpNetwork") == 1 and net_attr in cmds.listAttr(item) and cmds.getAttr(f"{item}.{net_attr}") == 1:
                     nets.append(item)
         return nets
 
@@ -637,7 +637,7 @@ class Utils:
             to_remove_items = []
             for item in items:
                 if verbose:
-                    self.set_progress(title)
+                    self.ar.ui_manager.set_progress(title)
                 item_type = cmds.objectType(item)
                 if filter_camera:
                     for camera_name in cameras:
@@ -664,7 +664,7 @@ class Utils:
                     to_remove_items.append(item)
                 if filter_basenode and item in self.maya_base_nodes:
                     to_remove_items.append(item)
-                if filter_basename and self.get_suffix_numbers(item)[1].endswith('Base'):
+                if filter_basename and self.ar.naming.get_suffix_numbers(item)[1].endswith('Base'):
                     to_remove_items.append(item)
                 if filter_lattice:
                     for def_name in ['lattice', 'baseLattice']:
@@ -685,7 +685,7 @@ class Utils:
                 #if 'Orig' in child:
                 if child.endswith('Orig'):
                     cmds.delete(child)
-                elif cmds.getAttr(child+".intermediateObject") == 1:
+                elif cmds.getAttr(f"{child}.intermediateObject") == 1:
                     if delete_intermediate:
                         cmds.delete(child)
                 else:
@@ -741,7 +741,7 @@ class Utils:
             Return the created locator name.
         """
         if item:
-            temp_pos = cmds.spaceLocator(name=item+"_LocTemp")[0]
+            temp_pos = cmds.spaceLocator(name=f"{item}_LocTemp")[0]
             cmds.matchTransform(temp_pos, item, position=True, rotation=True)
             return temp_pos
 
@@ -764,9 +764,9 @@ class Utils:
             if sets:
                 for set_nodes in sets:
                     cmds.sets(item, remove=set_nodes)
-                    cmds.sets(item+".vtx[*]", remove=set_nodes)
-                    cmds.sets(item+".f[*]", remove=set_nodes)
-                    cmds.sets(item+".e[*]", remove=set_nodes)
+                    cmds.sets(f"{item}.vtx[*]", remove=set_nodes)
+                    cmds.sets(f"{item}.f[*]", remove=set_nodes)
+                    cmds.sets(f"{item}.e[*]", remove=set_nodes)
 
 
     def replace_item_suffix(self, item, source_data, suffixes=None):
@@ -791,13 +791,13 @@ class Utils:
                     if self.item_type == 'mesh' or self.item_type == 'nurbsSurface':
                         return True
                     else:
-                        mel.eval("warning \""+item+" is not a geometry.\";")
+                        mel.eval(f'warning "{item} is not a geometry.";')
                 else:
-                    mel.eval("warning \"Select the transform node instead of "+item+" shape, please.\";")
+                    mel.eval(f'warning "Select the transform node instead of {item} shape, please.";')
             else:
-                mel.eval("warning \""+item+" does not exists, maybe it was deleted, sorry.\";")
+                mel.eval(f'warning "{item} does not exists, maybe it was deleted, sorry.";')
         else:
-            mel.eval("warning \"Not found "+item+"\";")
+            mel.eval(f'warning "Not found {item}";')
 
 
     def get_keys_by_value(self, data, value):
@@ -812,7 +812,7 @@ class Utils:
     def envelope_is_valid(self, node):
         """ Check if the given node envelope attribute is not connected, nodeState is normal and not user defined.
         """
-        not_connected =  not cmds.listConnections(node+".envelope", source=True, destination=False)
-        node_state_normal = cmds.getAttr(node+".nodeState") == 0
+        not_connected =  not cmds.listConnections(f"{node}.envelope", source=True, destination=False)
+        node_state_normal = cmds.getAttr(f"{node}.nodeState") == 0
         not_user_defined = not 'envelope' in (cmds.listAttr(node, userDefined=True) or [])
         return not_connected and node_state_normal and not_user_defined

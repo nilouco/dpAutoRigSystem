@@ -30,9 +30,9 @@ class Ribbon:
         self.limb_instance = limb_instance
         self.radius = limb_instance.radius
         self.curve_degree = limb_instance.curve_degree
-        self.limb_manual_vv_attr = self.ar.data.lang['m019_limb'].lower()+"Manual_"+self.ar.data.lang['c031_volumeVariation']
-        self.limb_vv_attr = self.ar.data.lang['m019_limb'].lower()+"_"+self.ar.data.lang['c031_volumeVariation']
-        self.limb_min_vv_attr = self.ar.data.lang['m019_limb'].lower()+"Min_"+self.ar.data.lang['c031_volumeVariation']
+        self.limb_manual_vv_attr = f"{self.ar.data.lang['m019_limb'].lower()}Manual_{self.ar.data.lang['c031_volumeVariation']}"
+        self.limb_vv_attr = f"{self.ar.data.lang['m019_limb'].lower()}_{self.ar.data.lang['c031_volumeVariation']}"
+        self.limb_min_vv_attr = f"{self.ar.data.lang['m019_limb'].lower()}Min_{self.ar.data.lang['c031_volumeVariation']}"
         self.limb_length_attr = self.ar.data.lang['c113_length']
         self.to_ids = []
 
@@ -67,13 +67,13 @@ class Ribbon:
 
         cmds.delete(cmds.orientConstraint(ori_loc, mid_loc, mo=False, skip=skipa, weight=1))
         
-        up_ctrls = self.create_bend_ctrl(prefix+name+'_Up_Offset_Ctrl', r=self.radius)
+        up_ctrls = self.create_bend_ctrl(f"{prefix}{name}_Up_Offset_Ctrl", r=self.radius)
         up_zero = up_ctrls[0]
         up_ctrl = up_ctrls[1]
-        down_ctrls = self.create_bend_ctrl(prefix+name+'_Down_Offset_Ctrl', r=self.radius)
+        down_ctrls = self.create_bend_ctrl(f"{prefix}{name}_Down_Offset_Ctrl", r=self.radius)
         down_zero = down_ctrls[0]
         down_ctrl = down_ctrls[1]
-        elbow_ctrls = self.create_elbow_ctrl(prefix+name+'_'+corner_name+'_Offset_Ctrl', arm_style=arm)
+        elbow_ctrls = self.create_elbow_ctrl(f"{prefix}{name}_{corner_name}_Offset_Ctrl", arm_style=arm)
         elbow_grp = elbow_ctrls[0]
         self.elbow_ctrl = elbow_ctrls[1]
         self.elbow_zero_0 = elbow_ctrls[2]
@@ -98,10 +98,10 @@ class Ribbon:
             cmds.delete(cmds.orientConstraint(ori_b_loc, aux_b_loc, mo=False, skip=skipa, weight=1))
             cmds.matchTransform(mid_b_loc, lista[2], position=True, rotation=True)
             cmds.delete(cmds.orientConstraint(ori_b_loc, mid_b_loc, mo=False, skip=skipa, weight=1))
-            down_b_ctrls = self.create_bend_ctrl(prefix+name+'_DownB_Offset_Ctrl', r=self.radius)
+            down_b_ctrls = self.create_bend_ctrl(f"{prefix}{name}_DownB_Offset_Ctrl", r=self.radius)
             down_b_zero = down_b_ctrls[0]
             down_b_ctrl = down_b_ctrls[1]
-            elbow_b_ctrls = self.create_elbow_ctrl(prefix+name+'_'+corner_name+'B_Offset_Ctrl', arm_style=arm)
+            elbow_b_ctrls = self.create_elbow_ctrl(f"{prefix}{name}_{corner_name}B_Offset_Ctrl", arm_style=arm)
             elbow_b_grp = elbow_b_ctrls[0]
             self.elbow_b_ctrl = elbow_b_ctrls[1]
             self.elbow_b_zero_0 = elbow_b_ctrls[2]
@@ -115,49 +115,49 @@ class Ribbon:
             if ori_b_loc:
                 self.corner_b_jxt, self.corner_b_jnt = self.create_corner_joint(prefix, name, 'CornerB', self.elbow_b_ctrl)
             if not arm:
-                cmds.setAttr(self.corner_jnt+".rotateX", 180)
-                cmds.setAttr(self.corner_jnt+".rotateZ", 90)
+                cmds.setAttr(f"{self.corner_jnt}.rotateX", 180)
+                cmds.setAttr(f"{self.corner_jnt}.rotateZ", 90)
                 if ori_b_loc:
-                    cmds.setAttr(self.corner_b_jnt+".rotateX", 180)
-                    cmds.setAttr(self.corner_b_jnt+".rotateZ", 90)
+                    cmds.setAttr(f"{self.corner_b_jnt}.rotateX", 180)
+                    cmds.setAttr(f"{self.corner_b_jnt}.rotateZ", 90)
             if side == 1:
                 if arm:
-                    cmds.setAttr(self.corner_jnt+".rotateX", 180)
-                    cmds.setAttr(self.corner_jnt+".scaleX", -1)
+                    cmds.setAttr(f"{self.corner_jnt}.rotateX", 180)
+                    cmds.setAttr(f"{self.corner_jnt}.scaleX", -1)
                 else:
-                    cmds.setAttr(self.corner_jnt+".rotateX", 0)
-                    cmds.setAttr(self.corner_jnt+".rotateZ", -90)
+                    cmds.setAttr(f"{self.corner_jnt}.rotateX", 0)
+                    cmds.setAttr(f"{self.corner_jnt}.rotateZ", -90)
                     if ori_b_loc:
-                        cmds.setAttr(self.corner_b_jnt+".rotateX", 0)
-                        cmds.setAttr(self.corner_b_jnt+".rotateZ", -90)
+                        cmds.setAttr(f"{self.corner_b_jnt}.rotateX", 0)
+                        cmds.setAttr(f"{self.corner_b_jnt}.rotateZ", -90)
             if add_correct:
                 self.add_corrective_joint(jcr_number, self.corner_jnt, jcr_pos, jcr_rot)
                 if ori_b_loc:
                     self.add_corrective_joint(jcr_number, self.corner_b_jnt, jcr_pos, jcr_rot)
         
         if arm:
-            up_limb = self.create_ribbon(name=prefix+name+'_Up', axis=(0, 0, -1), horizontal=True, num_joints=num, v=False, guides=[lista[0], lista[1]], s=side, up_ctrl=up_ctrl, world_ref=world_ref, joint_label_add=joint_label_add, joint_label_name='Up_'+name, center_up_down=1, add_artic=add_artic, additional_joint=additional, limbArm=arm)
-            down_limb = self.create_ribbon(name=prefix+name+'_Down', axis=(0, 0, -1), horizontal=True, num_joints=num, ini_jxt=ini_jxt, v=False, guides=[lista[1], lista[2]], s=side, world_ref=world_ref, joint_label_add=joint_label_add, joint_label_name='Down_'+name, center_up_down=2, add_artic=add_artic, additional_joint=additional, limbArm=arm)
-            cmds.connectAttr(up_ctrl+".scaleX", up_limb['extraCtrlGrp']+".scaleX", force=True)
-            cmds.connectAttr(up_ctrl+".scaleY", up_limb['extraCtrlGrp']+".scaleY", force=True)
-            cmds.connectAttr(down_ctrl+".scaleX", down_limb['extraCtrlGrp']+".scaleX", force=True)
-            cmds.connectAttr(down_ctrl+".scaleY", down_limb['extraCtrlGrp']+".scaleY", force=True)
+            up_limb = self.create_ribbon(name=f"{prefix}{name}_Up", axis=(0, 0, -1), horizontal=True, num_joints=num, v=False, guides=[lista[0], lista[1]], s=side, up_ctrl=up_ctrl, world_ref=world_ref, joint_label_add=joint_label_add, joint_label_name=f"Up_{name}", center_up_down=1, add_artic=add_artic, additional_joint=additional, limbArm=arm)
+            down_limb = self.create_ribbon(name=f"{prefix}{name}_Down", axis=(0, 0, -1), horizontal=True, num_joints=num, ini_jxt=ini_jxt, v=False, guides=[lista[1], lista[2]], s=side, world_ref=world_ref, joint_label_add=joint_label_add, joint_label_name=f"Down_{name}", center_up_down=2, add_artic=add_artic, additional_joint=additional, limbArm=arm)
+            cmds.connectAttr(f"{up_ctrl}.scaleX", f"{up_limb['extraCtrlGrp']}.scaleX", force=True)
+            cmds.connectAttr(f"{up_ctrl}.scaleY", f"{up_limb['extraCtrlGrp']}.scaleY", force=True)
+            cmds.connectAttr(f"{down_ctrl}.scaleX", f"{down_limb['extraCtrlGrp']}.scaleX", force=True)
+            cmds.connectAttr(f"{down_ctrl}.scaleY", f"{down_limb['extraCtrlGrp']}.scaleY", force=True)
         else:
-            up_limb = self.create_ribbon(name=prefix+name+'_Up', axis=(0, 0, 1), horizontal=True, num_joints=num, v=False, guides=[lista[0], lista[1]], s=side, up_ctrl=up_ctrl, world_ref=world_ref, joint_label_add=joint_label_add, joint_label_name='Up_'+name, center_up_down=1, add_artic=add_artic, additional_joint=additional, limbArm=arm)
-            down_limb = self.create_ribbon(name=prefix+name+'_Down', axis=(0, 0, 1), horizontal=True, num_joints=num, v=False, guides=[lista[1], lista[2]], s=side, world_ref=world_ref, joint_label_add=joint_label_add, joint_label_name='Down_'+name, center_up_down=2, add_artic=add_artic, additional_joint=additional, limbArm=arm)
-            cmds.connectAttr(up_ctrl+".scaleX", up_limb['extraCtrlGrp']+".scaleY", force=True)
-            cmds.connectAttr(up_ctrl+".scaleY", up_limb['extraCtrlGrp']+".scaleX", force=True)
-            cmds.connectAttr(down_ctrl+".scaleX", down_limb['extraCtrlGrp']+".scaleY", force=True)
-            cmds.connectAttr(down_ctrl+".scaleY", down_limb['extraCtrlGrp']+".scaleX", force=True)
+            up_limb = self.create_ribbon(name=f"{prefix}{name}_Up", axis=(0, 0, 1), horizontal=True, num_joints=num, v=False, guides=[lista[0], lista[1]], s=side, up_ctrl=up_ctrl, world_ref=world_ref, joint_label_add=joint_label_add, joint_label_name=f"Up_{name}", center_up_down=1, add_artic=add_artic, additional_joint=additional, limbArm=arm)
+            down_limb = self.create_ribbon(name=f"{prefix}{name}_Down", axis=(0, 0, 1), horizontal=True, num_joints=num, v=False, guides=[lista[1], lista[2]], s=side, world_ref=world_ref, joint_label_add=joint_label_add, joint_label_name=f"Down_{name}", center_up_down=2, add_artic=add_artic, additional_joint=additional, limbArm=arm)
+            cmds.connectAttr(f"{up_ctrl}.scaleX", f"{up_limb['extraCtrlGrp']}.scaleY", force=True)
+            cmds.connectAttr(f"{up_ctrl}.scaleY", f"{up_limb['extraCtrlGrp']}.scaleX", force=True)
+            cmds.connectAttr(f"{down_ctrl}.scaleX", f"{down_limb['extraCtrlGrp']}.scaleY", force=True)
+            cmds.connectAttr(f"{down_ctrl}.scaleY", f"{down_limb['extraCtrlGrp']}.scaleX", force=True)
             if ori_b_loc:
-                down_b_limb = self.create_ribbon(name=prefix+name+'_DownB', axis=(0, 0, 1), horizontal=True, num_joints=num, v=False, guides=[lista[2], lista[3]], s=side, world_ref=world_ref, joint_label_add=joint_label_add, joint_label_name='DownB_'+name, center_up_down=2, add_artic=add_artic, additional_joint=additional, limbArm=arm, ori_b_loc=ori_b_loc)
-                cmds.connectAttr(down_b_ctrl+".scaleZ", down_b_limb['extraCtrlGrp']+".scaleZ", force=True)
-        cmds.connectAttr(up_ctrl+".scaleZ", up_limb['extraCtrlGrp']+".scaleZ", force=True)
-        cmds.connectAttr(down_ctrl+".scaleZ", down_limb['extraCtrlGrp']+".scaleZ", force=True)
+                down_b_limb = self.create_ribbon(name=f"{prefix}{name}_DownB", axis=(0, 0, 1), horizontal=True, num_joints=num, v=False, guides=[lista[2], lista[3]], s=side, world_ref=world_ref, joint_label_add=joint_label_add, joint_label_name=f"DownB_{name}", center_up_down=2, add_artic=add_artic, additional_joint=additional, limbArm=arm, ori_b_loc=ori_b_loc)
+                cmds.connectAttr(f"{down_b_ctrl}.scaleZ", f"{down_b_limb['extraCtrlGrp']}.scaleZ", force=True)
+        cmds.connectAttr(f"{up_ctrl}.scaleZ", f"{up_limb['extraCtrlGrp']}.scaleZ", force=True)
+        cmds.connectAttr(f"{down_ctrl}.scaleZ", f"{down_limb['extraCtrlGrp']}.scaleZ", force=True)
         
         # parentTag
-        cmds.connectAttr(up_ctrl+".message", up_limb['extraCtrlList'][0]+".parentTag", force=True)
-        cmds.connectAttr(down_ctrl+".message", down_limb['extraCtrlList'][0]+".parentTag", force=True)
+        cmds.connectAttr(f"{up_ctrl}.message", f"{up_limb['extraCtrlList'][0]}.parentTag", force=True)
+        cmds.connectAttr(f"{down_ctrl}.message", f"{down_limb['extraCtrlList'][0]}.parentTag", force=True)
 
         cmds.matchTransform(up_zero, ori_loc, position=True, rotation=True)
         cmds.delete(cmds.pointConstraint(up_limb['middleCtrl'], up_zero, mo=False, w=1))
@@ -169,53 +169,53 @@ class Ribbon:
             cmds.delete(cmds.pointConstraint(down_b_limb['middleCtrl'], down_b_zero, mo=False, w=1))
 
         cmds.matchTransform(elbow_grp, mid_loc, position=True, rotation=True)
-        orc = cmds.orientConstraint(lista[0], lista[1], elbow_grp, mo=False, w=1, name=elbow_grp+"_OrC")[0]
-        cmds.setAttr(orc+".interpType", 2)
+        orc = cmds.orientConstraint(lista[0], lista[1], elbow_grp, mo=False, w=1, name=f"{elbow_grp}_OrC")[0]
+        cmds.setAttr(f"{orc}.interpType", 2)
         if ori_b_loc:
             cmds.matchTransform(elbow_b_grp, mid_b_loc, position=True, rotation=True)
-            orc_b = cmds.orientConstraint(lista[1], lista[2], elbow_b_grp, mo=False, w=1, name=elbow_b_grp+"_OrC")[0]
-            cmds.setAttr(orc_b+".interpType", 2)
+            orc_b = cmds.orientConstraint(lista[1], lista[2], elbow_b_grp, mo=False, w=1, name=f"{elbow_b_grp}_OrC")[0]
+            cmds.setAttr(f"{orc_b}.interpType", 2)
 
         cmds.delete(up_limb['constraints'][1])
-        cmds.parentConstraint(self.elbow_ctrl, up_limb['locsList'][0], mo=True, w=1, name=up_limb['locsList'][0]+"_PaC")
+        cmds.parentConstraint(self.elbow_ctrl, up_limb['locsList'][0], mo=True, w=1, name=f"{up_limb['locsList'][0]}_PaC")
         cmds.delete(up_limb['constraints'][3])
-        cmds.pointConstraint(self.elbow_ctrl, up_limb['locsList'][3], mo=True, w=1, name=up_limb['locsList'][3]+"_PoC")
+        cmds.pointConstraint(self.elbow_ctrl, up_limb['locsList'][3], mo=True, w=1, name=f"{up_limb['locsList'][3]}_PoC")
         
         cmds.delete(down_limb['constraints'][0])
-        cmds.parentConstraint(self.elbow_ctrl, down_limb['locsList'][2], mo=True, w=1, name=down_limb['locsList'][2]+"_PaC")
+        cmds.parentConstraint(self.elbow_ctrl, down_limb['locsList'][2], mo=True, w=1, name=f"{down_limb['locsList'][2]}_PaC")
         cmds.delete(down_limb['constraints'][2])
-        cmds.pointConstraint(self.elbow_ctrl, down_limb['locsList'][4], mo=True, w=1, name=down_limb['locsList'][4]+"_PoC")
+        cmds.pointConstraint(self.elbow_ctrl, down_limb['locsList'][4], mo=True, w=1, name=f"{down_limb['locsList'][4]}_PoC")
         if ori_b_loc:
             cmds.delete(down_limb['constraints'][1])
-            cmds.parentConstraint(self.elbow_b_ctrl, down_limb['locsList'][0], mo=True, w=1, name=down_limb['locsList'][2]+"_2_PaC")
+            cmds.parentConstraint(self.elbow_b_ctrl, down_limb['locsList'][0], mo=True, w=1, name=f"{down_limb['locsList'][2]}_2_PaC")
             cmds.delete(down_limb['constraints'][3])
-            cmds.pointConstraint(self.elbow_b_ctrl, down_limb['locsList'][3], mo=True, w=1, name=down_limb['locsList'][4]+"_2_PoC")
+            cmds.pointConstraint(self.elbow_b_ctrl, down_limb['locsList'][3], mo=True, w=1, name=f"{down_limb['locsList'][4]}_2_PoC")
             
             cmds.delete(down_b_limb['constraints'][0])
-            cmds.parentConstraint(self.elbow_b_ctrl, down_b_limb['locsList'][2], mo=True, w=1, name=down_b_limb['locsList'][2]+"_PaC")
+            cmds.parentConstraint(self.elbow_b_ctrl, down_b_limb['locsList'][2], mo=True, w=1, name=f"{down_b_limb['locsList'][2]}_PaC")
             cmds.delete(down_b_limb['constraints'][2])
-            cmds.pointConstraint(self.elbow_b_ctrl, down_b_limb['locsList'][4], mo=True, w=1, name=down_b_limb['locsList'][4]+"_PoC")
+            cmds.pointConstraint(self.elbow_b_ctrl, down_b_limb['locsList'][4], mo=True, w=1, name=f"{down_b_limb['locsList'][4]}_PoC")
 
-            down_b_pac = cmds.parentConstraint(cmds.listRelatives(down_b_limb['middleCtrl'], p=True)[0], self.elbow_b_ctrl, down_b_zero, mo=True, w=1, skipRotate=['x', 'y', 'z'], name=down_b_zero+"_PaC")[0]
-            cmds.orientConstraint(cmds.listRelatives(down_b_limb['middleCtrl'], p=True)[0], down_b_zero, mo=True, w=1, name=down_b_zero+"_OrC")
-            cmds.setAttr(down_b_pac+'.interpType', 2)
-            cmds.connectAttr(self.elbow_b_ctrl+'.autoBend', down_b_pac+'.'+self.elbow_b_ctrl+'W1', force=True)
-            cmds.parentConstraint(cmds.listRelatives(down_b_zero, c=True)[0], down_b_limb['middleCtrl'], mo=True, w=1, name=down_b_limb['middleCtrl']+"_PaC")
-            cmds.pointConstraint(lista[2], elbow_b_grp, mo=True, w=1, name=elbow_b_grp+"_PoC")
+            down_b_pac = cmds.parentConstraint(cmds.listRelatives(down_b_limb['middleCtrl'], p=True)[0], self.elbow_b_ctrl, down_b_zero, mo=True, w=1, skipRotate=['x', 'y', 'z'], name=f"{down_b_zero}_PaC")[0]
+            cmds.orientConstraint(cmds.listRelatives(down_b_limb['middleCtrl'], p=True)[0], down_b_zero, mo=True, w=1, name=f"{down_b_zero}_OrC")
+            cmds.setAttr(f"{down_b_pac}.interpType", 2)
+            cmds.connectAttr(f"{self.elbow_b_ctrl}.autoBend", f"{down_b_pac}.{self.elbow_b_ctrl}W1", force=True)
+            cmds.parentConstraint(cmds.listRelatives(down_b_zero, c=True)[0], down_b_limb['middleCtrl'], mo=True, w=1, name=f"{down_b_limb['middleCtrl']}_PaC")
+            cmds.pointConstraint(lista[2], elbow_b_grp, mo=True, w=1, name=f"{elbow_b_grp}_PoC")
         
-        up_pac = cmds.parentConstraint(cmds.listRelatives(up_limb['middleCtrl'], p=True)[0], self.elbow_ctrl, up_zero, mo=True, w=1, skipRotate=['x', 'y', 'z'], name=up_zero+"_PaC")[0]
-        cmds.orientConstraint(cmds.listRelatives(up_limb['middleCtrl'], p=True)[0], up_zero, mo=True, w=1, name=up_zero+"_OrC")
-        cmds.setAttr(up_pac+'.interpType', 2)
-        cmds.connectAttr(self.elbow_ctrl+'.autoBend', up_pac+'.'+self.elbow_ctrl+'W1', force=True)
-        cmds.parentConstraint(cmds.listRelatives(up_zero, c=True)[0], up_limb['middleCtrl'], mo=True, w=1, name=up_limb['middleCtrl']+"_PaC")
+        up_pac = cmds.parentConstraint(cmds.listRelatives(up_limb['middleCtrl'], p=True)[0], self.elbow_ctrl, up_zero, mo=True, w=1, skipRotate=['x', 'y', 'z'], name=f"{up_zero}_PaC")[0]
+        cmds.orientConstraint(cmds.listRelatives(up_limb['middleCtrl'], p=True)[0], up_zero, mo=True, w=1, name=f"{up_zero}_OrC")
+        cmds.setAttr(f"{up_pac}.interpType", 2)
+        cmds.connectAttr(f"{self.elbow_ctrl}.autoBend", f"{up_pac}.{self.elbow_ctrl}W1", force=True)
+        cmds.parentConstraint(cmds.listRelatives(up_zero, c=True)[0], up_limb['middleCtrl'], mo=True, w=1, name=f"{up_limb['middleCtrl']}_PaC")
         
-        down_pac = cmds.parentConstraint(cmds.listRelatives(down_limb['middleCtrl'], p=True)[0], self.elbow_ctrl, down_zero, mo=True, w=1, skipRotate=['x', 'y', 'z'], name=down_zero+"_PaC")[0]
-        cmds.orientConstraint(cmds.listRelatives(down_limb['middleCtrl'], p=True)[0], down_zero, mo=True, w=1, name=down_zero+"_OrC")
-        cmds.setAttr(down_pac+'.interpType', 2)
-        cmds.connectAttr(self.elbow_ctrl+'.autoBend', down_pac+'.'+self.elbow_ctrl+'W1', force=True)
-        cmds.parentConstraint(cmds.listRelatives(down_zero, c=True)[0], down_limb['middleCtrl'], mo=True, w=1, name=down_limb['middleCtrl']+"_PaC")
+        down_pac = cmds.parentConstraint(cmds.listRelatives(down_limb['middleCtrl'], p=True)[0], self.elbow_ctrl, down_zero, mo=True, w=1, skipRotate=['x', 'y', 'z'], name=f"{down_zero}_PaC")[0]
+        cmds.orientConstraint(cmds.listRelatives(down_limb['middleCtrl'], p=True)[0], down_zero, mo=True, w=1, name=f"{down_zero}_OrC")
+        cmds.setAttr(f"{down_pac}.interpType", 2)
+        cmds.connectAttr(f"{self.elbow_ctrl}.autoBend", f"{down_pac}.{self.elbow_ctrl}W1", force=True)
+        cmds.parentConstraint(cmds.listRelatives(down_zero, c=True)[0], down_limb['middleCtrl'], mo=True, w=1, name=f"{down_limb['middleCtrl']}_PaC")
         
-        cmds.pointConstraint(lista[1], elbow_grp, mo=True, w=1, name=elbow_grp+"_PoC")
+        cmds.pointConstraint(lista[1], elbow_grp, mo=True, w=1, name=f"{elbow_grp}_PoC")
         
         up_jnt_grp = cmds.listRelatives(up_limb['skinJointsList'][0], p=True, f=True)
         down_jnt_grp = cmds.listRelatives(down_limb['skinJointsList'][0], p=True, f=True)
@@ -231,11 +231,11 @@ class Ribbon:
                 limb_joints.extend([self.corner_b_jxt])
             limb_joints.extend(down_b_limb['skinJointsList'])
         
-        jnt_grp = cmds.group(limb_joints, n=prefix+name+'_Jnts_Grp')
+        jnt_grp = cmds.group(limb_joints, n=f"{prefix}{name}_Jnts_Grp")
         #Deactivate the segment scale compensate on the bone to prevent scaling problem.
         #It will prevent a double scale problem that will come from the upper parent in the rig
         for n_bone in limb_joints:
-            cmds.setAttr(n_bone+".segmentScaleCompensate", 0)
+            cmds.setAttr(f"{n_bone}.segmentScaleCompensate", 0)
         
         # fix renaming:
         if add_artic:
@@ -252,20 +252,20 @@ class Ribbon:
                     if old_name in child:
                         cmds.rename(child, child.replace(old_name, f"{prefix}{name}_{(i+artic_number):02d}"))
         
-        scale_grp = cmds.group(up_limb['scaleGrp'], down_limb['scaleGrp'], jnt_grp, n=prefix+name+'_Ribbon_Scale_Grp')
-        cmds.setAttr(up_limb['scaleGrp']+'.visibility', cmds.getAttr(up_limb['finalGrp']+'.visibility'))
-        cmds.setAttr(down_limb['scaleGrp']+'.visibility', cmds.getAttr(down_limb['finalGrp']+'.visibility'))
+        scale_grp = cmds.group(up_limb['scaleGrp'], down_limb['scaleGrp'], jnt_grp, n=f"{prefix}{name}_Ribbon_Scale_Grp")
+        cmds.setAttr(f"{up_limb['scaleGrp']}.visibility", cmds.getAttr(f"{up_limb['finalGrp']}.visibility"))
+        cmds.setAttr(f"{down_limb['scaleGrp']}.visibility", cmds.getAttr(f"{down_limb['finalGrp']}.visibility"))
         
         cmds.delete(up_jnt_grp, down_jnt_grp)
         
-        static_grp = cmds.group(up_limb['finalGrp'], down_limb['finalGrp'], n=prefix+name+'_Ribbon_Static_Grp')
+        static_grp = cmds.group(up_limb['finalGrp'], down_limb['finalGrp'], n=f"{prefix}{name}_Ribbon_Static_Grp")
         
-        ctrls_grp = cmds.group(up_zero, down_zero, elbow_grp, up_limb['extraCtrlGrp'], down_limb['extraCtrlGrp'], n=prefix+name+'_Ctrls_Grp')
+        ctrls_grp = cmds.group(up_zero, down_zero, elbow_grp, up_limb['extraCtrlGrp'], down_limb['extraCtrlGrp'], n=f"{prefix}{name}_Ctrls_Grp")
         
         cmds.delete(mid_loc, aux_loc)
         if ori_b_loc:
             cmds.parent(down_b_limb['scaleGrp'], scale_grp)
-            cmds.setAttr(down_b_limb['scaleGrp']+'.visibility', cmds.getAttr(down_b_limb['finalGrp']+'.visibility'))
+            cmds.setAttr(f"{down_b_limb['scaleGrp']}.visibility", cmds.getAttr(f"{down_b_limb['finalGrp']}.visibility"))
             cmds.delete(down_b_jnt_grp)
             cmds.parent(down_b_limb['finalGrp'], static_grp)
             cmds.parent(down_b_zero, elbow_b_grp, down_b_limb['extraCtrlGrp'], ctrls_grp)
@@ -285,19 +285,19 @@ class Ribbon:
                 cmds.rename(item, item.replace('_Jnt', '_Jxt'))
         
         if ini_jxt and cmds.objExists(ini_jxt): #arm elbow
-            pac = cmds.parentConstraint(ini_jxt, down_limb['bendGrpList'][0], mo=True, name=down_limb['bendGrpList'][0]+"_PaC")[0]
-            cmds.setAttr(pac+".interpType", 2) #shortest
-            cmds.setAttr(pac+"."+ini_jxt+"W1", 0.3)
+            pac = cmds.parentConstraint(ini_jxt, down_limb['bendGrpList'][0], mo=True, name=f"{down_limb['bendGrpList'][0]}_PaC")[0]
+            cmds.setAttr(f"{pac}.interpType", 2) #shortest
+            cmds.setAttr(f"{pac}.{ini_jxt}W1", 0.3)
 
         # corner autoRotate setup
         loaded_quaternion_plugin = self.ar.config.check_loaded_plugin('quatNodes', self.ar.data.lang['e014_cantLoadQuatNode'])
         loaded_matrix_plugin = self.ar.config.check_loaded_plugin('matrixNodes', self.ar.data.lang['e002_matrixPluginNotFound'])
         if loaded_quaternion_plugin and loaded_matrix_plugin:
-            corner_auto_rotate_md = cmds.createNode('multiplyDivide', name=prefix+name+"_"+corner_name+"_AutoRotate_MD")
-            corner_auto_rotate_mm = cmds.createNode('multMatrix', name=prefix+name+"_"+corner_name+"_AutoRotate_MM")
-            corner_auto_rotate_dm = cmds.createNode('decomposeMatrix', name=prefix+name+"_"+corner_name+"_AutoRotate_DM")
-            corner_auto_rotate_qte = cmds.createNode('quatToEuler', name=prefix+name+"_"+corner_name+"_AutoRotate_QtE")
-            corner_auto_rotate_rev = cmds.createNode('reverse', name=prefix+name+"_"+corner_name+"_AutoRotate_Rev")
+            corner_auto_rotate_md = cmds.createNode('multiplyDivide', name=f"{prefix}{name}_{corner_name}_AutoRotate_MD")
+            corner_auto_rotate_mm = cmds.createNode('multMatrix', name=f"{prefix}{name}_{corner_name}_AutoRotate_MM")
+            corner_auto_rotate_dm = cmds.createNode('decomposeMatrix', name=f"{prefix}{name}_{corner_name}_AutoRotate_DM")
+            corner_auto_rotate_qte = cmds.createNode('quatToEuler', name=f"{prefix}{name}_{corner_name}_AutoRotate_QtE")
+            corner_auto_rotate_rev = cmds.createNode('reverse', name=f"{prefix}{name}_{corner_name}_AutoRotate_Rev")
             corner_auto_rotate_inv_pin_md = cmds.createNode('multiplyDivide', name=corner_auto_rotate_md.replace('MD', 'Pin_Inv_MD'))
             corner_auto_rotate_inv_mid_md = cmds.createNode('multiplyDivide', name=corner_auto_rotate_md.replace('MD', 'Mid_Inv_MD'))
             self.to_ids.extend([corner_auto_rotate_md, corner_auto_rotate_mm, corner_auto_rotate_dm, corner_auto_rotate_qte, corner_auto_rotate_rev, corner_auto_rotate_inv_pin_md, corner_auto_rotate_inv_mid_md])
@@ -306,30 +306,30 @@ class Ribbon:
                 idx = 3
             extreme_loc = cmds.spaceLocator(name=lista[idx].replace('Jnt', 'AutoRotate_Loc'))[0]
             cmds.matchTransform(extreme_loc, lista[idx], position=True, rotation=True)
-            corner_auto_rot_grp = cmds.group(extreme_loc, name=extreme_loc+"_Grp")
+            corner_auto_rot_grp = cmds.group(extreme_loc, name=f"{extreme_loc}_Grp")
             extreme_orig_loc = cmds.duplicate(extreme_loc, name=lista[2].replace('Jnt', "AutoRotate_Orig_Loc"))[0]
             for axis in self.ar.data.axes:
-                cmds.connectAttr(lista[idx]+".rotate"+axis, extreme_loc+".rotate"+axis, force=True)
-                cmds.setAttr(extreme_orig_loc+".rotate"+axis, cmds.getAttr(extreme_loc+".rotate"+axis))
-            cmds.setAttr(corner_auto_rot_grp+".inheritsTransform", 0)
-            cmds.setAttr(corner_auto_rot_grp+".visibility", 0)
+                cmds.connectAttr(f"{lista[idx]}.rotate{axis}", f"{extreme_loc}.rotate{axis}", force=True)
+                cmds.setAttr(f"{extreme_orig_loc}.rotate{axis}", cmds.getAttr(f"{extreme_loc}.rotate{axis}"))
+            cmds.setAttr(f"{corner_auto_rot_grp}.inheritsTransform", 0)
+            cmds.setAttr(f"{corner_auto_rot_grp}.visibility", 0)
             cmds.parent(corner_auto_rot_grp, static_grp)
-            cmds.connectAttr(self.elbow_ctrl+".autoRotate", corner_auto_rotate_md+".input1Z", force=True)
-            cmds.connectAttr(self.elbow_ctrl+".autoRotate", corner_auto_rotate_rev+".inputZ", force=True)
-            cmds.connectAttr(extreme_orig_loc+".worldInverseMatrix[0]", corner_auto_rotate_mm+".matrixIn[0]", force=True)
-            cmds.connectAttr(extreme_loc+".worldMatrix[0]", corner_auto_rotate_mm+".matrixIn[1]", force=True)
-            cmds.connectAttr(corner_auto_rotate_mm+".matrixSum", corner_auto_rotate_dm+".inputMatrix", force=True)
-            cmds.connectAttr(corner_auto_rotate_dm+".outputQuatX", corner_auto_rotate_qte+".inputQuatX", force=True)
-            cmds.connectAttr(corner_auto_rotate_dm+".outputQuatY", corner_auto_rotate_qte+".inputQuatY", force=True)
-            cmds.connectAttr(corner_auto_rotate_dm+".outputQuatZ", corner_auto_rotate_qte+".inputQuatZ", force=True)
-            cmds.connectAttr(corner_auto_rotate_dm+".outputQuatW", corner_auto_rotate_qte+".inputQuatW", force=True)
-            cmds.connectAttr(corner_auto_rotate_md+".outputZ", corner_auto_rotate_inv_pin_md+".input1Z", force=True)
-            cmds.connectAttr(corner_auto_rotate_rev+".outputZ", corner_auto_rotate_inv_mid_md+".input1Z", force=True)
-            cmds.connectAttr(corner_auto_rotate_qte+".outputRotateZ", corner_auto_rotate_md+".input2Z", force=True)
+            cmds.connectAttr(f"{self.elbow_ctrl}.autoRotate", f"{corner_auto_rotate_md}.input1Z", force=True)
+            cmds.connectAttr(f"{self.elbow_ctrl}.autoRotate", f"{corner_auto_rotate_rev}.inputZ", force=True)
+            cmds.connectAttr(f"{extreme_orig_loc}.worldInverseMatrix[0]", f"{corner_auto_rotate_mm}.matrixIn[0]", force=True)
+            cmds.connectAttr(f"{extreme_loc}.worldMatrix[0]", f"{corner_auto_rotate_mm}.matrixIn[1]", force=True)
+            cmds.connectAttr(f"{corner_auto_rotate_mm}.matrixSum", f"{corner_auto_rotate_dm}.inputMatrix", force=True)
+            cmds.connectAttr(f"{corner_auto_rotate_dm}.outputQuatX", f"{corner_auto_rotate_qte}.inputQuatX", force=True)
+            cmds.connectAttr(f"{corner_auto_rotate_dm}.outputQuatY", f"{corner_auto_rotate_qte}.inputQuatY", force=True)
+            cmds.connectAttr(f"{corner_auto_rotate_dm}.outputQuatZ", f"{corner_auto_rotate_qte}.inputQuatZ", force=True)
+            cmds.connectAttr(f"{corner_auto_rotate_dm}.outputQuatW", f"{corner_auto_rotate_qte}.inputQuatW", force=True)
+            cmds.connectAttr(f"{corner_auto_rotate_md}.outputZ", f"{corner_auto_rotate_inv_pin_md}.input1Z", force=True)
+            cmds.connectAttr(f"{corner_auto_rotate_rev}.outputZ", f"{corner_auto_rotate_inv_mid_md}.input1Z", force=True)
+            cmds.connectAttr(f"{corner_auto_rotate_qte}.outputRotateZ", f"{corner_auto_rotate_md}.input2Z", force=True)
             if arm:
-                cmds.connectAttr(corner_auto_rotate_inv_pin_md+".outputZ", self.elbow_zero_0+".rotateX", force=True)
+                cmds.connectAttr(f"{corner_auto_rotate_inv_pin_md}.outputZ", f"{self.elbow_zero_0}.rotateX", force=True)
             else: #leg
-                cmds.connectAttr(corner_auto_rotate_inv_pin_md+".outputZ", self.elbow_zero_0+".rotateY", force=True)
+                cmds.connectAttr(f"{corner_auto_rotate_inv_pin_md}.outputZ", f"{self.elbow_zero_0}.rotateY", force=True)
 
         # implementing pin setup to ribbon corner offset control:
         if elbow_ctrls[2]:
@@ -339,23 +339,23 @@ class Ribbon:
         
         # autoRotate by twistBone control setup:
         if up_limb['up_twist_bone_md']:
-            cmds.connectAttr(up_ctrl+".autoRotate", up_limb['up_twist_bone_md']+".input1Z", force=True)
-            cmds.connectAttr(up_ctrl+".invert", up_limb['twist_bone_cnd']+".firstTerm", force=True)
+            cmds.connectAttr(f"{up_ctrl}.autoRotate", f"{up_limb['up_twist_bone_md']}.input1Z", force=True)
+            cmds.connectAttr(f"{up_ctrl}.invert", f"{up_limb['twist_bone_cnd']}.firstTerm", force=True)
         if up_limb['bottom_twist_bone_md']:
-            cmds.connectAttr(up_ctrl+".autoRotate", up_limb['bottom_twist_bone_md']+".input1Z", force=True)
+            cmds.connectAttr(f"{up_ctrl}.autoRotate", f"{up_limb['bottom_twist_bone_md']}.input1Z", force=True)
         if down_limb['up_twist_bone_md']:
-            cmds.connectAttr(down_ctrl+".autoRotate", down_limb['up_twist_bone_md']+".input1Z", force=True)
-            cmds.connectAttr(down_ctrl+".invert", down_limb['twist_bone_cnd']+".firstTerm", force=True)
+            cmds.connectAttr(f"{down_ctrl}.autoRotate", f"{down_limb['up_twist_bone_md']}.input1Z", force=True)
+            cmds.connectAttr(f"{down_ctrl}.invert", f"{down_limb['twist_bone_cnd']}.firstTerm", force=True)
         if down_limb['bottom_twist_bone_md']:
-            cmds.connectAttr(down_ctrl+".autoRotate", down_limb['bottom_twist_bone_md']+".input1Z", force=True)
-            cmds.connectAttr(corner_auto_rotate_inv_mid_md+".outputZ", down_limb['twist_auto_rot_md']+".input2X", force=True)
+            cmds.connectAttr(f"{down_ctrl}.autoRotate", f"{down_limb['bottom_twist_bone_md']}.input1Z", force=True)
+            cmds.connectAttr(f"{corner_auto_rotate_inv_mid_md}.outputZ", f"{down_limb['twist_auto_rot_md']}.input2X", force=True)
         if ori_b_loc:
             if down_b_limb['up_twist_bone_md']:
-                cmds.connectAttr(down_b_ctrl+".autoRotate", down_b_limb['up_twist_bone_md']+".input1Z", force=True)
-                cmds.connectAttr(down_b_ctrl+".invert", down_b_limb['twist_bone_cnd']+".firstTerm", force=True)
+                cmds.connectAttr(f"{down_b_ctrl}.autoRotate", f"{down_b_limb['up_twist_bone_md']}.input1Z", force=True)
+                cmds.connectAttr(f"{down_b_ctrl}.invert", f"{down_b_limb['twist_bone_cnd']}.firstTerm", force=True)
             if down_b_limb['bottom_twist_bone_md']:
-                cmds.connectAttr(down_b_ctrl+".autoRotate", down_b_limb['bottom_twist_bone_md']+".input1Z", force=True)
-                cmds.connectAttr(corner_auto_rotate_inv_mid_md+".outputZ", down_b_limb['twist_auto_rot_md']+".input2X", force=True)
+                cmds.connectAttr(f"{down_b_ctrl}.autoRotate", f"{down_b_limb['bottom_twist_bone_md']}.input1Z", force=True)
+                cmds.connectAttr(f"{corner_auto_rotate_inv_mid_md}.outputZ", f"{down_b_limb['twist_auto_rot_md']}.input2X", force=True)
 
         self.ar.utils.add_attr_to_items([scale_grp, ], self.ar.utils.ignore_transform_io_attr)
         self.ar.custom_attr.add_attr(0, self.to_ids) #dpID
@@ -397,7 +397,7 @@ class Ribbon:
         curve = self.ar.ctrls.create_controller('id_038_RibbonBend', name, r=self.radius, d=self.curve_degree, rot=(0, 90, 0), guide_source=self.limb_instance.guide_base)
         self.ar.ctrls.set_lock_hide([curve], ['v'])
         if zero:
-            grp = cmds.group(curve, n=name+'_Grp')
+            grp = cmds.group(curve, n=f"{name}_Grp")
             self.ar.utils.add_attr_to_items([grp], self.ar.utils.ignore_transform_io_attr)
         return [grp, curve]
     
@@ -407,14 +407,14 @@ class Ribbon:
             Returns the group, the control curve and its create_zero_out group.
         """
         if arm_style:
-            curve = self.ar.ctrls.create_controller('id_039_RibbonCorner', name, r=self.radius, d=self.curve_degree, rot=(0, 90, 0), guide_source=self.limb_instance.name_guide+"_Corner")
+            curve = self.ar.ctrls.create_controller('id_039_RibbonCorner', name, r=self.radius, d=self.curve_degree, rot=(0, 90, 0), guide_source=f"{self.limb_instance.name_guide}_Corner")
         else:
-            curve = self.ar.ctrls.create_controller('id_039_RibbonCorner', name, r=self.radius, d=self.curve_degree, rot=(90, 0, 0), guide_source=self.limb_instance.name_guide+"_Corner")
+            curve = self.ar.ctrls.create_controller('id_039_RibbonCorner', name, r=self.radius, d=self.curve_degree, rot=(90, 0, 0), guide_source=f"{self.limb_instance.name_guide}_Corner")
         grp = None
         if zero:
-            zero0 = cmds.group(curve, name=name+'_Zero_0_Grp')
-            zero1 = cmds.group(zero0, name=name+'_Zero_1_Grp')
-            grp = cmds.group(zero1, name=name+'_Grp')
+            zero0 = cmds.group(curve, name=f"{name}_Zero_0_Grp")
+            zero1 = cmds.group(zero0, name=f"{name}_Zero_1_Grp")
+            grp = cmds.group(zero1, name=f"{name}_Grp")
             if arm_style:
                 cmds.rotate(0, -90, -90, zero1)
             else:
@@ -450,10 +450,10 @@ class Ribbon:
         
         #create a nurbsPlane based in the choose orientation option
         if horizontal:
-            ribbon = cmds.nurbsPlane(ax=axis, w=num_joints, lr=(1/float(num_joints)), d=3, u=num_joints, v=1, ch=0, name=name+'_Plane')[0]
+            ribbon = cmds.nurbsPlane(ax=axis, w=num_joints, lr=(1/float(num_joints)), d=3, u=num_joints, v=1, ch=0, name=f"{name}_Plane")[0]
             cmds.rebuildSurface(ribbon, ch=0, rpo=1, rt=0, end=1, kr=0, kcp=0, kc=0, sv=1, du=3, dv=1, tol=0.01, fr=0, dir=1) 
         else:
-            ribbon = cmds.nurbsPlane(ax=axis, w=1, lr=num_joints, d=3, u=1, v=num_joints, ch=0, name=name+'_Plane')[0]
+            ribbon = cmds.nurbsPlane(ax=axis, w=1, lr=num_joints, d=3, u=1, v=num_joints, ch=0, name=f"{name}_Plane")[0]
             cmds.rebuildSurface(ribbon, ch=0, rpo=1, rt=0, end=1, kr=0, kcp=0, kc=0, su=1, du=1, dv=3, tol=0.01, fr=0, dir=0) 
         # make this ribbonNurbsPlane as not skinable from dpAR_UI:
         self.ar.utils.add_attr_to_items([ribbon], self.ar.skin.ignore_skinning_attr)
@@ -462,28 +462,28 @@ class Ribbon:
         rb_Jnt = results[0]
         fols = results[1]
         #create locator controls for the middle of the ribbon
-        mid_Loc.append(cmds.spaceLocator(name=name+'_Mid_Pos_Loc')[0])
-        mid_Loc.append(cmds.spaceLocator(name=name+'_Mid_Aim_Loc')[0])
-        mid_Loc.append(cmds.spaceLocator(name=name+'_Mid_Off_Loc')[0])
-        mid_Loc.append(cmds.spaceLocator(name=name+'_Mid_Up_Loc')[0])
+        mid_Loc.append(cmds.spaceLocator(name=f"{name}_Mid_Pos_Loc")[0])
+        mid_Loc.append(cmds.spaceLocator(name=f"{name}_Mid_Aim_Loc")[0])
+        mid_Loc.append(cmds.spaceLocator(name=f"{name}_Mid_Off_Loc")[0])
+        mid_Loc.append(cmds.spaceLocator(name=f"{name}_Mid_Up_Loc")[0])
         #parent correctly the middle locators
         cmds.parent(mid_Loc[2], mid_Loc[1], relative=True)
         cmds.parent(mid_Loc[1], mid_Loc[0], relative=True)
         cmds.parent(mid_Loc[3], mid_Loc[0], relative=True)
         #create the locators controls for the top of the ribbon
-        top_Loc.append(cmds.spaceLocator(name=name+'_Top_Pos_Loc')[0])
-        top_Loc.append(cmds.spaceLocator(name=name+'_Top_Aim_Loc')[0])
-        top_Loc.append(cmds.spaceLocator(name=name+'_Top_Up_Loc')[0])
-        top_Loc.append(cmds.spaceLocator(name=name+'_Top_Rot0_Loc')[0])
+        top_Loc.append(cmds.spaceLocator(name=f"{name}_Top_Pos_Loc")[0])
+        top_Loc.append(cmds.spaceLocator(name=f"{name}_Top_Aim_Loc")[0])
+        top_Loc.append(cmds.spaceLocator(name=f"{name}_Top_Up_Loc")[0])
+        top_Loc.append(cmds.spaceLocator(name=f"{name}_Top_Rot0_Loc")[0])
         #parent correctly the top locators
         cmds.parent(top_Loc[1], top_Loc[0], relative=True)
         cmds.parent(top_Loc[2], top_Loc[0], relative=True)
         cmds.parent(top_Loc[3], top_Loc[0], relative=True)
         #create the locators for the end of the ribbon
-        bttm_Loc.append(cmds.spaceLocator(name=name+'_Bottom_Pos_Loc')[0])
-        bttm_Loc.append(cmds.spaceLocator(name=name+'_Bottom_Aim_Loc')[0])
-        bttm_Loc.append(cmds.spaceLocator(name=name+'_Bottom_Up_Loc')[0])
-        bttm_Loc.append(cmds.spaceLocator(name=name+'_Bottom_Rot0_Loc')[0])
+        bttm_Loc.append(cmds.spaceLocator(name=f"{name}_Bottom_Pos_Loc")[0])
+        bttm_Loc.append(cmds.spaceLocator(name=f"{name}_Bottom_Aim_Loc")[0])
+        bttm_Loc.append(cmds.spaceLocator(name=f"{name}_Bottom_Up_Loc")[0])
+        bttm_Loc.append(cmds.spaceLocator(name=f"{name}_Bottom_Rot0_Loc")[0])
         #parent correctly the bottom locators
         cmds.parent(bttm_Loc[1], bttm_Loc[0], relative=True)
         cmds.parent(bttm_Loc[2], bttm_Loc[0], relative=True)
@@ -506,37 +506,37 @@ class Ribbon:
         #cmds.parent(drv_Jnt, w=True)
         for jnt in drv_Jnt:
             cmds.joint(jnt, e=True, oj='none', ch=True, zso=True);
-            cmds.setAttr(jnt+'.radius', cmds.getAttr(jnt+'.radius')+0.5)
+            cmds.setAttr(f"{jnt}.radius", cmds.getAttr(f"{jnt}.radius")+0.5)
         #rename created joints
-        drv_Jnt[0] = cmds.rename(drv_Jnt[0], name+'_Drv_Bottom_Jxt')
-        drv_Jnt[1] = cmds.rename(drv_Jnt[1], name+'_Drv_Mid_Jxt')
-        drv_Jnt[2] = cmds.rename(drv_Jnt[2], name+'_Drv_Top_Jxt')
-        drv_Jnt[3] = cmds.rename(drv_Jnt[3], name+'_Drv_Bottom_'+self.ar.data.joint_end_attr)
-        drv_Jnt[4] = cmds.rename(drv_Jnt[4], name+'_Drv_Top_'+self.ar.data.joint_end_attr)
+        drv_Jnt[0] = cmds.rename(drv_Jnt[0], f"{name}_Drv_Bottom_Jxt")
+        drv_Jnt[1] = cmds.rename(drv_Jnt[1], f"{name}_Drv_Mid_Jxt")
+        drv_Jnt[2] = cmds.rename(drv_Jnt[2], f"{name}_Drv_Top_Jxt")
+        drv_Jnt[3] = cmds.rename(drv_Jnt[3], f"{name}_Drv_Bottom_{self.ar.data.joint_end_attr}")
+        drv_Jnt[4] = cmds.rename(drv_Jnt[4], f"{name}_Drv_Top_{self.ar.data.joint_end_attr}")
         
         #place joints correctly accordaly with the user options choose
         if (horizontal and axis==(1, 0, 0)) or (horizontal and axis==(0, 0, 1)):
-            cmds.setAttr(bttm_Loc[2]+'.translateY', 2)
-            cmds.setAttr(top_Loc[2]+'.translateY', 2)
-            cmds.setAttr(mid_Loc[3]+'.translateY', 2)
+            cmds.setAttr(f"{bttm_Loc[2]}.translateY", 2)
+            cmds.setAttr(f"{top_Loc[2]}.translateY", 2)
+            cmds.setAttr(f"{mid_Loc[3]}.translateY", 2)
         elif (horizontal and axis==(0, 1, 0)) or (not horizontal and axis==(1, 0, 0)):
-            cmds.setAttr(bttm_Loc[2]+'.translateZ', 2)
-            cmds.setAttr(top_Loc[2]+'.translateZ', 2)
-            cmds.setAttr(mid_Loc[3]+'.translateZ', 2)
+            cmds.setAttr(f"{bttm_Loc[2]}.translateZ", 2)
+            cmds.setAttr(f"{top_Loc[2]}.translateZ", 2)
+            cmds.setAttr(f"{mid_Loc[3]}.translateZ", 2)
         elif not horizontal and axis==(0, 1, 0) or (not horizontal and axis==(0, 0, 1)) or horizontal and axis==(0, 0, -1):
-            cmds.setAttr(bttm_Loc[2]+'.translateX', 2)
-            cmds.setAttr(top_Loc[2]+'.translateX', 2)
-            cmds.setAttr(mid_Loc[3]+'.translateX', 2)
+            cmds.setAttr(f"{bttm_Loc[2]}.translateX", 2)
+            cmds.setAttr(f"{top_Loc[2]}.translateX", 2)
+            cmds.setAttr(f"{mid_Loc[3]}.translateX", 2)
         
         #create auxiliary joints that will be used to control the ribbon
-        aux_Jnt.append(cmds.duplicate(drv_Jnt[1], name=name+'_Rot_Jxt')[0])
-        cmds.setAttr(aux_Jnt[0]+'.jointOrient', 0, 0, 0)
-        cmds.setAttr(aux_Jnt[0]+'.rotateOrder', 5)
-        aux_Jnt.append(cmds.duplicate(aux_Jnt[0], name=name+'_Rot_Extra_Jxt')[0])
+        aux_Jnt.append(cmds.duplicate(drv_Jnt[1], name=f"{name}_Rot_Jxt")[0])
+        cmds.setAttr(f"{aux_Jnt[0]}.jointOrient", 0, 0, 0)
+        cmds.setAttr(f"{aux_Jnt[0]}.rotateOrder", 5)
+        aux_Jnt.append(cmds.duplicate(aux_Jnt[0], name=f"{name}_Rot_Extra_Jxt")[0])
         self.ar.utils.add_joint_end_attr([drv_Jnt[3], drv_Jnt[4]])
         
         cmds.parent(aux_Jnt[1], mid_Loc[3])
-        cmds.setAttr(aux_Jnt[1]+'.translate', 0, 0, 0)
+        cmds.setAttr(f"{aux_Jnt[1]}.translate", 0, 0, 0)
         cmds.parent(aux_Jnt[1], aux_Jnt[0])
         cmds.parent(mid_Loc[3], aux_Jnt[1])
         #calculate the adjust for the new chain position
@@ -547,60 +547,60 @@ class Ribbon:
         
         #adjust the joints orientation and position based in the options choose from user
         if horizontal and axis==(1, 0, 0):
-            cmds.setAttr(drv_Jnt[0]+'.jointOrient', 0, 90, 0)
-            cmds.setAttr(drv_Jnt[2]+'.jointOrient', 0, 90, 0)
+            cmds.setAttr(f"{drv_Jnt[0]}.jointOrient", 0, 90, 0)
+            cmds.setAttr(f"{drv_Jnt[2]}.jointOrient", 0, 90, 0)
             
-            cmds.setAttr(drv_Jnt[0]+'.translateZ', -dist)
-            cmds.setAttr(drv_Jnt[3]+'.translateZ', end_dist*dist)
-            cmds.setAttr(drv_Jnt[2]+'.translateZ', dist)
-            cmds.setAttr(drv_Jnt[4]+'.translateZ', -end_dist*dist)
+            cmds.setAttr(f"{drv_Jnt[0]}.translateZ", -dist)
+            cmds.setAttr(f"{drv_Jnt[3]}.translateZ", end_dist*dist)
+            cmds.setAttr(f"{drv_Jnt[2]}.translateZ", dist)
+            cmds.setAttr(f"{drv_Jnt[4]}.translateZ", -end_dist*dist)
         
         elif horizontal and axis==(0, 1, 0) or horizontal and axis==(0, 0, 1) or horizontal and axis==(0, 0, -1):
-            cmds.setAttr(drv_Jnt[0]+'.jointOrient', 0, 0, 0)
-            cmds.setAttr(drv_Jnt[2]+'.jointOrient', 0, 0, 0)
+            cmds.setAttr(f"{drv_Jnt[0]}.jointOrient", 0, 0, 0)
+            cmds.setAttr(f"{drv_Jnt[2]}.jointOrient", 0, 0, 0)
             
-            cmds.setAttr(drv_Jnt[0]+'.translateX', -dist)
-            cmds.setAttr(drv_Jnt[3]+'.translateX', end_dist*dist)
-            cmds.setAttr(drv_Jnt[2]+'.translateX', dist)
-            cmds.setAttr(drv_Jnt[4]+'.translateX', -end_dist*dist)
+            cmds.setAttr(f"{drv_Jnt[0]}.translateX", -dist)
+            cmds.setAttr(f"{drv_Jnt[3]}.translateX", end_dist*dist)
+            cmds.setAttr(f"{drv_Jnt[2]}.translateX", dist)
+            cmds.setAttr(f"{drv_Jnt[4]}.translateX", -end_dist*dist)
             
         elif not horizontal and axis==(1, 0, 0):
-            cmds.setAttr(drv_Jnt[0]+'.jointOrient', 0, 0, -90)
-            cmds.setAttr(drv_Jnt[2]+'.jointOrient', 0, 0, -90)
+            cmds.setAttr(f"{drv_Jnt[0]}.jointOrient", 0, 0, -90)
+            cmds.setAttr(f"{drv_Jnt[2]}.jointOrient", 0, 0, -90)
         
-            cmds.setAttr(drv_Jnt[0]+'.translateY', -dist)
-            cmds.setAttr(drv_Jnt[3]+'.translateY', end_dist*dist)
-            cmds.setAttr(drv_Jnt[2]+'.translateY', dist)
-            cmds.setAttr(drv_Jnt[4]+'.translateY', -end_dist*dist)
+            cmds.setAttr(f"{drv_Jnt[0]}.translateY", -dist)
+            cmds.setAttr(f"{drv_Jnt[3]}.translateY", end_dist*dist)
+            cmds.setAttr(f"{drv_Jnt[2]}.translateY", dist)
+            cmds.setAttr(f"{drv_Jnt[4]}.translateY", -end_dist*dist)
             
         elif not horizontal and axis==(0, 1, 0):
-            cmds.setAttr(drv_Jnt[0]+'.jointOrient', 0, 90, 0)
-            cmds.setAttr(drv_Jnt[2]+'.jointOrient', 0, 90, 0)
+            cmds.setAttr(f"{drv_Jnt[0]}.jointOrient", 0, 90, 0)
+            cmds.setAttr(f"{drv_Jnt[2]}.jointOrient", 0, 90, 0)
         
-            cmds.setAttr(drv_Jnt[0]+'.translateZ', -dist)
-            cmds.setAttr(drv_Jnt[3]+'.translateZ', end_dist*dist)
-            cmds.setAttr(drv_Jnt[2]+'.translateZ', dist)
-            cmds.setAttr(drv_Jnt[4]+'.translateZ', -end_dist*dist)
+            cmds.setAttr(f"{drv_Jnt[0]}.translateZ", -dist)
+            cmds.setAttr(f"{drv_Jnt[3]}.translateZ", end_dist*dist)
+            cmds.setAttr(f"{drv_Jnt[2]}.translateZ", dist)
+            cmds.setAttr(f"{drv_Jnt[4]}.translateZ", -end_dist*dist)
             
         elif not horizontal and axis==(0, 0, 1):
-            cmds.setAttr(drv_Jnt[0]+'.jointOrient', 0, 0, -90)
-            cmds.setAttr(drv_Jnt[2]+'.jointOrient', 0, 0, -90)
+            cmds.setAttr(f"{drv_Jnt[0]}.jointOrient", 0, 0, -90)
+            cmds.setAttr(f"{drv_Jnt[2]}.jointOrient", 0, 0, -90)
         
-            cmds.setAttr(drv_Jnt[0]+'.translateY', -dist)
-            cmds.setAttr(drv_Jnt[3]+'.translateY', end_dist*dist)
-            cmds.setAttr(drv_Jnt[2]+'.translateY', dist)
-            cmds.setAttr(drv_Jnt[4]+'.translateY', -end_dist*dist)
+            cmds.setAttr(f"{drv_Jnt[0]}.translateY", -dist)
+            cmds.setAttr(f"{drv_Jnt[3]}.translateY", end_dist*dist)
+            cmds.setAttr(f"{drv_Jnt[2]}.translateY", dist)
+            cmds.setAttr(f"{drv_Jnt[4]}.translateY", -end_dist*dist)
         
         #fix the control locators position and orientation
         cmds.parent(top_Loc[0], drv_Jnt[2])
-        cmds.setAttr(top_Loc[0]+'.translate', 0, 0, 0)
+        cmds.setAttr(f"{top_Loc[0]}.translate", 0, 0, 0)
         cmds.parent(top_Loc[0], world=True)
-        cmds.setAttr(top_Loc[0]+'.rotate', 0, 0, 0)
+        cmds.setAttr(f"{top_Loc[0]}.rotate", 0, 0, 0)
         
         cmds.parent(bttm_Loc[0], drv_Jnt[0])
-        cmds.setAttr(bttm_Loc[0]+'.translate', 0, 0, 0)
+        cmds.setAttr(f"{bttm_Loc[0]}.translate", 0, 0, 0)
         cmds.parent(bttm_Loc[0], world=True)
-        cmds.setAttr(bttm_Loc[0]+'.rotate', 0, 0, 0)    
+        cmds.setAttr(f"{bttm_Loc[0]}.rotate", 0, 0, 0)    
         
         cmds.parent(drv_Jnt[2], top_Loc[1])
         cmds.parent(drv_Jnt[1], mid_Loc[2])
@@ -608,10 +608,10 @@ class Ribbon:
         
         cmds.parent(aux_Jnt[0], mid_Loc[0])
         #create a nurbs control in order to be used in the ribbon offset
-        mid_ctrl = self.ar.ctrls.create_controller('Circle', name+'_MidCtrl', r=self.radius, d=self.curve_degree, rot=(0, 90, 0), guide_source=self.limb_instance.name_guide+"_Corner")
+        mid_ctrl = self.ar.ctrls.create_controller('Circle', f"{name}_MidCtrl", r=self.radius, d=self.curve_degree, rot=(0, 90, 0), guide_source=f"{self.limb_instance.name_guide}_Corner")
         self.ar.utils.remove_user_defined_attr(mid_ctrl, True)
         middle_ctrl = mid_ctrl #TODO: it's very confused yet, sorry... seems mid_ctrl is a father curve of the middle_ctrl
-        mid_ctrl = cmds.group(n=mid_ctrl+'_Grp', em=True)
+        mid_ctrl = cmds.group(n=f"{mid_ctrl}_Grp", em=True)
         cmds.matchTransform(mid_ctrl, middle_ctrl, position=True, rotation=True)
         cmds.parent(middle_ctrl, mid_ctrl)
         
@@ -626,15 +626,15 @@ class Ribbon:
         cmds.parent(bttm_Loc[2], bttm_Loc[0])
         cmds.parent(mid_Loc[3], aux_Jnt[1]) 
         #create needed constraints in the locators in order to set the top always follow, to the base always aim the middle, to the middle always aim the top
-        cmds.aimConstraint(drv_Jnt[1], bttm_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(1, 0, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=bttm_Loc[2], name=bttm_Loc[1]+"_AiC")
-        cmds.aimConstraint(top_Loc[0], mid_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(1, 0, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=mid_Loc[3], name=mid_Loc[1]+"_AiC")
-        cmds.aimConstraint(drv_Jnt[1], top_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(-1, 0, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=top_Loc[2], name=top_Loc[1]+"_AiC")
+        cmds.aimConstraint(drv_Jnt[1], bttm_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(1, 0, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=bttm_Loc[2], name=f"{bttm_Loc[1]}_AiC")
+        cmds.aimConstraint(top_Loc[0], mid_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(1, 0, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=mid_Loc[3], name=f"{mid_Loc[1]}_AiC")
+        cmds.aimConstraint(drv_Jnt[1], top_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(-1, 0, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=top_Loc[2], name=f"{top_Loc[1]}_AiC")
         
         #create a point and orient constraint for the middle control
-        cmds.pointConstraint(top_Loc[0], bttm_Loc[0], mid_Loc[0], offset=(0, 0, 0), weight=1, name=mid_Loc[0]+"_PoC")
+        cmds.pointConstraint(top_Loc[0], bttm_Loc[0], mid_Loc[0], offset=(0, 0, 0), weight=1, name=f"{mid_Loc[0]}_PoC")
         cmds.delete(cmds.orientConstraint(bttm_Loc[0], aux_Jnt[0], weight=1, mo=False))
-        mid_pac = cmds.parentConstraint(top_Loc[0], bttm_Loc[0], aux_Jnt[0], maintainOffset=True, skipTranslate=['x', 'y', 'z'], weight=0.5, name=aux_Jnt[0]+"_PaC")[0]
-        cmds.setAttr(mid_pac+".interpType", 2) #Shortest
+        mid_pac = cmds.parentConstraint(top_Loc[0], bttm_Loc[0], aux_Jnt[0], maintainOffset=True, skipTranslate=['x', 'y', 'z'], weight=0.5, name=f"{aux_Jnt[0]}_PaC")[0]
+        cmds.setAttr(f"{mid_pac}.interpType", 2) #Shortest
         
         #ribbon scale (volume variation)
         if num_joints == 3:
@@ -659,65 +659,65 @@ class Ribbon:
             if center_up_down == 2: #down
                 proportions = [0.875, 0.75, 0.625, 0.5, 0.375, 0.25, 0.125]
 
-        curve_info_node = cmds.arclen(ribbon+".v[0.5]", constructionHistory=True)
-        curve_info_node = cmds.rename(curve_info_node, ribbon+"_CurveInfo")
-        curve_from_surface_iso = cmds.listConnections(curve_info_node+".inputCurve", source=True, destination=False)
-        cmds.rename(curve_from_surface_iso, ribbon+"_CurveFromSurface_Iso")
-        rb_scale_md = cmds.createNode('multiplyDivide', name=ribbon+"_ScaleCompensate_MD")
-        rb_normalize_md = cmds.createNode('multiplyDivide', name=ribbon+"_Normalize_MD")
-        self.to_ids.extend([curve_info_node, rb_scale_md, rb_normalize_md, ribbon+"_CurveFromSurface_Iso"])
-        cmds.setAttr(rb_normalize_md+".operation", 2)
-        cmds.connectAttr(curve_info_node+".arcLength", rb_normalize_md+".input2X", force=True)
-        cmds.connectAttr(rb_scale_md+".outputX", rb_normalize_md+".input1X", force=True)
+        curve_info_node = cmds.arclen(f"{ribbon}.v[0.5]", constructionHistory=True)
+        curve_info_node = cmds.rename(curve_info_node, f"{ribbon}_CurveInfo")
+        curve_from_surface_iso = cmds.listConnections(f"{curve_info_node}.inputCurve", source=True, destination=False)
+        cmds.rename(curve_from_surface_iso, f"{ribbon}_CurveFromSurface_Iso")
+        rb_scale_md = cmds.createNode('multiplyDivide', name=f"{ribbon}_ScaleCompensate_MD")
+        rb_normalize_md = cmds.createNode('multiplyDivide', name=f"{ribbon}_Normalize_MD")
+        self.to_ids.extend([curve_info_node, rb_scale_md, rb_normalize_md, f"{ribbon}_CurveFromSurface_Iso"])
+        cmds.setAttr(f"{rb_normalize_md}.operation", 2)
+        cmds.connectAttr(f"{curve_info_node}.arcLength", f"{rb_normalize_md}.input2X", force=True)
+        cmds.connectAttr(f"{rb_scale_md}.outputX", f"{rb_normalize_md}.input1X", force=True)
 
         if cmds.objExists(world_ref):
-            if not cmds.objExists(world_ref+"."+self.limb_manual_vv_attr):
+            if not cmds.objExists(f"{world_ref}.{self.limb_manual_vv_attr}"):
                 cmds.addAttr(world_ref, longName=self.limb_vv_attr, attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
                 cmds.addAttr(world_ref, longName=self.limb_manual_vv_attr, attributeType='float', defaultValue=1, keyable=True)
                 cmds.addAttr(world_ref, longName=self.limb_min_vv_attr, attributeType='float', defaultValue=0.01, keyable=True)
-            cmds.connectAttr(world_ref+".scaleX", rb_scale_md+".input1X", force=True)
+            cmds.connectAttr(f"{world_ref}.scaleX", f"{rb_scale_md}.input1X", force=True)
         
         #fix group hierarchy
-        extra_ctrl_grp = cmds.group(empty=True, name=name+"_ExtraBendyCtrl_Grp")
+        extra_ctrl_grp = cmds.group(empty=True, name=f"{name}_ExtraBendyCtrl_Grp")
         i = 0
         for jnt in rb_Jnt:
             cmds.makeIdentity(jnt, apply=True)
             
             # create extra control
             extra_name = jnt[:-4] #removed _Jnt suffix
-            extra_ctrl = self.ar.ctrls.create_controller('id_040_RibbonExtra', ctrl_name=extra_name+"_Ctrl", r=self.radius, d=self.curve_degree, guide_source=self.limb_instance.guide_base, parent_tag=self.limb_instance.get_parent_to_tag(extra_ctrls))
+            extra_ctrl = self.ar.ctrls.create_controller('id_040_RibbonExtra', ctrl_name=f"{extra_name}_Ctrl", r=self.radius, d=self.curve_degree, guide_source=self.limb_instance.guide_base, parent_tag=self.limb_instance.get_parent_to_tag(extra_ctrls))
             extra_ctrls.append(extra_ctrl)
             cmds.rotate(0, 90, 0, extra_ctrl)
             cmds.makeIdentity(extra_ctrl, a=True)
             extra_zero = self.ar.utils.create_zero_out([extra_ctrl])[0]
             cmds.parent(extra_zero, extra_ctrl_grp)
-            cmds.parentConstraint(fols[i], extra_zero, w=1, name=extra_zero+"_PaC")
-            cmds.parentConstraint(extra_ctrl, jnt, w=1, name=jnt+"_PaC")
-            cmds.scaleConstraint(extra_ctrl, jnt, w=1, name=jnt+"_ScC")
+            cmds.parentConstraint(fols[i], extra_zero, w=1, name=f"{extra_zero}_PaC")
+            cmds.parentConstraint(extra_ctrl, jnt, w=1, name=f"{jnt}_PaC")
+            cmds.scaleConstraint(extra_ctrl, jnt, w=1, name=f"{jnt}_ScC")
             
             # work with volume variation
-            rb_proportion_md = cmds.createNode('multiplyDivide', name=extra_name+"_Proportion_MD")
-            rb_intensity_md = cmds.createNode('multiplyDivide', name=extra_name+"_Intensity_MD")
-            rb_length_md = cmds.createNode('multiplyDivide', name=extra_name+"_Length_MD")
-            rb_add_scale_pma = cmds.createNode('plusMinusAverage', name=extra_name+"_AddScale_PMA")
-            rb_scale_clp = cmds.createNode('clamp', name=extra_name+"_Scale_Clp")
-            rb_blend_bc = cmds.createNode('blendColors', name=extra_name+"_BC")
+            rb_proportion_md = cmds.createNode('multiplyDivide', name=f"{extra_name}_Proportion_MD")
+            rb_intensity_md = cmds.createNode('multiplyDivide', name=f"{extra_name}_Intensity_MD")
+            rb_length_md = cmds.createNode('multiplyDivide', name=f"{extra_name}_Length_MD")
+            rb_add_scale_pma = cmds.createNode('plusMinusAverage', name=f"{extra_name}_AddScale_PMA")
+            rb_scale_clp = cmds.createNode('clamp', name=f"{extra_name}_Scale_Clp")
+            rb_blend_bc = cmds.createNode('blendColors', name=f"{extra_name}_BC")
             self.to_ids.extend([rb_proportion_md, rb_intensity_md, rb_length_md, rb_add_scale_pma, rb_scale_clp, rb_blend_bc])
-            cmds.connectAttr(world_ref+"."+self.limb_vv_attr, rb_blend_bc+".blender", force=True)
-            cmds.setAttr(rb_blend_bc+".color2", 1, 1, 1, type='double3')
-            cmds.connectAttr(rb_normalize_md+".outputX", rb_proportion_md+".input1X", force=True)
-            cmds.setAttr(rb_proportion_md+".input2X", proportions[i])
-            cmds.connectAttr(rb_proportion_md+".outputX", rb_intensity_md+".input1X", force=True)
-            cmds.connectAttr(world_ref+"."+self.limb_manual_vv_attr, rb_intensity_md+".input2X", force=True)
-            cmds.connectAttr(world_ref+"."+self.limb_length_attr, rb_length_md+".input2X", force=True)
-            cmds.connectAttr(rb_intensity_md+".outputX", rb_length_md+".input1X", force=True)
-            cmds.connectAttr(rb_length_md+".outputX", rb_add_scale_pma+".input1D[1]", force=True)
-            cmds.connectAttr(rb_add_scale_pma+".output1D", rb_scale_clp+".inputR", force=True)
-            cmds.connectAttr(world_ref+"."+self.limb_min_vv_attr, rb_scale_clp+".minR")
-            cmds.setAttr(rb_scale_clp+".maxR", 1000000)
-            cmds.connectAttr(rb_scale_clp+".outputR", rb_blend_bc+".color1.color1R", force=True)
-            cmds.connectAttr(rb_blend_bc+".output.outputR", extra_zero+".scaleY", force=True)
-            cmds.connectAttr(rb_blend_bc+".output.outputR", extra_zero+".scaleZ", force=True)
+            cmds.connectAttr(f"{world_ref}.{self.limb_vv_attr}", f"{rb_blend_bc}.blender", force=True)
+            cmds.setAttr(f"{rb_blend_bc}.color2", 1, 1, 1, type='double3')
+            cmds.connectAttr(f"{rb_normalize_md}.outputX", f"{rb_proportion_md}.input1X", force=True)
+            cmds.setAttr(f"{rb_proportion_md}.input2X", proportions[i])
+            cmds.connectAttr(f"{rb_proportion_md}.outputX", f"{rb_intensity_md}.input1X", force=True)
+            cmds.connectAttr(f"{world_ref}.{self.limb_manual_vv_attr}", f"{rb_intensity_md}.input2X", force=True)
+            cmds.connectAttr(f"{world_ref}.{self.limb_length_attr}", f"{rb_length_md}.input2X", force=True)
+            cmds.connectAttr(f"{rb_intensity_md}.outputX", f"{rb_length_md}.input1X", force=True)
+            cmds.connectAttr(f"{rb_length_md}.outputX", f"{rb_add_scale_pma}.input1D[1]", force=True)
+            cmds.connectAttr(f"{rb_add_scale_pma}.output1D", f"{rb_scale_clp}.inputR", force=True)
+            cmds.connectAttr(f"{world_ref}.{self.limb_min_vv_attr}", f"{rb_scale_clp}.minR")
+            cmds.setAttr(f"{rb_scale_clp}.maxR", 1000000)
+            cmds.connectAttr(f"{rb_scale_clp}.outputR", f"{rb_blend_bc}.color1.color1R", force=True)
+            cmds.connectAttr(f"{rb_blend_bc}.output.outputR", f"{extra_zero}.scaleY", force=True)
+            cmds.connectAttr(f"{rb_blend_bc}.output.outputR", f"{extra_zero}.scaleZ", force=True)
             
             # additional joint
             if additional_joint:
@@ -727,7 +727,7 @@ class Ribbon:
                 for add_dir in additional_dirs:
                     for add_axis in additional_axes:
                         cmds.select(jnt)
-                        jad = cmds.joint(name=jnt.replace('_Jnt', "_"+str(d).zfill(2)+"_Jad"), scaleCompensate=False)
+                        jad = cmds.joint(name=jnt.replace('_Jnt', f"_{str(d).zfill(2)}_Jad"), scaleCompensate=False)
                         # joint position:
                         if s == 1: #right
                             if axis == (0, 0, -1): #arm
@@ -737,7 +737,7 @@ class Ribbon:
                             else: #leg
                                 # flip direction to conform with left side
                                 add_dir = -1 * add_dir
-                        cmds.setAttr(jad+".translate"+add_axis, add_dir*self.radius*0.5)
+                        cmds.setAttr(f"{jad}.translate{add_axis}", add_dir*self.radius*0.5)
                         self.ar.naming.set_joint_label(jad, s+joint_label_add, 18, f"{joint_label_name}_{i:02d}_{d:02d}")
                         cmds.addAttr(jad, longName='dpAR_joint', attributeType='float', keyable=False)
                         # control:
@@ -745,11 +745,11 @@ class Ribbon:
                         extra_ctrls.append(add_ctrl)
                         add_ctrl_grp = self.ar.utils.create_zero_out([add_ctrl])[0]
                         cmds.matchTransform(add_ctrl_grp, jad, position=True, rotation=True)
-                        cmds.parentConstraint(add_ctrl, jad, maintainOffset=True, name=jad+"_PaC")
-                        cmds.scaleConstraint(add_ctrl, jad, maintainOffset=True, name=jad+"_ScC")
+                        cmds.parentConstraint(add_ctrl, jad, maintainOffset=True, name=f"{jad}_PaC")
+                        cmds.scaleConstraint(add_ctrl, jad, maintainOffset=True, name=f"{jad}_ScC")
                         cmds.parent(add_ctrl_grp, extra_ctrl, absolute=True)
-                        cmds.setAttr(add_ctrl_grp+".scaleY", 1)
-                        cmds.setAttr(add_ctrl_grp+".scaleZ", 1)
+                        cmds.setAttr(f"{add_ctrl_grp}.scaleY", 1)
+                        cmds.setAttr(f"{add_ctrl_grp}.scaleZ", 1)
                         d = d + 1
 
             # update i
@@ -764,105 +764,105 @@ class Ribbon:
             rb_scale_clp = cmds.createNode('clamp', name=self.elbow_ctrl.replace('_Ctrl', '_Scale_Clp'))
             rb_blend_bc = cmds.createNode('blendColors', name=self.elbow_ctrl.replace('_Ctrl', '_BC'))
             self.to_ids.extend([rb_proportion_md, rb_intensity_md, rb_add_scale_pma, rb_length_md, rb_scale_clp, rb_blend_bc])
-            cmds.connectAttr(world_ref+"."+self.limb_vv_attr, rb_blend_bc+".blender", force=True)
-            cmds.setAttr(rb_blend_bc+".color2", 1, 1, 1, type='double3')
-            cmds.connectAttr(rb_normalize_md+".outputX", rb_proportion_md+".input1X", force=True)
-            cmds.setAttr(rb_proportion_md+".input2X", 1)
-            cmds.connectAttr(rb_proportion_md+".outputX", rb_intensity_md+".input1X", force=True)
-            cmds.connectAttr(world_ref+"."+self.limb_manual_vv_attr, rb_intensity_md+".input2X", force=True)
-            cmds.connectAttr(world_ref+"."+self.limb_length_attr, rb_length_md+".input2X", force=True)
-            cmds.connectAttr(rb_intensity_md+".outputX", rb_length_md+".input1X", force=True)
-            cmds.connectAttr(rb_length_md+".outputX", rb_add_scale_pma+".input1D[1]", force=True)
-            cmds.connectAttr(rb_add_scale_pma+".output1D", rb_scale_clp+".inputR", force=True)
-            cmds.connectAttr(world_ref+"."+self.limb_min_vv_attr, rb_scale_clp+".minR")
-            cmds.setAttr(rb_scale_clp+".maxR", 1000000)
-            cmds.connectAttr(rb_scale_clp+".outputR", rb_blend_bc+".color1.color1R", force=True)
-            cmds.connectAttr(rb_blend_bc+".output.outputR", self.corner_jnt+".scaleY", force=True)
-            cmds.connectAttr(rb_blend_bc+".output.outputR", self.corner_jnt+".scaleZ", force=True)
+            cmds.connectAttr(f"{world_ref}.{self.limb_vv_attr}", f"{rb_blend_bc}.blender", force=True)
+            cmds.setAttr(f"{rb_blend_bc}.color2", 1, 1, 1, type='double3')
+            cmds.connectAttr(f"{rb_normalize_md}.outputX", f"{rb_proportion_md}.input1X", force=True)
+            cmds.setAttr(f"{rb_proportion_md}.input2X", 1)
+            cmds.connectAttr(f"{rb_proportion_md}.outputX", f"{rb_intensity_md}.input1X", force=True)
+            cmds.connectAttr(f"{world_ref}.{self.limb_manual_vv_attr}", f"{rb_intensity_md}.input2X", force=True)
+            cmds.connectAttr(f"{world_ref}.{self.limb_length_attr}", f"{rb_length_md}.input2X", force=True)
+            cmds.connectAttr(f"{rb_intensity_md}.outputX", f"{rb_length_md}.input1X", force=True)
+            cmds.connectAttr(f"{rb_length_md}.outputX", f"{rb_add_scale_pma}.input1D[1]", force=True)
+            cmds.connectAttr(f"{rb_add_scale_pma}.output1D", f"{rb_scale_clp}.inputR", force=True)
+            cmds.connectAttr(f"{world_ref}.{self.limb_min_vv_attr}", f"{rb_scale_clp}.minR")
+            cmds.setAttr(f"{rb_scale_clp}.maxR", 1000000)
+            cmds.connectAttr(f"{rb_scale_clp}.outputR", f"{rb_blend_bc}.color1.color1R", force=True)
+            cmds.connectAttr(f"{rb_blend_bc}.output.outputR", f"{self.corner_jnt}.scaleY", force=True)
+            cmds.connectAttr(f"{rb_blend_bc}.output.outputR", f"{self.corner_jnt}.scaleZ", force=True)
             if ori_b_loc:
-                cmds.connectAttr(rb_blend_bc+".output.outputR", self.corner_b_jnt+".scaleY", force=True)
-                cmds.connectAttr(rb_blend_bc+".output.outputR", self.corner_b_jnt+".scaleZ", force=True)
+                cmds.connectAttr(f"{rb_blend_bc}.output.outputR", f"{self.corner_b_jnt}.scaleY", force=True)
+                cmds.connectAttr(f"{rb_blend_bc}.output.outputR", f"{self.corner_b_jnt}.scaleZ", force=True)
         
-        locators_grps = cmds.group(bttm_Loc[0], top_Loc[0], mid_Loc[0], bttm_Loc[3], top_Loc[3], n=name+'_Loc_Grp')
-        skin_jnt_grp = cmds.group(rb_Jnt, n=name+'_Jnt_Grp')
-        final_system_grp = cmds.group(ribbon, locators_grps, skin_jnt_grp, n=name+'_RibbonSystem_Grp')
+        locators_grps = cmds.group(bttm_Loc[0], top_Loc[0], mid_Loc[0], bttm_Loc[3], top_Loc[3], n=f"{name}_Loc_Grp")
+        skin_jnt_grp = cmds.group(rb_Jnt, n=f"{name}_Jnt_Grp")
+        final_system_grp = cmds.group(ribbon, locators_grps, skin_jnt_grp, n=f"{name}_RibbonSystem_Grp")
         #do the controller joints skin and the ribbon
         ribbon_shape = cmds.listRelatives(ribbon, shapes=True)
-        skincluster_node = cmds.skinCluster(drv_Jnt[0:3], ribbon_shape, tsb=True, mi=2, dr=1, n=name+"_SC")[0]
-        bindpose = cmds.listConnections(skincluster_node+".bindPose", destination=False, source=True)
-        cmds.rename(bindpose, name+"_BP")
-        self.to_ids.extend([skincluster_node, name+"_BP"])
+        skincluster_node = cmds.skinCluster(drv_Jnt[0:3], ribbon_shape, tsb=True, mi=2, dr=1, n=f"{name}_SC")[0]
+        bindpose = cmds.listConnections(f"{skincluster_node}.bindPose", destination=False, source=True)
+        cmds.rename(bindpose, f"{name}_BP")
+        self.to_ids.extend([skincluster_node, f"{name}_BP"])
         
         #skin presets for the ribbon (that's amazing!)
         if not horizontal:
             if num_joints == 3:
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0:1][5]', transformValue=[(drv_Jnt[2], 0.99), (drv_Jnt[1], 0.01)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0:1][4]', transformValue=[(drv_Jnt[2], 0.6), (drv_Jnt[1], 0.4)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0:1][3]', transformValue=[(drv_Jnt[2], 0.2), (drv_Jnt[1], 0.8)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0:1][2]', transformValue=[(drv_Jnt[0], 0.2), (drv_Jnt[1], 0.8)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0:1][1]', transformValue=[(drv_Jnt[0], 0.6), (drv_Jnt[1], 0.4)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0:1][0]', transformValue=[(drv_Jnt[0], 0.99), (drv_Jnt[1], 0.01)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0:1][5]", transformValue=[(drv_Jnt[2], 0.99), (drv_Jnt[1], 0.01)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0:1][4]", transformValue=[(drv_Jnt[2], 0.6), (drv_Jnt[1], 0.4)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0:1][3]", transformValue=[(drv_Jnt[2], 0.2), (drv_Jnt[1], 0.8)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0:1][2]", transformValue=[(drv_Jnt[0], 0.2), (drv_Jnt[1], 0.8)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0:1][1]", transformValue=[(drv_Jnt[0], 0.6), (drv_Jnt[1], 0.4)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0:1][0]", transformValue=[(drv_Jnt[0], 0.99), (drv_Jnt[1], 0.01)])
 
             elif num_joints == 5:
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0:1][7]', transformValue=[(drv_Jnt[2], 0.99), (drv_Jnt[1], 0.01)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0:1][6]', transformValue=[(drv_Jnt[2], 0.8), (drv_Jnt[1], 0.2)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0:1][5]', transformValue=[(drv_Jnt[2], 0.5), (drv_Jnt[1], 0.5)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0:1][4]', transformValue=[(drv_Jnt[2], 0.25), (drv_Jnt[1], 0.75)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0:1][3]', transformValue=[(drv_Jnt[0], 0.25), (drv_Jnt[1], 0.75)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0:1][2]', transformValue=[(drv_Jnt[0], 0.5), (drv_Jnt[1], 0.5)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0:1][1]', transformValue=[(drv_Jnt[0], 0.8), (drv_Jnt[1], 0.2)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0:1][0]', transformValue=[(drv_Jnt[0], 0.99), (drv_Jnt[1], 0.01)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0:1][7]", transformValue=[(drv_Jnt[2], 0.99), (drv_Jnt[1], 0.01)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0:1][6]", transformValue=[(drv_Jnt[2], 0.8), (drv_Jnt[1], 0.2)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0:1][5]", transformValue=[(drv_Jnt[2], 0.5), (drv_Jnt[1], 0.5)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0:1][4]", transformValue=[(drv_Jnt[2], 0.25), (drv_Jnt[1], 0.75)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0:1][3]", transformValue=[(drv_Jnt[0], 0.25), (drv_Jnt[1], 0.75)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0:1][2]", transformValue=[(drv_Jnt[0], 0.5), (drv_Jnt[1], 0.5)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0:1][1]", transformValue=[(drv_Jnt[0], 0.8), (drv_Jnt[1], 0.2)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0:1][0]", transformValue=[(drv_Jnt[0], 0.99), (drv_Jnt[1], 0.01)])
             elif num_joints == 7:
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0:1][9]', transformValue=[(drv_Jnt[2], 0.99), (drv_Jnt[1], 0.01)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0:1][8]', transformValue=[(drv_Jnt[2], 0.85), (drv_Jnt[1], 0.15)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0:1][7]', transformValue=[(drv_Jnt[2], 0.6), (drv_Jnt[1], 0.4)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0:1][6]', transformValue=[(drv_Jnt[2], 0.35), (drv_Jnt[1], 0.65)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0:1][5]', transformValue=[(drv_Jnt[2], 0.25), (drv_Jnt[1], 0.75)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0:1][4]', transformValue=[(drv_Jnt[0], 0.25), (drv_Jnt[1], 0.75)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0:1][3]', transformValue=[(drv_Jnt[0], 0.35), (drv_Jnt[1], 0.65)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0:1][2]', transformValue=[(drv_Jnt[0], 0.6), (drv_Jnt[1], 0.4)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0:1][1]', transformValue=[(drv_Jnt[0], 0.85), (drv_Jnt[1], 0.15)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0:1][0]', transformValue=[(drv_Jnt[0], 0.99), (drv_Jnt[1], 0.01)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0:1][9]", transformValue=[(drv_Jnt[2], 0.99), (drv_Jnt[1], 0.01)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0:1][8]", transformValue=[(drv_Jnt[2], 0.85), (drv_Jnt[1], 0.15)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0:1][7]", transformValue=[(drv_Jnt[2], 0.6), (drv_Jnt[1], 0.4)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0:1][6]", transformValue=[(drv_Jnt[2], 0.35), (drv_Jnt[1], 0.65)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0:1][5]", transformValue=[(drv_Jnt[2], 0.25), (drv_Jnt[1], 0.75)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0:1][4]", transformValue=[(drv_Jnt[0], 0.25), (drv_Jnt[1], 0.75)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0:1][3]", transformValue=[(drv_Jnt[0], 0.35), (drv_Jnt[1], 0.65)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0:1][2]", transformValue=[(drv_Jnt[0], 0.6), (drv_Jnt[1], 0.4)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0:1][1]", transformValue=[(drv_Jnt[0], 0.85), (drv_Jnt[1], 0.15)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0:1][0]", transformValue=[(drv_Jnt[0], 0.99), (drv_Jnt[1], 0.01)])
         else:
             if num_joints == 3:
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[5][0:1]', transformValue=[(drv_Jnt[2], 0.99), (drv_Jnt[1], 0.01)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[4][0:1]', transformValue=[(drv_Jnt[2], 0.6), (drv_Jnt[1], 0.4)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[3][0:1]', transformValue=[(drv_Jnt[2], 0.2), (drv_Jnt[1], 0.8)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[2][0:1]', transformValue=[(drv_Jnt[0], 0.2), (drv_Jnt[1], 0.8)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[1][0:1]', transformValue=[(drv_Jnt[0], 0.6), (drv_Jnt[1], 0.4)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0][0:1]', transformValue=[(drv_Jnt[0], 0.99), (drv_Jnt[1], 0.01)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[5][0:1]", transformValue=[(drv_Jnt[2], 0.99), (drv_Jnt[1], 0.01)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[4][0:1]", transformValue=[(drv_Jnt[2], 0.6), (drv_Jnt[1], 0.4)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[3][0:1]", transformValue=[(drv_Jnt[2], 0.2), (drv_Jnt[1], 0.8)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[2][0:1]", transformValue=[(drv_Jnt[0], 0.2), (drv_Jnt[1], 0.8)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[1][0:1]", transformValue=[(drv_Jnt[0], 0.6), (drv_Jnt[1], 0.4)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0][0:1]", transformValue=[(drv_Jnt[0], 0.99), (drv_Jnt[1], 0.01)])
             elif num_joints == 5:
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[7][0:1]', transformValue=[(drv_Jnt[2], 0.99), (drv_Jnt[1], 0.01)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[6][0:1]', transformValue=[(drv_Jnt[2], 0.8), (drv_Jnt[1], 0.2)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[5][0:1]', transformValue=[(drv_Jnt[2], 0.5), (drv_Jnt[1], 0.5)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[4][0:1]', transformValue=[(drv_Jnt[2], 0.25), (drv_Jnt[1], 0.75)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[3][0:1]', transformValue=[(drv_Jnt[0], 0.25), (drv_Jnt[1], 0.75)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[2][0:1]', transformValue=[(drv_Jnt[0], 0.5), (drv_Jnt[1], 0.5)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[1][0:1]', transformValue=[(drv_Jnt[0], 0.8), (drv_Jnt[1], 0.2)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0][0:1]', transformValue=[(drv_Jnt[0], 0.99), (drv_Jnt[1], 0.01)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[7][0:1]", transformValue=[(drv_Jnt[2], 0.99), (drv_Jnt[1], 0.01)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[6][0:1]", transformValue=[(drv_Jnt[2], 0.8), (drv_Jnt[1], 0.2)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[5][0:1]", transformValue=[(drv_Jnt[2], 0.5), (drv_Jnt[1], 0.5)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[4][0:1]", transformValue=[(drv_Jnt[2], 0.25), (drv_Jnt[1], 0.75)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[3][0:1]", transformValue=[(drv_Jnt[0], 0.25), (drv_Jnt[1], 0.75)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[2][0:1]", transformValue=[(drv_Jnt[0], 0.5), (drv_Jnt[1], 0.5)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[1][0:1]", transformValue=[(drv_Jnt[0], 0.8), (drv_Jnt[1], 0.2)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0][0:1]", transformValue=[(drv_Jnt[0], 0.99), (drv_Jnt[1], 0.01)])
             elif num_joints == 7:
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[9][0:1]', transformValue=[(drv_Jnt[2], 0.99), (drv_Jnt[1], 0.01)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[8][0:1]', transformValue=[(drv_Jnt[2], 0.85), (drv_Jnt[1], 0.15)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[7][0:1]', transformValue=[(drv_Jnt[2], 0.6), (drv_Jnt[1], 0.4)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[6][0:1]', transformValue=[(drv_Jnt[2], 0.35), (drv_Jnt[1], 0.65)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[5][0:1]', transformValue=[(drv_Jnt[2], 0.25), (drv_Jnt[1], 0.75)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[4][0:1]', transformValue=[(drv_Jnt[0], 0.25), (drv_Jnt[1], 0.75)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[3][0:1]', transformValue=[(drv_Jnt[0], 0.35), (drv_Jnt[1], 0.65)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[2][0:1]', transformValue=[(drv_Jnt[0], 0.6), (drv_Jnt[1], 0.4)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[1][0:1]', transformValue=[(drv_Jnt[0], 0.85), (drv_Jnt[1], 0.15)])
-                cmds.skinPercent(skincluster_node, ribbon+'.cv[0][0:1]', transformValue=[(drv_Jnt[0], 0.99), (drv_Jnt[1], 0.01)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[9][0:1]", transformValue=[(drv_Jnt[2], 0.99), (drv_Jnt[1], 0.01)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[8][0:1]", transformValue=[(drv_Jnt[2], 0.85), (drv_Jnt[1], 0.15)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[7][0:1]", transformValue=[(drv_Jnt[2], 0.6), (drv_Jnt[1], 0.4)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[6][0:1]", transformValue=[(drv_Jnt[2], 0.35), (drv_Jnt[1], 0.65)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[5][0:1]", transformValue=[(drv_Jnt[2], 0.25), (drv_Jnt[1], 0.75)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[4][0:1]", transformValue=[(drv_Jnt[0], 0.25), (drv_Jnt[1], 0.75)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[3][0:1]", transformValue=[(drv_Jnt[0], 0.35), (drv_Jnt[1], 0.65)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[2][0:1]", transformValue=[(drv_Jnt[0], 0.6), (drv_Jnt[1], 0.4)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[1][0:1]", transformValue=[(drv_Jnt[0], 0.85), (drv_Jnt[1], 0.15)])
+                cmds.skinPercent(skincluster_node, f"{ribbon}.cv[0][0:1]", transformValue=[(drv_Jnt[0], 0.99), (drv_Jnt[1], 0.01)])
         constr = []
         if guides:
             top = guides[0]
             bottom = guides[1]
-            constr.append(cmds.parentConstraint(top, bttm_Loc[0], mo=False, name=bttm_Loc[0]+"_PaC"))
-            constr.append(cmds.parentConstraint(bottom, top_Loc[0], mo=False, name=top_Loc[0]+"_PaC")) #to integrate jxt after
+            constr.append(cmds.parentConstraint(top, bttm_Loc[0], mo=False, name=f"{bttm_Loc[0]}_PaC"))
+            constr.append(cmds.parentConstraint(bottom, top_Loc[0], mo=False, name=f"{top_Loc[0]}_PaC")) #to integrate jxt after
             cmds.matchTransform(bttm_Loc[3], top, position=True, rotation=True)
             cmds.matchTransform(top_Loc[3], bottom, position=True, rotation=True)
-            constr.append(cmds.pointConstraint(top, bttm_Loc[3], mo=False, name=bttm_Loc[3]+"_PoC"))
-            constr.append(cmds.pointConstraint(bottom, top_Loc[3], mo=False, name=top_Loc[3]+"_PoC"))
+            constr.append(cmds.pointConstraint(top, bttm_Loc[3], mo=False, name=f"{bttm_Loc[3]}_PoC"))
+            constr.append(cmds.pointConstraint(bottom, top_Loc[3], mo=False, name=f"{top_Loc[3]}_PoC"))
             # this is an important constraint to avoid Ribbon flipping and follow correctely the hierarchy:
-            cmds.parentConstraint(top, locators_grps, maintainOffset=True, name=locators_grps+"_PaC")
+            cmds.parentConstraint(top, locators_grps, maintainOffset=True, name=f"{locators_grps}_PaC")
         #fix loc_Grp scale
         if guides:
             from math import pow, sqrt
@@ -876,71 +876,71 @@ class Ribbon:
             dist = sqrt(pow(a[0]-b[0], 2.0)+pow(a[1]-b[1], 2.0)+pow(a[2]-b[2], 2.0))
             scale = dist/float(num_joints)
             
-            cmds.setAttr(locators_grps+'.s', scale, scale, scale)
+            cmds.setAttr(f"{locators_grps}.s", scale, scale, scale)
         
             cmds.delete(aux_loc_1, aux_loc_2)
 
         # baseTwist:
         if up_ctrl != None:
-            bttm_LocGrp = cmds.group(bttm_Loc[2], name=bttm_Loc[2]+"_Grp")
-            bttm_LocTwistBoneGrp = cmds.group(bttm_LocGrp, name=bttm_Loc[2]+"_TwistBone_Grp")
+            bttm_LocGrp = cmds.group(bttm_Loc[2], name=f"{bttm_Loc[2]}_Grp")
+            bttm_LocTwistBoneGrp = cmds.group(bttm_LocGrp, name=f"{bttm_Loc[2]}_TwistBone_Grp")
             self.ar.utils.add_attr_to_items([bttm_LocGrp, bttm_LocTwistBoneGrp], self.ar.utils.ignore_transform_io_attr)
             bttm_LocPos = cmds.xform(bttm_Loc[0], query=True, worldSpace=True, translation=True)
-            cmds.move(bttm_LocPos[0], bttm_LocPos[1], bttm_LocPos[2], bttm_LocGrp+".scalePivot", bttm_LocGrp+".rotatePivot", absolute=True)
-            cmds.move(bttm_LocPos[0], bttm_LocPos[1], bttm_LocPos[2], bttm_LocTwistBoneGrp+".scalePivot", bttm_LocTwistBoneGrp+".rotatePivot", absolute=True)
-            twist_bone_md = cmds.createNode('multiplyDivide', name=up_ctrl+"_TwistBone_MD")
-            invert_twist_bone_md = cmds.createNode('multiplyDivide', name=up_ctrl+"_InvertTwistBone_MD")
+            cmds.move(bttm_LocPos[0], bttm_LocPos[1], bttm_LocPos[2], f"{bttm_LocGrp}.scalePivot", f"{bttm_LocGrp}.rotatePivot", absolute=True)
+            cmds.move(bttm_LocPos[0], bttm_LocPos[1], bttm_LocPos[2], f"{bttm_LocTwistBoneGrp}.scalePivot", f"{bttm_LocTwistBoneGrp}.rotatePivot", absolute=True)
+            twist_bone_md = cmds.createNode('multiplyDivide', name=f"{up_ctrl}_TwistBone_MD")
+            invert_twist_bone_md = cmds.createNode('multiplyDivide', name=f"{up_ctrl}_InvertTwistBone_MD")
             self.to_ids.extend([twist_bone_md, invert_twist_bone_md])
-            cmds.setAttr(invert_twist_bone_md+".input2Z", -1)
-            cmds.connectAttr(up_ctrl+".autoTwistBone", twist_bone_md+".input1Z", force=True)
-            cmds.connectAttr(twist_bone_md+".outputZ", invert_twist_bone_md+".input1Z", force=True)
-            cmds.connectAttr(invert_twist_bone_md+".outputZ", bttm_LocTwistBoneGrp+".rotateZ", force=True)
-            cmds.connectAttr(up_ctrl+".baseTwist", bttm_LocGrp+".rotateZ", force=True)
+            cmds.setAttr(f"{invert_twist_bone_md}.input2Z", -1)
+            cmds.connectAttr(f"{up_ctrl}.autoTwistBone", f"{twist_bone_md}.input1Z", force=True)
+            cmds.connectAttr(f"{twist_bone_md}.outputZ", f"{invert_twist_bone_md}.input1Z", force=True)
+            cmds.connectAttr(f"{invert_twist_bone_md}.outputZ", f"{bttm_LocTwistBoneGrp}.rotateZ", force=True)
+            cmds.connectAttr(f"{up_ctrl}.baseTwist", f"{bttm_LocGrp}.rotateZ", force=True)
             result_data['twistBoneMD'] = twist_bone_md
         
         # autoRotate:
         loaded_quaternion_plugin = self.ar.config.check_loaded_plugin('quatNodes', self.ar.data.lang['e014_cantLoadQuatNode'])
         loaded_matrix_plugin = self.ar.config.check_loaded_plugin('matrixNodes', self.ar.data.lang['e002_matrixPluginNotFound'])
         if loaded_quaternion_plugin and loaded_matrix_plugin:
-            up_twist_bone_md = self.ar.math.create_twist_bone_matrix(top_Loc[0], top_Loc[3], name+"_Top_TwistBone")
-            bottom_twist_bone_md = self.ar.math.create_twist_bone_matrix(bttm_Loc[0], bttm_Loc[3], name+"_Bottom_TwistBone")
-            twist_bone_pma = cmds.createNode('plusMinusAverage', name=name+"_TwistBone_PMA")
-            twist_bone_inv_md = cmds.createNode('multiplyDivide', name=name+"_TwistBone_Inv_MD")
-            twist_bone_cnd = cmds.createNode('condition', name=name+"_TwistBone_Cnd")
-            twist_auto_rot_md = cmds.createNode('multiplyDivide', name=name+"_TwistBone_AutoRotate_MD")
+            up_twist_bone_md = self.ar.math.create_twist_bone_matrix(top_Loc[0], top_Loc[3], f"{name}_Top_TwistBone")
+            bottom_twist_bone_md = self.ar.math.create_twist_bone_matrix(bttm_Loc[0], bttm_Loc[3], f"{name}_Bottom_TwistBone")
+            twist_bone_pma = cmds.createNode('plusMinusAverage', name=f"{name}_TwistBone_PMA")
+            twist_bone_inv_md = cmds.createNode('multiplyDivide', name=f"{name}_TwistBone_Inv_MD")
+            twist_bone_cnd = cmds.createNode('condition', name=f"{name}_TwistBone_Cnd")
+            twist_auto_rot_md = cmds.createNode('multiplyDivide', name=f"{name}_TwistBone_AutoRotate_MD")
             self.to_ids.extend([twist_bone_pma, twist_bone_inv_md, twist_bone_inv_md, twist_bone_cnd, twist_auto_rot_md])
-            cmds.setAttr(twist_bone_cnd+".colorIfTrueR", -1)
-            cmds.setAttr(twist_bone_cnd+".secondTerm", 1)
-            cmds.connectAttr(twist_bone_pma+".output1D", twist_bone_inv_md+".input1X", force=True)
-            cmds.connectAttr(twist_bone_cnd+".outColor.outColorR", twist_bone_inv_md+".input2X", force=True)
-            cmds.connectAttr(up_twist_bone_md+".outputZ", twist_bone_pma+".input1D[0]", force=True)
-            cmds.connectAttr(bottom_twist_bone_md+".outputZ", twist_bone_pma+".input1D[1]", force=True)
-            cmds.connectAttr(twist_bone_inv_md+".outputX", twist_auto_rot_md+".input1X", force=True)
-            cmds.connectAttr(twist_auto_rot_md+".outputX", mid_Loc[2]+".rotateX", force=True)
+            cmds.setAttr(f"{twist_bone_cnd}.colorIfTrueR", -1)
+            cmds.setAttr(f"{twist_bone_cnd}.secondTerm", 1)
+            cmds.connectAttr(f"{twist_bone_pma}.output1D", f"{twist_bone_inv_md}.input1X", force=True)
+            cmds.connectAttr(f"{twist_bone_cnd}.outColor.outColorR", f"{twist_bone_inv_md}.input2X", force=True)
+            cmds.connectAttr(f"{up_twist_bone_md}.outputZ", f"{twist_bone_pma}.input1D[0]", force=True)
+            cmds.connectAttr(f"{bottom_twist_bone_md}.outputZ", f"{twist_bone_pma}.input1D[1]", force=True)
+            cmds.connectAttr(f"{twist_bone_inv_md}.outputX", f"{twist_auto_rot_md}.input1X", force=True)
+            cmds.connectAttr(f"{twist_auto_rot_md}.outputX", f"{mid_Loc[2]}.rotateX", force=True)
             result_data['up_twist_bone_md'] = up_twist_bone_md
             result_data['bottom_twist_bone_md'] = bottom_twist_bone_md
             result_data['twist_bone_cnd'] = twist_bone_cnd
             result_data['twist_auto_rot_md'] = twist_auto_rot_md
             
         #updating values
-        cmds.setAttr(rb_scale_md+".input2X", cmds.getAttr(curve_info_node+".arcLength"))
+        cmds.setAttr(f"{rb_scale_md}.input2X", cmds.getAttr(f"{curve_info_node}.arcLength"))
         for jnt in rb_Jnt:
             rb_add_scale_pma = jnt.replace('_Jnt', '_AddScale_PMA')
-            cmds.setAttr(rb_add_scale_pma+".input1D[0]", 1-cmds.getAttr(rb_add_scale_pma+".input1D[1]"))
+            cmds.setAttr(f"{rb_add_scale_pma}.input1D[0]", 1-cmds.getAttr(f"{rb_add_scale_pma}.input1D[1]"))
 
         self.ar.utils.add_attr_to_items([mid_ctrl, extra_ctrl_grp, locators_grps, skin_jnt_grp, final_system_grp], self.ar.utils.ignore_transform_io_attr)
 
         #change renderStats
         ribbon_shape = cmds.listRelatives(ribbon, s=True, f=True)[0]
         
-        cmds.setAttr(ribbon_shape+'.castsShadows', 0)
-        cmds.setAttr(ribbon_shape+'.receiveShadows', 0)
-        cmds.setAttr(ribbon_shape+'.motionBlur', 0)
-        cmds.setAttr(ribbon_shape+'.primaryVisibility', 0)
-        cmds.setAttr(ribbon_shape+'.smoothShading', 0)
-        cmds.setAttr(ribbon_shape+'.visibleInReflections', 0)
-        cmds.setAttr(ribbon_shape+'.visibleInRefractions', 0)
-        cmds.setAttr(ribbon_shape+'.doubleSided', 1)
+        cmds.setAttr(f"{ribbon_shape}.castsShadows", 0)
+        cmds.setAttr(f"{ribbon_shape}.receiveShadows", 0)
+        cmds.setAttr(f"{ribbon_shape}.motionBlur", 0)
+        cmds.setAttr(f"{ribbon_shape}.primaryVisibility", 0)
+        cmds.setAttr(f"{ribbon_shape}.smoothShading", 0)
+        cmds.setAttr(f"{ribbon_shape}.visibleInReflections", 0)
+        cmds.setAttr(f"{ribbon_shape}.visibleInRefractions", 0)
+        cmds.setAttr(f"{ribbon_shape}.doubleSided", 1)
         
         result_data['name'] = name
         result_data['locsList'] = [top_Loc[0], mid_Loc[0], bttm_Loc[0], top_Loc[3], bttm_Loc[3]]
@@ -952,7 +952,7 @@ class Ribbon:
         result_data['bendGrpList'] = [top_Loc[0], bttm_Loc[0]]
         result_data['extraCtrlGrp'] = extra_ctrl_grp
         result_data['extraCtrlList'] = extra_ctrls
-        cmds.setAttr(final_system_grp+'.visibility', v)
+        cmds.setAttr(f"{final_system_grp}.visibility", v)
         return result_data
     
     
@@ -972,16 +972,16 @@ class Ribbon:
                 fol_shape = cmds.createNode('follicle', name=f"{name}_{i:02d}_FolShape")
                 fol_transform = cmds.rename(cmds.listRelatives(fol_shape, p=1)[0], f"{name}_{i:02d}_Fol")         
                 fols.append(fol_transform)
-                cmds.connectAttr(rib+'.worldMatrix[0]', fol_shape+'.inputWorldMatrix')
-                cmds.connectAttr(rib+'.local', fol_shape+'.inputSurface')
-                cmds.connectAttr(fol_shape+'.outTranslate', fol_transform+'.translate')
-                cmds.connectAttr(fol_shape+'.outRotate', fol_transform+'.rotate')
-                cmds.setAttr(fol_shape+'.parameterU', passo)
-                cmds.setAttr(fol_shape+'.parameterV', 0.5) 
+                cmds.connectAttr(f"{rib}.worldMatrix[0]", f"{fol_shape}.inputWorldMatrix")
+                cmds.connectAttr(f"{rib}.local", f"{fol_shape}.inputSurface")
+                cmds.connectAttr(f"{fol_shape}.outTranslate", f"{fol_transform}.translate")
+                cmds.connectAttr(f"{fol_shape}.outRotate", f"{fol_transform}.rotate")
+                cmds.setAttr(f"{fol_shape}.parameterU", passo)
+                cmds.setAttr(f"{fol_shape}.parameterV", 0.5) 
                 #create the joint in the follicle
                 cmds.select(cl=True)
                 jnts.append(cmds.joint(n=f"{name}_{i:02d}_Jnt"))
-                cmds.setAttr(jnts[i]+'.jointOrient', 0, 0, 0)
+                cmds.setAttr(f"{jnts[i]}.jointOrient", 0, 0, 0)
                 self.ar.naming.set_joint_label(f"{name}_{i:02d}_Jnt", side+joint_label_add, 18, f"{joint_label_name}_{i:02d}")
                 cmds.addAttr(jnts[i], longName="dpAR_joint", attributeType='float', keyable=False)
                 cmds.select(cl=True)
@@ -997,16 +997,16 @@ class Ribbon:
                 fol_shape = cmds.createNode('follicle', name=f"{name}_{i:02d}_FolShape")
                 fol_transform = cmds.rename(cmds.listRelatives(fol_shape, p=1)[0], f"{name}_{i:02d}_Fol")
                 fols.append(fol_transform)
-                cmds.connectAttr(rib+'.worldMatrix[0]', fol_shape+'.inputWorldMatrix')
-                cmds.connectAttr(rib+'.local', fol_shape+'.inputSurface')
-                cmds.connectAttr(fol_shape+'.outTranslate', fol_transform+'.translate')
-                cmds.connectAttr(fol_shape+'.outRotate', fol_transform+'.rotate')
-                cmds.setAttr(fol_shape+'.parameterU', 0.5)   
-                cmds.setAttr(fol_shape+'.parameterV', passo) 
+                cmds.connectAttr(f"{rib}.worldMatrix[0]", f"{fol_shape}.inputWorldMatrix")
+                cmds.connectAttr(f"{rib}.local", f"{fol_shape}.inputSurface")
+                cmds.connectAttr(f"{fol_shape}.outTranslate", f"{fol_transform}.translate")
+                cmds.connectAttr(f"{fol_shape}.outRotate", f"{fol_transform}.rotate")
+                cmds.setAttr(f"{fol_shape}.parameterU", 0.5)   
+                cmds.setAttr(f"{fol_shape}.parameterV", passo) 
                 #create the joint in the follicle
                 cmds.select(cl=True)
                 jnts.append(cmds.joint(name=f"{name}_{i:02d}_Jnt"))
-                cmds.setAttr(jnts[i]+'.jointOrient', 0, 0, 0)
+                cmds.setAttr(f"{jnts[i]}.jointOrient", 0, 0, 0)
                 self.ar.naming.set_joint_label(f"{name}_{i:02d}_Jnt", side+joint_label_add, 18, f"{joint_label_name}_{i:02d}")
                 cmds.addAttr(jnts[i], longName='dpAR_joint', attributeType='float', keyable=False)
                 cmds.select(cl=True)
@@ -1022,13 +1022,13 @@ class Ribbon:
         """ Create and return the corner joint and jxt.
         """
         cmds.select(clear=True)
-        corner_jxt = cmds.joint(name=prefix+name+'_'+corner_name+'_Jxt', scaleCompensate=False)
-        corner_jnt = cmds.joint(name=prefix+name+'_'+corner_name+'_Jnt', scaleCompensate=False, radius=1.5)
-        cmds.setAttr(corner_jxt+".segmentScaleCompensate", 1)
-        cmds.setAttr(corner_jnt+".segmentScaleCompensate", 0) #jar
+        corner_jxt = cmds.joint(name=f"{prefix}{name}_{corner_name}_Jxt", scaleCompensate=False)
+        corner_jnt = cmds.joint(name=f"{prefix}{name}_{corner_name}_Jnt", scaleCompensate=False, radius=1.5)
+        cmds.setAttr(f"{corner_jxt}.segmentScaleCompensate", 1)
+        cmds.setAttr(f"{corner_jnt}.segmentScaleCompensate", 0) #jar
         cmds.addAttr(corner_jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-        cmds.parentConstraint(ctrl, corner_jxt, maintainOffset=False, name=corner_jxt+"_PaC")
-        cmds.scaleConstraint(ctrl, corner_jxt, maintainOffset=False, name=corner_jxt+"_ScC")
+        cmds.parentConstraint(ctrl, corner_jxt, maintainOffset=False, name=f"{corner_jxt}_PaC")
+        cmds.scaleConstraint(ctrl, corner_jxt, maintainOffset=False, name=f"{corner_jxt}_ScC")
         return [corner_jxt, corner_jnt]
 
 
@@ -1037,27 +1037,27 @@ class Ribbon:
         """
         for i in range(jcr_number):
             cmds.select(corner_jnt)
-            jcr = cmds.joint(name=corner_jnt[:corner_jnt.rfind('_')+1]+str(i)+"_Jcr")
-            cmds.setAttr(jcr+".segmentScaleCompensate", 0)
+            jcr = cmds.joint(name=f"{corner_jnt[:corner_jnt.rfind('_')+1]}{i}_Jcr")
+            cmds.setAttr(f"{jcr}.segmentScaleCompensate", 0)
             cmds.addAttr(jcr, longName='dpAR_joint', attributeType='float', keyable=False)
             if jcr_pos:
-                cmds.setAttr(jcr+".translateX", jcr_pos[i][0])
-                cmds.setAttr(jcr+".translateY", jcr_pos[i][1])
-                cmds.setAttr(jcr+".translateZ", jcr_pos[i][2])
+                cmds.setAttr(f"{jcr}.translateX", jcr_pos[i][0])
+                cmds.setAttr(f"{jcr}.translateY", jcr_pos[i][1])
+                cmds.setAttr(f"{jcr}.translateZ", jcr_pos[i][2])
             if jcr_rot:
-                cmds.setAttr(jcr+".rotateX", jcr_rot[i][0])
-                cmds.setAttr(jcr+".rotateY", jcr_rot[i][1])
-                cmds.setAttr(jcr+".rotateZ", jcr_rot[i][2])
+                cmds.setAttr(f"{jcr}.rotateX", jcr_rot[i][0])
+                cmds.setAttr(f"{jcr}.rotateY", jcr_rot[i][1])
+                cmds.setAttr(f"{jcr}.rotateZ", jcr_rot[i][2])
 
 
     def pin_corner_setup(self, world_ref, elbow_grp, elbow_ctrl, elbow_zero_1, corner_auto_rotate_inv_pin_md):
         """ Create the pin setup for the given corner controller.
         """
-        world_ref_pac = cmds.parentConstraint(world_ref, elbow_grp, elbow_zero_1, mo=True, name=elbow_zero_1+"_PaC")[0]
-        pin_rev = cmds.createNode('reverse', name=elbow_ctrl+"_Pin_Rev")
+        world_ref_pac = cmds.parentConstraint(world_ref, elbow_grp, elbow_zero_1, mo=True, name=f"{elbow_zero_1}_PaC")[0]
+        pin_rev = cmds.createNode('reverse', name=f"{elbow_ctrl}_Pin_Rev")
         self.to_ids.append(pin_rev)
-        cmds.connectAttr(elbow_ctrl+".pin", world_ref_pac+"."+world_ref+"W0", force=True)
-        cmds.connectAttr(elbow_ctrl+".pin", pin_rev+".inputX", force=True)
-        cmds.connectAttr(pin_rev+".outputX", world_ref_pac+"."+elbow_grp+"W1", force=True)
-        cmds.connectAttr(pin_rev+".outputX", corner_auto_rotate_inv_pin_md+".input2Z", force=True)
-        cmds.setAttr(world_ref_pac+".interpType", 2) #shortest
+        cmds.connectAttr(f"{elbow_ctrl}.pin", f"{world_ref_pac}.{world_ref}W0", force=True)
+        cmds.connectAttr(f"{elbow_ctrl}.pin", f"{pin_rev}.inputX", force=True)
+        cmds.connectAttr(f"{pin_rev}.outputX", f"{world_ref_pac}.{elbow_grp}W1", force=True)
+        cmds.connectAttr(f"{pin_rev}.outputX", f"{corner_auto_rotate_inv_pin_md}.input2Z", force=True)
+        cmds.setAttr(f"{world_ref_pac}.interpType", 2) #shortest

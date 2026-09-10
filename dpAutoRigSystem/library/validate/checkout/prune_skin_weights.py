@@ -62,14 +62,14 @@ class PruneSkinWeights(action.BaseAction):
                                     #cmds.skinCluster(skincluster_node, edit=True, prune=True)
                                     influences = cmds.skinCluster(skincluster_node, query=True, influence=True)
                                     for jnt in influences:
-                                        cmds.setAttr(jnt+".liw", 0) #unlock
+                                        cmds.setAttr(f"{jnt}.liw", 0) #unlock
                                     cmds.select(meshes[0])
                                     mel.eval('doPruneSkinClusterWeightsArgList 2 { "'+str(self.prune_min_value)+'", "1" };')
                                     self.good_results.append(True)
-                                    self.messages.append(self.ar.data.lang['v004_fixed']+": "+skincluster_node+" = "+str(len(to_prune_items))+" vertices")
+                                    self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {skincluster_node} = {len(to_prune_items)} vertices")
                                 except:
                                     self.good_results.append(False)
-                                    self.messages.append(self.ar.data.lang['v005_cantFix']+": "+skincluster_node)
+                                    self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {skincluster_node}")
                                 cmds.select(clear=True)
             else:
                 self.not_found_node()

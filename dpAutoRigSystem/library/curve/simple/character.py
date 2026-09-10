@@ -12,7 +12,7 @@ class Character(curve.BaseCurve):
         curve.BaseCurve.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, None)
     
     
-    def cv_main(self, use_ui, cv_id=None, cv_name=CLASS_NAME+'_Ctrl', cv_size=1.0, cv_degree=1, cv_direction='+Y', cv_rot=(0, 0, 0), cv_action=1, guide=False):
+    def cv_main(self, use_ui, cv_id=None, cv_name=f"{CLASS_NAME}_Ctrl", cv_size=1.0, cv_degree=1, cv_direction='+Y', cv_rot=(0, 0, 0), cv_action=1, guide=False):
         """ The principal method to call all other methods in order to build the create_controller curve.
             Return the result: new control curve or the destination list depending of action.
         """

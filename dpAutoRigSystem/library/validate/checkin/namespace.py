@@ -80,10 +80,10 @@ class Namespace(action.BaseAction):
                             # call function inside validator to remove namespaces when it's not a guide.
                             self.remove_namespace()
                         self.good_results.append(True)
-                        self.messages.append(self.ar.data.lang['v004_fixed']+": "+namespace)
+                        self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {namespace}")
                     except:
                         self.good_results.append(False)
-                        self.messages.append(self.ar.data.lang['v005_cantFix']+": "+namespace)
+                        self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {namespace}")
             else:
                 self.not_found_node()
         else:

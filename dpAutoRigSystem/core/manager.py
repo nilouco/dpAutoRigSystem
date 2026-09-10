@@ -12,7 +12,7 @@ class UIManager:
         """
         if opt_var and item:
             self.ar.opt.set_option_var(opt_var, item)
-        cmds.evalDeferred("ar = main.Start("+str(self.ar.dev)+", intro=False); ar.ui();", lowestPriority=True)
+        cmds.evalDeferred(f"ar = main.Start({self.ar.dev}, intro=False); ar.ui();", lowestPriority=True)
 
     
     def reload_dev_mode_ui(self, *args):
@@ -81,7 +81,7 @@ class UIManager:
             if quantity == 0:
                 quantity = 'Zero'
         if self.ar.data.ui_state:
-            cmds.text(text_name, edit=True, label=str(quantity)+" "+self.ar.data.lang[message_id])
+            cmds.text(text_name, edit=True, label=f"{quantity} {self.ar.data.lang[message_id]}")
 
 
     def update_skinning_footer(self, *args):
@@ -104,7 +104,7 @@ class UIManager:
             
             # edit the footerB text:
             if n_selected_joints != 0 and n_selected_geoms != 0:
-                cmds.text('skin_footer_txt', edit=True, label=str(n_selected_joints)+" "+self.ar.data.lang['i025_joints']+" "+str(n_selected_geoms)+" "+self.ar.data.lang['i024_geometries'])
+                cmds.text('skin_footer_txt', edit=True, label=f"{n_selected_joints} {self.ar.data.lang['i025_joints']} {n_selected_geoms} {self.ar.data.lang['i024_geometries']}")
             else:
                 cmds.text('skin_footer_txt', edit=True, label=self.ar.data.lang['i029_skinNothing'])
 
@@ -239,7 +239,7 @@ class UIManager:
             log_text += f"\nExported: {publish_log['exportPath']}"
             log_text += f"\nComments: {publish_log['comments']}\n"
         if action_instances:
-            self.ar.ui_manager.set_progress(self.ar.data.lang[action_type]+': '+self.ar.data.lang['c110_start'], self.ar.data.lang[action_type], len(action_instances))
+            self.ar.ui_manager.set_progress(f"{self.ar.data.lang[action_type]}: {self.ar.data.lang['c110_start']}", self.ar.data.lang[action_type], len(action_instances))
             for a, action_instance in enumerate(action_instances):
                 if action_instance.active:
                     self.ar.ui_manager.set_progress(action_instance.name)
@@ -257,15 +257,15 @@ class UIManager:
                     log_text += '\n'
             height_size = len(action_result_keys)
         else:
-            log_text += "\n"+self.ar.data.lang['i207_notMarked']
+            log_text += f"\n{self.ar.data.lang['i207_notMarked']}"
             height_size = 2
-        log_text = self.ar.pipeliner.get_today(True)+"\n\n"+log_text+"\n"
+        log_text = f"{self.ar.pipeliner.get_today(True)}\n\n{log_text}\n"
         if verbose:
             self.ar.logger.infoWin('i019_log', action_type, log_text, 'left', 250, (150+(height_size)*13))
-            print("\n-------------\n"+self.ar.data.lang[action_type]+"\n"+log_text)
+            print(f"\n-------------\n{self.ar.data.lang[action_type]}\n{log_text}")
             if publish_log:
                 action_result_data['Publisher'] = publish_log
-            if not self.ar.utils.export_log_dic_to_json(action_result_data, sub_folder=self.ar.data.dp_data+"/"+self.ar.data.dp_log):
+            if not self.ar.utils.export_log_dic_to_json(action_result_data, sub_folder=f"{self.ar.data.dp_data}/{self.ar.data.dp_log}"):
                 print(self.ar.data.lang['i201_saveScene'])
         self.ar.ui_manager.set_progress(end_it=True)
         return action_result_data, False, 0
@@ -314,7 +314,7 @@ class UIManager:
                         cmds.progressWindow(edit=True, maxValue=max, progress=0)
                 else:
                     if add_number:
-                        message = message+" # "+str(self.current_amount)
+                        message = f"{message} # {self.current_amount}"
                     cmds.progressWindow(edit=True, progress=self.current_amount, status=message)
             else: #create
                 self.current_amount = amount

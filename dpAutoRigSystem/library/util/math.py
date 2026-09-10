@@ -17,24 +17,24 @@ class Math:
         """
         if cmds.objExists(a) and cmds.objExists(b):
             # create nulls:
-            null_a = cmds.createNode('transform', name=a+"_DistBetNull_Grp")
-            null_b = cmds.createNode('transform', name=b+"_DistBetNull_Grp")
-            null_c = cmds.createNode('transform', name=b+"_DistBetNull_OrigRef_Grp")
-            cmds.pointConstraint(a, null_a, maintainOffset=False, name=null_a+"_PoC")
-            cmds.pointConstraint(b, null_b, maintainOffset=False, name=null_b+"_PoC")
+            null_a = cmds.createNode('transform', name=f"{a}_DistBetNull_Grp")
+            null_b = cmds.createNode('transform', name=f"{b}_DistBetNull_Grp")
+            null_c = cmds.createNode('transform', name=f"{b}_DistBetNull_OrigRef_Grp")
+            cmds.pointConstraint(a, null_a, maintainOffset=False, name=f"{null_a}_PoC")
+            cmds.pointConstraint(b, null_b, maintainOffset=False, name=f"{null_b}_PoC")
             cmds.delete(cmds.pointConstraint(b, null_c, maintainOffset=False))
-            poc = cmds.pointConstraint(b, null_c, null_b, maintainOffset=False, name=null_b+"_PoC")[0]
+            poc = cmds.pointConstraint(b, null_c, null_b, maintainOffset=False, name=f"{null_b}_PoC")[0]
             # create distanceBetween node:
             dist_bet = cmds.createNode('distanceBetween', n=name)
             # connect aPos to the distance between point1:
-            cmds.connectAttr(null_a+".translateX", dist_bet+".point1X")
-            cmds.connectAttr(null_a+".translateY", dist_bet+".point1Y")
-            cmds.connectAttr(null_a+".translateZ", dist_bet+".point1Z")
+            cmds.connectAttr(f"{null_a}.translateX", f"{dist_bet}.point1X")
+            cmds.connectAttr(f"{null_a}.translateY", f"{dist_bet}.point1Y")
+            cmds.connectAttr(f"{null_a}.translateZ", f"{dist_bet}.point1Z")
             # connect bPos to the distance between point2:
-            cmds.connectAttr(null_b+".translateX", dist_bet+".point2X")
-            cmds.connectAttr(null_b+".translateY", dist_bet+".point2Y")
-            cmds.connectAttr(null_b+".translateZ", dist_bet+".point2Z")
-            dist = cmds.getAttr(dist_bet+".distance")
+            cmds.connectAttr(f"{null_b}.translateX", f"{dist_bet}.point2X")
+            cmds.connectAttr(f"{null_b}.translateY", f"{dist_bet}.point2Y")
+            cmds.connectAttr(f"{null_b}.translateZ", f"{dist_bet}.point2Z")
+            dist = cmds.getAttr(f"{dist_bet}.distance")
             if keep:
                 self.ar.utils.add_attr_to_items([null_a, null_b, null_c], self.ar.utils.ignore_transform_io_attr)
                 self.ar.custom_attr.add_attr(0, [dist_bet]) #dpID
@@ -52,22 +52,22 @@ class Math:
             Reference:
             https://bindpose.com/maya-matrix-nodes-part-2-node-based-matrix-twist-calculator/
         """
-        twist_bone_mm = cmds.createNode('multMatrix', name=twist_bone_name+"_ExtractAngle_MM")
-        twist_bone_dm = cmds.createNode('decomposeMatrix', name=twist_bone_name+"_ExtractAngle_DM")
-        twist_bone_qte = cmds.createNode('quatToEuler', name=twist_bone_name+"_ExtractAngle_QtE")
-        cmds.connectAttr(node_b+".worldMatrix[0]", twist_bone_mm+".matrixIn[0]", force=True)
+        twist_bone_mm = cmds.createNode('multMatrix', name=f"{twist_bone_name}_ExtractAngle_MM")
+        twist_bone_dm = cmds.createNode('decomposeMatrix', name=f"{twist_bone_name}_ExtractAngle_DM")
+        twist_bone_qte = cmds.createNode('quatToEuler', name=f"{twist_bone_name}_ExtractAngle_QtE")
+        cmds.connectAttr(f"{node_b}.worldMatrix[0]", f"{twist_bone_mm}.matrixIn[0]", force=True)
         if inverse:
-            cmds.connectAttr(node_a+".worldInverseMatrix[0]", twist_bone_mm+".matrixIn[1]", force=True)
+            cmds.connectAttr(f"{node_a}.worldInverseMatrix[0]", f"{twist_bone_mm}.matrixIn[1]", force=True)
         else:
-            cmds.connectAttr(node_a+".worldMatrix[0]", twist_bone_mm+".matrixIn[1]", force=True)
-        cmds.connectAttr(twist_bone_mm+".matrixSum", twist_bone_dm+".inputMatrix", force=True)
-        cmds.connectAttr(twist_bone_dm+".outputQuat.outputQuat"+axis, twist_bone_qte+".inputQuat.inputQuat"+axis, force=True)
-        cmds.connectAttr(twist_bone_dm+".outputQuat.outputQuatW", twist_bone_qte+".inputQuat.inputQuatW", force=True)
+            cmds.connectAttr(f"{node_a}.worldMatrix[0]", f"{twist_bone_mm}.matrixIn[1]", force=True)
+        cmds.connectAttr(f"{twist_bone_mm}.matrixSum", f"{twist_bone_dm}.inputMatrix", force=True)
+        cmds.connectAttr(f"{twist_bone_dm}.outputQuat.outputQuat{axis}", f"{twist_bone_qte}.inputQuat.inputQuat{axis}", force=True)
+        cmds.connectAttr(f"{twist_bone_dm}.outputQuat.outputQuatW", f"{twist_bone_qte}.inputQuat.inputQuatW", force=True)
         if twist_bone_md:
-            cmds.connectAttr(twist_bone_qte+".outputRotate.outputRotate"+axis, twist_bone_md+".input2"+axis, force=True)
+            cmds.connectAttr(f"{twist_bone_qte}.outputRotate.outputRotate{axis}", f"{twist_bone_md}.input2{axis}", force=True)
         else:
-            twist_bone_md = cmds.createNode('multiplyDivide', name=twist_bone_name+"_MD")
-            cmds.connectAttr(twist_bone_qte+".outputRotate.outputRotate"+axis, twist_bone_md+".input2"+axis, force=True)
+            twist_bone_md = cmds.createNode('multiplyDivide', name=f"{twist_bone_name}_MD")
+            cmds.connectAttr(f"{twist_bone_qte}.outputRotate.outputRotate{axis}", f"{twist_bone_md}.input2{axis}", force=True)
         self.ar.custom_attr.add_attr(0, [twist_bone_mm, twist_bone_dm, twist_bone_qte, twist_bone_md]) #dpID
         return twist_bone_md
 
@@ -95,8 +95,8 @@ class Math:
         """ Return an ID generated by the sum of the "dp" string, plus the given name, plus dot, plus the current time.
         """
         now = str(round(time.time()*10000000000000))
-        word = ("dp"+str(name)).encode('utf-8').hex()
-        return word+"."+now
+        word = f"dp{name}".encode().hex()
+        return f"{word}."+now
 
 
     def get_decomposed_ids(self, id):
@@ -114,7 +114,7 @@ class Math:
         """ Return a list with the name and date decomposed from dpID attribute of the given node.
         """
         if cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True):
-            id = cmds.getAttr(item+"."+self.ar.data.dp_id)
+            id = cmds.getAttr(f"{item}.{self.ar.data.dp_id}")
             return self.get_decomposed_ids(id)
         return [None, None, None]
     

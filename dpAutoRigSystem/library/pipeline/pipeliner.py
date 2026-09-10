@@ -63,7 +63,7 @@ class Pipeliner:
     def get_json_settings_path(self):
         """ Returns the json path for the pipeline settings file.
         """
-        base_path = self.ar.data.dp_auto_rig_path+"/library/pipeline"
+        base_path = f"{self.ar.data.dp_auto_rig_path}/library/pipeline"
         return os.path.join(base_path, self.settings_file).replace('\\', '/')
 
 
@@ -118,7 +118,7 @@ class Pipeliner:
             if dependent:
                 if self.pipe_data[dependent]:
                     try:
-                        name = name[name.rfind(self.pipe_data[dependent]+"/")+len(self.pipe_data[dependent])+1:]
+                        name = name[name.rfind(f"{self.pipe_data[dependent]}/")+len(self.pipe_data[dependent])+1:]
                         to_end_it = False
                         if self.pipe_data['f_wip'] and self.pipe_data['f_wip'] in name:
                             name = name.split(self.pipe_data['f_wip'])[0]
@@ -158,31 +158,31 @@ class Pipeliner:
         's_presets'          : 'dpPresets',
         's_addOns'           : 'dpAddOns',
         's_finishing'        : 'dpFinishing',
-        's_hist'             : self.ar.data.dp_data+'/dpHist',
-        's_modelIO'          : self.ar.data.dp_data+'/dpModel',
-        's_supportNodeIO'    : self.ar.data.dp_data+'/dpSupportNode',
-        's_blendShapeIO'     : self.ar.data.dp_data+'/dpBlendShape',
-        's_shaderIO'         : self.ar.data.dp_data+'/dpShader',
-        's_guideIO'          : self.ar.data.dp_data+'/dpGuide',
-        's_rivetIO'          : self.ar.data.dp_data+'/dpRivet',
-        's_parentingIO'      : self.ar.data.dp_data+'/dpParenting',
-        's_skinningIO'       : self.ar.data.dp_data+'/dpSkinning',
-        's_deformationIO'    : self.ar.data.dp_data+'/dpDeformation',
-        's_componentTagIO'   : self.ar.data.dp_data+'/dpComponentTag',
-        's_inputOrderIO'     : self.ar.data.dp_data+'/dpInputOrder',
-        's_renameIO'         : self.ar.data.dp_data+'/dpRename',
-        's_transformationIO' : self.ar.data.dp_data+'/dpTransformation',
-        's_controlShapeIO'   : self.ar.data.dp_data+'/dpControlShape',
-        's_attributeIO'      : self.ar.data.dp_data+'/dpAttribute',
-        's_constraintIO'     : self.ar.data.dp_data+'/dpConstraint',
-        's_utilityIO'        : self.ar.data.dp_data+'/dpUtility',
-        's_drivenKeyIO'      : self.ar.data.dp_data+'/dpDrivenKey',
-        's_offsetMatrixIO'   : self.ar.data.dp_data+'/dpOffsetMatrix',
-        's_connectionIO'     : self.ar.data.dp_data+'/dpConnection',
-        's_calibrationIO'    : self.ar.data.dp_data+'/dpCalibration',
-        's_visibilityIO'     : self.ar.data.dp_data+'/dpVisibility',
-        's_channelIO'        : self.ar.data.dp_data+'/dpChannel',
-        's_hierarchyIO'      : self.ar.data.dp_data+'/dpHierarchy',
+        's_hist'             : f"{self.ar.data.dp_data}/dpHist",
+        's_modelIO'          : f"{self.ar.data.dp_data}/dpModel",
+        's_supportNodeIO'    : f"{self.ar.data.dp_data}/dpSupportNode",
+        's_blendShapeIO'     : f"{self.ar.data.dp_data}/dpBlendShape",
+        's_shaderIO'         : f"{self.ar.data.dp_data}/dpShader",
+        's_guideIO'          : f"{self.ar.data.dp_data}/dpGuide",
+        's_rivetIO'          : f"{self.ar.data.dp_data}/dpRivet",
+        's_parentingIO'      : f"{self.ar.data.dp_data}/dpParenting",
+        's_skinningIO'       : f"{self.ar.data.dp_data}/dpSkinning",
+        's_deformationIO'    : f"{self.ar.data.dp_data}/dpDeformation",
+        's_componentTagIO'   : f"{self.ar.data.dp_data}/dpComponentTag",
+        's_inputOrderIO'     : f"{self.ar.data.dp_data}/dpInputOrder",
+        's_renameIO'         : f"{self.ar.data.dp_data}/dpRename",
+        's_transformationIO' : f"{self.ar.data.dp_data}/dpTransformation",
+        's_controlShapeIO'   : f"{self.ar.data.dp_data}/dpControlShape",
+        's_attributeIO'      : f"{self.ar.data.dp_data}/dpAttribute",
+        's_constraintIO'     : f"{self.ar.data.dp_data}/dpConstraint",
+        's_utilityIO'        : f"{self.ar.data.dp_data}/dpUtility",
+        's_drivenKeyIO'      : f"{self.ar.data.dp_data}/dpDrivenKey",
+        's_offsetMatrixIO'   : f"{self.ar.data.dp_data}/dpOffsetMatrix",
+        's_connectionIO'     : f"{self.ar.data.dp_data}/dpConnection",
+        's_calibrationIO'    : f"{self.ar.data.dp_data}/dpCalibration",
+        's_visibilityIO'     : f"{self.ar.data.dp_data}/dpVisibility",
+        's_channelIO'        : f"{self.ar.data.dp_data}/dpChannel",
+        's_hierarchyIO'      : f"{self.ar.data.dp_data}/dpHierarchy",
         's_old'              : 'dpOld',
         's_dropbox'          : 'Job',
         's_webhook'          : '',
@@ -316,20 +316,20 @@ class Pipeliner:
         self.pipe_data['shortName'] = cmds.file(query=True, sceneName=True, shortName=True)
         self.pipe_data['mayaProject'] = cmds.workspace(query=True, fullName=True)
         self.pipe_data['projectPath'] = self.pipe_data['mayaProject']
-        self.pipe_data['wipPath'] = self.pipe_data['mayaProject']+"/"+self.pipe_data['f_wip']
+        self.pipe_data['wipPath'] = f"{self.pipe_data['mayaProject']}/{self.pipe_data['f_wip']}"
         if not self.pipe_data['path']:
             # mouting pipeline data dictionary
             if self.pipe_data['sceneName']:
                 self.get_info_by_path('f_drive', None)
-                if self.pipe_data['sceneName'] != self.pipe_data['f_drive'] + "/" + self.pipe_data['shortName']:
+                if self.pipe_data['sceneName'] != f"{self.pipe_data['f_drive']}/{self.pipe_data['shortName']}":
                     self.get_info_by_path('f_studio', 'f_drive')
                     self.get_info_by_path('f_project', 'f_studio')
-                self.pipe_data['wipPath'] = self.pipe_data['f_drive']+"/"+self.pipe_data['f_studio']+"/"+self.pipe_data['f_project']+"/"+self.pipe_data['f_wip']
-                self.pipe_data['projectPath'] = self.pipe_data['f_drive']+"/"+self.pipe_data['f_studio']+"/"+self.pipe_data['f_project']
-                self.pipe_data['path'] = self.pipe_data['f_drive']+"/"+self.pipe_data['f_studio']+"/"+PIPE_FOLDER #dpTeam
+                self.pipe_data['wipPath'] = f"{self.pipe_data['f_drive']}/{self.pipe_data['f_studio']}/{self.pipe_data['f_project']}/{self.pipe_data['f_wip']}"
+                self.pipe_data['projectPath'] = f"{self.pipe_data['f_drive']}/{self.pipe_data['f_studio']}/{self.pipe_data['f_project']}"
+                self.pipe_data['path'] = f"{self.pipe_data['f_drive']}/{self.pipe_data['f_studio']}/{PIPE_FOLDER}" #dpTeam
                 if not os.path.exists(self.pipe_data['path']):
                     self.restore_old_pipe_data(old_pipe_data)
-                    self.pipe_data['wipPath'] = self.pipe_data['mayaProject']+"/"+self.pipe_data['f_wip']
+                    self.pipe_data['wipPath'] = f"{self.pipe_data['mayaProject']}/{self.pipe_data['f_wip']}"
                     loaded = False
                 if not os.path.exists(self.pipe_data['projectPath']):
                     self.pipe_data['projectPath'] = self.pipe_data['mayaProject']
@@ -340,10 +340,10 @@ class Pipeliner:
             self.pipe_info = self.get_pipeline_info()
             if self.pipe_info:
                 # mounting structured pipeline data
-                self.pipe_data['publishPath'] = self.pipe_data['f_drive']+"/"+self.pipe_data['f_studio']+"/"+self.pipe_data['f_project']+"/"+self.pipe_data['f_publish']
-                self.pipe_data['addOnsPath'] = self.pipe_data['path']+"/"+self.pipe_data['s_addOns']
-                self.pipe_data['finishingPath'] = self.pipe_data['path']+"/"+self.pipe_data['s_finishing']
-                self.pipe_data['presetsPath'] = self.pipe_data['path']+"/"+self.pipe_data['s_presets']
+                self.pipe_data['publishPath'] = f"{self.pipe_data['f_drive']}/{self.pipe_data['f_studio']}/{self.pipe_data['f_project']}/{self.pipe_data['f_publish']}"
+                self.pipe_data['addOnsPath'] = f"{self.pipe_data['path']}/{self.pipe_data['s_addOns']}"
+                self.pipe_data['finishingPath'] = f"{self.pipe_data['path']}/{self.pipe_data['s_finishing']}"
+                self.pipe_data['presetsPath'] = f"{self.pipe_data['path']}/{self.pipe_data['s_presets']}"
             else:
                 self.pipe_info = self.get_default_pipeline_info()
                 print('Not found', self.info_file)
@@ -388,7 +388,7 @@ class Pipeliner:
         """
         path_data = self.ar.data.lang['i062_notFound']
         if self.pipe_info and self.pipe_data['path']:
-            path_data = self.pipe_data['path']+"/"+self.info_file
+            path_data = f"{self.pipe_data['path']}/{self.info_file}"
         return path_data
 
 
@@ -402,7 +402,7 @@ class Pipeliner:
             else:
                 # try to find the project name by scene path
                 project_folder = self.pipe_data['sceneName'][self.pipe_data['sceneName'].rfind(self.pipe_data['f_studio'])+len(self.pipe_data['f_studio'])+1:self.pipe_data['sceneName'].rfind(self.pipe_data['f_wip'])]
-            self.pipe_data['publishPath'] = self.pipe_data['f_drive']+"/"+self.pipe_data['f_studio']+"/"+project_folder+self.pipe_data['f_publish']
+            self.pipe_data['publishPath'] = f"{self.pipe_data['f_drive']}/{self.pipe_data['f_studio']}/{project_folder}{self.pipe_data['f_publish']}"
             return self.pipe_data['publishPath']
         else:
             print(self.ar.data.lang['i350_notFoundPipeInfoFile'])
@@ -452,7 +452,7 @@ class Pipeliner:
         clean_pipe_data = self.pipe_data
         clean_pipe_data.pop('sceneName', None)
         clean_pipe_data.pop('shortName', None)
-        out_file = open(self.pipe_data['path']+"/"+self.info_file, 'w')
+        out_file = open(f"{self.pipe_data['path']}/{self.info_file}", 'w')
         json.dump(clean_pipe_data, out_file, indent=4)
         out_file.close()
 
@@ -492,7 +492,7 @@ class Pipeliner:
             if file_path_names:
                 file_path = file_path_names[0]
                 if '.' in file_path and not file_path.endswith('.json'):
-                    file_path = file_path[:file_path.rfind('.')]+".json"
+                    file_path = f"{file_path[:file_path.rfind('.')]}.json"
         if file_path:
             cmds.textFieldButtonGrp('pipeline_path_data_tfbg', edit=True, text=file_path)
             self.pipe_data['path'] = file_path[:file_path.rfind('/')]
@@ -536,17 +536,17 @@ class Pipeliner:
         if self.pipe_data['publishPath']:
             # send to client path
             if self.pipe_data['b_deliver']:
-                self.pipe_data['toClientPath'] = self.pipe_data['f_drive']+"/"+self.pipe_data['f_studio']+"/"+self.pipe_data['f_project']+"/"+self.pipe_data['f_toClient']
+                self.pipe_data['toClientPath'] = f"{self.pipe_data['f_drive']}/{self.pipe_data['f_studio']}/{self.pipe_data['f_project']}/{self.pipe_data['f_toClient']}"
                 if self.pipe_data['b_dateDir']:
-                    self.pipe_data['toClientPath'] += "/"+self.get_today()
+                    self.pipe_data['toClientPath'] += f"/{self.get_today()}"
                 self.make_dir_if_not_exists(self.pipe_data['toClientPath'])
             # hist path
             if self.pipe_data['b_archive']:
                 if self.pipe_data['assetNameFolderIssue']:
                     self.pipe_data['scenePath'] = self.get_current_path()
                 else:
-                    self.pipe_data['scenePath'] = self.pipe_data['f_drive']+"/"+self.pipe_data['f_studio']+"/"+self.pipe_data['f_project']+"/"+self.pipe_data['f_wip']+"/"+self.pipe_data['assetName']
-                self.pipe_data['historyPath'] = self.pipe_data['scenePath']+"/"+self.pipe_data['s_hist']
+                    self.pipe_data['scenePath'] = f"{self.pipe_data['f_drive']}/{self.pipe_data['f_studio']}/{self.pipe_data['f_project']}/{self.pipe_data['f_wip']}/{self.pipe_data['assetName']}"
+                self.pipe_data['historyPath'] = f"{self.pipe_data['scenePath']}/{self.pipe_data['s_hist']}"
                 self.make_dir_if_not_exists(self.pipe_data['historyPath'])
             # dropbox path
             if self.pipe_data['b_cloud'] and self.pipe_data['s_dropbox']:
@@ -554,18 +554,18 @@ class Pipeliner:
                 if os.name == 'posix': #Linux or Mac
                     dropbox_folder = '~/.dropbox'
                 else: #Windows
-                    dropbox_folder = os.getenv('LOCALAPPDATA')+"/Dropbox"
+                    dropbox_folder = f"{os.getenv('LOCALAPPDATA')}/Dropbox"
                 if os.path.exists(dropbox_folder):
-                    dropbox_info = dropbox_folder+"/info.json"
+                    dropbox_info = f"{dropbox_folder}/info.json"
                     if os.path.exists(dropbox_info):
                         content = self.get_json_content(dropbox_info)
                         if content:
                             self.pipe_data['dropInfoPath'] = content[next(iter(content))]['path'].replace('\\', '/')
 #                                self.pipe_data['dropInfoHost'] = content[list(content)[0]]['host']
-                            self.pipe_data['dropboxPath'] = self.pipe_data['dropInfoPath']+"/"+self.pipe_data['s_dropbox']+"/"+self.pipe_data['f_studio']+"/"+self.pipe_data['f_project']
+                            self.pipe_data['dropboxPath'] = f"{self.pipe_data['dropInfoPath']}/{self.pipe_data['s_dropbox']}/{self.pipe_data['f_studio']}/{self.pipe_data['f_project']}"
                             self.make_dir_if_not_exists(self.pipe_data['dropboxPath'])
             # old
-            self.make_dir_if_not_exists(self.pipe_data['publishPath']+"/"+self.pipe_data['s_old'])
+            self.make_dir_if_not_exists(f"{self.pipe_data['publishPath']}/{self.pipe_data['s_old']}")
             # discord
             if self.pipe_data['b_discord']:
                 if self.pipe_data['s_webhook']:
@@ -699,7 +699,7 @@ class Pipeliner:
                 filenames = next(os.walk(file_path))[2]
                 if filenames:
                     for filename in filenames:
-                        if asset_name+self.pipe_data['s_middle'] in filename or asset_name.lower()+self.pipe_data['s_middle'] in filename or asset_name.upper()+self.pipe_data['s_middle'] in filename and not filename in self.asset_names:
+                        if (f"{asset_name}{self.pipe_data['s_middle']}" in filename or f"{asset_name.lower()}{self.pipe_data['s_middle']}" in filename or f"{asset_name.upper()}{self.pipe_data['s_middle']}" in filename) and not filename in self.asset_names:
                             self.asset_names.append(filename)
                     if self.asset_names:
                         publish_version = self.define_file_version(self.asset_names)
@@ -715,7 +715,7 @@ class Pipeliner:
             self.pipe_data['extension'] = self.get_file_extension()
             self.pipe_data['rigVersion'] = self.get_wip_rig_version()
             self.pipe_data['publishVersion'] = publish_version
-            self.pipe_data['fileName'] = self.pipe_data['s_prefix']+asset_name+self.pipe_data['s_middle']+(str(publish_version).zfill(int(self.pipe_data['i_padding']))+self.pipe_data['s_suffix'])
+            self.pipe_data['fileName'] = f"{self.pipe_data['s_prefix']}{asset_name}{self.pipe_data['s_middle']}{(str(publish_version).zfill(int(self.pipe_data['i_padding'])))}{self.pipe_data['s_suffix']}"
             return self.pipe_data['fileName']
         else:
             return False
@@ -740,15 +740,15 @@ class Pipeliner:
         """
         if self.check_asset_context():
             try:
-                cmds.frameLayout('asset_fl', edit=True, label=self.ar.data.lang['i303_asset']+" - "+self.pipe_data['assetName'])
+                cmds.frameLayout('asset_fl', edit=True, label=f"{self.ar.data.lang['i303_asset']} - {self.pipe_data['assetName']}")
                 cmds.textFieldGrp('asset_name_tfg', edit=True, text=self.pipe_data['assetName'])
                 if self.ar.data.verbose:
-                    print(self.ar.data.lang['r067_currentAssetContext']+" "+self.pipe_data['assetName'])
+                    print(f"{self.ar.data.lang['r067_currentAssetContext']} {self.pipe_data['assetName']}")
             except:
                 pass
         else:
             try:
-                cmds.frameLayout('asset_fl', edit=True, label=self.ar.data.lang['i303_asset']+" - "+self.ar.data.lang['i305_none'])
+                cmds.frameLayout('asset_fl', edit=True, label=f"{self.ar.data.lang['i303_asset']} - {self.ar.data.lang['i305_none']}")
                 cmds.textFieldGrp('asset_name_tfg', edit=True, text=self.ar.data.lang['i305_none'])
                 if self.ar.data.verbose:
                     print(self.ar.data.lang['r027_noAssetContext'])
@@ -800,7 +800,7 @@ class Pipeliner:
                 path = self.pipe_data['wipPath']
             else:
                 # There's no path to load assets
-                cmds.confirmDialog(title=self.ar.data.lang['i187_load']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i350_notFoundPipeInfoFile'], button='Ok')
+                cmds.confirmDialog(title=f"{self.ar.data.lang['i187_load']} {self.ar.data.lang['i303_asset']}", message=self.ar.data.lang['i350_notFoundPipeInfoFile'], button='Ok')
         if path and os.path.exists(path):
             if not file:
                 assets = next(os.walk(path))[1]
@@ -816,9 +816,9 @@ class Pipeliner:
                     return
                 else:
                     # Inform that it isn't possible to continue without wip assets to load
-                    cmds.confirmDialog(title=self.ar.data.lang['i187_load']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i351_notFoundWIPAssets'], button='Ok')
+                    cmds.confirmDialog(title=f"{self.ar.data.lang['i187_load']} {self.ar.data.lang['i303_asset']}", message=self.ar.data.lang['i351_notFoundWIPAssets'], button='Ok')
             if file:
-                asset_folder = path+"/"+file
+                asset_folder = f"{path}/{file}"
                 if mode == 0: #load
                     # Get latest version
                     latest_file = self.get_latest_file(asset_folder)
@@ -829,7 +829,7 @@ class Pipeliner:
                             saved_scene = self.confirm_save_this_scene(False)
                         if saved_scene:
                             self.ar.data.rebuilding = False
-                            cmds.file(asset_folder+"/"+latest_file, open=True, ignoreVersion=True, force=True)
+                            cmds.file(f"{asset_folder}/{latest_file}", open=True, ignoreVersion=True, force=True)
                             cmds.workspace(directory=asset_folder)
                             self.pipe_data['sceneName'] = cmds.file(query=True, sceneName=True)
                             self.pipe_data['shortName'] = cmds.file(query=True, sceneName=True, shortName=True)
@@ -841,10 +841,10 @@ class Pipeliner:
                         self.ar.pipeline_ui.replace_data_ui(file)
                     else:
                         # There's no data do replace from the selected asset
-                        cmds.confirmDialog(title=self.ar.data.lang['i187_load']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['r007_notExportedData']+": "+file, button='Ok')
+                        cmds.confirmDialog(title=f"{self.ar.data.lang['i187_load']} {self.ar.data.lang['i303_asset']}", message=f"{self.ar.data.lang['r007_notExportedData']}: {file}", button='Ok')
         else:
             # There's no wip path to load assets
-            cmds.confirmDialog(title=self.ar.data.lang['i187_load']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i352_notFoundWIPPath'], button='Ok')
+            cmds.confirmDialog(title=f"{self.ar.data.lang['i187_load']} {self.ar.data.lang['i303_asset']}", message=self.ar.data.lang['i352_notFoundWIPPath'], button='Ok')
 
 
     def get_save_version_preview_text(self, *args):
@@ -852,8 +852,8 @@ class Pipeliner:
         """
         modelVersionValue = cmds.textFieldGrp('save_version_model_tfg', query=True, text=True)
         rigVersionValue = cmds.textFieldGrp('save_version_rig_tfg', query=True, text=True)
-        previewSaveVersionFileName = self.pipe_data['assetName']+self.pipe_data['s_model']+modelVersionValue.zfill(self.pipe_data['i_padding'])+self.pipe_data['s_rig']+rigVersionValue.zfill(self.pipe_data['i_padding'])+self.pipe_data['extension']
-        self.saveVersionFile = self.pipe_data['assetPath']+"/"+previewSaveVersionFileName
+        previewSaveVersionFileName = f"{self.pipe_data['assetName']}{self.pipe_data['s_model']}{modelVersionValue.zfill(self.pipe_data['i_padding'])}{self.pipe_data['s_rig']}{rigVersionValue.zfill(self.pipe_data['i_padding'])}{self.pipe_data['extension']}"
+        self.saveVersionFile = f"{self.pipe_data['assetPath']}/{previewSaveVersionFileName}"
         if self.saveVersionFile:
             cmds.text('save_version_preview_txt', edit=True, label=previewSaveVersionFileName)
         return 'save_version_preview_txt'
@@ -874,9 +874,9 @@ class Pipeliner:
                 self.ar.data.rebuilding = False
                 self.refresh_asset_data()
             else:
-                cmds.confirmDialog(title=self.ar.data.lang['i158_create']+" "+self.ar.data.lang['i304_new']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i349_alreadyExistsAsset'], button='Ok')
+                cmds.confirmDialog(title=f"{self.ar.data.lang['i158_create']} {self.ar.data.lang['i304_new']} {self.ar.data.lang['i303_asset']}", message=self.ar.data.lang['i349_alreadyExistsAsset'], button='Ok')
         else:
-            cmds.confirmDialog(title=self.ar.data.lang['i158_create']+" "+self.ar.data.lang['i304_new']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i307_fillFieldCorrectly'], button='Ok')
+            cmds.confirmDialog(title=f"{self.ar.data.lang['i158_create']} {self.ar.data.lang['i304_new']} {self.ar.data.lang['i303_asset']}", message=self.ar.data.lang['i307_fillFieldCorrectly'], button='Ok')
 
 
     def get_datas_to_replace(self, path, *args):
@@ -909,7 +909,7 @@ class Pipeliner:
             ]
         self.ios = []
         for item in io_elements:
-            if os.path.exists(path+"/"+self.pipe_data["s_"+item]):
+            if os.path.exists(f"{path}/{self.pipe_data[f's_{item}']}"):
                 self.ios.append(item)
 
 
@@ -922,26 +922,26 @@ class Pipeliner:
             to_replace_items = self.ar.pipeline_ui.to_replace_datas
         if path and to_replace_items:
             for item in to_replace_items:
-                source_path = path+"/"+self.pipe_data['s_'+item]
-                dest_path = self.pipe_data['assetPath']+"/"+self.pipe_data['s_'+item]
+                source_path = f"{path}/{self.pipe_data[f's_{item}']}"
+                dest_path = f"{self.pipe_data['assetPath']}/{self.pipe_data[f's_{item}']}"
                 if os.path.exists(source_path):
                     if os.path.exists(dest_path):
                         for dest_file in next(os.walk(dest_path))[2]:
                             try:
-                                os.remove(dest_path+"/"+dest_file)
+                                os.remove(f"{dest_path}/{dest_file}")
                             except PermissionError:
                                 # use a brute force to delete without permission:
-                                os.chmod(dest_path+"/"+dest_file, stat.S_IWUSR)
-                                os.remove(dest_path+"/"+dest_file)
+                                os.chmod(f"{dest_path}/{dest_file}", stat.S_IWUSR)
+                                os.remove(f"{dest_path}/{dest_file}")
                     else:
                         self.make_dir_if_not_exists(dest_path)
                     source_item = next(os.walk(source_path))[2][-1]
                     ext = source_item[source_item.rfind('.'):]
                     prefix = source_item[:source_item.find('_')+1]
-                    dest_item = dest_path+"/"+prefix+self.pipe_data['assetName']+self.pipe_data['s_model']+"0".zfill(self.pipe_data['i_padding'])+self.pipe_data['s_rig']+"0".zfill(self.pipe_data['i_padding'])+ext
-                    shutil.copy2(source_path+"/"+source_item, dest_item)
+                    dest_item = f"{dest_path}/{prefix}{self.pipe_data['assetName']}{self.pipe_data['s_model']}{"0".zfill(self.pipe_data['i_padding'])}{self.pipe_data['s_rig']}{"0".zfill(self.pipe_data['i_padding'])}{ext}"
+                    shutil.copy2(f"{source_path}/{source_item}", dest_item)
             # Concatenate done message
-            sucess_message_text = self.ar.data.lang['r068_replacedDataSuccess']+"\n\n"+self.ar.data.lang['i036_from']+": "+path+"\n"+self.ar.data.lang['i037_to']+": "+self.pipe_data['assetName']+"\n\n"+" \n".join(to_replace_items)
+            sucess_message_text = f"{self.ar.data.lang['r068_replacedDataSuccess']}\n\n{self.ar.data.lang['i036_from']}: {path}\n{self.ar.data.lang['i037_to']}: {self.pipe_data['assetName']}\n\n{' \n'.join(to_replace_items)}"
             cmds.confirmDialog(title='dpAutoRigSystem', message=sucess_message_text, button='Ok')
 
 
@@ -956,9 +956,9 @@ class Pipeliner:
         cancel_name = self.ar.data.lang['i132_cancel']
         continue_name = self.ar.data.lang['i174_continue']
         if must_save_it:
-            confirm_result = cmds.confirmDialog(title="dpAutoRigSystem - Pipeliner "+str(self.ar.data.version), message=self.ar.data.lang['i201_saveScene'], button=[save_name, save_as_name, cancel_name], defaultButton=save_name, cancelButton=cancel_name, dismissString=cancel_name)
+            confirm_result = cmds.confirmDialog(title=f"dpAutoRigSystem - Pipeliner {self.ar.data.version}", message=self.ar.data.lang['i201_saveScene'], button=[save_name, save_as_name, cancel_name], defaultButton=save_name, cancelButton=cancel_name, dismissString=cancel_name)
         else:
-            confirm_result = cmds.confirmDialog(title="dpAutoRigSystem - Pipeliner "+str(self.ar.data.version), message=self.ar.data.lang['i201_saveScene'], button=[save_name, save_as_name, cancel_name, continue_name], defaultButton=save_name, cancelButton=cancel_name, dismissString=cancel_name)
+            confirm_result = cmds.confirmDialog(title=f"dpAutoRigSystem - Pipeliner {self.ar.data.version}", message=self.ar.data.lang['i201_saveScene'], button=[save_name, save_as_name, cancel_name, continue_name], defaultButton=save_name, cancelButton=cancel_name, dismissString=cancel_name)
         if confirm_result == cancel_name:
             return False
         if confirm_result == continue_name:

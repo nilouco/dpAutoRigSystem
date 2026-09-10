@@ -21,7 +21,7 @@ class ValueEditorUI:
         # window
         width  = 430
         height = 300
-        cmds.window('dpDefaultValueOptionWindow', title=self.ar.data.lang['i270_defaultValues']+" "+self.ar.data.lang['i274_editor'], widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.window('dpDefaultValueOptionWindow', title=f"{self.ar.data.lang['i270_defaultValues']} {self.ar.data.lang['i274_editor']}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         # create UI layout and elements:
         cmds.columnLayout('value_editor_main_cl', adjustableColumn=True, columnOffset=('both', 10), parent='dpDefaultValueOptionWindow')
         cmds.separator(style='none', height=5, parent='value_editor_main_cl')
@@ -63,7 +63,7 @@ class ValueEditorUI:
                             cmds.text(label='')
                         cmds.text(label=attr)
                         # default value
-                        cmds.floatField(value=cmds.addAttr(ctrl+"."+attr, query=True, defaultValue=True), precision=3, changeCommand=partial(self.ar.ctrls.set_default_value, ctrl, attr))
+                        cmds.floatField(value=cmds.addAttr(f"{ctrl}.{attr}", query=True, defaultValue=True), precision=3, changeCommand=partial(self.ar.ctrls.set_default_value, ctrl, attr))
                         # current value
-                        cmds.floatField(value=cmds.getAttr(ctrl+"."+attr), precision=3, changeCommand=partial(self.ar.ctrls.set_current_value, ctrl, attr))
+                        cmds.floatField(value=cmds.getAttr(f"{ctrl}.{attr}"), precision=3, changeCommand=partial(self.ar.ctrls.set_current_value, ctrl, attr))
                     cmds.separator(style='in', height=10, parent='value_editor_default_cl')

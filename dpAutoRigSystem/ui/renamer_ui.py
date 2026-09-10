@@ -14,7 +14,7 @@ class RenamerUI:
         # UI:
         width = 530
         height = 280
-        cmds.window('dpRenamerWin', title=self.ar.data.lang['m214_renamer']+' - v'+str(self.ar.data.version), width=width, height=height, sizeable=False, minimizeButton=False, maximizeButton=False)
+        cmds.window('dpRenamerWin', title=f"{self.ar.data.lang['m214_renamer']} - v{self.ar.data.version}", width=width, height=height, sizeable=False, minimizeButton=False, maximizeButton=False)
         # UI elements:
         cmds.rowColumnLayout('renamer_main_rcl', numberOfColumns=2, columnWidth=[(1, 200), (2, 200)], columnSpacing=[(1, 10), (2, 10)])
         # fields
@@ -32,7 +32,7 @@ class RenamerUI:
         cmds.textField('renamer_prefix_tf', textChangedCommand=self.change_prefix, parent='renamer_pre_pos_rc')
         cmds.textField('renamer_suffix_tf', textChangedCommand=self.change_suffix, parent='renamer_pre_pos_rc')
         cmds.separator(style='in', height=20, parent='renamer_fields_cl')
-        cmds.checkBox('renamer_search_replace_cb', label=self.ar.data.lang['m218_search']+" - "+self.ar.data.lang['m219_replace'], changeCommand=self.change_search_replace, value=False, parent='renamer_fields_cl')
+        cmds.checkBox('renamer_search_replace_cb', label=f"{self.ar.data.lang['m218_search']} - {self.ar.data.lang['m219_replace']}", changeCommand=self.change_search_replace, value=False, parent='renamer_fields_cl')
         cmds.textFieldGrp('renamer_search_tfg', label=self.ar.data.lang['i036_from'], textChangedCommand=self.change_search, columnAlign=[(1, 'right'), (2, 'right')], columnWidth=[(1, 30), (2, 136)], adjustableColumn2=True, parent='renamer_fields_cl')
         cmds.textFieldGrp('renamer_replace_tfg', label=self.ar.data.lang['i037_to'], textChangedCommand=self.change_search, columnAlign=[(1, 'right'), (2, 'right')], columnWidth=[(1, 30), (2, 136)], adjustableColumn2=True, parent='renamer_fields_cl')
         # loaded items
@@ -40,7 +40,7 @@ class RenamerUI:
         cmds.text(label=self.ar.data.lang['m223_preview'], align='center', height=20, font='boldLabelFont', parent='renamer_items_cl')
         cmds.rowColumnLayout('renamer_items_scrolls_rcl', numberOfColumns=2, columnWidth=[(1, 140), (2, 140)], columnSpacing=[(1, 5), (2, 5)], columnAlign=[(1, 'center'), (2, 'center')], rowSpacing=[(1, 5), (2, 5)], parent='renamer_items_cl')
         cmds.text('renamer_current_txt', label=self.ar.data.lang['i276_current'], parent='renamer_items_scrolls_rcl')
-        cmds.text('renamer_preview_txt', label=self.ar.data.lang['m224_rename']+" "+self.ar.data.lang['i037_to'], parent='renamer_items_scrolls_rcl')
+        cmds.text('renamer_preview_txt', label=f"{self.ar.data.lang['m224_rename']} {self.ar.data.lang['i037_to']}", parent='renamer_items_scrolls_rcl')
         cmds.textScrollList('renamer_original_sl', width=130, height=193, enable=True, parent='renamer_items_scrolls_rcl')
         cmds.textScrollList('renamer_preview_sl', width=130, height=193, enable=True, parent='renamer_items_scrolls_rcl')
         # footer

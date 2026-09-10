@@ -56,20 +56,20 @@ class Vaccine(action.BaseAction):
                         else: #fix
                             try:
                                 cmds.delete(item)
-                                path = cmds.internalVar(userAppDir=True)+"/scripts/"
+                                path = f"{cmds.internalVar(userAppDir=True)}/scripts/"
                                 vaccine_items = ['vaccine.py', 'vaccine.pyc']
                                 for vaccine in vaccine_items:
-                                    if os.path.exists(path+vaccine):
-                                        os.remove(path+vaccine)
-                                if os.path.exists(path+"userSetup.py"):
-                                    self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item+"\n    - "+path+"userSetup.py")
+                                    if os.path.exists(f"{path}{vaccine}"):
+                                        os.remove(f"{path}{vaccine}")
+                                if os.path.exists(f"{path}userSetup.py"):
+                                    self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}\n    - {path}userSetup.py")
                                 else:
-                                    self.messages.append(self.ar.data.lang['v004_fixed']+": "+item)
+                                    self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {item}")
                                 cmds.select(clear=True)
                                 self.good_results.append(True)
                             except:
                                 self.good_results.append(False)
-                                self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
+                                self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}")
             else:
                 self.not_found_node()
         else:

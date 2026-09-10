@@ -56,9 +56,9 @@ class DeformationIO(action.BaseAction):
                             if has_def:
                                 self.export_json_file(self.get_deformer_data(input_deformers))
                             else:
-                                self.maybe_done_io(self.ar.data.lang['v014_notFoundNodes']+" deformers")
+                                self.maybe_done_io(f"{self.ar.data.lang['v014_notFoundNodes']} deformers")
                         else:
-                            self.maybe_done_io(self.ar.data.lang['v014_notFoundNodes']+" mesh")
+                            self.maybe_done_io(f"{self.ar.data.lang['v014_notFoundNodes']} mesh")
                     else: #import
                         deformer_data = self.import_latest_json_file(self.get_exported_items())
                         if deformer_data:
@@ -154,11 +154,11 @@ class DeformationIO(action.BaseAction):
                 if cmds.objExists(deformer_data[deformer_node]['relatedNode']):
                     wrap_base_shape = False
                     if 'inflType' in cmds.listAttr(deformer_data[deformer_node]['relatedNode']):
-                        plugged_items = cmds.listConnections(deformer_data[deformer_node]['relatedNode']+".inflType", destination=True, source=False)
+                        plugged_items = cmds.listConnections(f"{deformer_data[deformer_node]['relatedNode']}.inflType", destination=True, source=False)
                         if plugged_items:
                             for plugged in plugged_items:
                                 if cmds.objectType(plugged) == 'wrap':
-                                    wrap_base_shapes = cmds.listConnections(plugged+".basePoints[0]", destination=False, source=True)
+                                    wrap_base_shapes = cmds.listConnections(f"{plugged}.basePoints[0]", destination=False, source=True)
                                     if wrap_base_shapes:
                                         wrap_base_shape = wrap_base_shapes[0]
                                         break
@@ -167,9 +167,9 @@ class DeformationIO(action.BaseAction):
                     hist = cmds.listHistory(self.existShapeList)
                     wrap_items = cmds.ls(hist, type='wrap')[0]
                     new_def_node = cmds.rename(wrap_items, deformer_data[deformer_node]['name'])
-                    new_wrap_base_node = cmds.listConnections(new_def_node+".basePoints[0]", destination=False, source=True)[0]
+                    new_wrap_base_node = cmds.listConnections(f"{new_def_node}.basePoints[0]", destination=False, source=True)[0]
                     if wrap_base_shape:
-                        cmds.connectAttr(wrap_base_shape+".worldMesh[0]", new_def_node+".basePoints[0]", force=True)
+                        cmds.connectAttr(f"{wrap_base_shape}.worldMesh[0]", f"{new_def_node}.basePoints[0]", force=True)
                         cmds.delete(new_wrap_base_node)
                     support_grp = self.ar.utils.get_node_by_message('supportGrp')
                     if support_grp:
@@ -183,8 +183,8 @@ class DeformationIO(action.BaseAction):
             elif deformer_data[deformer_node]['type'] == 'shrinkWrap':
                 new_def_node = cmds.deformer(self.existShapeList, type=deformer_data[deformer_node]['type'], name=deformer_data[deformer_node]['name'], useComponentTags=deformer_data[deformer_node]['componentTag'])[0] #shrinkWrap
                 for c_attr in ['continuity', 'smoothUVs', 'keepBorder', 'boundaryRule', 'keepHardEdge', 'propagateEdgeHardness', 'keepMapBorders']:
-                    cmds.connectAttr(deformer_data[deformer_node]['relatedNode']+"."+c_attr, new_def_node+"."+c_attr, force=True)
-                cmds.connectAttr(deformer_data[deformer_node]['relatedNode']+".worldMesh", new_def_node+".targetGeom", force=True)
+                    cmds.connectAttr(f"{deformer_data[deformer_node]['relatedNode']}.{c_attr}", f"{new_def_node}.{c_attr}", force=True)
+                cmds.connectAttr(f"{deformer_data[deformer_node]['relatedNode']}.worldMesh", f"{new_def_node}.targetGeom", force=True)
             elif deformer_data[deformer_node]['type'] == 'wire':
                 if not cmds.objExists(deformer_data[deformer_node]['relatedNode']):
                     is_periodic = False
@@ -200,10 +200,10 @@ class DeformationIO(action.BaseAction):
                 new_def_node = cmds.deformer(self.existShapeList, type=deformer_data[deformer_node]['type'], name=deformer_data[deformer_node]['name'], useComponentTags=deformer_data[deformer_node]['componentTag'])[0]
             if deformer_data[deformer_node]['type'] == 'morph':
                 if cmds.objExists(deformer_data[deformer_node]['relatedNode']):
-                    cmds.connectAttr(deformer_data[deformer_node]['relatedNode']+".worldMesh[0]", new_def_node+".morphTarget[0]", force=True)
+                    cmds.connectAttr(f"{deformer_data[deformer_node]['relatedNode']}.worldMesh[0]", f"{new_def_node}.morphTarget[0]", force=True)
                 else:
                     well_imported = False
-                    self.fail_io(self.latest_data_file+": "+deformer_node+" - "+deformer_data[deformer_node]['relatedNode'])
+                    self.fail_io(f"{self.latest_data_file}: {deformer_node} - {deformer_data[deformer_node]['relatedNode']}")
         # parenting
         need_parent_it = False
         if deformer_data[deformer_node]['father'] and cmds.objExists(deformer_data[deformer_node]['father']):
@@ -221,7 +221,7 @@ class DeformationIO(action.BaseAction):
         if new_def_node:
             for attr in deformer_data[deformer_node]['attributes']:
                 try:
-                    cmds.setAttr(new_def_node+"."+attr, deformer_data[deformer_node]['attributes'][attr])
+                    cmds.setAttr(f"{new_def_node}.{attr}", deformer_data[deformer_node]['attributes'][attr])
                 except:
                     pass #just to avoid try set connected attributes like envelope or curvature.
         # import deformer weights, except for skinCluster, blendShape, sculpt, wrap
@@ -255,7 +255,7 @@ class DeformationIO(action.BaseAction):
                 try:
                     well_imported = self.import_deformation(deformer_node, deformer_data, well_imported)
                 except Exception as e:
-                    self.fail_io(self.latest_data_file+": "+deformer_node+" - "+str(e))
+                    self.fail_io(f"{self.latest_data_file}: {deformer_node} - {e}")
             if not_found_meshs: #call again the same instruction to try create a deformer in a deformer, like a cluster in a lattice.
                 for deformer_node in not_found_meshs:
                     for shape in deformer_data[deformer_node]['shapeList']:
@@ -263,13 +263,13 @@ class DeformationIO(action.BaseAction):
                             try:
                                 well_imported = self.import_deformation(deformer_node, deformer_data, well_imported)
                             except Exception as e:
-                                self.fail_io(self.latest_data_file+": "+deformer_node+" - "+str(e))
+                                self.fail_io(f"{self.latest_data_file}: {deformer_node} - {e}")
             if well_imported:
                 self.well_done_io(self.latest_data_file)
         else:
-            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(deformer_data.keys())))
+            self.fail_io(f"{self.ar.data.lang['v014_notFoundNodes']} {', '.join(deformer_data.keys())}")
         if not well_imported:
             if changed_shape_meshes:
-                self.fail_io(self.ar.data.lang['r018_changedMesh']+" shape "+str(', '.join(changed_shape_meshes)))
+                self.fail_io(f"{self.ar.data.lang['r018_changedMesh']} shape {', '.join(changed_shape_meshes)}")
             elif not_found_meshs:
-                self.fail_io(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(not_found_meshs)))
+                self.fail_io(f"{self.ar.data.lang['v014_notFoundNodes']} {', '.join(not_found_meshs)}")

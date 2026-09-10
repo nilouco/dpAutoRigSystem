@@ -48,16 +48,16 @@ class JointDisplay(base.BaseLibrary):
         """
         if self.joints:
             for jnt in self.joints:
-                if cmds.getAttr(jnt +'.drawStyle') == 0:
+                if cmds.getAttr(f"{jnt}.drawStyle") == 0:
                     self.bone_label_items.append(jnt)
                     self.selected_board = 0
-                elif cmds.getAttr(jnt +'.drawStyle') == 1:
+                elif cmds.getAttr(f"{jnt}.drawStyle") == 1:
                     self.multichild_label_items.append(jnt)                    
                     self.selected_board = 1
-                elif cmds.getAttr(jnt +'.drawStyle') == 2:
+                elif cmds.getAttr(f"{jnt}.drawStyle") == 2:
                     self.none_label_items.append(jnt)
                     self.selected_board = 2
-                elif cmds.getAttr(jnt +'.drawStyle') == 3:
+                elif cmds.getAttr(f"{jnt}.drawStyle") == 3:
                     self.joint_label_items.append(jnt)
                     self.selected_board = 3
 
@@ -77,15 +77,15 @@ class JointDisplay(base.BaseLibrary):
         """
         # Get active selection of button list
         if self.selection_ui_items:
-            current_draw_style = cmds.getAttr(self.selection_ui_items[0]+'.drawStyle')
+            current_draw_style = cmds.getAttr(f"{self.selection_ui_items[0]}.drawStyle")
             if current_draw_style < 3:
                 for jnt in self.selection_ui_items:
-                    cmds.setAttr(jnt+'.drawStyle', current_draw_style + 1)
+                    cmds.setAttr(f"{jnt}.drawStyle", current_draw_style + 1)
                 self.dest_board_index = current_draw_style + 1
             else:
                 current_draw_style = 0
                 for jnt in self.selection_ui_items: 
-                    cmds.setAttr(jnt+'.drawStyle', current_draw_style)
+                    cmds.setAttr(f"{jnt}.drawStyle", current_draw_style)
                 self.dest_board_index = 0
             if self.ar.data.ui_state:
                 self.ar.joint_display_ui.refresh_ui()
@@ -97,15 +97,15 @@ class JointDisplay(base.BaseLibrary):
         """
         # Get active selection of button list
         if self.selection_ui_items:
-            current_draw_style = cmds.getAttr(self.selection_ui_items[0]+'.drawStyle')
+            current_draw_style = cmds.getAttr(f"{self.selection_ui_items[0]}.drawStyle")
             if current_draw_style > 0 and current_draw_style < 3:
                 for jnt in self.selection_ui_items:
-                    cmds.setAttr(jnt+'.drawStyle', current_draw_style - 1)
+                    cmds.setAttr(f"{jnt}.drawStyle", current_draw_style - 1)
                 self.dest_board_index = current_draw_style - 1
             else: 
                 current_draw_style = 3
                 for jnt in self.selection_ui_items:
-                    cmds.setAttr(jnt+'.drawStyle', current_draw_style)
+                    cmds.setAttr(f"{jnt}.drawStyle", current_draw_style)
                 self.dest_board_index = 3
             if self.ar.data.ui_state:
                 self.ar.joint_display_ui.refresh_ui()
@@ -145,4 +145,4 @@ class JointDisplay(base.BaseLibrary):
             self.ar.joint_display_ui.refresh_ui()
         if self.selection_ui_items:
             for jnt in self.selection_ui_items:
-                cmds.setAttr(jnt+".radius", value)
+                cmds.setAttr(f"{jnt}.radius", value)

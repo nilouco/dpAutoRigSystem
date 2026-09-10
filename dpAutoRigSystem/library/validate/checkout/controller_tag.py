@@ -42,11 +42,11 @@ class ControllerTag(action.BaseAction):
                     self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                     if not 'controlID' in cmds.listAttr(item):
                         continue
-                    if cmds.getAttr(item + ".controlID") != 'id_092_Correctives':
+                    if cmds.getAttr(f"{item}.controlID") != 'id_092_Correctives':
                         if self.first_mode:
                             # conditional to check here
                             if not cmds.controller(item, query=True, isController=True):
-                                self.checked_items.append(item+" + controllers")
+                                self.checked_items.append(f"{item} + controllers")
                                 self.found_issues.append(True)
                                 self.good_results.append(False)
                                 self.messages.append(self.ar.data.lang['v075_missingControllerTags'])
@@ -58,12 +58,12 @@ class ControllerTag(action.BaseAction):
                                 result = self.add_parent_controller_tag(item)
                                 self.good_results.append(True)
                                 if result:
-                                    self.messages.append(self.ar.data.lang['v004_fixed']+": "+result)
+                                    self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {result}")
                                 else:
-                                    self.messages.append(self.ar.data.lang['v004_fixed']+": "+item)
+                                    self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {item}")
                             except:
                                 self.good_results.append(False)
-                                self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
+                                self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}")
             else:
                 self.not_found_node()
         else:
@@ -82,7 +82,7 @@ class ControllerTag(action.BaseAction):
         """ Add parent controller tag to the given item.
         """
         if 'parentTag' in cmds.listAttr(item):
-            parent_tag_items = cmds.listConnections(item+".parentTag", source=True, destination=False)
+            parent_tag_items = cmds.listConnections(f"{item}.parentTag", source=True, destination=False)
             if parent_tag_items:
                 cmds.controller(item, parent_tag_items[0], parent=True)
-                return ("Tagged parent = "+item+" --> "+parent_tag_items[0])
+                return (f"Tagged parent = {item} --> {parent_tag_items[0]}")

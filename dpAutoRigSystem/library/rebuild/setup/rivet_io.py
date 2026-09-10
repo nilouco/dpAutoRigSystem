@@ -91,8 +91,8 @@ class RivetIO(action.BaseAction):
             if self.ar.data.verbose:
                 self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             # mount a rivet data dictionary
-            if cmds.objExists(net+".rivetData"):
-                data = json.loads(cmds.getAttr(net+".rivetData"))
+            if cmds.objExists(f"{net}.rivetData"):
+                data = json.loads(cmds.getAttr(f"{net}.rivetData"))
                 add_it = True
                 if n > 0:
                     for x in range(i):
@@ -113,7 +113,7 @@ class RivetIO(action.BaseAction):
         for net in rivet_data:
             try:
                 net_data = rivet_data[net]
-                self.ar.ui_manager.set_progress(self.ar.data.lang[self.title]+': '+net_data['geoToAttach'])
+                self.ar.ui_manager.set_progress(f"{self.ar.data.lang[self.title]}: {net_data['geoToAttach']}")
                 old_ui_state = self.ar.data.ui_state
                 self.ar.data.ui_state = False
                 # recreate rivet:
@@ -122,10 +122,10 @@ class RivetIO(action.BaseAction):
                 self.ar.data.ui_state = old_ui_state
                 if not rivets:
                     well_imported = False
-                    self.fail_io(net+": "+self.ar.data.lang['r032_notImportedData'])
+                    self.fail_io(f"{net}: {self.ar.data.lang['r032_notImportedData']}")
             except Exception as e:
                 well_imported = False
-                self.fail_io(net+": "+str(e))
+                self.fail_io(f"{net}: {e}")
                 break
         if well_imported:
             self.well_done_io(self.latest_data_file)

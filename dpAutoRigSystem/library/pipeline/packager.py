@@ -34,22 +34,22 @@ class Packager:
             Returns the zipFilePathName.
         """
         if date:
-            zip_name = file_name[:-3]+"_"+date+".zip"
+            zip_name = f"{file_name[:-3]}_{date}.zip"
         else:
-            zip_name = file_name[:-3]+".zip"
-        zip = zipfile.ZipFile(destination_folder+"/"+zip_name, 'w', zipfile.ZIP_DEFLATED)
-        zip.write(filename=file_path+"/"+file_name, arcname=file_name)
+            zip_name = f"{file_name[:-3]}.zip"
+        zip = zipfile.ZipFile(f"{destination_folder}/{zip_name}", 'w', zipfile.ZIP_DEFLATED)
+        zip.write(filename=f"{file_path}/{file_name}", arcname=file_name)
         zip.close()
-        return destination_folder+"/"+zip_name
+        return f"{destination_folder}/{zip_name}"
         
 
     def frame_camera_to_publish(self, cam=CAMERA, rot_x=CAM_ROTX, rot_y=CAM_ROTY, rot_z=CAM_ROTZ, focus_it=None):
         """ Prepare the given camera to frame correctly the viewport to publish.
         """
         # set up rotation
-        cmds.setAttr(cam+".rotateX", rot_x)
-        cmds.setAttr(cam+".rotateY", rot_y)
-        cmds.setAttr(cam+".rotateZ", rot_z)
+        cmds.setAttr(f"{cam}.rotateX", rot_x)
+        cmds.setAttr(f"{cam}.rotateY", rot_y)
+        cmds.setAttr(f"{cam}.rotateZ", rot_z)
         # frame all
         cmds.viewFit(allObjects=True)
         position = cmds.xform(cam, query=True, translation=True, worldSpace=True)
@@ -71,7 +71,7 @@ class Packager:
         """ Return the RGB values listed for the given search_item from displayRGBColor Maya command.
         """
         for item in cmds.displayRGBColor(list=True):
-            if search_item+' ' in item:
+            if f"{search_item} " in item:
                 values = item[:-1].split(' ')
                 values = values[1:]
                 values = [float(x) for x in values]
@@ -106,16 +106,16 @@ class Packager:
         cam_vis_attributes = []
         cam_attributes = ['displayGateMask', 'displayResolution', 'displayFilmGate', 'displayFieldChart', 'displaySafeAction', 'displaySafeTitle', 'displayFilmPivot', 'displayFilmOrigin', 'depthOfField']
         for attr in cam_attributes:
-            cam_vis_attributes.append(cmds.getAttr(cam+"."+attr)) #current camera vis attr
-            cmds.setAttr(cam+"."+attr, False)
-        current_cam_overscan = cmds.getAttr(cam+".overscan")
-        cmds.setAttr(cam+".overscan", 1.0)
+            cam_vis_attributes.append(cmds.getAttr(f"{cam}.{attr}")) #current camera vis attr
+            cmds.setAttr(f"{cam}.{attr}", False)
+        current_cam_overscan = cmds.getAttr(f"{cam}.overscan")
+        cmds.setAttr(f"{cam}.overscan", 1.0)
         current_cam_aspect_ratio = cmds.camera(cam, query=True, aspectRatio=True)
         cmds.camera(cam, edit=True, aspectRatio=0.8)
         current_ctrl_layer_display = False
         if cmds.objExists(CTRL_LAYER):
-            current_ctrl_layer_display = cmds.getAttr(CTRL_LAYER+".hideOnPlayback")
-            cmds.setAttr(CTRL_LAYER+".hideOnPlayback", 0)
+            current_ctrl_layer_display = cmds.getAttr(f"{CTRL_LAYER}.hideOnPlayback")
+            cmds.setAttr(f"{CTRL_LAYER}.hideOnPlayback", 0)
 
         # set up custom display settings
         cmds.grid(toggle=False)
@@ -127,35 +127,35 @@ class Packager:
         cmds.displayRGBColor('backgroundBottom', 0.42, 0.42, 0.42)
 
         # file information messages
-        cmds.headsUpDisplay('HudRigPreviewTxt'+str(h+1), section=0, block=(h+1), labelFontSize='large', allowOverlap=True, label='')
-        cmds.headsUpDisplay('HudRigPreviewTxt'+str(h+2), section=0, block=(h+2), labelFontSize='large', allowOverlap=True, label=rig_preview)
+        cmds.headsUpDisplay(f"HudRigPreviewTxt{h+1}", section=0, block=(h+1), labelFontSize='large', allowOverlap=True, label='')
+        cmds.headsUpDisplay(f"HudRigPreviewTxt{h+2}", section=0, block=(h+2), labelFontSize='large', allowOverlap=True, label=rig_preview)
         b = h+3
         if pipe_data['b_i_maya']:
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize='large', allowOverlap=True, label=cmds.about(installedVersion=True)) #Maya version
+            cmds.headsUpDisplay(f"HudRigPreviewTxt{b}", section=0, block=b, labelFontSize='large', allowOverlap=True, label=cmds.about(installedVersion=True)) #Maya version
             b += 1
         if pipe_data['b_i_version']:
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize='large', allowOverlap=True, label="dpAutoRigSystem "+version)
+            cmds.headsUpDisplay(f"HudRigPreviewTxt{b}", section=0, block=b, labelFontSize='large', allowOverlap=True, label=f"dpAutoRigSystem {version}")
             b += 1
         if pipe_data['b_i_studio']:
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize='large', allowOverlap=True, label=pipe_data['f_studio'])
+            cmds.headsUpDisplay(f"HudRigPreviewTxt{b}", section=0, block=b, labelFontSize='large', allowOverlap=True, label=pipe_data['f_studio'])
             b += 1
         if pipe_data['b_i_project']:
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize='large', allowOverlap=True, label=pipe_data['f_project'])
+            cmds.headsUpDisplay(f"HudRigPreviewTxt{b}", section=0, block=b, labelFontSize='large', allowOverlap=True, label=pipe_data['f_project'])
             b += 1
         if pipe_data['b_i_asset']:
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize='large', allowOverlap=True, label=pipe_data['assetName'])
+            cmds.headsUpDisplay(f"HudRigPreviewTxt{b}", section=0, block=b, labelFontSize='large', allowOverlap=True, label=pipe_data['assetName'])
             b += 1
         if pipe_data['b_i_model']:
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize='large', allowOverlap=True, label="Model "+str(pipe_data['modelVersion']).zfill(int(pipe_data['i_padding'])))
+            cmds.headsUpDisplay(f"HudRigPreviewTxt{b}", section=0, block=b, labelFontSize='large', allowOverlap=True, label=f"Model {str(pipe_data['modelVersion']).zfill(int(pipe_data['i_padding']))}")
             b += 1
         if pipe_data['b_i_wip']:
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize='large', allowOverlap=True, label="Rig "+str(pipe_data['rigVersion']).zfill(int(pipe_data['i_padding'])))
+            cmds.headsUpDisplay(f"HudRigPreviewTxt{b}", section=0, block=b, labelFontSize='large', allowOverlap=True, label=f"Rig {str(pipe_data['rigVersion']).zfill(int(pipe_data['i_padding']))}")
             b += 1
         if pipe_data['b_i_publish']:
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize='large', allowOverlap=True, label="Publish "+str(pipe_data['publishVersion']).zfill(int(pipe_data['i_padding'])))
+            cmds.headsUpDisplay(f"HudRigPreviewTxt{b}", section=0, block=b, labelFontSize='large', allowOverlap=True, label=f"Publish {str(pipe_data['publishVersion']).zfill(int(pipe_data['i_padding']))}")
             b += 1
         if pipe_data['b_i_date']:
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize='large', allowOverlap=True, label=date)
+            cmds.headsUpDisplay(f"HudRigPreviewTxt{b}", section=0, block=b, labelFontSize='large', allowOverlap=True, label=date)
             b += 1
             
         # create a new persp viewport window to get the image from it
@@ -180,7 +180,7 @@ class Packager:
         destination_folder = pipe_data['toClientPath']
         if not destination_folder.endswith('/'):
             destination_folder += '/'
-        export_path = "{}{}_{}.jpg".format(destination_folder, pipe_data['assetName'], rig_preview.replace(' ', ''))
+        export_path = f"{destination_folder}{pipe_data['assetName']}_{rig_preview.replace(' ', '')}.jpg"
         # playblast to make an image
         cmds.playblast(frame=current_frame, viewer=False, format='image', compression='jpg', showOrnaments=True, completeFilename=export_path, widthHeight=[width_res, height_res], percent=100, forceOverwrite=False, quality=100, editorPanelName=imager_panel)
         # clean up the UI
@@ -201,13 +201,13 @@ class Packager:
             cmds.headsUpDisplay(huds[i], edit=True, visible=current_hud_visibilities[i])
         # remove hud texts
         for n in range((h+1), b):
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(n), remove=True)
+            cmds.headsUpDisplay(f"HudRigPreviewTxt{n}", remove=True)
         for c in range(len(cam_attributes)):
-            cmds.setAttr(cam+"."+cam_attributes[c], cam_vis_attributes[c])
-        cmds.setAttr(cam+".overscan", current_cam_overscan)
+            cmds.setAttr(f"{cam}.{cam_attributes[c]}", cam_vis_attributes[c])
+        cmds.setAttr(f"{cam}.overscan", current_cam_overscan)
         cmds.camera(cam, edit=True, aspectRatio=current_cam_aspect_ratio)
         if current_ctrl_layer_display:
-            cmds.setAttr(CTRL_LAYER+".hideOnPlayback", current_ctrl_layer_display)
+            cmds.setAttr(f"{CTRL_LAYER}.hideOnPlayback", current_ctrl_layer_display)
         # force persp viewport to show file as default view options
         active_editor = cmds.playblast(activeEditor=True)
         cmds.modelEditor(active_editor, edit=True, displayAppearance='smoothShaded', xray=False, wireframeOnShaded=False, occlusionCulling=False, shadows=False, polymeshes=True, pivots=False, nurbsCurves=True, jointXray=False, displayTextures=False, useDefaultMaterial=False, activeComponentsXray=False)
@@ -226,9 +226,9 @@ class Packager:
         if scenes:
             for item in scenes:
                 self.remove_existing_archived(destination_folder, item)
-                shutil.move(scene_path+"/"+item, destination_folder)
+                shutil.move(f"{scene_path}/{item}", destination_folder)
         try: #to avoid have an issue when copying file to a non default pipeline asset name folder
-            shutil.copy2(scene_path+"/"+file_shortname, destination_folder)
+            shutil.copy2(f"{scene_path}/{file_shortname}", destination_folder)
         except:
             pass
 
@@ -252,14 +252,14 @@ class Packager:
         for item in asset_names:
             if item != publish_filename:
                 self.remove_existing_archived(destination_folder, item)
-                shutil.move(source_folder+"/"+item, destination_folder)
+                shutil.move(f"{source_folder}/{item}", destination_folder)
 
 
     def remove_existing_archived(self, file_path, file_name):
         """ Delete existing same achived version in dpOld if it exists to avoid naming conflict when copying.
         """
-        if os.path.isfile(file_path+"/"+file_name):
-            os.remove(file_path+"/"+file_name)
+        if os.path.isfile(f"{file_path}/{file_name}"):
+            os.remove(f"{file_path}/{file_name}")
 
     
     def to_discord(self, webhook, message_text):

@@ -55,10 +55,10 @@ class UnusedNode(action.BaseAction):
                             try:
                                 fix_result = mel.eval('MLdeleteUnused;')
                                 self.good_results.append(True)
-                                self.messages.append(self.ar.data.lang['v004_fixed']+": "+str(fix_result)+" nodes = "+str(len(issue_materials))+" materials")
+                                self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {fix_result} nodes = {len(issue_materials)} materials")
                             except:
                                 self.good_results.append(False)
-                                self.messages.append(self.ar.data.lang['v005_cantFix']+": materials")
+                                self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: materials")
                 else:
                     self.not_found_node()
             else:

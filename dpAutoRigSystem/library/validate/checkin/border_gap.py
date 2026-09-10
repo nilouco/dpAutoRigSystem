@@ -57,7 +57,7 @@ class BorderGap(action.BaseAction):
                         # verify if objName or shape_name is in check_items
                         for item in check_items:
                             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
-                            if item == shape_name and not cmds.getAttr(item+".intermediateObject"):
+                            if item == shape_name and not cmds.getAttr(f"{item}.intermediateObject"):
                                 iter_polys = OpenMaya.MItMeshEdge(shape)
                                 # Iterate through polys on current mesh
                                 while not iter_polys.isDone():
@@ -67,7 +67,7 @@ class BorderGap(action.BaseAction):
                                     if len(index_con_faces) == 1:
                                         if not item_name in gap_items:
                                             gap_items.append(item_name)
-                                        gap_components.append(item_name+'.e["+str(iter_polys.index())+"]')
+                                        gap_components.append(f"{item_name}.e['{iter_polys.index()}']")
                                     # Move to next polygon in the mesh list
                                     iter_polys.next()
                         # Move to the next selected node in the list
@@ -82,9 +82,9 @@ class BorderGap(action.BaseAction):
                             self.good_results.append(False)
                         else: #fix
                             self.good_results.append(False)
-                            self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
-                    self.messages.append(self.ar.data.lang['v122_borderGap']+": "+str(gap_components))
-                    self.messages.append("---\n"+self.ar.data.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(gap_components)+")\n---")
+                            self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}")
+                    self.messages.append(f"{self.ar.data.lang['v122_borderGap']}: {gap_components}")
+                    self.messages.append(f"---\n{self.ar.data.lang['v121_sharePythonSelect']}\nmaya.cmds.select('{gap_components}')\n---")
                     cmds.select(gap_components)
             else:
                 self.not_found_node()

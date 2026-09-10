@@ -82,7 +82,7 @@ class OffsetMatrixIO(action.BaseAction):
         for item in items:
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
-                in_plugs = cmds.listConnections(item+"."+self.offset_matrix_attr, source=True, destination=False, plugs=True)
+                in_plugs = cmds.listConnections(f"{item}.{self.offset_matrix_attr}", source=True, destination=False, plugs=True)
                 if in_plugs:
                     data[item] = in_plugs[0]
         return data
@@ -100,18 +100,18 @@ class OffsetMatrixIO(action.BaseAction):
             not_found_nodes = []
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
-                om_attr = item+"."+self.offset_matrix_attr
+                om_attr = f"{item}.{self.offset_matrix_attr}"
                 if not cmds.listConnections(om_attr, plugs=True, source=True, destination=False):
                     is_locked = cmds.getAttr(om_attr, lock=True)
                     cmds.setAttr(om_attr, lock=False)
-                    cmds.connectAttr(connection_data[item]+"[0]", om_attr, force=True)
+                    cmds.connectAttr(f"{connection_data[item]}[0]", om_attr, force=True)
                     if is_locked:
                         cmds.setAttr(om_attr, lock=True)
                 if not item in well_imported_items:
                     well_imported_items.append(item)
             else:
-                not_found_nodes.append(item+"."+self.offset_matrix_attr)
+                not_found_nodes.append(f"{item}.{self.offset_matrix_attr}")
         if not_found_nodes:
-            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(not_found_nodes))
+            self.fail_io(f"{self.ar.data.lang['v014_notFoundNodes']}: {', '.join(not_found_nodes)}")
         elif well_imported_items:
             self.well_done_io(self.latest_data_file)

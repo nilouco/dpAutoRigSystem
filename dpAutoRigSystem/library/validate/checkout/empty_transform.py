@@ -51,16 +51,16 @@ class EmptyTransform(action.BaseAction):
                             self.good_results.append(False)
                         else: #fix
                             try:
-                                if self.keep_attr in cmds.listAttr(item) and cmds.getAttr(item+"."+self.keep_attr) == True:
+                                if self.keep_attr in cmds.listAttr(item) and cmds.getAttr(f"{item}.{self.keep_attr}") == True:
                                     pass
                                 else:
                                     cmds.lockNode(item, lock=False)
                                     cmds.delete(item)
                                 self.good_results.append(True)
-                                self.messages.append(self.ar.data.lang['v004_fixed']+": "+item)
+                                self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {item}")
                             except:
                                 self.good_results.append(False)
-                                self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
+                                self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}")
             else:
                 self.not_found_node()
         else:

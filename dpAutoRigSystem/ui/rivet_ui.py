@@ -16,13 +16,13 @@ class RivetUI:
         self.ar.ui_manager.close_ui('dpRivetWindow')
         width  = 305
         height = 470
-        cmds.window('dpRivetWindow', title=self.ar.data.lang['m083_rivet']+" "+str(self.ar.data.version), widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        cmds.window('dpRivetWindow', title=f"{self.ar.data.lang['m083_rivet']} {self.ar.data.version}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         cmds.tabLayout('rivet_main_tl', innerMarginWidth=5, innerMarginHeight=5, parent='dpRivetWindow')
         cmds.columnLayout('rivet_add_cl', columnOffset=('left', 10), parent='rivet_main_tl')
         cmds.text('rivet_load_geo_txt', label=self.ar.data.lang['m145_loadGeo'], height=30, font='boldLabelFont', parent='rivet_add_cl')
         cmds.rowColumnLayout('rivet_geo_rcl', numberOfColumns=2, columnWidth=[(1, 100), (2, 210)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent='rivet_add_cl')
-        cmds.button('rivet_geo_bt', label=self.ar.data.lang['m146_geo']+" >", annotation='Load the Geometry here in order to be used to attach.', backgroundColor=(1.0, 0.7, 1.0), width=100, command=self.load_geo_to_attach, parent='rivet_geo_rcl')
+        cmds.button('rivet_geo_bt', label=f"{self.ar.data.lang['m146_geo']} >", annotation='Load the Geometry here in order to be used to attach.', backgroundColor=(1.0, 0.7, 1.0), width=100, command=self.load_geo_to_attach, parent='rivet_geo_rcl')
         cmds.textField('rivet_geo_to_attach_tf', width=180, text='', changeCommand=partial(self.load_geo_to_attach, None, True), parent='rivet_geo_rcl')
         cmds.rowColumnLayout('rivet_use_set_rcl', numberOfColumns=2, columnWidth=[(1, 110), (2, 210)], columnAlign=[(1, 'right'), (2, 'left')], columnAttach=[(1, 'right', 1), (2, 'left', 10)], parent='rivet_add_cl')
         cmds.text('rivet_uv_set_txt', label='UV Set:', font='obliqueLabelFont', parent='rivet_use_set_rcl')
@@ -36,19 +36,19 @@ class RivetUI:
         cmds.button('rivet_add_bt', label=self.ar.data.lang['i045_add'], annotation=self.ar.data.lang['i045_add'], width=140, command=self.add_selected_item, parent='rivet_middle_rcl')
         cmds.button('rivet_remove_bt', label=self.ar.data.lang['i046_remove'], annotation=self.ar.data.lang['i046_remove'], width=140, command=self.remove_selected_item, parent='rivet_middle_rcl')
         cmds.separator(style='in', height=15, width=300, parent='rivet_add_cl')
-        cmds.text('rivet_options_txt', label=self.ar.data.lang['i002_options']+":", height=30, font='boldLabelFont', parent='rivet_add_cl')
+        cmds.text('rivet_options_txt', label=f"{self.ar.data.lang['i002_options']}:", height=30, font='boldLabelFont', parent='rivet_add_cl')
         cmds.columnLayout('rivet_father_cl', columnOffset=('left', 10), parent='rivet_add_cl')
-        cmds.checkBox('rivet_attach_t_cb', label=self.ar.data.lang['m148_attach']+" Translate", value=True, parent='rivet_father_cl')
-        cmds.checkBox('rivet_attach_r_cb', label=self.ar.data.lang['m148_attach']+" Rotate", value=False, parent='rivet_father_cl')
+        cmds.checkBox('rivet_attach_t_cb', label=f"{self.ar.data.lang['m148_attach']} Translate", value=True, parent='rivet_father_cl')
+        cmds.checkBox('rivet_attach_r_cb', label=f"{self.ar.data.lang['m148_attach']} Rotate", value=False, parent='rivet_father_cl')
         cmds.checkBox('rivet_father_grp_cb', label=self.ar.data.lang['m149_createGroupConst'], value=True, parent='rivet_father_cl')
         cmds.columnLayout('rivet_invert_cl', columnOffset=('left', 10), parent='rivet_add_cl')
         cmds.checkBox('rivet_add_invert_cb', label=self.ar.data.lang['m150_avoidDoubleTransf'], height=20, value=True, changeCommand=self.change_invert, parent='rivet_invert_cl')
         cmds.rowColumnLayout('rivet_translate_rcl', numberOfColumns=2, columnWidth=[(1, 30), (2, 150)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 5)], height=20, parent='rivet_add_cl')
         cmds.separator(style='none', parent='rivet_translate_rcl')
-        cmds.checkBox('rivet_invert_t_cb', label=self.ar.data.lang['m151_invert']+" Translate", value=True, parent='rivet_translate_rcl')
+        cmds.checkBox('rivet_invert_t_cb', label=f"{self.ar.data.lang['m151_invert']} Translate", value=True, parent='rivet_translate_rcl')
         cmds.rowColumnLayout('rivet_rotate_rcl', numberOfColumns=2, columnWidth=[(1, 30), (2, 150)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 5)], height=20, parent='rivet_add_cl')
         cmds.separator(style='none', parent='rivet_rotate_rcl')
-        cmds.checkBox('rivet_invert_r_cb', label=self.ar.data.lang['m151_invert']+" Rotate", value=False, parent='rivet_rotate_rcl')
+        cmds.checkBox('rivet_invert_r_cb', label=f"{self.ar.data.lang['m151_invert']} Rotate", value=False, parent='rivet_rotate_rcl')
         cmds.columnLayout('rivet_face_to_rivet_cl', columnOffset=('left', 10), parent='rivet_add_cl')
         cmds.checkBox('rivet_face_to_rivet_cb', label=self.ar.data.lang['m226_createFaceToRivet'], height=20, value=True, changeCommand=self.change_deformer, parent='rivet_face_to_rivet_cl')
         cmds.columnLayout('rivet_deformer_cl', columnOffset=('left', 20), parent='rivet_face_to_rivet_cl')
@@ -60,7 +60,7 @@ class RivetUI:
             cmds.radioCollection('rivet_deformer_rc', edit=True, select='rivet_wrap_def_rb')
         cmds.separator(style='none', height=15, parent='rivet_add_cl')
         cmds.columnLayout('rivet_create_cl', columnOffset=('left', 10), parent='rivet_add_cl')
-        cmds.button('rivet_create_bt', label=self.ar.data.lang['i158_create']+" "+self.ar.data.lang['m083_rivet'], annotation=self.ar.data.lang['i158_create']+" "+self.ar.data.lang['m083_rivet'], width=290, backgroundColor=(0.20, 0.7, 1.0), command=self.create_rivet_from_ui, parent='rivet_create_cl')
+        cmds.button('rivet_create_bt', label=f"{self.ar.data.lang['i158_create']} {self.ar.data.lang['m083_rivet']}", annotation=f"{self.ar.data.lang['i158_create']} {self.ar.data.lang['m083_rivet']}", width=290, backgroundColor=(0.20, 0.7, 1.0), command=self.create_rivet_from_ui, parent='rivet_create_cl')
         # tab layout - remove tab
         cmds.columnLayout('rivet_remove_cl', columnOffset=('left', 10), parent='rivet_main_tl')
         cmds.separator(style='none', height=10, parent='rivet_remove_cl')
@@ -115,7 +115,7 @@ class RivetUI:
             if net:
                 self.app.remove_rivet_from_net(net)
             else:
-                mel.eval('print \"dpAR: '+self.ar.data.lang['m204_unableRemRivet']+items[i]+'\\n\";')
+                mel.eval(f'print "dpAR: {self.ar.data.lang['m204_unableRemRivet']}{items[i]}\n";')
         self.refresh_rivets()
         cmds.select(clear=True)
 
@@ -127,12 +127,12 @@ class RivetUI:
         selection_indexes = cmds.textScrollList('rivet_filter_controller_tsl', query=True, selectIndexedItem=True)
         if selection and selection_indexes:
             true_indexes = [n-1 for n in selection_indexes]
-            self.ar.ui_manager.set_progress(self.ar.data.lang['i315_removing'], self.ar.data.lang['i315_removing']+" "+self.ar.data.lang['m083_rivet'], len(true_indexes), add_one=False, add_number=False)
+            self.ar.ui_manager.set_progress(self.ar.data.lang['i315_removing'], f"{self.ar.data.lang['i315_removing']} {self.ar.data.lang['m083_rivet']}", len(true_indexes), add_one=False, add_number=False)
             self.remove_rivet_from_list(true_indexes, selection)
             self.app.remove_rivet_grp()
             self.ar.ui_manager.set_progress(end_it=True)
         else:
-            mel.eval('print \"dpAR: '+self.ar.data.lang['m169_noItemSelect']+'\\n\";')
+            mel.eval(f'print "dpAR: {self.ar.data.lang['m169_noItemSelect']}\n";')
         cmds.textScrollList('rivet_filter_controller_tsl', edit=True, deselectAll=True)
 
 
@@ -184,7 +184,7 @@ class RivetUI:
             remove_existing_rivet = cmds.confirmDialog(title=self.ar.data.lang['i074_attention'], icon='warning', message=self.ar.data.lang['i316_rivetNotFine'], button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no'], self.ar.data.lang['i132_cancel']], defaultButton=self.ar.data.lang['i071_yes'], cancelButton=self.ar.data.lang['i132_cancel'], dismissString=self.ar.data.lang['i132_cancel'])
             if remove_existing_rivet == self.ar.data.lang['i071_yes']:
                 need_to_remove_items, true_indexes = self.get_to_remove_indexes(need_to_remove, has_rivets_items)
-                self.ar.ui_manager.set_progress(self.ar.data.lang['i315_removing'], self.ar.data.lang['i315_removing']+" "+self.ar.data.lang['m083_rivet'], len(need_to_remove_items), add_one=False, add_number=False)
+                self.ar.ui_manager.set_progress(self.ar.data.lang['i315_removing'], f"{self.ar.data.lang['i315_removing']} {self.ar.data.lang['m083_rivet']}", len(need_to_remove_items), add_one=False, add_number=False)
                 self.remove_rivet_from_list(true_indexes, need_to_remove_items)
                 self.ar.ui_manager.set_progress(end_it=True)
             elif remove_existing_rivet == self.ar.data.lang['i072_no']:

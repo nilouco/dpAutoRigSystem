@@ -47,7 +47,7 @@ class UnlockNormals(action.BaseAction):
                 for mesh in meshes:
                     self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                     if cmds.objExists(mesh):
-                        locked_items = cmds.polyNormalPerVertex(mesh+".vtx[*]", query=True, freezeNormal=True)
+                        locked_items = cmds.polyNormalPerVertex(f"{mesh}.vtx[*]", query=True, freezeNormal=True)
                         # check if there's any locked normal
                         if True in locked_items:
                             self.checked_items.append(mesh)
@@ -59,10 +59,10 @@ class UnlockNormals(action.BaseAction):
                                     #cmds.polyNormalPerVertex(mesh+".vtx[*]", unFreezeNormal=True) #it doesn't keep the soft and hard edges when importing mesh
                                     self.edge_normals.set_soft_hard(mesh)
                                     self.good_results.append(True)
-                                    self.messages.append(self.ar.data.lang['v004_fixed']+": "+mesh)
+                                    self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {mesh}")
                                 except:
                                     self.good_results.append(False)
-                                    self.messages.append(self.ar.data.lang['v005_cantFix']+": "+mesh)
+                                    self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {mesh}")
             else:
                 self.not_found_node()
         else:

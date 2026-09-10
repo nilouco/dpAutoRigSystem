@@ -60,9 +60,9 @@ class RemapvalueToSetrange(action.BaseAction):
                             break
                         if value_interp != 1.0: #linear
                             break
-                        if cmds.getAttr(item+".inputMin") > cmds.getAttr(item+".inputMax"): #setRange isn't able to work well with it as a remapValue
+                        if cmds.getAttr(f"{item}.inputMin") > cmds.getAttr(f"{item}.inputMax"): #setRange isn't able to work well with it as a remapValue
                             break
-                        if cmds.getAttr(item+".outputMin") > cmds.getAttr(item+".outputMax"):
+                        if cmds.getAttr(f"{item}.outputMin") > cmds.getAttr(f"{item}.outputMax"):
                             break
                     else:
                         remapped_gradient = False
@@ -88,24 +88,24 @@ class RemapvalueToSetrange(action.BaseAction):
                                 #clear Interpolation_PMA node
                                 indexes = cmds.getAttr(f"{rmv_node}.value", multiIndices=True)
                                 for index in indexes:
-                                    connected_inputs = cmds.listConnections(rmv_node+".value["+str(index)+"].value_Interp", source=True, destination=False, plugs=False)
+                                    connected_inputs = cmds.listConnections(f"{rmv_node}.value[{index}].value_Interp", source=True, destination=False, plugs=False)
                                     if connected_inputs:
                                         cmds.delete(connected_inputs[0])
                                 # delete the old remapValue node
                                 cmds.delete(rmv_node)
-                                self.checked_items.append(rmv_node+" -> "+sr_node)
+                                self.checked_items.append(f"{rmv_node} -> {sr_node}")
                                 self.good_results.append(True)
                             except:
                                 self.good_results.append(False)
                                 well_done = False
                                 break
                     if self.first_mode:
-                        self.messages.append(self.ar.data.lang['v006_foundIssue']+": "+str(len(to_change_rmv_items))+" remapValue nodes")
+                        self.messages.append(f"{self.ar.data.lang['v006_foundIssue']}: {len(to_change_rmv_items)} remapValue nodes")
                     else:
                         if well_done:
-                            self.messages.append(self.ar.data.lang['v004_fixed']+": "+str(len(to_change_rmv_items))+" remapValue nodes")
+                            self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {len(to_change_rmv_items)} remapValue nodes")
                         else:
-                            self.messages.append(self.ar.data.lang['v005_cantFix']+": "+rmv_node)
+                            self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {rmv_node}")
             else:
                 self.not_found_node()
         else:

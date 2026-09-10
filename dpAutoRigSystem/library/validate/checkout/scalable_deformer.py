@@ -41,26 +41,26 @@ class ScalableDeformer(action.BaseAction):
                 option_ctrl = self.ar.utils.get_node_by_message('optionCtrl')
                 if option_ctrl:
                     self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
-                    rig_scale_output = [option_ctrl+"."+self.rig_scale_output_attr]
+                    rig_scale_output = [f"{option_ctrl}.{self.rig_scale_output_attr}"]
                     to_fix_item_attrs = []
                     for node in check_items:
                         self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                         node_type = cmds.objectType(node)
                         # check skinCluster nodes and connections
                         if node_type == 'skinCluster':
-                            if cmds.getAttr(node+".skinningMethod") != 0: # If it's not "Classic Linear"
-                                if cmds.getAttr(node+".dqsSupportNonRigid") == False:
-                                    to_fix_item_attrs.append(node+".dqsSupportNonRigid")
+                            if cmds.getAttr(f"{node}.skinningMethod") != 0: # If it's not "Classic Linear"
+                                if cmds.getAttr(f"{node}.dqsSupportNonRigid") == False:
+                                    to_fix_item_attrs.append(f"{node}.dqsSupportNonRigid")
                                 for dqs_attr in ['dqsScaleX', 'dqsScaleY', 'dqsScaleZ']:
-                                    sc_connections = cmds.listConnections(node+"."+dqs_attr, source=True, destination=True, plugs=True)
+                                    sc_connections = cmds.listConnections(f"{node}.{dqs_attr}", source=True, destination=True, plugs=True)
                                     if sc_connections != rig_scale_output:
-                                        to_fix_item_attrs.append(node+"."+dqs_attr)
+                                        to_fix_item_attrs.append(f"{node}.{dqs_attr}")
                         # check deltaMush nodes and connections
                         elif node_type == 'deltaMush':
                             for attr in ['scaleX', 'scaleY', 'scaleZ']:
-                                dm_connection = cmds.listConnections(node+"."+attr, source=True, destination=True, plugs=True)
+                                dm_connection = cmds.listConnections(f"{node}.{attr}", source=True, destination=True, plugs=True)
                                 if dm_connection != rig_scale_output:
-                                    to_fix_item_attrs.append(node+"."+attr)
+                                    to_fix_item_attrs.append(f"{node}.{attr}")
                     if to_fix_item_attrs:
                         for item_attr in to_fix_item_attrs:
                             self.checked_items.append(item_attr)
@@ -76,10 +76,10 @@ class ScalableDeformer(action.BaseAction):
                                         # connect the rig_scale_output to the deformer scale attributes
                                         cmds.connectAttr(rig_scale_output[0], item_attr, force=True)
                                     self.good_results.append(True)
-                                    self.messages.append(self.ar.data.lang['v004_fixed']+": "+item_attr)
+                                    self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {item_attr}")
                                 except:
                                     self.good_results.append(False)
-                                    self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item_attr)
+                                    self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item_attr}")
                                 cmds.select(clear=True)
                 else:
                     self.not_found_node('Option_Ctrl')

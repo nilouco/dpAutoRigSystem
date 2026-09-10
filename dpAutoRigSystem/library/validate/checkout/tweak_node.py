@@ -53,10 +53,10 @@ class TweakNode(action.BaseAction):
                                     cmds.delete(item)
                                 cmds.select(clear=True)
                                 self.good_results.append(True)
-                                self.messages.append(self.ar.data.lang['v004_fixed']+": "+item)
+                                self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {item}")
                             except:
                                 self.good_results.append(False)
-                                self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
+                                self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}")
             else:
                 self.not_found_node()
         else:
@@ -75,11 +75,11 @@ class TweakNode(action.BaseAction):
         """ Check if there are edited control point in the given tweak node and return them.
         """
         if cmds.objExists(item):
-            p_items = cmds.getAttr(item+".plist", multiIndices=True)
+            p_items = cmds.getAttr(f"{item}.plist", multiIndices=True)
             if p_items:
                 for idx in p_items:
-                    cp_items = cmds.getAttr(item+".plist["+str(idx)+"].controlPoints", multiIndices=True)
+                    cp_items = cmds.getAttr(f"{item}.plist[{idx}].controlPoints", multiIndices=True)
                     if cp_items:
                         for cp in cp_items:
-                            if cmds.getAttr(item + ".plist[" + str(idx) + "].controlPoints[" + str(cp) + "]") != [0.0, 0.0, 0.0]:
+                            if cmds.getAttr(f"{item}.plist[{idx}].controlPoints[{cp}]") != [0.0, 0.0, 0.0]:
                                 return True

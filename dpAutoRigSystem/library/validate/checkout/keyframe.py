@@ -74,12 +74,12 @@ class Keyframe(action.BaseAction):
                                                         cmds.delete(crv)
                                                         if not reported:
                                                             self.good_results.append(True)
-                                                            self.messages.append(self.ar.data.lang['v004_fixed']+": "+item)
+                                                            self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {item}")
                                                             reported = True
                                                     except:
                                                         if not reported:
                                                             self.good_results.append(False)
-                                                            self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
+                                                            self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}")
                                                             reported = True
             else:
                 self.not_found_node()

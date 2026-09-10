@@ -56,12 +56,12 @@ class UnlockAttributes(action.BaseAction):
                                     try:
                                         cmds.lockNode(item, lock=False, lockUnpublished=False)
                                         for attr in values:
-                                            cmds.setAttr(item+"."+attr, lock=False)
+                                            cmds.setAttr(f"{item}.{attr}", lock=False)
                                         self.good_results.append(True)
-                                        self.messages.append(self.ar.data.lang['v004_fixed']+": "+item+" = "+str(values))
+                                        self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {item} = {values}")
                                     except:
                                         self.good_results.append(False)
-                                        self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item+" = "+attr)
+                                        self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item} = {attr}")
                     else:
                         self.not_found_node()
                 else:
