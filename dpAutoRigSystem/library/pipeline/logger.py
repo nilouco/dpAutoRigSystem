@@ -48,7 +48,8 @@ class Logger:
             cmds.separator(style='none', height=20, parent=infoLayout)
             cmds.button(label='Wiki', command=partial(self.ar.web.visit_website, f"{self.ar.data.wiki_url}{wiki}"), backgroundColor=[1, 1, 1], align=self.info_align, parent=infoLayout)
         # call Info Window:
-        cmds.showWindow('dpInfoWindow')
+        if self.ar.data.ui_state:
+            cmds.showWindow('dpInfoWindow')
 
 
     def logWin(self, *args):
@@ -75,4 +76,5 @@ class Logger:
             log_text += f"{self.lang['i017_nothing']} \n"
         log_text += f"\n{self.lang['i018_thanks']}"
         # creating a info window to show the log:
-        self.infoWin('i019_log', None, log_text, 'center', 250, min((350, 150+(nRiggedModule*13))))
+        if self.ar.data.ui_state:
+            self.infoWin('i019_log', None, log_text, 'center', 250, min((350, 150+(nRiggedModule*13))))

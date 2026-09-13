@@ -64,8 +64,15 @@ class Maker:
     # .............................................................................. end here --- unused yet / or delete it
 
 
-    def create_template(self, name=None, *args):
-        self.ar.ui_manager.refresh_ui()
+    def create_template(self, name):
+        for i, item in enumerate(self.ar.data.lib[self.ar.data.template_folder]['templates']):
+            if item == name:
+                self.ar.data.lib[self.ar.data.template_folder]['instances'][i].build_template()
+
+
+    def export_template(self, name=None, *args):
+        if self.ar.data.ui_state:
+            self.ar.ui_manager.refresh_ui()
         nets = self.ar.utils.get_network_by_attr('dpGuideNet')
         nets.extend(self.ar.utils.get_network_by_attr('dpHeadDeformerNet') or [])
         if nets:

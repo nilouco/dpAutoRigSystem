@@ -27,13 +27,18 @@ class BaseTemplate(base.BaseLibrary):
     def build_template(self, *args):
         template_data = self.template_data
         if '_' in self.name:
-            base_name = self.name.split('_')[0]
-            names, splitted = self.get_template_variations(base_name)
-            if len(names) > 1:
-                user_choice = self.ask_build_detail(base_name.capitalize(), splitted)
-                if user_choice == self.ar.data.lang['i132_cancel']:
-                    return
-                template_data = self.ar.data.lib[self.ar.data.template_folder]['content'][f"{base_name}_{user_choice.lower()}"]
+            if self.ar.data.ui_state:
+                base_name = self.name.split('_')[0]
+                names, splitted = self.get_template_variations(base_name)
+                if len(names) > 1:
+                    user_choice = self.ask_build_detail(base_name.capitalize(), splitted)
+                    if user_choice == self.ar.data.lang['i132_cancel']:
+                        return
+                    template_data = self.ar.data.lib[self.ar.data.template_folder]['content'][f"{base_name}_{user_choice.lower()}"]
+            elif self.name in self.ar.data.lib[self.ar.data.template_folder]['content']:
+                template_data = self.ar.data.lib[self.ar.data.template_folder]['content'][self.name]
+            else:
+                return
         guide_io = self.ar.config.get_instance('GuideIO', [self.ar.data.setup_folder])
         guide_data = guide_io.parse_repeated_nets(template_data)
         guide_io.import_guide(guide_data, False)
