@@ -602,7 +602,7 @@ class Maker:
     def set_rigged_types(self):
         # actualise the number of rigged standard guides by type
         for class_name in self.ar.data.lib[self.ar.data.standard_folder]['names']:
-            cmds.setAttr(f"{self.all_grp}.dp{class_name}Count", len([n for n in self.ar.utils.get_network_by_attr('dpGuideNet') if f"{cmds.getAttr(f"{n}.moduleType")}" == class_name]))
+            cmds.setAttr(f"{self.all_grp}.dp{class_name}Count", len([n for n in self.ar.utils.get_network_by_attr('dpGuideNet') if cmds.getAttr(f"{n}.moduleType") == class_name]))
 
 
     def set_parent_tag(self):
