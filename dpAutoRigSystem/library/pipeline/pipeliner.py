@@ -938,7 +938,7 @@ class Pipeliner:
                     source_item = next(os.walk(source_path))[2][-1]
                     ext = source_item[source_item.rfind('.'):]
                     prefix = source_item[:source_item.find('_')+1]
-                    dest_item = f"{dest_path}/{prefix}{self.pipe_data['assetName']}{self.pipe_data['s_model']}{"0".zfill(self.pipe_data['i_padding'])}{self.pipe_data['s_rig']}{"0".zfill(self.pipe_data['i_padding'])}{ext}"
+                    dest_item = f"{dest_path}/{prefix}{self.pipe_data['assetName']}{self.pipe_data['s_model']}{'0'.zfill(self.pipe_data['i_padding'])}{self.pipe_data['s_rig']}{'0'.zfill(self.pipe_data['i_padding'])}{ext}"
                     shutil.copy2(f"{source_path}/{source_item}", dest_item)
             # Concatenate done message
             sucess_message_text = f"{self.ar.data.lang['r068_replacedDataSuccess']}\n\n{self.ar.data.lang['i036_from']}: {path}\n{self.ar.data.lang['i037_to']}: {self.pipe_data['assetName']}\n\n{' \n'.join(to_replace_items)}"
