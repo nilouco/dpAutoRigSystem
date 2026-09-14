@@ -138,7 +138,7 @@ class Rivet(base.BaseLibrary):
                     else:
                         cmds.delete(attached_geo)
         cmds.delete(rivetNetNode)
-        mel.eval(f'print "dpAR: {self.ar.data.lang['m144_removedRivet']} {rivet_ctrl}\n";')
+        mel.eval(f'print "dpAR: {self.ar.data.lang['m144_removedRivet']} {rivet_ctrl}";')
     
 
     def get_ctrl_items(self):
@@ -310,7 +310,7 @@ class Rivet(base.BaseLibrary):
                     elif cmds.objExists(item):
                         rivets.append(item)
             else:
-                mel.eval("error \"Select and add at least one item to be attached as a Rivet, please.\";")
+                mel.eval(f'error "{self.ar.data.lang['i364_selectItemToRivet']}";')
             if is_component == 'Together':
                 cls = f"{cmds.cluster(togethers, name="dpRivet_Cls")[0]}Handle"
                 cls_to_rivet = cmds.parent(cls, self.rivet_grp)[0]
@@ -337,7 +337,7 @@ class Rivet(base.BaseLibrary):
                             if not rivet in items:
                                 # clear created clusters:
                                 cmds.delete(rivet)
-                    mel.eval("error \"Canceled process: items to be Rivet can't be animated or have locked attributes, sorry.\";")
+                    mel.eval(f'error "{self.ar.data.lang['i365_canceledToRivet']}";')
                     return
             
             # workaround to avoid closestPoint node ignores transformations.
@@ -485,7 +485,7 @@ class Rivet(base.BaseLibrary):
             # clean-up temporary nodes:
             cmds.delete(dup_geo, self.cp_node, self.temp_node)
         else:
-            mel.eval("error \"Load one geometry to attach Rivets on it, please.\";")
+            mel.eval(f'error "{self.ar.data.lang['i366_loadGeoToRivet']}";')
         
         self.ar.naming.node_renaming_treatment(list(set(cmds.ls(selection=False, type='unitConversion'))-set(self.old_unit_conversions)))
         self.ar.custom_attr.add_attr(0, self.to_ids, descendents=True) #dpID

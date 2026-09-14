@@ -233,7 +233,7 @@ class RivetUI:
                 cmds.textField('rivet_geo_to_attach_tf', edit=True, text=self.app.geo_to_attach)
                 self.load_uv_set(self.app.geo_to_attach)
         else:
-            mel.eval("warning \"Select a geometry in order use it to attach rivets, please.\";")
+            mel.eval(f'warning "{self.ar.data.lang['i366_loadGeoToRivet']}";')
     
     
     def add_selected_item(self, items=None, *args):
@@ -272,9 +272,9 @@ class RivetUI:
                     # add selected items in the empyt target scroll list
                     cmds.textScrollList('rivet_items_tsl', edit=True, append=selected_items)
             else:
-                mel.eval("warning \"Please, select a tranform node, vertices or lattice points in order to add it in the item list.\";")
+                mel.eval(f'warning "{self.ar.data.lang['i367_selectNodeToRivet']}";')
         else:
-            mel.eval("warning \"Please, select a tranform node, vertices or lattice points in order to add it in the item list.\";")
+            mel.eval(f'warning "{self.ar.data.lang['i367_selectNodeToRivet']}";')
     
     
     def remove_selected_item(self, *args):

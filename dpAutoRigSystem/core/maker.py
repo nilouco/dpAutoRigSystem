@@ -64,13 +64,7 @@ class Maker:
     # .............................................................................. end here --- unused yet / or delete it
 
 
-    def create_template(self, name):
-        for i, item in enumerate(self.ar.data.lib[self.ar.data.template_folder]['templates']):
-            if item == name:
-                self.ar.data.lib[self.ar.data.template_folder]['instances'][i].build_template()
-
-
-    def export_template(self, name=None, *args):
+    def create_template(self, name=None, *args):
         if self.ar.data.ui_state:
             self.ar.ui_manager.refresh_ui()
         nets = self.ar.utils.get_network_by_attr('dpGuideNet')
@@ -1308,3 +1302,28 @@ class Composer:
             self.to_ids.extend(cmds.parentConstraint(self.ar.maker.root_ctrl, world_ref, maintainOffset=True, name=f"{world_ref}_PaC"))
             # remove dpControl attribute
             self.ar.custom_attr.remove_attr('dpControl', [world_ref])
+
+
+class Launcher:
+    def __init__(self, ar):
+            self.ar = ar
+            
+    def standard(self, name):
+        return self.ar.maker.create_raw_guide(name)
+
+
+    def template(self, name):
+        for i, item in enumerate(self.ar.data.lib[self.ar.data.template_folder]['templates']):
+            if item == name:
+                self.ar.data.lib[self.ar.data.template_folder]['instances'][i].build_template()
+
+
+    def tool(self, name):
+         for i, item in enumerate(self.ar.data.lib[self.ar.data.tools_folder]['names']):
+            if item == name:
+                self.ar.data.lib[self.ar.data.tools_folder]['instances'][i].build_tool()
+                return self.ar.data.lib[self.ar.data.tools_folder]['instances'][i]
+
+
+    # def curve(self, name, use_ui=False):
+    #     curves = 

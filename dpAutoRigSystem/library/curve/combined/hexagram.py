@@ -26,7 +26,7 @@ class Hexagram(curve.BaseCurve):
             return self.cv_create(use_ui, cv_id, cv_name, cv_size, cv_degree, cv_direction, cv_rot, cv_action, guide, True)
         else:
             # error checking modules in the folder:
-            mel.eval(f'error "{self.ar.data.lang['e001_guideNotChecked']} - {(", ").join(missing_modules)}";')
+            mel.eval(f'error "{self.ar.data.lang['e001_guideNotChecked']} - {(', ').join(missing_modules)}";')
     
     
     def create_combined_curves(self, cv_id, cv_name, cv_size, cv_degree):

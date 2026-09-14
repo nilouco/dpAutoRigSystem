@@ -5,7 +5,7 @@
     "_contact"       : "nilouco@gmail.com\nhttps://nilouco.blogspot.com",
     "_date"          : "2011-08-04",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2026-09-10",
+    "_updated"       : "2026-09-14",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas de caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -530,6 +530,10 @@
     "i361_mapRibbon"            : "Maper des ribbons de membres",
     "i362_sHierarchyAnn"        : "Le dossier ou on va importer et exporter les donnés de l'hierarchie des controlleurs.",
     "i363_addedFingerHandPose"  : "C'était ajouté des attributs de Pose de Doigts de la Main avec succès.\nMerci.",
+    "i364_selectItemToRivet"    : "Selecioner au moin un item pour l'ajouter dans le rivet, s'il tu plait.",
+    "i365_canceledToRivet"      : "Le processus est arreté: les items pour le rivet ne peut pas être animés ou avec des attributs lockés, désolé.",
+    "i366_loadGeoToRivet"       : "Charger une geometrie pour l'attacher rivets, s'il tu plait.",
+    "i367_selectNodeToRivet"    : "Selecioner un transform, des vertices ou des points de lattice pour les ajouter au rivet, s'il tu plait.",
 
     "m001_fkLine"                : "Fk Ligne",
     "m002_fkLineDesc"            : "Description du module Fk Ligne:\n\nCe module crée une chaîne de joints\navec le nombre de joints désiré.\n\nLorsque riggés, les contrôles seront FK (forward kinematics),\nik (inverse kinematics) ou dynamiques.\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",

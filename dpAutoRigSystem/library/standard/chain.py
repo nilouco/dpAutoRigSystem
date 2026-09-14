@@ -226,7 +226,7 @@ class Chain(standard.BaseStandard):
             if cmds.objExists('hairSystem1Follicles'):
                 cmds.delete('hairSystem1Follicles')
         else:
-            mel.eval(f"assignHairSystem {dp_hair_system_node};")
+            mel.eval(f'assignHairSystem {dp_hair_system_node};')
             if cmds.objExists('dpHairSystemFollicles'):
                 cmds.delete('dpHairSystemFollicles')
         cmds.rename(cmds.listRelatives(cmds.listRelatives(self.ik_static_grp, children=True, allDescendents=True, type='follicle')[0], parent=True)[0], f"{dyn_name}_Dyn_Fol")

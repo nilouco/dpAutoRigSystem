@@ -153,6 +153,7 @@ class Start:
     def load_components(self):
         self.maker = maker.Maker(self)
         self.composer = maker.Composer(self)
+        self.launcher = maker.Launcher(self)
         self.utils = utils.Utils(self)
         self.naming = naming.Naming(self)
         self.math = math.Math(self)

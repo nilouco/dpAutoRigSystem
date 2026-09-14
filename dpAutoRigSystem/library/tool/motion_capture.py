@@ -684,7 +684,7 @@ class MotionCapture(base.BaseLibrary):
                         if cmds.objExists(self.hik_data[hik_item][ctrl]):
                             cmds.select(self.hik_data[hik_item][ctrl])
                             mel.eval('hikControlRigSelectionChangedCallback;')
-                            mel.eval(f"hikCustomRigAssignEffector {self.hik_data[hik_item]['id']};")
+                            mel.eval(f'hikCustomRigAssignEffector {self.hik_data[hik_item]['id']};')
                             #print(self.hik_data[hik_item]['id'], self.hik_data[hik_item][ctrl])
                 print(self.ar.data.lang['m253_assignCtrlDefinition'])
                 cmds.select(clear=True)
@@ -757,7 +757,7 @@ class MotionCapture(base.BaseLibrary):
         """ Set custom map to translate and/or rotate for the given HumanIk item ID.
         """
         if self.hik_check_exists(id):
-            mel.eval(f"hikCustomRigToolWidget -e -sl {id};")
+            mel.eval(f'hikCustomRigToolWidget -e -sl {id};')
             mel.eval('hikControlRigSelectionChangedCallback;')
             mel.eval('hikUpdateCustomRigUI')
             if t != None:

@@ -285,7 +285,7 @@ class Weights:
         try:
             cmds.setAttr(f"{injest_node}.componentTags[{index}].componentTagName", tag_name, type='string')
             #cmds.setAttr(tags[0]+".componentTags["+str(index)+"].componentTagContents", len(component_items), contents, type="component_items")
-            mel.eval(f"setAttr {injest_node}.componentTags[{index}].componentTagContents -type component_items {len(component_items)} {contents};")
+            mel.eval(f'setAttr {injest_node}.componentTags[{index}].componentTagContents -type component_items {len(component_items)} {contents};')
         except:
             well_imported = False
         return well_imported

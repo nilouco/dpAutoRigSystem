@@ -25,6 +25,7 @@ class MayaInstaller:
     def __init__(self, *args):
         self.ar_name = 'dpAutoRigSystem'
         self.shelf_code = f"import {self.ar_name}\nfrom {self.ar_name}.core import main\nar = main.Start()\nar.ui()"
+        self.define_paths()
 
 
     def define_paths(self, remove_last_folder=True):

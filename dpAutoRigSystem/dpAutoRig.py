@@ -19,7 +19,8 @@ from maya import cmds, mel
 class Start:
     def __init__(self, *args):
         # keep old v5 compatibility
-        mel.eval(f"warning \"{DPAR_UPDATELOG.replace('\n', ' ')}\";")
+        warning_message = DPAR_UPDATELOG.replace('\n', ' ')
+        mel.eval(f'warning "{warning_message}";')
 
 
     def ui(self):
