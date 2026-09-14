@@ -142,7 +142,7 @@ class BaseStandard(base.BaseLibrary):
             else:
                 try:
                     self.delete_guide()
-                    mel.eval(f'warning "{self.ar.data.lang['e000_guideNotFound']} - {self.guide_base}";')
+                    mel.eval(f'warning "{self.ar.data.lang["e000_guideNotFound"]} - {self.guide_base}";')
                 except:
                     pass
                 return False

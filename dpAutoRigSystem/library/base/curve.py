@@ -146,7 +146,7 @@ class BaseCurve(base.BaseLibrary):
                     self.ar.ctrls.transfer_shape(True, True, self.cv_curve, destinations, True)
             else:
                 cmds.delete(self.cv_curve)
-                mel.eval(f'warning "{self.ar.data.lang['e011_notSelShape']}";')
+                mel.eval(f'warning "{self.ar.data.lang["e011_notSelShape"]}";')
     
     
     def cv_create(self, use_ui, cv_id, cv_name='Controller_Ctrl', cv_size=1.0, cv_degree=1, cv_direction='+Y', cv_rot=(0, 0, 0), cv_action=1, guide=False, combine=False):

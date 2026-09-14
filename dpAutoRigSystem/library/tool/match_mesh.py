@@ -151,7 +151,7 @@ class MatchMesh(base.BaseLibrary):
                     else:
                         print(self.ar.data.lang['i038_canceled'])
                 else:
-                    mel.eval(f'warning "{self.ar.data.lang['i039_notMatchDif']}";')
+                    mel.eval(f'warning "{self.ar.data.lang["i039_notMatchDif"]}";')
                 cmds.select(selection)
             else:
-                mel.eval(f'warning "{self.ar.data.lang['i040_notMatchSel']}";')
+                mel.eval(f'warning "{self.ar.data.lang["i040_notMatchSel"]}";')

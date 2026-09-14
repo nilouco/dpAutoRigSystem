@@ -96,9 +96,9 @@ class TargetMirrorUI:
                     # add selected items in the empyt target scroll list
                     cmds.textScrollList('target_mirror_targets_tsl', edit=True, append=meshes)
             else:
-                mel.eval(f'warning "{self.ar.data.lang['i055_tgtSelect']}";')
+                mel.eval(f'warning "{self.ar.data.lang["i055_tgtSelect"]}";')
         else:
-            mel.eval(f'warning "{self.ar.data.lang['i055_tgtSelect']}";')
+            mel.eval(f'warning "{self.ar.data.lang["i055_tgtSelect"]}";')
     
     
     def remove_selected(self, *args):

@@ -44,7 +44,7 @@ class ReorderAttr(base.BaseLibrary):
                     if user_def_attrs:
                         if not attributes[0] in user_def_attrs:
                             if verbose:
-                                mel.eval(f'warning "{self.ar.data.lang['m235_selectedStaticAttr']}";')
+                                mel.eval(f'warning "{self.ar.data.lang["m235_selectedStaticAttr"]}";')
                         else:
                             cmds.scriptEditorInfo(suppressInfo=True)
                             # unlock all user defined attibutes before start the changing position:
@@ -96,13 +96,13 @@ class ReorderAttr(base.BaseLibrary):
                                     cmds.setAttr(f"{item}.{lock_attr}", lock=True)
                     else:
                         if verbose:
-                            mel.eval(f'warning "{self.ar.data.lang['m236_canReorderUserDefAttr']}";')
+                            mel.eval(f'warning "{self.ar.data.lang["m236_canReorderUserDefAttr"]}";')
             else:
                 if verbose:
-                    mel.eval(f'warning "{self.ar.data.lang['m237_selectChannelBoxAttr']}";')
+                    mel.eval(f'warning "{self.ar.data.lang["m237_selectChannelBoxAttr"]}";')
         else:
             if verbose:
-                mel.eval(f'warning "{self.ar.data.lang['m238_selectTransform']}";')
+                mel.eval(f'warning "{self.ar.data.lang["m238_selectTransform"]}";')
         # back ScritpEditor to show info:
         cmds.scriptEditorInfo(suppressInfo=True)
  

@@ -70,7 +70,7 @@ class Zipper(base.BaseLibrary):
             # load curve data:
             self.load_data(base_curve)
         else:
-            mel.eval(f'warning "{self.ar.data.lang['i188_selectEdges']}";')
+            mel.eval(f'warning "{self.ar.data.lang["i188_selectEdges"]}";')
     
     
     def delete_old_curve(self, zipper_id):
@@ -374,9 +374,9 @@ class Zipper(base.BaseLibrary):
                     cmds.select(self.zipper_ctrl)
                     print(self.ar.data.lang['m174_createdZipper'])
                 else:
-                    mel.eval(f'warning "{self.ar.data.lang['i191_selectPoly']}";')
+                    mel.eval(f'warning "{self.ar.data.lang["i191_selectPoly"]}";')
             else:
-                mel.eval(f'warning "{self.ar.data.lang['i188_selectEdges']}";')
+                mel.eval(f'warning "{self.ar.data.lang["i188_selectEdges"]}";')
 
 
     def get_good_to_dpar(self):

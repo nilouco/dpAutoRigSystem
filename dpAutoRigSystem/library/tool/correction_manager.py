@@ -188,7 +188,7 @@ class CorrectionManager(base.BaseLibrary):
             cmds.parent(grp, self.ar.utils.get_node_by_message("correctionDataGrp", self.net))
             return loc
         else:
-            mel.eval(f'warning "{to_attach} {self.ar.data.lang['i061_notExists']}";')
+            mel.eval(f'warning "{to_attach} {self.ar.data.lang["i061_notExists"]}";')
 
 
     def create_correction_manager_setup(self, nodes=None, name=None, correct_type=None, to_rivet=False, from_ui=False, *args):
@@ -436,7 +436,7 @@ class CorrectionManager(base.BaseLibrary):
                         self.ar.correction_manager_ui.update_edit_net_layout()
                     cmds.undoInfo(closeChunk=True)
                 else:
-                    mel.eval(f'warning "{self.ar.data.lang['m065_selOrigAction']}";')
+                    mel.eval(f'warning "{self.ar.data.lang["m065_selOrigAction"]}";')
             else:
-                mel.eval(f'warning "{self.ar.data.lang['m066_selectTwo']}";')
+                mel.eval(f'warning "{self.ar.data.lang["m066_selectTwo"]}";')
         return self.net

@@ -43,15 +43,15 @@ class TargetMirror(base.BaseLibrary):
                             else:
                                 is_geometry = True
                         else:
-                            mel.eval(f'warning "{item} {self.ar.data.lang['i058_notGeo']}";')
+                            mel.eval(f'warning "{item} {self.ar.data.lang["i058_notGeo"]}";')
                     except:
-                        mel.eval(f'warning "{self.ar.data.lang['i163_sameName']} {item}";')
+                        mel.eval(f'warning "{self.ar.data.lang["i163_sameName"]} {item}";')
                 else:
-                    mel.eval(f'warning "{self.ar.data.lang['i059_selTransform']} {item} {self.ar.data.lang['i060_shapePlease']}";')
+                    mel.eval(f'warning "{self.ar.data.lang["i059_selTransform"]} {item} {self.ar.data.lang['i060_shapePlease']}";')
             else:
-                mel.eval(f'warning "{item} {self.ar.data.lang['i061_notExists']}";')
+                mel.eval(f'warning "{item} {self.ar.data.lang["i061_notExists"]}";')
         else:
-            mel.eval(f'warning "{self.ar.data.lang['i062_notFound']} {item}";')
+            mel.eval(f'warning "{self.ar.data.lang["i062_notFound"]} {item}";')
         return is_geometry
     
     

@@ -85,7 +85,7 @@ class OneSkeleton(base.BaseLibrary):
             self.ar.ctrls.set_controller_scale_compensate(False)
             self.ar.ui_manager.set_progress(end_it=True)
         else:
-            mel.eval(f'warning "{self.ar.data.lang['v014_notFoundNodes']}";')
+            mel.eval(f'warning "{self.ar.data.lang["v014_notFoundNodes"]}";')
 
 
     def grouper(self, iterable, n, fill_value=None, *args):
@@ -184,7 +184,7 @@ class OneSkeleton(base.BaseLibrary):
         unique_inf_items = []
         skinclusters = []
         if not cmds.listRelatives(meshes, type='transform', parent=True, fullPath=True):
-            mel.eval(f'warning "{self.ar.data.lang['i041_meshConnEmpty']}";')
+            mel.eval(f'warning "{self.ar.data.lang["i041_meshConnEmpty"]}";')
             return
         for transform_node in list(set(cmds.listRelatives(meshes, type='transform', parent=True, fullPath=True))):
             skinclusters.extend(self.ar.skin.check_existing_deformer_node(transform_node)[2] or [])

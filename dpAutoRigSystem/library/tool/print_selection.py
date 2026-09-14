@@ -34,7 +34,7 @@ class PrintSelection(base.BaseLibrary):
             if data:
                 self.run_printing(data)
         else:
-            mel.eval(f'warning "{self.ar.data.lang['i042_notSelection']}";')
+            mel.eval(f'warning "{self.ar.data.lang["i042_notSelection"]}";')
     
     
     def get_data(self, selection):
@@ -65,4 +65,4 @@ class PrintSelection(base.BaseLibrary):
             print(data['string'])
             print('-------')
         else:
-            mel.eval(f'warning "{self.ar.data.lang['i042_notSelection']}";')
+            mel.eval(f'warning "{self.ar.data.lang["i042_notSelection"]}";')

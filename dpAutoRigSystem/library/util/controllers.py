@@ -1176,7 +1176,7 @@ class Controllers:
             if path and 'dpData' in path:
                 current_path = path.split('dpData')[0]
             else:
-                mel.eval(f'warning "{self.ar.data.lang['i201_saveScene']}";')
+                mel.eval(f'warning "{self.ar.data.lang["i201_saveScene"]}";')
                 return
         if not nodes:
             nodes = self.get_controllers()
@@ -1241,7 +1241,7 @@ class Controllers:
                     print(f"Exported shapes to: {path}")
                 cmds.undoInfo(closeChunk=True)
         else:
-            mel.eval(f'warning "{self.ar.data.lang['i202_noControls']}";')
+            mel.eval(f'warning "{self.ar.data.lang["i202_noControls"]}";')
         if ui:
             # Close progress window
             self.ar.ui_manager.set_progress(end_it=True)

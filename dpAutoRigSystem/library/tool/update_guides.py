@@ -41,7 +41,7 @@ class UpdateGuides(base.BaseLibrary):
                 # Update existing outdated guides.
                 self.do_update()
         else:
-            mel.eval(f'print "dpAR: {self.ar.data.lang['e000_guideNotFound']}\n";')
+            mel.eval(f'print "dpAR: {self.ar.data.lang["e000_guideNotFound"]}\n";')
     
 
     def filter_not_nurbs_curve_and_transform(self, items):
@@ -117,14 +117,14 @@ class UpdateGuides(base.BaseLibrary):
         try:
             cmds.setAttr(f"{guide}.{attr}", value)
         except:
-            mel.eval(f'print "dpAR: {self.ar.data.lang['m195_couldNotBeSet']} {guide}.{attr}\n";')
+            mel.eval(f'print "dpAR: {self.ar.data.lang["m195_couldNotBeSet"]} {guide}.{attr}\n";')
 
 
     def set_attr_string_value(self, guide, attr, value):
         try:
             cmds.setAttr(f"{guide}.{attr}", value, type='string')
         except:
-            mel.eval(f'print "dpAR: {self.ar.data.lang['m195_couldNotBeSet']} {guide}.{attr}\n";')
+            mel.eval(f'print "dpAR: {self.ar.data.lang["m195_couldNotBeSet"]} {guide}.{attr}\n";')
     
 
     def set_eyelid_guide_attr(self, guide, value):
@@ -331,7 +331,7 @@ class UpdateGuides(base.BaseLibrary):
                 try:
                     cmds.parent(self.update_data[guide]['new_guide'], new_parent_final)
                 except:
-                    mel.eval(f'print "dpAR: {self.ar.data.lang['m196_parentNotFound']} {self.update_data[guide]['new_guide']}\n";')
+                    mel.eval(f'print "dpAR: {self.ar.data.lang["m196_parentNotFound"]} {self.update_data[guide]["new_guide"]}\n";')
             if self.ar.data.ui_state:
                 cmds.refresh()
 
@@ -345,7 +345,7 @@ class UpdateGuides(base.BaseLibrary):
                     try:
                         cmds.parent(retain_guide, new_parent_final)
                     except:
-                        mel.eval(f'print "dpAR: {self.ar.data.lang['m197_notPossibleParent']} {retain_guide}\n";')
+                        mel.eval(f'print "dpAR: {self.ar.data.lang["m197_notPossibleParent"]} {retain_guide}\n";')
     
 
     def copy_attr_from_guides(self, new_guide, old_guide_attr_data):
@@ -423,7 +423,7 @@ class UpdateGuides(base.BaseLibrary):
         try:
             cmds.delete(*self.update_data.keys())
         except:
-            mel.eval(f'print "dpAR: {self.ar.data.lang['e000_guideNotFound']}\n";')
+            mel.eval(f'print "dpAR: {self.ar.data.lang["e000_guideNotFound"]}\n";')
         for guide in self.update_data:
              if self.update_data[guide]['instance'].guide_namespace in cmds.namespaceInfo(listOnlyNamespaces=True):
                 cmds.namespace(moveNamespace=(self.update_data[guide]['instance'].guide_namespace, ':'), force=True)

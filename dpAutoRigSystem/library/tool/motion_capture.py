@@ -493,7 +493,7 @@ class MotionCapture(base.BaseLibrary):
             print(f"{self.ar.data.lang['m248_setIkFkMode']} {mode}")
             return opt_ctrl
         else:
-            mel.eval(f'warning "{self.ar.data.lang['m243_noOptCtrlToIkFk']}";')
+            mel.eval(f'warning "{self.ar.data.lang["m243_noOptCtrlToIkFk"]}";')
 
 
     def get_auto_rotate_ctrls(self):
@@ -604,7 +604,7 @@ class MotionCapture(base.BaseLibrary):
             if 'ikFkSnap' in cmds.listAttr(opt_ctrl):
                 self.run_ikfk_snap(False)
             else:
-                mel.eval(f'warning "{self.ar.data.lang['m244_setTPoseIssue']} ikFkSnap";')
+                mel.eval(f'warning "{self.ar.data.lang["m244_setTPoseIssue"]} ikFkSnap";')
         before_ctrls.extend(fk_ctrls)
         print(f"{self.ar.data.lang['m250_trySetTPose']} {', '.join(before_ctrls)}")
 
@@ -653,14 +653,14 @@ class MotionCapture(base.BaseLibrary):
                                     cmds.setAttr(f"{self.hik_data[hik_item][f"joint{r}"]}.{attr}", lock=False)
                                 break
                         else:
-                            mel.eval(f'warning "{self.ar.data.lang['m245_jointDefinitionIssue']}{self.hik_data[hik_item]['joint']}";')
+                            mel.eval(f'warning "{self.ar.data.lang["m245_jointDefinitionIssue"]}{self.hik_data[hik_item]["joint"]}";')
                 print(self.ar.data.lang['m252_assignJointDefinition'])
                 if old_ref_nodes:
                     cmds.delete(old_ref_nodes[0])
             else:
-                mel.eval(f'warning "{self.ar.data.lang['m246_missingDpARToRetarget']}";')
+                mel.eval(f'warning "{self.ar.data.lang["m246_missingDpARToRetarget"]}";')
         else:
-            mel.eval(f'warning "{self.ar.data.lang['m247_missingHIKCharNode']}";')
+            mel.eval(f'warning "{self.ar.data.lang["m247_missingHIKCharNode"]}";')
 
 
     def hik_map_biped_controllers(self, rib=False):
@@ -684,14 +684,14 @@ class MotionCapture(base.BaseLibrary):
                         if cmds.objExists(self.hik_data[hik_item][ctrl]):
                             cmds.select(self.hik_data[hik_item][ctrl])
                             mel.eval('hikControlRigSelectionChangedCallback;')
-                            mel.eval(f'hikCustomRigAssignEffector {self.hik_data[hik_item]['id']};')
+                            mel.eval(f'hikCustomRigAssignEffector {self.hik_data[hik_item]["id"]};')
                             #print(self.hik_data[hik_item]['id'], self.hik_data[hik_item][ctrl])
                 print(self.ar.data.lang['m253_assignCtrlDefinition'])
                 cmds.select(clear=True)
             else:
-                mel.eval(f'warning "{self.ar.data.lang['m246_missingDpARToRetarget']}";')
+                mel.eval(f'warning "{self.ar.data.lang["m246_missingDpARToRetarget"]}";')
         else:
-            mel.eval(f'warning "{self.ar.data.lang['m247_missingHIKCharNode']}";')
+            mel.eval(f'warning "{self.ar.data.lang["m247_missingHIKCharNode"]}";')
 
 
     def hik_create_custom_rig_ctrl(self):

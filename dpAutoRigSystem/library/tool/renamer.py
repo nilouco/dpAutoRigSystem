@@ -86,7 +86,7 @@ class Renamer(base.BaseLibrary):
                             if not child in self.originals:
                                 self.originals.append(child)
                 except: #more than one object with the same name
-                    mel.eval(f'warning "{self.ar.data.lang['i075_moreOne']} {self.ar.data.lang['i076_sameName']}";')
+                    mel.eval(f'warning "{self.ar.data.lang["i075_moreOne"]} {self.ar.data.lang["i076_sameName"]}";')
         return self.originals
 
 
@@ -105,8 +105,8 @@ class Renamer(base.BaseLibrary):
                     if cmds.objExists(item):
                         cmds.rename(item, self.previews[i])
                     else:
-                        mel.eval(f'warning "{self.ar.data.lang['v005_cantFix']} {item}";')
+                        mel.eval(f'warning "{self.ar.data.lang["v005_cantFix"]} {item}";')
             self.ar.renamer_ui.reset_ui()
             self.ar.renamer_ui.refresh_preview()
         else:
-            mel.eval(f'warning "{self.ar.data.lang['m225_selectAnything']}";')
+            mel.eval(f'warning "{self.ar.data.lang["m225_selectAnything"]}";')

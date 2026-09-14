@@ -244,7 +244,7 @@ class BrokenRivet(action.BaseAction):
             if closest_vertex_index == translated_closest_vertex_index:
                 cmds.xform(tweak_ctrl, piv=new_translation, ws=True)
             else:
-                mel.eval(f'warning "{self.ar.data.lang['e022_offsetClosetVertex']}";')
+                mel.eval(f'warning "{self.ar.data.lang["e022_offsetClosetVertex"]}";')
 
 
     def randomize_new_pivot(self, rivet_controllers, attach_to_geo_list):

@@ -488,13 +488,13 @@ class Option:
             if not prefix:
                 self.ar.data.prefix = ""
                 if self.ar.data.verbose:
-                    mel.eval(f'warning "{self.ar.data.lang['p001_prefixText']}";')
+                    mel.eval(f'warning "{self.ar.data.lang["p001_prefixText"]}";')
             else:
                 if not prefix.endswith('_'):
                     prefix = f"{prefix}_"
                 self.ar.data.prefix = prefix
-                if self.ar.data.ui_state and cmds.text("rig_prefix_txt", query=True, exists=True):
-                    cmds.text("rig_prefix_txt", edit=True, label=f"{self.ar.data.lang['i144_prefix']}: {prefix}", visible=True)
+                if self.ar.data.ui_state and cmds.text('rig_prefix_txt', query=True, exists=True):
+                    cmds.text('rig_prefix_txt', edit=True, label=f"{self.ar.data.lang['i144_prefix']}: {prefix}", visible=True)
         else:
             self.reset_prefix()
 

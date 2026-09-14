@@ -193,7 +193,7 @@ class FacialConnection(base.BaseLibrary):
             if self.ar.data.ui_state and results:
                 self.ar.logger.infoWin('m085_facialConnection', 'm048_createdTgt', '\n'.join(results), 'center', 200, 350)
         else:
-            mel.eval(f'warning "{self.ar.data.lang['i042_notSelection']}";')
+            mel.eval(f'warning "{self.ar.data.lang["i042_notSelection"]}";')
         self.ar.ui_manager.close_ui('dpFacialConnectionWindow')
     
 

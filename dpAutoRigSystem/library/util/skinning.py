@@ -158,7 +158,7 @@ class Skinning(weights.Weights):
                     cmds.reorderDeformers(dest_def_items[1][def_order_index-1], new_skin_cluster_node, destination_item)
                 i += 1
         # log result
-        mel.eval(f'print "{self.ar.data.lang['i083_copiedSkin']} {source_item} {destination_item}"; ')
+        mel.eval(f'print "{self.ar.data.lang["i083_copiedSkin"]} {source_item} {destination_item}"; ')
 
 
     def copy_skin_from_one_source(self, items=None, ui=False, by_uvs=False, *args):
@@ -180,11 +180,11 @@ class Skinning(weights.Weights):
                     # call copySkin function
                     self.serialize_copy_skin([source_item], destinations, True, by_uvs)
                 else:
-                    mel.eval(f'warning "{self.ar.data.lang['e007_notSkinFound']}";')
+                    mel.eval(f'warning "{self.ar.data.lang["e007_notSkinFound"]}";')
             else:
-                mel.eval(f'warning "{self.ar.data.lang['e006_firstSkinnedGeo']}";')
+                mel.eval(f'warning "{self.ar.data.lang["e006_firstSkinnedGeo"]}";')
         else:
-            mel.eval(f'warning "{self.ar.data.lang['e005_selectOneObj']}";')
+            mel.eval(f'warning "{self.ar.data.lang["e005_selectOneObj"]}";')
 
 
     def copy_skin_same_name(self, items=None, ui=False, by_uvs=False, *args):

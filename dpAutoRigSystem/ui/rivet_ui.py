@@ -115,7 +115,7 @@ class RivetUI:
             if net:
                 self.app.remove_rivet_from_net(net)
             else:
-                mel.eval(f'print "dpAR: {self.ar.data.lang['m204_unableRemRivet']}{items[i]}\n";')
+                mel.eval(f'print "dpAR: {self.ar.data.lang["m204_unableRemRivet"]}{items[i]}\n";')
         self.refresh_rivets()
         cmds.select(clear=True)
 
@@ -132,7 +132,7 @@ class RivetUI:
             self.app.remove_rivet_grp()
             self.ar.ui_manager.set_progress(end_it=True)
         else:
-            mel.eval(f'print "dpAR: {self.ar.data.lang['m169_noItemSelect']}\n";')
+            mel.eval(f'print "dpAR: {self.ar.data.lang["m169_noItemSelect"]}\n";')
         cmds.textScrollList('rivet_filter_controller_tsl', edit=True, deselectAll=True)
 
 
@@ -233,7 +233,7 @@ class RivetUI:
                 cmds.textField('rivet_geo_to_attach_tf', edit=True, text=self.app.geo_to_attach)
                 self.load_uv_set(self.app.geo_to_attach)
         else:
-            mel.eval(f'warning "{self.ar.data.lang['i366_loadGeoToRivet']}";')
+            mel.eval(f'warning "{self.ar.data.lang["i366_loadGeoToRivet"]}";')
     
     
     def add_selected_item(self, items=None, *args):
@@ -272,9 +272,9 @@ class RivetUI:
                     # add selected items in the empyt target scroll list
                     cmds.textScrollList('rivet_items_tsl', edit=True, append=selected_items)
             else:
-                mel.eval(f'warning "{self.ar.data.lang['i367_selectNodeToRivet']}";')
+                mel.eval(f'warning "{self.ar.data.lang["i367_selectNodeToRivet"]}";')
         else:
-            mel.eval(f'warning "{self.ar.data.lang['i367_selectNodeToRivet']}";')
+            mel.eval(f'warning "{self.ar.data.lang["i367_selectNodeToRivet"]}";')
     
     
     def remove_selected_item(self, *args):

@@ -344,7 +344,7 @@ class HeadDeformer(base.BaseLibrary):
             # try to integrate to Head_Head_Sub_Ctrl
             if not head_ctrl and head_sub_ctrl:
                 if len(head_sub_ctrl) > 1:
-                    mel.eval(f'warning"{self.ar.data.lang['i075_moreOne']} Head control.";')
+                    mel.eval(f'warning"{self.ar.data.lang["i075_moreOne"]} Head control.";')
                 else:
                     head_ctrl = head_sub_ctrl[0]
             if head_ctrl:
@@ -355,7 +355,7 @@ class HeadDeformer(base.BaseLibrary):
                 cmds.xform(data_grp, translation=(head_ctrl_pos[0], head_ctrl_pos[1], head_ctrl_pos[2]), worldSpace=True)
                 cmds.parent(main_ctrl_grp, head_ctrl)
             else:
-                mel.eval(f'warning"{self.ar.data.lang['e020_notFoundHeadCtrl']}";')
+                mel.eval(f'warning"{self.ar.data.lang["e020_notFoundHeadCtrl"]}";')
                 self.well_done = False
             
             cmds.parent(squash_def_items[1], side_bend_def_items[1], front_bend_def_items[1], twist_def_items[1], offset_grp)
@@ -419,7 +419,7 @@ class HeadDeformer(base.BaseLibrary):
                 print(self.ar.data.lang['i179_addedHeadDef'])
             return self.net
         else:
-            mel.eval(f'warning"{self.ar.data.lang['i034_notSelHeadDef']}";')
+            mel.eval(f'warning"{self.ar.data.lang["i034_notSelHeadDef"]}";')
 
 
     def get_net_data(self, deformer_name, hd_items):

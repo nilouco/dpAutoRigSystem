@@ -203,9 +203,9 @@ class Publisher:
                         self.ask_user_choose_file(publish_filename)
 
             else:
-                mel.eval(f'warning "{self.ar.data.lang['v021_noFileName']}";')
+                mel.eval(f'warning "{self.ar.data.lang["v021_noFileName"]}";')
         else:
-            mel.eval(f'warning "{self.ar.data.lang['v022_noFilePath']}";')
+            mel.eval(f'warning "{self.ar.data.lang["v022_noFilePath"]}";')
 
 
     def abort_publishing(self, raison=None):

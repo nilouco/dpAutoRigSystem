@@ -82,4 +82,4 @@ class ZipperUI:
                 cmds.button('zipper_model_bt', edit=True, label=self.ar.data.lang['m152_originalModel'], backgroundColor=(0.3, 0.8, 1.0))
                 self.app.orig_model = selected_nodes[0]
         else:
-            mel.eval(f'warning "{self.ar.data.lang['i191_selectPoly']}";')
+            mel.eval(f'warning "{self.ar.data.lang["i191_selectPoly"]}";')
