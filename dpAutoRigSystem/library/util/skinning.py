@@ -75,10 +75,11 @@ class Skinning(weights.Weights):
                         self.set_skin_relative_mode(new_skin_cluster_node)
                 print(self.ar.data.lang['i077_skinned']+', '.join(geos))
                 if log_win:
+                    new_line = '\n' #hack to avoid Python 3.11 older issue.
                     if not_skinned_items:
-                        self.ar.logger.infoWin('i028_skinButton', 'i077_skinned', f"{'\n'.join(geos)}\n\n{self.ar.data.lang['i322_didntChangeInf']}{'\n'.join(not_skinned_items)}", 'center', 205, 270)
+                        self.ar.logger.infoWin('i028_skinButton', 'i077_skinned', f"{new_line.join(geos)}\n\n{self.ar.data.lang['i322_didntChangeInf']}{new_line.join(not_skinned_items)}", 'center', 205, 270)
                     else:
-                        self.ar.logger.infoWin('i028_skinButton', 'i077_skinned', '\n'.join(geos), 'center', 205, 270)
+                        self.ar.logger.infoWin('i028_skinButton', 'i077_skinned', new_line.join(geos), 'center', 205, 270)
                 cmds.select(geos)
         else:
             print(self.ar.data.lang['i029_skinNothing'])
