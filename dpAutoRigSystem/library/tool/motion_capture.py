@@ -646,11 +646,11 @@ class MotionCapture(base.BaseLibrary):
                             if cmds.objExists(self.hik_data[hik_item][f"joint{r}"]):
                                 if r == '' and 'needJnt' in self.hik_data[hik_item] and not cmds.objExists(self.hik_data[hik_item]['needJnt']):
                                     continue
-                                cmds.connectAttr(f"{self.hik_data[hik_item][f"joint{r}"]}.message", f"{self.hik_node}.{hik_item}", force=True)
+                                cmds.connectAttr(f"{self.hik_data[hik_item][f'joint{r}']}.message", f"{self.hik_node}.{hik_item}", force=True)
                                 if not self.hik_character_attr in cmds.listAttr(self.hik_data[hik_item][f"joint{r}"]):
                                     cmds.addAttr(self.hik_data[hik_item][f"joint{r}"], longName=self.hik_character_attr, attributeType='message')
                                 for attr in self.ar.data.transform_attrs:
-                                    cmds.setAttr(f"{self.hik_data[hik_item][f"joint{r}"]}.{attr}", lock=False)
+                                    cmds.setAttr(f"{self.hik_data[hik_item][f'joint{r}']}.{attr}", lock=False)
                                 break
                         else:
                             mel.eval(f'warning "{self.ar.data.lang["m245_jointDefinitionIssue"]}{self.hik_data[hik_item]["joint"]}";')

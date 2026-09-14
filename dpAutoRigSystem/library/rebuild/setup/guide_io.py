@@ -119,7 +119,7 @@ class GuideIO(action.BaseAction):
             if 'afterData' in cmds.listAttr(net):
                 if 'rawGuide' in cmds.listAttr(net) and cmds.getAttr(f"{net}.rawGuide"):
                     # get data from not rendered guide (rawGuide status on)
-                    module_instance_info_string = cmds.getAttr(f"{cmds.listConnections(f"{net}.linkedNode")[0]}.moduleInstanceInfo")
+                    module_instance_info_string = cmds.getAttr(f"{cmds.listConnections(f'{net}.linkedNode')[0]}.moduleInstanceInfo")
                     for module_instance in self.ar.data.guide_instances:
                         if str(module_instance) == module_instance_info_string:
                             module_instance.serialize_guide(False) #serialize it without build it
@@ -356,5 +356,5 @@ class GuideIO(action.BaseAction):
 
     def get_net_custom_name(self, net):
         if cmds.getAttr(f"{net}.rawGuide"):
-            return cmds.getAttr(f"{cmds.listConnections(f"{net}.linkedNode", source=True, destination=False)[0]}.customName")
+            return cmds.getAttr(f"{cmds.listConnections(f'{net}.linkedNode', source=True, destination=False)[0]}.customName")
         return cmds.getAttr(f"{net}.guideName")

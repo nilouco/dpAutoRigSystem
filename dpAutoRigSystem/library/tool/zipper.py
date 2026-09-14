@@ -126,7 +126,7 @@ class Zipper(base.BaseLibrary):
         rig_scale_attr = 'rigScale'
         
         # create zipper control and attributes:
-        radius = cmds.xform(f"{self.first_curve}.cv[{len(cmds.ls(f"{self.first_curve}.cv[*]", flatten=True))-1}]", query=True, worldSpace=True, translation=True)[self.curve_axis]*0.3
+        radius = cmds.xform(f"{self.first_curve}.cv[{len(cmds.ls(f'{self.first_curve}.cv[*]', flatten=True))-1}]", query=True, worldSpace=True, translation=True)[self.curve_axis]*0.3
         self.zipper_ctrl = self.ar.ctrls.create_controller('id_074_Zipper', f"{self.zipper_name}_Ctrl", r=radius, d=0)
         self.ar.ctrls.color_shape([self.zipper_ctrl], 'cyan')
         cmds.addAttr(self.zipper_ctrl, longName=active_attr, attributeType='float', minValue=0, defaultValue=1, maxValue=1, keyable=True)

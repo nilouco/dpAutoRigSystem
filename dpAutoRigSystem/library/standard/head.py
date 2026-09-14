@@ -1142,7 +1142,9 @@ class Head(standard.BaseStandard):
                     hd_net = self.ar.config.get_instance('HeadDeformer', [self.ar.data.tools_folder]).create_head_def(f"{side}{self.number_name}_{self.ar.data.lang['c024_head']}", [self.deformer_cube], self.head_sub_ctrl, deformed_by_items, self.guide_net, ui=False)
 
                     self.add_node_to_guide_net([hd_net], ['hdNet'])
-                    cmds.connectAttr(f"{self.head_sub_ctrl}.message", f"{cmds.listConnections(f"{hd_net}.linkedNode", source=True, destination=False)[0]}.parentTag", force=True)
+                    connection = cmds.listConnections(f"{hd_net}.linkedNode", source=True, destination=False)
+                    if connection:
+                        cmds.connectAttr(f"{self.head_sub_ctrl}.message", f"{connection[0]}.parentTag", force=True)
                 elif cmds.objExists(f"{self.name_guide}_DeformerCube_MD"):
                     cmds.delete(f"{self.name_guide}_DeformerCube_MD")
 

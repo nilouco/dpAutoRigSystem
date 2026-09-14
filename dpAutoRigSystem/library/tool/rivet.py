@@ -282,13 +282,14 @@ class Rivet(base.BaseLibrary):
             if items:
                 asked = False
                 for i, item in enumerate(items):
+                    cluster_name = f"{item[:item.rfind('.')]}_{i}_Cls"
                     if '.vtx' in item or '.cv' in item or '.pt' in item:
                         if ask_component:
                             if not asked:
                                 is_component = cmds.confirmDialog(title='dpRivet on Components', message="How do you want attach vertices, cv's or lattice points?", button=('Individually', 'Together', 'Ignore'), defaultButton='Individually', dismissString='Ignore', cancelButton='Ignore')
                                 asked = True
                                 if is_component == 'Individually':
-                                    cls = f"{cmds.cluster(item, name=f"{item[:item.rfind('.')]}_{i}_Cls")[0]}Handle"
+                                    cls = f"{cmds.cluster(item, name=cluster_name)[0]}Handle"
                                     cls_to_rivet = cmds.parent(cls, self.rivet_grp)[0]
                                     rivets.append(cls_to_rivet)
                                 elif is_component == 'Together':
@@ -300,11 +301,11 @@ class Rivet(base.BaseLibrary):
                             elif is_component == 'Together':
                                 togethers.append(item)
                             else: #Individually
-                                cls = f"{cmds.cluster(item, name=f"{item[:item.rfind('.')]}_{i}_Cls")[0]}Handle"
+                                cls = f"{cmds.cluster(item, name=cluster_name)[0]}Handle"
                                 cls_to_rivet = cmds.parent(cls, self.rivet_grp)[0]
                                 rivets.append(cls_to_rivet)
                         else: #Individually
-                            cls = f"{cmds.cluster(item, name=f"{item[:item.rfind('.')]}_{i}_Cls")[0]}Handle"
+                            cls = f"{cmds.cluster(item, name=cluster_name)[0]}Handle"
                             cls_to_rivet = cmds.parent(cls, self.rivet_grp)[0]
                             rivets.append(cls_to_rivet)
                     elif cmds.objExists(item):
@@ -312,7 +313,7 @@ class Rivet(base.BaseLibrary):
             else:
                 mel.eval(f'error "{self.ar.data.lang["i364_selectItemToRivet"]}";')
             if is_component == 'Together':
-                cls = f"{cmds.cluster(togethers, name="dpRivet_Cls")[0]}Handle"
+                cls = f"{cmds.cluster(togethers, name='dpRivet_Cls')[0]}Handle"
                 cls_to_rivet = cmds.parent(cls, self.rivet_grp)[0]
                 rivets.append(cls_to_rivet)
             

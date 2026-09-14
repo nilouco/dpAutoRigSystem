@@ -124,10 +124,10 @@ class Wheel(standard.BaseStandard):
                 self.ar.ctrls.transfer_shape(delete_source = True, clear_dest_shapes=False, source_item=self.ar.ctrls.create_controller('Clip', f"{side}{self.number_name}_{self.ar.data.lang['m106_clip']}_Ctrl", r=self.radius*0.2, d=self.curve_degree, rot = (0, 0, 180) ), destinations=[wheel_ctrl], keep_color=False)
                 self.ar.ctrls.transfer_shape(delete_source = True, clear_dest_shapes=False, source_item=self.ar.ctrls.create_controller('Clip', f"{side}{self.number_name}_{self.ar.data.lang['m106_clip']}_Ctrl", r=self.radius*0.2, d=self.curve_degree, rot = (0, 0, 270) ), destinations=[wheel_ctrl], keep_color=False)
                 # optimize control CV shapes:
-                cmds.setAttr(f"{cmds.cluster(f"{wheel_ctrl}1Shape.cv[1:]")[1]}.translateY", self.radius*0.9)
-                cmds.setAttr(f"{cmds.cluster(f"{wheel_ctrl}2Shape.cv[1:]")[1]}.translateX", -self.radius*0.9)
-                cmds.setAttr(f"{cmds.cluster(f"{wheel_ctrl}3Shape.cv[1:]")[1]}.translateY", -self.radius*0.9)
-                cmds.setAttr(f"{cmds.cluster(f"{wheel_ctrl}4Shape.cv[1:]")[1]}.translateX", self.radius*0.9)
+                cmds.setAttr(f"{cmds.cluster(f'{wheel_ctrl}1Shape.cv[1:]')[1]}.translateY", self.radius*0.9)
+                cmds.setAttr(f"{cmds.cluster(f'{wheel_ctrl}2Shape.cv[1:]')[1]}.translateX", -self.radius*0.9)
+                cmds.setAttr(f"{cmds.cluster(f'{wheel_ctrl}3Shape.cv[1:]')[1]}.translateY", -self.radius*0.9)
+                cmds.setAttr(f"{cmds.cluster(f'{wheel_ctrl}4Shape.cv[1:]')[1]}.translateX", self.radius*0.9)
                 cmds.delete(wheel_ctrl, constructionHistory=True)
                 
                 # create defaults controls shape
