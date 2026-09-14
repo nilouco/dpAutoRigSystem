@@ -508,7 +508,7 @@ class MainUI:
                 else:
                     no_exist_joints.append(item)
         if no_exist_joints:
-            no_exists_joints_message = self.ar.data.lang['i069_notSkinJoint'] +"\n\n"+ ", ".join(str(no_exist_joint) for no_exist_joint in no_exist_joints) +"\n\n"+ self.ar.data.lang['i070_continueSkin']
+            no_exists_joints_message = f"{self.ar.data.lang['i069_notSkinJoint']}\n\n{', '.join(str(no_exist_joint) for no_exist_joint in no_exist_joints)}\n\n{self.ar.data.lang['i070_continueSkin']}"
             yes_bt = self.ar.data.lang['i071_yes']
             no_bt = self.ar.data.lang['i072_no']
             confirm_skinning = cmds.confirmDialog(title='Confirm Skinning', message=no_exists_joints_message, button=[yes_bt,no_bt], defaultButton=yes_bt, cancelButton=no_bt, dismissString=no_bt)

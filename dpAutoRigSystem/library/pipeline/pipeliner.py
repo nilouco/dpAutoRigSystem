@@ -941,7 +941,8 @@ class Pipeliner:
                     dest_item = f"{dest_path}/{prefix}{self.pipe_data['assetName']}{self.pipe_data['s_model']}{'0'.zfill(self.pipe_data['i_padding'])}{self.pipe_data['s_rig']}{'0'.zfill(self.pipe_data['i_padding'])}{ext}"
                     shutil.copy2(f"{source_path}/{source_item}", dest_item)
             # Concatenate done message
-            sucess_message_text = f"{self.ar.data.lang['r068_replacedDataSuccess']}\n\n{self.ar.data.lang['i036_from']}: {path}\n{self.ar.data.lang['i037_to']}: {self.pipe_data['assetName']}\n\n{' \\n'.join(to_replace_items)}"
+            to_replace_items_word = '\n'.join(to_replace_items)
+            sucess_message_text = f"{self.ar.data.lang['r068_replacedDataSuccess']}\n\n{self.ar.data.lang['i036_from']}: {path}\n{self.ar.data.lang['i037_to']}: {self.pipe_data['assetName']}\n\n{to_replace_items_word}"
             cmds.confirmDialog(title='dpAutoRigSystem', message=sucess_message_text, button='Ok')
 
 
