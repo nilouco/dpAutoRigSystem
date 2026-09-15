@@ -98,7 +98,7 @@ class JointDisplay(base.BaseLibrary):
         # Get active selection of button list
         if self.selection_ui_items:
             current_draw_style = cmds.getAttr(f"{self.selection_ui_items[0]}.drawStyle")
-            if current_draw_style > 0 and current_draw_style < 3:
+            if current_draw_style > 0 and current_draw_style < 4:
                 for jnt in self.selection_ui_items:
                     cmds.setAttr(f"{jnt}.drawStyle", current_draw_style - 1)
                 self.dest_board_index = current_draw_style - 1
