@@ -67,7 +67,7 @@ class BaseStandard(base.BaseLibrary):
             layout_name = self.number_name
         self.module_layout_name = f"{self.ar.data.lang[self.title]} - {layout_name}"
         if self.ar.data.ui_state:
-            if cmds.columnLayout('rig_guides_inst_cl', query=True, exists=True):
+            if cmds.columnLayout('rig_guides_inst_cl', query=True, exists=True) and not cmds.frameLayout(f"{self.number_name}_fl", query=True, exists=True):
                 cmds.frameLayout(f"{self.number_name}_fl", label=self.module_layout_name, collapsable=True, collapse=False, parent='rig_guides_inst_cl')
                 cmds.columnLayout(f"{self.number_name}_top_cl", adjustableColumn=True, parent=f"{self.number_name}_fl")
             # rig_guides_inst_cl -> here we have just the column layouts to be populated by modules.

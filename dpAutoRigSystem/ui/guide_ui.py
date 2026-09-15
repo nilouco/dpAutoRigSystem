@@ -11,10 +11,11 @@ class GuideUI:
     def basic_module_layout(self, standard, *args):
         """ Create a Basic Module layout.
         """
-        cmds.rowLayout(f"{standard.number_name}_rl", numberOfColumns=3, width=190, columnWidth3=(30, 120, 20), adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 4), (3, 'both', 0)], parent=f"{standard.number_name}_top_cl")
-        cmds.button(f"{standard.number_name}_select_bt", label=' ', annotation=self.ar.data.lang['m004_select'], command=partial(self.update_edit_selected_module_ui, standard, True), backgroundColor=(0.5, 0.5, 0.5), dragCallback=partial(self.select_button_callback, standard), parent=f"{standard.number_name}_rl")
-        cmds.textField(f"{standard.number_name}_custom_name_tf", annotation=self.ar.data.lang['i101_customName'], text=cmds.getAttr(f"{standard.guide_base}.customName"), changeCommand=standard.set_guide_custom_name, parent=f"{standard.number_name}_rl")
-        cmds.iconTextButton(image=self.ar.data.icon['plus_info'], height=30, width=17, style='iconOnly', command=partial(self.plus_info_ui, standard), parent=f"{standard.number_name}_rl")
+        if self.ar.data.ui_state and not cmds.rowLayout(f"{standard.number_name}_rl", query=True, exists=True):
+            cmds.rowLayout(f"{standard.number_name}_rl", numberOfColumns=3, width=190, columnWidth3=(30, 120, 20), adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 4), (3, 'both', 0)], parent=f"{standard.number_name}_top_cl")
+            cmds.button(f"{standard.number_name}_select_bt", label=' ', annotation=self.ar.data.lang['m004_select'], command=partial(self.update_edit_selected_module_ui, standard, True), backgroundColor=(0.5, 0.5, 0.5), dragCallback=partial(self.select_button_callback, standard), parent=f"{standard.number_name}_rl")
+            cmds.textField(f"{standard.number_name}_custom_name_tf", annotation=self.ar.data.lang['i101_customName'], text=cmds.getAttr(f"{standard.guide_base}.customName"), changeCommand=standard.set_guide_custom_name, parent=f"{standard.number_name}_rl")
+            cmds.iconTextButton(image=self.ar.data.icon['plus_info'], height=30, width=17, style='iconOnly', command=partial(self.plus_info_ui, standard), parent=f"{standard.number_name}_rl")
         self.update_edit_selected_module_ui(standard)
 
 
