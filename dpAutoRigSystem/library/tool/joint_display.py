@@ -112,18 +112,20 @@ class JointDisplay(base.BaseLibrary):
                 self.ar.joint_display_ui.keep_selection()
 
 
-    def change_all_joints(self, *args):
+    def change_all_joints(self, selected_label=None, *args):
         """ Change all joints to the selected drawStyle.
         """
-        selected_label = cmds.optionMenu('joint_display_change_om', query=True, value=True)
-        if selected_label == 'Bone':
-            self.set_draw_style(0)
-        elif selected_label == 'Multi-Child as box':
-            self.set_draw_style(1)
-        elif selected_label == 'None':
-            self.set_draw_style(2)
-        elif selected_label == 'Joint':
-            self.set_draw_style(3)
+        if self.ar.data.ui_state and not selected_label:
+            selected_label = cmds.optionMenu('joint_display_change_om', query=True, value=True)
+        if selected_label:
+            if selected_label == 'Bone':
+                self.set_draw_style(0)
+            elif selected_label == 'Multi-Child as box':
+                self.set_draw_style(1)
+            elif selected_label == 'None':
+                self.set_draw_style(2)
+            elif selected_label == 'Joint':
+                self.set_draw_style(3)
 
 
     def set_draw_style(self, draw_style_index, *args):

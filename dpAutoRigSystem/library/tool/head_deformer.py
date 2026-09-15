@@ -26,7 +26,7 @@ class HeadDeformer(base.BaseLibrary):
     def build_tool(self, *args):
         # call main function
         if self.ar.data.ui_state:
-            self.create_head_def(self)
+            self.create_head_def(self, ui=True)
     
     
     def head_def_dialog(self, *args):
@@ -63,7 +63,7 @@ class HeadDeformer(base.BaseLibrary):
                 return f"{deformer_name}_"
     
 
-    def create_head_def(self, dialog_name=None, hd_items=None, ctrl=None, deformed_by_items=None, guide_net=None, ui=True, *args):
+    def create_head_def(self, dialog_name=None, hd_items=None, ctrl=None, deformed_by_items=None, guide_net=None, ui=False, *args):
         """ Create the arrow curve and deformers (squash and bends).
         """
         head_ctrl = None

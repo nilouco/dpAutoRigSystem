@@ -24,13 +24,15 @@ class MatchMesh(base.BaseLibrary):
         self.run_match_mesh()
     
 
-    def run_match_mesh(self):
+    def run_match_mesh(self, items=None):
         """ Get selection and transfere vertices information.
         """
         # declaring variables
         from_transform_data, to_transform_data = {}, {}
         # get a list of selected items
-        selection = cmds.ls(selection=True)
+        selection = items
+        if not items:
+            selection = cmds.ls(selection=True)
         
         if(len(selection) <= 1):
             cmds.warning(self.ar.data.lang['i040_notMatchSel'])

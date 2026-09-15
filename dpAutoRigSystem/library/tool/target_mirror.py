@@ -20,7 +20,8 @@ class TargetMirror(base.BaseLibrary):
     
     
     def build_tool(self, *args):
-        self.ar.target_mirror_ui.create_ui(self)
+        if self.ar.data.ui_state:
+            self.ar.target_mirror_ui.create_ui(self)
     
     
     def check_geometry(self, item):
@@ -32,11 +33,14 @@ class TargetMirror(base.BaseLibrary):
                     try:
                         item_type = cmds.objectType(children[0])
                         if item_type == 'mesh' or item_type == 'nurbsSurface' or item_type == 'subdiv':
-                            if cmds.checkBox('target_mirror_check_hist_cb', query=True, value=True):
-                                hist_items = cmds.listHistory(children[0])
-                                if len(hist_items) > 1:
-                                    dialog_result = cmds.confirmDialog(title=self.ar.data.lang['i159_historyFound'], message=f"{self.ar.data.lang['i160_historyDesc']}\n\n{item}\n\n{self.ar.data.lang['i161_historyMessage']}", button=['Yes','No'], defaultButton='Yes', cancelButton='No', dismissString='No')
-                                    if dialog_result == 'Yes':
+                            if self.ar.data.ui_state:
+                                if cmds.checkBox('target_mirror_check_hist_cb', query=True, value=True):
+                                    hist_items = cmds.listHistory(children[0])
+                                    if len(hist_items) > 1:
+                                        dialog_result = cmds.confirmDialog(title=self.ar.data.lang['i159_historyFound'], message=f"{self.ar.data.lang['i160_historyDesc']}\n\n{item}\n\n{self.ar.data.lang['i161_historyMessage']}", button=['Yes','No'], defaultButton='Yes', cancelButton='No', dismissString='No')
+                                        if dialog_result == 'Yes':
+                                            is_geometry = True
+                                    else:
                                         is_geometry = True
                                 else:
                                     is_geometry = True
@@ -55,7 +59,7 @@ class TargetMirror(base.BaseLibrary):
         return is_geometry
     
     
-    def run_target_mirror(self, original_model=None, target_items=None, *args):
+    def run_target_mirror(self, original_model=None, target_items=None, axis="X", clear_undo=True, from_name="L_", to_name="R_", pos=True, *args):
         """ Create the mirrored targets.
         """
         # declaring variables
@@ -74,9 +78,10 @@ class TargetMirror(base.BaseLibrary):
                 cancelled = False
                 self.to_ids = []
                 # get mirror information from UI
-                selected_mirror = cmds.radioCollection('target_mirror_axis_rc', query=True, select=True)
-                axis = cmds.radioButton(selected_mirror, query=True, annotation=True)
-                clear_undo = cmds.checkBox('target_mirror_clear_undo_cb', query=True, value=True)
+                if not axis and self.ar.data.ui_state:
+                    selected_mirror = cmds.radioCollection('target_mirror_axis_rc', query=True, select=True)
+                    axis = cmds.radioButton(selected_mirror, query=True, annotation=True)
+                    clear_undo = cmds.checkBox('target_mirror_clear_undo_cb', query=True, value=True)
                 # clear selection
                 cmds.select(clear=True)
                 for item in targets:
@@ -89,11 +94,11 @@ class TargetMirror(base.BaseLibrary):
                     if item != orig_node and self.check_geometry(item):
                         # naming
                         new_target_name = f"{item}_Mirror{axis}"
-                        if cmds.checkBox('target_mirror_auto_rename_cb', query=True, value=True):
+                        if self.ar.data.ui_state and cmds.checkBox('target_mirror_auto_rename_cb', query=True, value=True):
                             from_name = cmds.textField('target_mirror_from_tf', query=True, text=True)
                             to_name = cmds.textField('target_mirror_to_tf', query=True, text=True)
-                            if from_name in item:
-                                new_target_name = item.replace(from_name, to_name)
+                        if from_name in item:
+                            new_target_name = item.replace(from_name, to_name)
                         # duplicate original model
                         temp_dup = cmds.duplicate(orig_node, name='temp_dupOrig')[0]
                         # create a temporary blendShape node
@@ -114,7 +119,9 @@ class TargetMirror(base.BaseLibrary):
                         cmds.delete(new_target, constructionHistory=True)
                         cmds.delete(bs_mirror_grp)
                         # position:
-                        if cmds.checkBox('target_mirror_pos_cb', query=True, value=True):
+                        if self.ar.data.ui_state:
+                            pos = cmds.checkBox('target_mirror_pos_cb', query=True, value=True)
+                        if pos:
                             try:
                                 for attr in attributes:
                                     cmds.setAttr(f"{new_target}.{attr}", cmds.getAttr(f"{item}.{attr}"))
