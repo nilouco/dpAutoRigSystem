@@ -107,14 +107,14 @@ class Wheel(standard.BaseStandard):
                 cmds.addAttr(center_joint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
                 self.ar.naming.set_joint_label(center_joint, s+self.joint_label_add, 18, f"{self.number_name}_{self.ar.data.lang['m156_wheel']}")
-                self.create_end_joint(f"{side}{self.number_name}_{self.ar.data.lang['m156_wheel']}", self.guide_front_loc)
+                end_joint = self.create_end_joint(f"{side}{self.number_name}_{self.ar.data.lang['m156_wheel']}", self.guide_front_loc)
                 # main joint:
                 cmds.select(clear=True)
                 main_joint = cmds.joint(name=f"{side}{self.number_name}_{self.ar.data.lang['c058_main']}_Jnt", scaleCompensate=False)
                 cmds.addAttr(main_joint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
                 self.ar.naming.set_joint_label(main_joint, s+self.joint_label_add, 18, f"{self.number_name}_{self.ar.data.lang['c058_main']}")
-                self.create_end_joint(f"{side}{self.number_name}_{self.ar.data.lang['c058_main']}", self.guide_front_loc)
+                main_end_joint = self.create_end_joint(f"{side}{self.number_name}_{self.ar.data.lang['c058_main']}", self.guide_front_loc)
                 
                 # create controls:
                 wheel_ctrl = self.ar.ctrls.create_controller('id_060_WheelCenter', f"{side}{self.number_name}_{self.ar.data.lang['m156_wheel']}_Ctrl", r=self.radius, d=self.curve_degree, guide_source=f"{self.name_guide}_CenterLoc")
@@ -155,6 +155,9 @@ class Wheel(standard.BaseStandard):
                 cmds.matchTransform(main_ctrl, self.guide_center_loc, position=True, rotation=True)
                 cmds.parentConstraint(main_ctrl, main_joint, maintainOffset=False, name=f"{main_joint}_PaC")
                 cmds.scaleConstraint(main_ctrl, main_joint, maintainOffset=True, name=f"{main_joint}_ScC")
+                cmds.matchTransform(end_joint, self.guide_front_loc, position=True, rotation=True)
+                cmds.matchTransform(main_end_joint, self.guide_front_loc, position=True, rotation=True)
+                
                 if s == 1 and cmds.getAttr(f"{self.guide_base}.flip") == 1:
                     cmds.move(self.radius, main_ctrl, moveY=True, relative=True, objectSpace=True, worldSpaceDistance=True)
                 else:
