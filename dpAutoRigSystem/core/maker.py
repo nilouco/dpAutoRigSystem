@@ -1046,7 +1046,7 @@ class Composer:
             master_scale_vv_attrs = spine.composed['MasterScaleVolumeVariationAttrList'][s]
             ik_fk_blend_attr = spine.composed['IkFkBlendAttrList'][s]
             cluster_grp = spine.composed['scalableGrp'][s]
-            shape_vis_attrs = spine.composed['shapeVisAttrList']
+            shape_vis_attrs = spine.composed['shapeVisAttrList'][s]
             self.to_ids.extend(cmds.scaleConstraint(self.ar.maker.master_ctrl, cluster_grp, name=f"{cluster_grp}_ScC"))
             cmds.addAttr(self.ar.maker.option_ctrl, longName=volume_variation_attr, attributeType='float', defaultValue=1, keyable=True)
             cmds.connectAttr(f"{self.ar.maker.option_ctrl}.{volume_variation_attr}", f"{hips_a}.{volume_variation_attr}")

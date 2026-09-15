@@ -211,8 +211,7 @@ class Spine(standard.BaseStandard):
                 cmds.addAttr(self.hips_a_ctrl, longName=f"{attr_name_lower}{base_name}{self.ar.data.lang['c126_display']}", attributeType='long', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 cmds.connectAttr(f"{self.hips_a_ctrl}.{attr_name_lower}{end_name}{self.ar.data.lang['c126_display']}", f"{cmds.listRelatives(self.tip_ctrl, children=True, type='shape')[0]}.visibility", force=True)
                 cmds.connectAttr(f"{self.hips_a_ctrl}.{attr_name_lower}{base_name}{self.ar.data.lang['c126_display']}", f"{cmds.listRelatives(self.base_ctrl, children=True, type='shape')[0]}.visibility", force=True)
-                self.shape_vis_attributes.append(f"{attr_name_lower}{end_name}{self.ar.data.lang['c126_display']}")
-                self.shape_vis_attributes.append(f"{attr_name_lower}{base_name}{self.ar.data.lang['c126_display']}")
+                self.shape_vis_attributes.append([f"{attr_name_lower}{end_name}{self.ar.data.lang['c126_display']}", f"{attr_name_lower}{base_name}{self.ar.data.lang['c126_display']}"])
 
                 # Setup axis order
                 if self.rigType == 'quadruped' or style == 2: #quadruped
