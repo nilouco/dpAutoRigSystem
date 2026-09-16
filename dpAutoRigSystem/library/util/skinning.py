@@ -53,13 +53,13 @@ class Skinning(weights.Weights):
             if joints and geos:
                 not_skinned_items = []
                 for geo in geos:
-                    if (mode == 'Add'):
+                    if mode == 'Add':
                         for joint in joints:
                             try:
                                 cmds.skinCluster(geo, edit=True, addInfluence=joint, toSelectedBones=True, lockWeights=True, weight=0.0)
                             except:
                                 not_skinned_items.append(joint)
-                    elif (mode == 'Remove'):
+                    elif mode == 'Remove':
                         for joint in joints:
                             try:
                                 cmds.skinCluster(geo, edit=True, removeInfluence=joint, toSelectedBones=True)

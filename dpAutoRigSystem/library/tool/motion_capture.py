@@ -477,7 +477,7 @@ class MotionCapture(base.BaseLibrary):
                 # make an ikFkSnap instance without create another network node.
                 ikfk_snap_inst = ik_fk_snap.IkFkSnap(self.ar, net, world_ref, fk_ctrls, [ik_corner_ctrl, ik_extreme_ctrl, ik_extreme_sub_ctrl], ik_joints, [self.ar.data.lang['c018_revFoot_roll'], self.ar.data.lang['c019_revFoot_spin'], self.ar.data.lang['c020_revFoot_turn']], self.ar.data.lang['c040_uniformScale'], creation=False)
                 # snap from Fk to Ik (that means move ik to fk position)                
-                ikfk_snap_inst.snapFkToIk()
+                ikfk_snap_inst.snap_fk_to_ik()
                 del ikfk_snap_inst
                 if key:
                     cmds.setKeyframe([ik_extreme_ctrl, ik_corner_ctrl], attribute=['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ'])
@@ -827,7 +827,7 @@ class HumanIKCleaner(object):
                 zero_grp = cmds.listRelatives(ctrl, parent=True, type='transform')[0]
                 for axis in ['X', 'Y', 'Z']:
                     cmds.mute(zero_grp+".rotate"+axis, disable=True)
-            print("'''+self.ar.data.lang['i046_remove']+''' '''+self.ar.data.lang['m249_muteAutoRotate']+''' {', '.join(self.controllers))
+            print("'''+self.ar.data.lang['i046_remove']+''' '''+self.ar.data.lang['m249_muteAutoRotate']+''' ', '.join(self.controllers)")
 
     def lock_auto_rotate_attr(self, ctrl, value):
         """ Lock or unlock the autoRotate attribute for the given controller.

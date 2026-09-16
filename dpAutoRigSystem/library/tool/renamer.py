@@ -40,15 +40,16 @@ class Renamer(base.BaseLibrary):
             self.ar.renamer_ui.ar.renamer_ui.refresh_preview()
 
     
-    def generate_previews(self):
+    def generate_previews(self, items=None):
         """ Generate a renamed preview list used to rename the original listed items.
         """
-        self.get_originals()
+        self.get_originals(items)
         if self.originals:
             self.previews = []
             preview_data = {}
-            # get UI info
-            self.ar.renamer_ui.get_info_from_ui()
+            if self.ar.data.ui_state:
+                # get UI info
+                self.ar.renamer_ui.get_info_from_ui()
             for i, item in enumerate(self.originals):
                 if cmds.objExists(item):
                     # new:
@@ -60,7 +61,7 @@ class Renamer(base.BaseLibrary):
                     if self.add_sequence:
                         preview_data[item] = self.sequence_name+str(self.start+i).zfill(self.padding)
                     # replace
-                    if self.search_replace and self.search_name != "":
+                    if self.search_replace and self.search_name != "" and self.replace_name != None:
                         preview_data[item] = preview_data[item].replace(self.search_name, self.replace_name)
                     if self.add_prefix:
                         preview_data[item] = self.prefix_name+preview_data[item]
@@ -71,11 +72,13 @@ class Renamer(base.BaseLibrary):
                     self.previews.append(preview_data[item])
     
 
-    def get_originals(self):
+    def get_originals(self, items=None):
         """ Get the listed objects to rename them.
         """
-        # list current selection
-        self.originals = cmds.ls(selection=True)
+        self.originals = items
+        if not items:
+            # list current selection
+            self.originals = cmds.ls(selection=True)
         # check if need to add hierarchy children
         if self.originals and self.sel_option == 2: #Hierarchy
             for item in self.originals:
@@ -97,16 +100,42 @@ class Renamer(base.BaseLibrary):
         if self.originals:
             self.generate_previews()
             if self.previews:
-                for i, item in enumerate(self.originals):
-                    if not cmds.objExists(item):
-                        items = cmds.ls(f"*{item}*")
-                        if items:
-                            item = items[0]
-                    if cmds.objExists(item):
-                        cmds.rename(item, self.previews[i])
-                    else:
-                        mel.eval(f'warning "{self.ar.data.lang["v005_cantFix"]} {item}";')
-            self.ar.renamer_ui.reset_ui()
-            self.ar.renamer_ui.refresh_preview()
+                self.rename_items(self.originals, self.previews)
+            if self.ar.data.ui_state:
+                self.ar.renamer_ui.reset_ui()
+                self.ar.renamer_ui.refresh_preview()
         else:
             mel.eval(f'warning "{self.ar.data.lang["m225_selectAnything"]}";')
+
+
+    def run_renamer(self, items, sequence=None, prefix=None, suffix=None, search=None, replace=None, pad=2, start=0):
+        self.sequence_name = sequence
+        self.prefix_name = prefix
+        self.suffix_name = suffix
+        self.search_name = search
+        self.replace_name = replace
+        self.padding = pad
+        self.start = start
+        if sequence:
+            self.add_sequence = True
+        if prefix:
+            self.add_prefix = True
+        if suffix:
+            self.add_suffix = True
+        if replace:
+            self.search_replace = True
+        self.generate_previews(items)
+        if self.previews:
+            self.rename_items(self.originals, self.previews)
+
+
+    def rename_items(self, from_items, to_items):
+        for i, item in enumerate(from_items):
+            if not cmds.objExists(item):
+                items = cmds.ls(f"*{item}*")
+                if items:
+                    item = items[0]
+            if cmds.objExists(item):
+                cmds.rename(item, to_items[i])
+            else:
+                mel.eval(f'warning "{self.ar.data.lang["v005_cantFix"]} {item}";')

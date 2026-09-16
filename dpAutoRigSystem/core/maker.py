@@ -788,6 +788,8 @@ class Maker:
             if detected_bug:
                 print(f"\n\n{self.ar.data.lang['b000_bugGeneral']}")
                 cmds.confirmDialog(title=self.ar.data.lang['i078_detectedBug'], message=self.ar.data.lang['b000_bugGeneral'], button=['OK'])
+        else:
+            print(f'Error: "{self.ar.data.lang["e000_guideNotFound"]}')
         self.ar.utils.clear_guide_mirror_grp()
         self.ar.filler.populate_joints()
         if not self.ar.data.rebuilding:
@@ -1306,7 +1308,7 @@ class Composer:
 
 class Launcher:
     def __init__(self, ar):
-            self.ar = ar
+        self.ar = ar
             
     def standard(self, name):
         return self.ar.maker.create_raw_guide(name)
@@ -1327,3 +1329,4 @@ class Launcher:
 
     # def curve(self, name, use_ui=False):
     #     curves = 
+    #self.ar.config.get_instance('LimbSpaceSwitch', [self.ar.data.tools_folder]).build_tool()

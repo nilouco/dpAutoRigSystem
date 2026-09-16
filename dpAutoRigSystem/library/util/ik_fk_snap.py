@@ -76,8 +76,8 @@ class IkFkSnap:
         cmds.addAttr(self.ikfk_snap_net, longName='ikPoleVectorCtrl', attributeType='message')
         cmds.addAttr(self.ikfk_snap_net, longName='ikExtremCtrl', attributeType='message')
         cmds.addAttr(self.ikfk_snap_net, longName='ikExtremSubCtrl', attributeType='message')
-        cmds.addAttr(self.ikfk_snap_net, longName='fk_ctrls', multi=True)
-        cmds.addAttr(self.ikfk_snap_net, longName='ik_joints', multi=True)
+        cmds.addAttr(self.ikfk_snap_net, longName='fkCtrlList', multi=True)
+        cmds.addAttr(self.ikfk_snap_net, longName='ikJointList', multi=True)
         cmds.addAttr(self.ikfk_snap_net, longName='rev_foot_attrs', dataType='string')
         cmds.addAttr(self.ikfk_snap_net, longName='uniform_scale_attr', dataType='string')
         cmds.addAttr(self.ikfk_snap_net, longName='ikFkBlendAttr', dataType='string')
@@ -100,9 +100,9 @@ class IkFkSnap:
         cmds.connectAttr(f"{self.ik_extreme_ctrl}.message", f"{self.ikfk_snap_net}.ikExtremCtrl", force=True)
         cmds.connectAttr(f"{self.ik_extreme_sub_ctrl}.message", f"{self.ikfk_snap_net}.ikExtremSubCtrl", force=True)
         for f, fk_ctrl in enumerate(self.fk_ctrls):
-            cmds.connectAttr(f"{fk_ctrl}.message", f"{self.ikfk_snap_net}.fk_ctrls[{f}]", force=True)
+            cmds.connectAttr(f"{fk_ctrl}.message", f"{self.ikfk_snap_net}.fkCtrlList[{f}]", force=True)
         for i, ik_joint in enumerate(self.ik_joints):
-            cmds.connectAttr(f"{ik_joint}.message", f"{self.ikfk_snap_net}.ik_joints[{i}]", force=True)
+            cmds.connectAttr(f"{ik_joint}.message", f"{self.ikfk_snap_net}.ikJointList[{i}]", force=True)
 
 
     ###
@@ -331,8 +331,8 @@ class IkFkSnap(object):
         self.ik_pole_vector_ctrl = cmds.listConnections(self.ikfk_snap_net+".ikPoleVectorCtrl")[0]
         self.ik_extreme_ctrl = cmds.listConnections(self.ikfk_snap_net+".ikExtremCtrl")[0]
         self.ik_extreme_sub_ctrl = cmds.listConnections(self.ikfk_snap_net+".ikExtremSubCtrl")[0]
-        self.fk_ctrls = cmds.listConnections(self.ikfk_snap_net+".fk_ctrls")
-        self.ik_joints = cmds.listConnections(self.ikfk_snap_net+".ik_joints")
+        self.fk_ctrls = cmds.listConnections(self.ikfk_snap_net+".fkCtrlList")
+        self.ik_joints = cmds.listConnections(self.ikfk_snap_net+".ikJointList")
         self.rev_foot_attrs = list(cmds.getAttr(self.ikfk_snap_net+".rev_foot_attrs").split(';'))
         self.extreme_offset_matrix = cmds.getAttr(self.ikfk_snap_net+".extremOffset")
 
