@@ -20,10 +20,11 @@ class Zipper(base.BaseLibrary):
         base.BaseLibrary.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         if self.ar.dev:
             reload(base)
+        self.first = 'c114_first'
+        self.second = 'c115_second'
         self.zipper_name = self.ar.data.lang['m061_zipper']
-        self.first_name = self.ar.data.lang['c114_first']
-        self.second_name = self.ar.data.lang['c115_second']
-        self.good_to_dpar = True
+        self.first_name = self.ar.data.lang[self.first]
+        self.second_name = self.ar.data.lang[self.second]
         self.orig_model = None
         self.first_curve = None
         self.second_curve = None
@@ -37,17 +38,19 @@ class Zipper(base.BaseLibrary):
         
 
     def build_tool(self, *args):
-        self.ar.zipper_ui.create_ui(self)
-        self.load_data()
+        if self.ar.data.ui_state:
+            self.ar.zipper_ui.create_ui(self)
+            self.load_data()
     
     
     def create_curve_from_edge(self, zipper_id, *args):
         """ Create curve from selected polygon edges.
         """
-        self.ar.zipper_ui.get_curve_direction()
+        if self.ar.data.ui_state:
+            self.ar.zipper_ui.get_curve_direction()
         # declaring names:
         this_name = self.first_name
-        if zipper_id == 'c115_second':
+        if zipper_id == self.second:
             this_name = self.second_name
         curve_name = f"{self.zipper_name}_{this_name}_Crv"
         pec_name = f"{self.zipper_name}_{this_name}_PEC"
@@ -62,16 +65,26 @@ class Zipper(base.BaseLibrary):
             base_curve = base_curves[0]
             # rename polyEdgeToCurve node:
             cmds.rename(cmds.listConnections(f"{base_curve}.create")[0], pec_name)
-            # add attributes:
-            cmds.addAttr(base_curve, longName=ZIPPER_ATTR, attributeType='bool')
-            cmds.addAttr(base_curve, longName=ZIPPER_ID, dataType='string')
-            cmds.setAttr(f"{base_curve}.{ZIPPER_ATTR}", 1)
-            cmds.setAttr(f"{base_curve}.{ZIPPER_ID}", zipper_id, type='string')
+            self.add_curve_attrs(base_curve, zipper_id)
             # load curve data:
             self.load_data(base_curve)
         else:
             mel.eval(f'warning "{self.ar.data.lang["i188_selectEdges"]}";')
     
+
+    def add_curve_attrs(self, base_curve, zipper_id):
+        # add attributes:
+        if not ZIPPER_ATTR in cmds.listAttr(base_curve):
+            cmds.addAttr(base_curve, longName=ZIPPER_ATTR, attributeType='bool')
+        if not ZIPPER_ID in cmds.listAttr(base_curve):
+            cmds.addAttr(base_curve, longName=ZIPPER_ID, dataType='string')
+        cmds.setAttr(f"{base_curve}.{ZIPPER_ATTR}", 1)
+        cmds.setAttr(f"{base_curve}.{ZIPPER_ID}", zipper_id, type='string')
+        if zipper_id == self.first:
+            self.first_curve = base_curve
+        elif zipper_id == self.second:
+            self.second_curve = base_curve
+
     
     def delete_old_curve(self, zipper_id):
         """ Check if exist the same old curve to delete it.
@@ -263,20 +276,18 @@ class Zipper(base.BaseLibrary):
     def parent_zipper_ctrl(self, rig_scale_attr='rigScale'):
         """ Try to parent the zipper controller to head sub controller or to controls visibility group.
         """
-        # check if there's a dpAR Option_Ctrl:
-        if self.good_to_dpar:
-            option_ctrl = self.ar.utils.get_node_by_message('optionCtrl')
-            if option_ctrl:
-                opt_ctrl_rig_scale_node = cmds.listConnections(f"{option_ctrl}.{rig_scale_attr}", source=False, destination=True)[0]
-                cmds.connectAttr(f"{opt_ctrl_rig_scale_node}.outputX", f"{self.zipper_ctrl}.{rig_scale_attr}", force=True)
-                cmds.setAttr(f"{self.zipper_ctrl}.{rig_scale_attr}", lock=True)
-            head_sub_ctrl = self.ar.ctrls.get_controller_node_by_id('id_093_HeadSub')
-            if head_sub_ctrl:
-                cmds.parent(self.ctrl_grp, head_sub_ctrl)
-            else:
-                ctrls_vis_grp = self.ar.utils.get_node_by_message('ctrlsVisibilityGrp')
-                if ctrls_vis_grp:
-                    cmds.parent(self.ctrl_grp, ctrls_vis_grp)
+        option_ctrl = self.ar.utils.get_node_by_message('optionCtrl')
+        if option_ctrl:
+            opt_ctrl_rig_scale_node = cmds.listConnections(f"{option_ctrl}.{rig_scale_attr}", source=False, destination=True)[0]
+            cmds.connectAttr(f"{opt_ctrl_rig_scale_node}.outputX", f"{self.zipper_ctrl}.{rig_scale_attr}", force=True)
+            cmds.setAttr(f"{self.zipper_ctrl}.{rig_scale_attr}", lock=True)
+        head_sub_ctrl = self.ar.ctrls.get_controller_node_by_id('id_093_HeadSub')
+        if head_sub_ctrl:
+            cmds.parent(self.ctrl_grp, head_sub_ctrl)
+        else:
+            ctrls_vis_grp = self.ar.utils.get_node_by_message('ctrlsVisibilityGrp')
+            if ctrls_vis_grp:
+                cmds.parent(self.ctrl_grp, ctrls_vis_grp)
 
 
     def create_deform_mesh(self):
@@ -341,24 +352,25 @@ class Zipper(base.BaseLibrary):
         zipper_distance_grp = cmds.group(self.first_loc, self.second_loc, self.dist_dim_transform, name=f"{self.zipper_name}_Distance_Grp")
         zipper_grp = cmds.group(zipper_curves_grp, zipper_distance_grp, name=f"{self.zipper_name}_Data_Grp")
         self.to_ids.append(zipper_grp)
-        if self.good_to_dpar:
-            static_grp = self.ar.utils.get_node_by_message('staticGrp')
-            if static_grp:
-                cmds.parent(zipper_grp, static_grp)
+        static_grp = self.ar.utils.get_node_by_message('staticGrp')
+        if static_grp:
+            cmds.parent(zipper_grp, static_grp)
     
     
     def create_zipper(self, *args):
         """ Main method to buid the all zipper setup.
             Uses the pre-defined and loaded curves.
         """
-        run_dialog = cmds.confirmDialog(title='Zipper', message=self.ar.data.lang['i192_notUndoable'], button=[self.ar.data.lang['i174_continue'],self.ar.data.lang['i132_cancel']], defaultButton=self.ar.data.lang['i174_continue'], cancelButton=self.ar.data.lang['i132_cancel'], dismissString=self.ar.data.lang['i132_cancel'])
+        run_dialog = self.ar.data.lang['i174_continue']
+        if self.ar.data.ui_state:
+            run_dialog = cmds.confirmDialog(title='Zipper', message=self.ar.data.lang['i192_notUndoable'], button=[self.ar.data.lang['i174_continue'],self.ar.data.lang['i132_cancel']], defaultButton=self.ar.data.lang['i174_continue'], cancelButton=self.ar.data.lang['i132_cancel'], dismissString=self.ar.data.lang['i132_cancel'])
         if run_dialog == self.ar.data.lang['i174_continue']:
-            self.get_good_to_dpar()
             if self.first_curve and self.second_curve:
                 if self.orig_model:
                     self.to_ids = []
                     self.old_add_double_linear_items = cmds.ls(selection=False, type='addDoubleLinear')
-                    self.ar.zipper_ui.get_curve_direction()
+                    if self.ar.data.ui_state:
+                        self.ar.zipper_ui.get_curve_direction()
                     self.set_curve_direction(self.first_curve)
                     self.set_curve_direction(self.second_curve)
                     self.generate_middle_curve(self.first_curve)
@@ -377,14 +389,6 @@ class Zipper(base.BaseLibrary):
                     mel.eval(f'warning "{self.ar.data.lang["i191_selectPoly"]}";')
             else:
                 mel.eval(f'warning "{self.ar.data.lang["i188_selectEdges"]}";')
-
-
-    def get_good_to_dpar(self):
-        """ Check if we'll integrate with dpAutoRigSystem.
-        """
-        if self.ar.data.ui_state:
-            self.good_to_dpar = cmds.checkBox('zipper_good_to_dpar_cb', query=True, value=True)
-            return self.good_to_dpar
 
 
     def load_data(self, curve_name=None):

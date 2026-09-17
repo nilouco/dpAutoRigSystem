@@ -15,7 +15,7 @@ class ZipperUI:
         self.app = app
         self.ar.ui_manager.close_ui('dpZipperWindow')
         width  = 380
-        height = 300
+        height = 280
         cmds.window('dpZipperWindow', title=f"{self.app.zipper_name} {self.ar.data.version}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         cmds.showWindow('dpZipperWindow')
         # create UI layout and elements:
@@ -38,7 +38,6 @@ class ZipperUI:
         cmds.text('zipper_options_txt', label=f"{self.ar.data.lang['i002_options']}:", height=30, font='boldLabelFont', align='left', parent='zipper_main_cl')
         cmds.columnLayout('zipper_options_cl', adjustableColumn=True, columnOffset=("left", 10), rowSpacing=3, parent='zipper_main_cl')
         cmds.radioButtonGrp('zipper_curve_direction_rb', label=f"{self.ar.data.lang['i189_curve']} {self.ar.data.lang['i106_direction']}", labelArray3=['X', 'Y', 'Z'], columnAlign=[(1, 'left'), (2, 'left')], columnWidth=[(1, 100), (2, 50), (3, 50), (4, 50)], adjustableColumn=4, numberOfRadioButtons=3, select=1, changeCommand=self.get_curve_direction, vertical=False, parent='zipper_options_cl')
-        cmds.checkBox('zipper_good_to_dpar_cb', label=self.ar.data.lang['i190_integrateDPAR'], value=1, align='left', parent='zipper_options_cl')
         cmds.separator(style='none', height=15, width=100, parent='zipper_main_cl')
         cmds.columnLayout('zipper_create_cl', columnOffset=('left', 10), parent='zipper_main_cl')
         cmds.button('zipper_create_bt', label=f"{self.ar.data.lang['i158_create']} {self.app.zipper_name}", annotation=f"{self.ar.data.lang['i158_create']} {self.app.zipper_name}", command=self.app.create_zipper, width=350, backgroundColor=(0.3, 1, 0.7), parent='zipper_create_cl')
