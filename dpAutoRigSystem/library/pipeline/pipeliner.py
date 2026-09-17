@@ -814,8 +814,9 @@ class Pipeliner:
                         return
                     elif mode == 1: #replaceData exclude the current asset from given list to chose.
                         assets.remove(self.pipe_data['assetName'])
-                    # Load UI to choose one asset to define the file to use
-                    self.ar.pipeline_ui.select_asset_ui(assets, path, mode)
+                    if self.ar.data.ui_state:
+                        # Load UI to choose one asset to define the file to use
+                        self.ar.pipeline_ui.select_asset_ui(assets, path, mode)
                     return
                 else:
                     # Inform that it isn't possible to continue without wip assets to load

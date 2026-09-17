@@ -486,7 +486,7 @@ class MainUI:
         cmds.separator(style='none', parent=f"{name}_fl")
         cmds.checkBox(f"{name}_select_all_cb", label=f"{self.ar.data.lang['m004_select']} {self.ar.data.lang['i211_all']} {self.ar.data.lang[name]}", value=False, changeCommand=partial(self.ar.ui_manager.change_active_modules, instances), parent=f"{name}_fl")
         cmds.paneLayout(f"{name}_select_v2_pl", configuration='vertical2', separatorThickness=7.0, parent=f"{name}_fl")
-        cmds.button(f"{name}_veryfy_all_bt", label=self.ar.data.lang['i210_verify'].upper(), command=partial(self.ar.ui_manager.run_selected_actions, instances, True, True), parent=f"{name}_select_v2_pl")
+        cmds.button(f"{name}_verify_all_bt", label=self.ar.data.lang['i210_verify'].upper(), command=partial(self.ar.ui_manager.run_selected_actions, instances, True, True), parent=f"{name}_select_v2_pl")
         cmds.button(f"{name}_fix_all_bt", label=self.ar.data.lang['c052_fix'].upper(), command=partial(self.ar.ui_manager.run_selected_actions, instances, False, True), parent=f"{name}_select_v2_pl")
         cmds.separator(height=30, parent=f"{name}_fl")
 

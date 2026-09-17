@@ -512,7 +512,7 @@ class BaseAction(base.BaseLibrary):
     def update_delete_data_button(self):
         """ Check if there's some exported data for this module and update the delete data button as enable or disable.
         """
-        if self.io_folder and cmds.iconTextButton(self.delete_data_itb, query=True, exists=True):
+        if self.ar.data.ui_state and self.io_folder and cmds.iconTextButton(self.delete_data_itb, query=True, exists=True):
             if self.get_exported_items(ask_has_data=True):
                 cmds.iconTextButton(self.delete_data_itb, edit=True, enable=True)
             else:

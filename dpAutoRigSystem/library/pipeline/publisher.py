@@ -244,7 +244,7 @@ class Publisher:
         if path:
             published_items, errors = [], []
             if not comments:
-                if cmds.textFieldGrp('comment_batch_tfg', query=True, exists=True):
+                if self.ar.data.ui_state and cmds.textFieldGrp('comment_batch_tfg', query=True, exists=True):
                     comments = cmds.textFieldGrp('comment_batch_tfg', query=True, text=True)
                 if not comments:
                     comments = f"{self.ar.data.lang['m046_publisher']} v{self.ar.data.version}"
