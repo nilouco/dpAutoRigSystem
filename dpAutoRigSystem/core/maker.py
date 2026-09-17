@@ -1311,6 +1311,8 @@ class Launcher:
         self.ar = ar
             
     def standard(self, name):
+        """ Returns the module instance and the guide base.
+        """
         return self.ar.maker.create_raw_guide(name)
 
 
@@ -1327,6 +1329,12 @@ class Launcher:
                 return self.ar.data.lib[self.ar.data.tools_folder]['instances'][i]
 
 
-    # def curve(self, name, use_ui=False):
-    #     curves = 
-    #self.ar.config.get_instance('LimbSpaceSwitch', [self.ar.data.tools_folder]).build_tool()
+    def curve(self, name, ui=False):
+        curve = None
+        if name in self.ar.data.lib[self.ar.data.curve_simple_folder]['names']:
+            curve = self.ar.config.get_instance(name, [self.ar.data.curve_simple_folder])
+        elif name in self.ar.data.lib[self.ar.data.curve_combined_folder]['names']:
+            curve = self.ar.config.get_instance(name, [self.ar.data.curve_combined_folder])
+        if curve:
+            curve.cv_main(use_ui=ui)
+            return curve
