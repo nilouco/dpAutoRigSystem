@@ -395,6 +395,9 @@ class Pipeliner:
     def load_publish_path(self):
         """ Returns the absolute path to publish the current file.
         """
+        self.get_info_by_path('f_drive', None)
+        self.get_info_by_path('f_studio', 'f_drive')
+        self.get_info_by_path('f_project', 'f_studio')
         if self.pipe_data['path']:
             project_folder = self.pipe_data['f_project']
             if project_folder:

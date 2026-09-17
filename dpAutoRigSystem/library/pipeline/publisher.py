@@ -63,6 +63,7 @@ class Publisher:
             - generate the image preview
             If it fails, it'll reopen the current file without save any change and returns False.
         """
+        self.ar.pipeliner.load_publish_path()
         if self.ar.pipeliner.pipe_data['publishPath']:
             # Starting progress window
             self.ar.ui_manager.set_progress(f"{self.ar.data.lang['i335_starting']}...", self.ar.data.lang['m046_publisher'], 5, add_one=False, add_number=False)
@@ -196,12 +197,12 @@ class Publisher:
                                 print('Callback result =', callback_result)
 
                     # publisher log window
-                    self.ar.publish_ui.success_published_ui(publish_filename)
+                    if self.ar.data.ui_state:
+                        self.ar.publish_ui.success_published_ui(publish_filename)
                     self.ar.ui_manager.set_progress(end_it=True)
                     self.ar.ui_manager.close_ui('dpPublisherWindow')
                     if from_ui:
                         self.ask_user_choose_file(publish_filename)
-
             else:
                 mel.eval(f'warning "{self.ar.data.lang["v021_noFileName"]}";')
         else:

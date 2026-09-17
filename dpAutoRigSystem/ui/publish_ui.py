@@ -37,10 +37,6 @@ class PublishUI:
             cmds.button('run_publishing_bt', label=self.ar.data.lang['i216_publish'], command=partial(self.ar.publisher.run_publishing, True, self.ar.data.verbose), height=30, backgroundColor=(0.75, 0.75, 0.75), parent='publisher_pl')
             cmds.button('publish_batch_bt', label=self.ar.data.lang['i358_batch'], command=partial(self.ar.pipeliner.load_asset, mode=2), height=30, backgroundColor=(0.75, 0.75, 0.75), parent='publisher_pl')
             cmds.showWindow('dpPublisherWindow')
-            # load pipeliner data correctly
-            self.ar.pipeliner.get_info_by_path('f_drive', None)
-            self.ar.pipeliner.get_info_by_path('f_studio', 'f_drive')
-            self.ar.pipeliner.get_info_by_path('f_project', 'f_studio')
             self.set_publish_file_path()
 
 
