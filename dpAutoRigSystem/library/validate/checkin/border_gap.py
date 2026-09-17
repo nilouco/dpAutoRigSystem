@@ -67,7 +67,7 @@ class BorderGap(action.BaseAction):
                                     if len(index_con_faces) == 1:
                                         if not item_name in gap_items:
                                             gap_items.append(item_name)
-                                        gap_components.append(f"{item_name}.e['{iter_polys.index()}']")
+                                        gap_components.append(f"{item_name}.e[{iter_polys.index()}]")
                                     # Move to next polygon in the mesh list
                                     iter_polys.next()
                         # Move to the next selected node in the list

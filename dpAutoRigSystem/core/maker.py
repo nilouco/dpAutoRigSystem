@@ -1311,30 +1311,31 @@ class Launcher:
         self.ar = ar
             
     def standard(self, name):
-        """ Returns the module instance and the guide base.
+        """ Returns the module instance and the created guide base.
         """
         return self.ar.maker.create_raw_guide(name)
 
 
     def template(self, name):
-        for i, item in enumerate(self.ar.data.lib[self.ar.data.template_folder]['templates']):
-            if item == name:
-                self.ar.data.lib[self.ar.data.template_folder]['instances'][i].build_template()
-
+        template = self.ar.config.get_instance(name, [self.ar.data.template_folder])
+        if template:
+            template.build_template()
+        
 
     def tool(self, name):
-         for i, item in enumerate(self.ar.data.lib[self.ar.data.tools_folder]['names']):
-            if item == name:
-                self.ar.data.lib[self.ar.data.tools_folder]['instances'][i].build_tool()
-                return self.ar.data.lib[self.ar.data.tools_folder]['instances'][i]
+        tool = self.ar.config.get_instance(name, [self.ar.data.tools_folder])
+        if tool:
+            tool.build_tool()
+            return tool
 
 
     def curve(self, name, ui=False):
-        curve = None
-        if name in self.ar.data.lib[self.ar.data.curve_simple_folder]['names']:
-            curve = self.ar.config.get_instance(name, [self.ar.data.curve_simple_folder])
-        elif name in self.ar.data.lib[self.ar.data.curve_combined_folder]['names']:
-            curve = self.ar.config.get_instance(name, [self.ar.data.curve_combined_folder])
+        curve = self.ar.config.get_instance(name, [self.ar.data.curve_simple_folder, self.ar.data.curve_combined_folder])
         if curve:
             curve.cv_main(use_ui=ui)
             return curve
+
+    def validator(self, name):
+        for item in self.ar.config.get_validator_instances():
+            if item.name == name:
+                return item

@@ -61,11 +61,11 @@ class NonQuadFace(action.BaseAction):
                                     if n_vertex > 4:
                                         if not item_name in poly_items:
                                             poly_items.append(item_name)
-                                        poly_faces.append(f"{item_name}.f['{iter_polys.index()}']")
+                                        poly_faces.append(f"{item_name}.f[{iter_polys.index()}]")
                                     elif n_vertex == 3:
                                         if not item_name in tris_items:
                                             tris_items.append(item_name)
-                                        tris_faces.append(f"{item_name}.f['{iter_polys.index()}']")
+                                        tris_faces.append(f"{item_name}.f[{iter_polys.index()}]")
                                     # Move to next polygon in the mesh list
                                     iter_polys.next()
                         # Move to the next selected node in the list
