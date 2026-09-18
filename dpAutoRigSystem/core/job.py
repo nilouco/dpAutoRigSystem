@@ -30,14 +30,23 @@ class Job:
             - WorkspaceChanged = not documented
         """
         cmds.scriptJob(uiDeleted=('dpAutoRigSystemWC', partial(self.ar.ui_manager.set_ui_state, False)))
-        cmds.scriptJob(event=('SceneOpened', partial(self.ar.ui_manager.refresh_ui, clear_selection=True)), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
-        cmds.scriptJob(event=('deleteAll', self.ar.ui_manager.refresh_ui), parent='dpAutoRigSystemWC', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
         #cmds.scriptJob(event=('NewSceneOpened', self.ar.ui_manager.refresh_ui), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
         cmds.scriptJob(event=('SceneSaved', partial(self.ar.ui_manager.refresh_ui, saved_scene=True, reset_buttons=False)), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
         cmds.scriptJob(event=('workspaceChanged', self.ar.pipeliner.refresh_asset_data), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
         self.start_corrective_edit_mode()
         self.selection_change()
         self.selected_guide()
+        self.start_scene_jobs()
+
+
+    def start_scene_jobs(self):
+        self.scene_opened_job_id = cmds.scriptJob(event=('SceneOpened', partial(self.ar.ui_manager.refresh_ui, clear_selection=True)), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
+        self.new_scene_job_id = cmds.scriptJob(event=('deleteAll', self.ar.ui_manager.refresh_ui), parent='dpAutoRigSystemWC', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
+
+
+    def delete_scene_jobs(self):
+        cmds.scriptJob(kill=self.scene_opened_job_id)
+        cmds.scriptJob(kill=self.new_scene_job_id)
 
 
     def selection_change(self):

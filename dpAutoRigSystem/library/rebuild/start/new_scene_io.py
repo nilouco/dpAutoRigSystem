@@ -45,8 +45,10 @@ class NewSceneIO(action.BaseAction):
                 self.well_done_io(self.ar.data.lang['v007_allOk'])
             else: #import
                 try:
+                    self.ar.job.delete_scene_jobs()
                     # start a new clean scene and keep the same asset context
                     cmds.file(newFile=True, force=True)
+                    self.ar.job.start_scene_jobs()
                     self.well_done_io(self.ar.pipeliner.pipe_data['assetName'])
                 except Exception as e:
                     self.fail_io(str(e))
