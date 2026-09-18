@@ -70,7 +70,7 @@ class Weights:
     def unlock_joints(self, skincluster_node):
         """ Just unlock joints from a given skinCluster node.
         """
-        for joint in cmds.skinCluster(skincluster_node, influences=True, query=True):
+        for joint in cmds.skinCluster(skincluster_node, influence=True, query=True):
             cmds.setAttr(f"{joint}.liw", 0)
 
 

@@ -334,10 +334,9 @@ class GuideIO(action.BaseAction):
 
 
     def get_new_name(self, name):
-        if not cmds.objExists(name):
-            base = name.split(':')[0]
-            if base in self.correlations:
-                return name.replace(base, self.correlations[base])
+        base = name.split(':')[0]
+        if base in self.correlations:
+            return name.replace(base, self.correlations[base])
         return name
 
 

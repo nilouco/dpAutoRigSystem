@@ -92,7 +92,7 @@ class Rivet(base.BaseLibrary):
             rivet_transform = rivet_transform[0]
         rivet_ctrl = cmds.listConnections(f"{rivetNetNode}.item_node", destination=False)[0]
         follicle = cmds.listConnections(f"{rivetNetNode}.follicle", destination=False)[0]
-        attached_geo = cmds.listConnections(f"{rivetNetNode}.geo_to_attach", destination=False)[0]
+        attached_geo = cmds.listConnections(f"{rivetNetNode}.geoToAttach", destination=False)[0]
         try:
             original_parent = cmds.listRelatives(rivet_transform, parent=True)
             current_parent = cmds.listRelatives(rivet_ctrl, parent=True)
@@ -439,24 +439,24 @@ class Rivet(base.BaseLibrary):
                 cmds.addAttr(self.net, longName='item_node', attributeType='message')
                 cmds.addAttr(self.net, longName='rivet', attributeType='message')
                 cmds.addAttr(self.net, longName='follicle', attributeType='message')
-                cmds.addAttr(self.net, longName='geo_to_attach', attributeType='message')
-                cmds.addAttr(self.net, longName='inv_t_grp', attributeType='message')
-                cmds.addAttr(self.net, longName='inv_r_grp', attributeType='message')
+                cmds.addAttr(self.net, longName='geoToAttach', attributeType='message')
+                cmds.addAttr(self.net, longName='invTGrp', attributeType='message')
+                cmds.addAttr(self.net, longName='invRGrp', attributeType='message')
                 cmds.addAttr(self.net, longName='deformerGeo', attributeType='message')
-                cmds.addAttr(self.net, longName='deformer_node', attributeType='message')
+                cmds.addAttr(self.net, longName='deformerNode', attributeType='message')
                 cmds.addAttr(self.net, longName='pacNode', attributeType='message')
                 cmds.addAttr(self.net, longName='rivetData', dataType='string')
                 # set
-                cmds.setAttr(f"{self.net}.rivetData", json.dumps(self.get_rivet_data(items[r], geo_to_attach, uv_set_name, items, attatch_translate, attach_rotate, add_father_grp, add_invert, inv_t, inv_r, face_to_rivet, rivet_grp_name, ask_component, use_offset)), type='string')
+                cmds.setAttr(f"{self.net}.rivetData", json.dumps(self.get_rivet_info_data(items[r], geo_to_attach, uv_set_name, items, attatch_translate, attach_rotate, add_father_grp, add_invert, inv_t, inv_r, face_to_rivet, rivet_grp_name, ask_component, use_offset)), type='string')
                 # connect
                 cmds.connectAttr(f"{rivet}.message", f"{self.net}.rivet", force=True)
                 cmds.connectAttr(f"{fol_transform}.message", f"{self.net}.follicle", force=True)
-                cmds.connectAttr(f"{geo_to_attach}.message", f"{self.net}.geo_to_attach", force=True)
+                cmds.connectAttr(f"{geo_to_attach}.message", f"{self.net}.geoToAttach", force=True)
                 cmds.connectAttr(f"{rivetPac}.message", f"{self.net}.pacNode", force=True)
                 
                 if face_to_rivet:
-                    cmds.connectAttr(f"{self.deformerNodeList[0]}.message", f"{self.net}.deformerGeo", force=True)
-                    cmds.connectAttr(f"{self.deformerNodeList[1]}.message", f"{self.net}.deformer_node", force=True)
+                    cmds.connectAttr(f"{self.deformer_node_items[0]}.message", f"{self.net}.deformerGeo", force=True)
+                    cmds.connectAttr(f"{self.deformer_node_items[1]}.message", f"{self.net}.deformerNode", force=True)
                 if len(items) == len(rivets) and cmds.objExists(items[r]):
                     cmds.connectAttr(f"{items[r]}.message", f"{self.net}.item_node", force=True)
                     if not cmds.objExists(f"{items[r]}.rivetNet"):
@@ -480,9 +480,9 @@ class Rivet(base.BaseLibrary):
                 for rivet, net in zip(rivets, self.nets):
                     inv_t_grp, inv_r_grp = self.invert_attr_transformation(rivet, inv_t, inv_r)
                     if inv_t_grp:
-                        cmds.connectAttr(f"{inv_t_grp}.message", f"{net}.inv_t_grp", force=True)
+                        cmds.connectAttr(f"{inv_t_grp}.message", f"{net}.invTGrp", force=True)
                     if inv_r_grp:
-                        cmds.connectAttr(f"{inv_r_grp}.message", f"{net}.inv_r_grp", force=True)
+                        cmds.connectAttr(f"{inv_r_grp}.message", f"{net}.invRGrp", force=True)
             # clean-up temporary nodes:
             cmds.delete(dup_geo, self.cp_node, self.temp_node)
         else:
@@ -494,27 +494,27 @@ class Rivet(base.BaseLibrary):
         return self.nets
     
 
-    def get_rivet_data(self, item_node, geo_to_attach, uv_set_name, items, attatch_translate, attach_rotate, add_father_grp, add_invert, inv_t, inv_r, face_to_rivet, rivet_grp_name, ask_component, use_offset, *args):
+    def get_rivet_info_data(self, item_node, geo_to_attach, uv_set_name, items, attatch_translate, attach_rotate, add_father_grp, add_invert, inv_t, inv_r, face_to_rivet, rivet_grp_name, ask_component, use_offset, *args):
         """ Collect all rivet data and return it as a dictionary.
         """
         data = {
                 'rivetNetName' : self.net,
-                'item_node' : item_node,
-                'geo_to_attach' : self.origined_geo,
-                'uv_set_name' : uv_set_name,
-                'items' : items,
-                'attatch_translate' : attatch_translate,
-                'attach_rotate' : attach_rotate,
-                'add_father_grp' : add_father_grp,
-                'add_invert' : add_invert,
-                'inv_t' : inv_t,
-                'inv_r' : inv_r,
-                'face_to_rivet' : face_to_rivet,
-                'rivet_grp_name' : rivet_grp_name,
-                'ask_component' : ask_component,
-                'use_offset' : use_offset,
-                'deformer_to_use' : self.deformer_to_use,
-                'reuse_face_to_rivet': geo_to_attach
+                'itemNode' : item_node,
+                'geoToAttach' : self.origined_geo,
+                'uvSetName' : uv_set_name,
+                'itemList' : items,
+                'attachTranslate' : attatch_translate,
+                'attachRotate' : attach_rotate,
+                'addFatherGrp' : add_father_grp,
+                'addInvert' : add_invert,
+                'invT' : inv_t,
+                'invR' : inv_r,
+                'faceToRivet' : face_to_rivet,
+                'rivetGrpName' : rivet_grp_name,
+                'askComponent' : ask_component,
+                'useOffset' : use_offset,
+                'deformerToUse' : self.deformer_to_use,
+                'reuseFaceToRivet': geo_to_attach
         }
         return data
 
@@ -632,17 +632,11 @@ class Rivet(base.BaseLibrary):
     def deform_face_to_rivet(self, geometry, origGeo, *args):
         """ Do deformation from original mesh to face_to_rivet geo.
         """
-        if self.ar.data.ui_state:
-            # Create deformer by user selection
-            selected_deformer_rb = cmds.radioCollection('rivet_deformer_rc', query=True, select=True)
-            self.deformer_to_use = cmds.radioButton(selected_deformer_rb, query=True, annotation=True)
-        else:
-            self.deformer_to_use = self.morph_deformer
         if self.deformer_to_use:
             if self.deformer_to_use == self.morph_deformer:
-                self.deformerNodeList = self.apply_morph_deformer(geometry, origGeo)
+                self.deformer_node_items = self.apply_morph_deformer(geometry, origGeo)
             elif self.deformer_to_use == self.wrap_deformer:
-                self.deformerNodeList = self.apply_wrap_deformer(geometry, origGeo)
+                self.deformer_node_items = self.apply_wrap_deformer(geometry, origGeo)
 
 
     def check_node_exists(self, shapes, type, *args):

@@ -355,7 +355,7 @@ class Skinning(weights.Weights):
                         cmds.setAttr(f"{skincluster_name}.weightDistribution", skin_weight_data[item][skincluster_name]['skinWeightDistribution'])
                         cmds.setAttr(f"{skincluster_name}.maxInfluences", skin_weight_data[item][skincluster_name]['skinMaxInfluences'])
                         cmds.setAttr(f"{skincluster_name}.maintainMaxInfluences", skin_weight_data[item][skincluster_name]['skinMaintainMaxInfluences'])
-                        if 'relativeSpaceMode' in cmds.listAttrs(skincluster_name) and 'skinRelativeSpaceMode' in skin_weight_data[item][skincluster_name]:
+                        if 'relativeSpaceMode' in cmds.listAttr(skincluster_name) and 'skinRelativeSpaceMode' in skin_weight_data[item][skincluster_name]:
                             cmds.setAttr(f"{skincluster_name}.relativeSpaceMode", skin_weight_data[item][skincluster_name]['skinRelativeSpaceMode'])
         if verbose:
             self.ar.ui_manager.set_progress(end_it=True)
