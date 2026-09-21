@@ -248,4 +248,3 @@ class FkLine(standard.BaseStandard):
         self.delete_guide()
         self.rename_unit_conversion()
         self.ar.custom_attr.add_attr(0, self.to_ids) #dpID
-    

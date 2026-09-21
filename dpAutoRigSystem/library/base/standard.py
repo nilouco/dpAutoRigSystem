@@ -55,6 +55,7 @@ class BaseStandard(base.BaseLibrary):
         self.guide_net = self.ar.utils.get_node_by_message('net', self.guide_base)
         if self.guide_net:
             self.raw = cmds.getAttr(f"{self.guide_net}.rawGuide")
+        self.custom_name = cmds.getAttr(f"{self.guide_base}.customName")
 
     
     def create_module_layout(self):
@@ -210,11 +211,12 @@ class BaseStandard(base.BaseLibrary):
                             self.custom_name = f"{base_name}{n.zfill(pad)}"
                             break
                 # edit the prefixTextField with the normalText:
-                try:
-                    cmds.textField('edit_guide_custom_name_tf', edit=True, text=self.custom_name)
-                    cmds.frameLayout('edit_guide_fl', edit=True, label=f"{self.ar.data.lang[self.title]} - {self.custom_name}")
-                except:
-                    pass
+                if self.ar.data.ui_state:
+                    try:
+                        cmds.textField('edit_guide_custom_name_tf', edit=True, text=self.custom_name)
+                        cmds.frameLayout('edit_guide_fl', edit=True, label=f"{self.ar.data.lang[self.title]} - {self.custom_name}")
+                    except:
+                        pass
                 cmds.setAttr(f"{self.guide_base}.customName", self.custom_name, type='string')
                 cmds.setAttr(f"{self.annotation}.text", self.custom_name, type='string')
                 if self.guide_net:
@@ -467,7 +469,7 @@ class BaseStandard(base.BaseLibrary):
                     cmds.parent(child, world=True)
             
             # just edit customName and prefix:
-            if self.custom_name != "" and self.custom_name != ' ' and self.custom_name != '_' and self.custom_name != None:
+            if self.custom_name != '' and self.custom_name != ' ' and self.custom_name != '_' and self.custom_name != None:
                 names = [n for n in cmds.ls(selection=False, type='transform') if 'dpAR_name' in cmds.listAttr(n)]
                 for item in names:
                    if self.custom_name == cmds.getAttr(f"{item}.dpAR_name"):
@@ -484,23 +486,26 @@ class BaseStandard(base.BaseLibrary):
             self.rigType = self.get_guide_attr('rigType')
     
 
-    def create_hook_setup(self, side, controllers, scalableList=None, staticList=None, *args):
+    def create_hook_setup(self, side, controllers, scalables=None, statics=None, *args):
         """ Generate the hook setup to find lists of controllers, scalable and static groups.
             Add message attributes to map hooked groups for the rigged module.
         """
         # create a masterModuleGrp to be checked if this rig exists:
+        self.main_hook_grp = cmds.createNode('transform', name=f"{side}{self.number_name}_Main_Grp")
+        self.scalable_hook_grp = cmds.createNode('transform', name=f"{side}{self.number_name}_Scalable_Grp")
+        self.static_hook_grp = cmds.createNode('transform', name=f"{side}{self.number_name}_Static_Grp")
         self.ctrl_hook_grp = cmds.group(controllers, name=f"{side}{self.number_name}_Control_Grp")
-        self.scalable_hook_grp = cmds.group(empty=True, name=f"{side}{self.number_name}_Scalable_Grp")
-        self.static_hook_grp = cmds.group(self.ctrl_hook_grp, self.scalable_hook_grp, name=f"{side}{self.number_name}_Static_Grp")
-        if staticList:
-            cmds.parent(staticList, self.static_hook_grp)
-        if scalableList:
-            cmds.parent(scalableList, self.scalable_hook_grp)
-        self.ar.custom_attr.add_attr(0, [self.ctrl_hook_grp, self.scalable_hook_grp, self.static_hook_grp]) #dpID
+        if statics:
+            cmds.parent(statics, self.static_hook_grp)
+        if scalables:
+            cmds.parent(scalables, self.scalable_hook_grp)
+        self.ar.custom_attr.add_attr(0, [self.main_hook_grp, self.ctrl_hook_grp, self.scalable_hook_grp, self.static_hook_grp]) #dpID
+        cmds.parent(self.scalable_hook_grp, self.static_hook_grp, self.ctrl_hook_grp, self.main_hook_grp)
         # add hook attributes to be read when rigging composed modules:
         self.ar.utils.add_hook(self.ctrl_hook_grp, 'ctrlHook')
         self.ar.utils.add_hook(self.scalable_hook_grp, 'scalableHook')
         self.ar.utils.add_hook(self.static_hook_grp, 'staticHook')
+        self.ar.utils.add_hook(self.main_hook_grp, 'mainHook')
         cmds.lockNode(self.guide_net, lock=False)
         # add module type counter value
         if not 'dpAR_count' in cmds.listAttr(self.guide_net):
@@ -510,9 +515,11 @@ class BaseStandard(base.BaseLibrary):
         cmds.addAttr(self.guide_net, longName=f"{side}ControlHookGrp", attributeType='message')
         cmds.addAttr(self.guide_net, longName=f"{side}StaticHookGrp", attributeType='message')
         cmds.addAttr(self.guide_net, longName=f"{side}ScalableHookGrp", attributeType='message')
+        cmds.addAttr(self.guide_net, longName=f"{side}MainHookGrp", attributeType='message')
         cmds.connectAttr(f"{self.ctrl_hook_grp}.message", f"{self.guide_net}.{side}ControlHookGrp", force=True)
         cmds.connectAttr(f"{self.scalable_hook_grp}.message", f"{self.guide_net}.{side}ScalableHookGrp", force=True)
         cmds.connectAttr(f"{self.static_hook_grp}.message", f"{self.guide_net}.{side}StaticHookGrp", force=True)
+        cmds.connectAttr(f"{self.main_hook_grp}.message", f"{self.guide_net}.{side}MainHookGrp", force=True)
         cmds.setAttr(f"{self.scalable_hook_grp}.visibility", self.ar.data.display_joint)
         cmds.setAttr(f"{self.static_hook_grp}.visibility", self.ar.data.display_joint)
         cmds.lockNode(self.guide_net, lock=True)

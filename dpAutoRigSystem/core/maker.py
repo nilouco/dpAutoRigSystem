@@ -544,6 +544,7 @@ class Maker:
         for item in self.guides_to_rig:
             for s, side in enumerate(self.get_mirror_names(item)):
                 # get hook groups info:
+                self.main_hook_grp = cmds.listConnections(f"{item.guide_net}.{side}MainHookGrp", destination=False, source=True)[0]
                 self.static_hook_grp = cmds.listConnections(f"{item.guide_net}.{side}StaticHookGrp", destination=False, source=True)[0]
                 self.scalable_hook_grp = cmds.listConnections(f"{item.guide_net}.{side}ScalableHookGrp", destination=False, source=True)[0]
                 self.ctrl_hook_grp = cmds.listConnections(f"{item.guide_net}.{side}ControlHookGrp", destination=False, source=True)[0]
@@ -578,6 +579,8 @@ class Maker:
                 # put static and scalable groups in dataGrp:
                 cmds.parent(self.static_hook_grp, self.static_grp)
                 cmds.parent(self.scalable_hook_grp, self.scalable_grp)
+                if not cmds.listRelatives(self.main_hook_grp, children=True):
+                    cmds.delete(self.main_hook_grp)
                 # finish hookGrps:
                 cmds.setAttr(f"{self.static_hook_grp}.staticHook", 0)
                 cmds.setAttr(f"{self.scalable_hook_grp}.scalableHook", 0)
@@ -586,6 +589,7 @@ class Maker:
                 cmds.deleteAttr(f"{item.guide_net}.{side}StaticHookGrp")
                 cmds.deleteAttr(f"{item.guide_net}.{side}ScalableHookGrp")
                 cmds.deleteAttr(f"{item.guide_net}.{side}ControlHookGrp")
+                cmds.deleteAttr(f"{item.guide_net}.{side}MainHookGrp")
                 cmds.lockNode(item.guide_net, lock=True)
 
 
