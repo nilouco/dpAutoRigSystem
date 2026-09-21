@@ -28,6 +28,7 @@ class Configuration:
                             self.ar.data.curve_combined_folder,
                             self.ar.data.checkin_folder,
                             self.ar.data.checkout_folder,
+                            self.ar.data.prepare_anim_folder,
                             self.ar.data.start_folder,
                             self.ar.data.source_folder,
                             self.ar.data.setup_folder,
@@ -322,6 +323,7 @@ class Configuration:
             validators.extend(self.ar.data.lib[self.ar.data.checkaddon_folder]['instances'])
         validators.extend(self.ar.data.lib[self.ar.data.checkin_folder]['instances'])
         validators.extend(self.ar.data.lib[self.ar.data.checkout_folder]['instances'])
+        validators.extend(self.ar.data.lib[self.ar.data.prepare_anim_folder]['instances'])
         if self.ar.data.checkfinishing_folder:
             validators.extend(self.ar.data.lib[self.ar.data.checkfinishing_folder]['instances'])
         return validators

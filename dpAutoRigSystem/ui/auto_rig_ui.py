@@ -413,6 +413,7 @@ class MainUI:
         # validators
         self.create_check_layout('i208_checkin', self.ar.data.lib[self.ar.data.checkin_folder]['instances'], 'validator_cl')
         self.create_check_layout('i209_checkout', self.ar.data.lib[self.ar.data.checkout_folder]['instances'], 'validator_cl')
+        self.create_check_layout('i368_prepare_anim', self.ar.data.lib[self.ar.data.prepare_anim_folder]['instances'], 'validator_cl')
         if self.ar.data.checkaddon_folder:
             self.create_check_layout('i212_addOns', self.ar.data.lib[self.ar.data.checkaddon_folder]['instances'], 'validator_cl', False)
         if self.ar.data.checkfinishing_folder:

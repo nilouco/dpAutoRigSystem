@@ -7,7 +7,8 @@ class UIFiller:
     def __init__(self, ar):
         self.ar = ar
         self.validator_folders = [ self.ar.data.checkin_folder, 
-                                   self.ar.data.checkout_folder]
+                                   self.ar.data.checkout_folder,
+                                   self.ar.data.prepare_anim_folder]
         self.rebuilder_folders = [ self.ar.data.start_folder,
                                    self.ar.data.source_folder,
                                    self.ar.data.setup_folder,
@@ -38,6 +39,8 @@ class UIFiller:
             self.populate_library(item, self.ar.data.checkin_folder, 'i208_checkin_module_cl')
         for item in self.ar.data.lib[self.ar.data.checkout_folder]['instances']:
             self.populate_library(item, self.ar.data.checkout_folder, 'i209_checkout_module_cl')
+        for item in self.ar.data.lib[self.ar.data.prepare_anim_folder]['instances']:
+            self.populate_library(item, self.ar.data.prepare_anim_folder, 'i368_prepare_anim_module_cl')
         if self.ar.data.checkaddon_folder:
             for item in self.ar.data.lib[self.ar.data.checkaddon_folder]['instances']:
                 cmds.frameLayout('i212_addOns_fl', edit=True, visible=True)

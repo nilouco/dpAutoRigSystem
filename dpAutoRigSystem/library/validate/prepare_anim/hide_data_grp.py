@@ -51,6 +51,7 @@ class HideDataGrp(action.BaseAction):
                     else: #fix
                         try:
                             cmds.setAttr(f"{data_grp}.visibility", 0)
+                            cmds.setAttr(f"{data_grp}.hiddenInOutliner", 0)
                             self.good_results.append(True)
                             self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {data_grp}")
                         except:

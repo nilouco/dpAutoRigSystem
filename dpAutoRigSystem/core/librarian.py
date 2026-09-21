@@ -32,6 +32,7 @@ class Lib:
         # validators
         self.start_modules_by_folder(self.ar.data.checkin_folder)
         self.start_modules_by_folder(self.ar.data.checkout_folder)
+        self.start_modules_by_folder(self.ar.data.prepare_anim_folder)
         if self.ar.pipeliner.pipe_data['addOnsPath'] and self.ar.config.get_validator_addons():
             self.start_modules_by_folder('', path=self.ar.pipeliner.pipe_data['addOnsPath'])
             self.ar.data.checkaddon_folder = self.ar.pipeliner.pipe_data['addOnsPath']

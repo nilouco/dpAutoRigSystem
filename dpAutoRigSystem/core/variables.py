@@ -70,6 +70,7 @@ class Data:
     facial_preset_folder: str = 'library.preset.facial'
     checkin_folder: str = 'library.validate.checkin'
     checkout_folder: str = 'library.validate.checkout'
+    prepare_anim_folder: str = 'library.validate.prepare_anim'
     validate_preset_folder: str = 'library.preset.validate'
     start_folder: str = 'library.rebuild.start'
     source_folder: str = 'library.rebuild.source'
