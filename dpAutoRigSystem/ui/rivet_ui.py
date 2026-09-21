@@ -53,8 +53,8 @@ class RivetUI:
         cmds.checkBox('rivet_face_to_rivet_cb', label=self.ar.data.lang['m226_createFaceToRivet'], height=20, value=True, changeCommand=self.change_deformer, parent='rivet_face_to_rivet_cl')
         cmds.columnLayout('rivet_deformer_cl', columnOffset=('left', 20), parent='rivet_face_to_rivet_cl')
         cmds.radioCollection('rivet_deformer_rc', parent='rivet_deformer_cl')
-        cmds.radioButton('rivet_morph_def_rb', label=self.ar.data.lang['m232_morphDeformer'], annotation=self.app.morph_deformer, enable=self.app.maya_required_version, collection='rivet_deformer_rc')
-        cmds.radioButton('rivet_wrap_def_rb', label=self.ar.data.lang['m172_wrapDeformer'], annotation=self.app.wrap_deformer, enable=self.app.maya_required_version, collection='rivet_deformer_rc')
+        cmds.radioButton('rivet_morph_def_rb', label=self.ar.data.lang['m232_morphDeformer'], annotation=self.app.morph_deformer, enable=self.app.maya_required_version, changeCommand=self.get_deformer_by_ui, collection='rivet_deformer_rc')
+        cmds.radioButton('rivet_wrap_def_rb', label=self.ar.data.lang['m172_wrapDeformer'], annotation=self.app.wrap_deformer, enable=self.app.maya_required_version, changeCommand=self.get_deformer_by_ui, collection='rivet_deformer_rc')
         cmds.radioCollection('rivet_deformer_rc', edit=True, select='rivet_morph_def_rb')
         if not self.app.maya_required_version:
             cmds.radioCollection('rivet_deformer_rc', edit=True, select='rivet_wrap_def_rb')
@@ -296,3 +296,8 @@ class RivetUI:
             value = False
         cmds.radioButton('rivet_morph_def_rb', edit=True, enable=value)
         cmds.radioButton('rivet_wrap_def_rb', edit=True, enable=value)
+
+
+    def get_deformer_by_ui(self, *args):
+        selected_deformer_rc = cmds.radioCollection('rivet_deformer_rc', query=True, select=True)
+        self.app.deformer_to_use = cmds.radioButton(selected_deformer_rc, query=True, annotation=True)
