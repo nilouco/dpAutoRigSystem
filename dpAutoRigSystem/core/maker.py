@@ -831,6 +831,7 @@ class Composer:
         elif item.name == self.ar.data.wheel_name:
             self.wheel_options(item)
             self.wheel_steering(item, father)
+            self.wheel_pedal(item)
         elif item.name == self.ar.data.suspension_name:
             self.suspension_wheel(item, father)
         elif item.name == self.ar.data.nose_name:
@@ -1212,6 +1213,27 @@ class Composer:
                 # reparent wheel module:
                 wheel_hook_ctrl_grp = wheel.composed['ctrlHookGrpList'][s]
                 cmds.parent(wheel_hook_ctrl_grp, self.ar.maker.ctrls_vis_grp)
+
+
+    def wheel_pedal(self, wheel):
+        for s, side in enumerate(self.ar.maker.get_mirror_names(wheel)):
+            wheel_ctrl = wheel.composed['wheelCtrlList'][s]
+            # get pedal module:
+            for child in cmds.listRelatives(wheel_ctrl, children=True, allDescendents=True, type='transform') or []:
+                if 'dpControl' in cmds.listAttr(child):
+                    if not 'invertRotate' in cmds.listAttr(child):
+                        cmds.addAttr(child, longName='invertRotate', minValue=0, maxValue=1, defaultValue=1, attributeType='float')
+                        cmds.setAttr(f"{child}.invertRotate", keyable=True)
+                    child_grp = cmds.listRelatives(child, parent=True)[0]
+                    pma = cmds.createNode('plusMinusAverage', name=f'{child_grp}_Rotate_PMA')
+                    bc = cmds.createNode('blendColors', name=f'{child_grp}_Rotate_BC')
+                    cmds.setAttr(f"{bc}.color2R", 0)
+                    cmds.connectAttr(f'{wheel_ctrl}.rotateZ', f'{pma}.input1D[0]', force=True)
+                    cmds.connectAttr(f'{cmds.listRelatives(wheel_ctrl, parent=True)[0]}.rotateZ', f'{pma}.input1D[1]', force=True)
+                    cmds.connectAttr(f'{child}.invertRotate', f'{bc}.blender', force=True)
+                    cmds.connectAttr(f'{pma}.output1D', f'{bc}.color1R', force=True)
+                    cmds.connectAttr(f'{bc}.outputR', f'{child_grp}.rotateX', force=True)
+                    self.to_ids.extend([bc, pma])
 
 
     def suspension_wheel(self, suspension, wheel):

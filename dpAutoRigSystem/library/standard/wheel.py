@@ -138,7 +138,8 @@ class Wheel(standard.BaseStandard):
                 self.wheel_ctrls.append(wheel_ctrl)
 
                 # origined from attributes:
-                self.ar.utils.set_origined_from_attr(main_ctrl, f"{self.base};{self.guide_center_loc};{self.guide_front_loc};{self.guide_radius}")
+                self.ar.utils.set_origined_from_attr(main_ctrl, f"{self.guide_front_loc};{self.guide_radius}")
+                self.ar.utils.set_origined_from_attr(wheel_ctrl, f"{self.base};{self.guide_center_loc}")
                 self.ar.utils.set_origined_from_attr(inside_ctrl, self.guide_inside_loc)
                 self.ar.utils.set_origined_from_attr(outside_ctrl, self.guide_outside_loc)
                 
