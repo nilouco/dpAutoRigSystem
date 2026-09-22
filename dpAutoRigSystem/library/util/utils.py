@@ -185,6 +185,9 @@ class Utils:
         transforms = cmds.ls(type='transform')
         for item in transforms:
             if 'guideBase' in cmds.listAttr(item) and cmds.getAttr(f"{item}.guideBase") == 1:
+                guide_parents = []
+                father_nodes = []
+                parent_node = ''
                 # module info:
                 guide_module_namespace = item[:item.find(':')]
                 name = item[:item.find('__')]
@@ -201,14 +204,11 @@ class Utils:
                         if cmds.objExists(f"{child}.guideBase") and cmds.getAttr(f"{child}.guideBase") == 1:
                             guide_children.append(child)                
                 # get father:
-                guide_parents = []
-                father_nodes = []
-                parent_node = ''
                 parents = cmds.listRelatives(item, parent=True, type='transform')
                 if parents:
                     next_loop = True
                     while next_loop:
-                        if cmds.objExists(f"{parents[0]}.guideBase") and cmds.getAttr(f"{parents[0]}.guideBase") == 1:
+                        if 'guideBase' in cmds.listAttr(parents[0]) and cmds.getAttr(f"{parents[0]}.guideBase") == 1:
                             guide_parents.append(parents[0])
                             next_loop = False
                         else:
@@ -221,9 +221,9 @@ class Utils:
                                 next_loop = False
                     if guide_parents:
                         # father info:
-                        guide_parent      = guide_parents[0]
-                        father_module     = guide_parent[:guide_parent.find('__')]
-                        father_instance   = guide_parent[guide_parent.rfind('__')+2:guide_parent.find(':')]
+                        guide_parent = guide_parents[0]
+                        father_module = guide_parent[:guide_parent.find('__')]
+                        father_instance = guide_parent[guide_parent.rfind('__')+2:guide_parent.find(':')]
                         father_custom_name = cmds.getAttr(f"{guide_parent}.customName")
                         father_mirror_axis = cmds.getAttr(f"{guide_parent}.mirrorAxis")
                         current_father_mirror_name  = cmds.getAttr(f"{guide_parent}.mirrorName")
@@ -234,9 +234,12 @@ class Utils:
                             guide_parent_children = cmds.listRelatives(guide_parent, children=True, type='transform')
                             if guide_parent_children:
                                 for guide_parent_child in guide_parent_children:
-                                    if cmds.objExists(f"{guide_parent_child}.nJoint") and cmds.getAttr(f"{guide_parent_child}.nJoint") == 1 and guide_parent[:guide_parent.rfind(':')] in guide_parent_child:
+                                    if 'nJoint' in cmds.listAttr(guide_parent_child) and cmds.getAttr(f"{guide_parent_child}.nJoint") == 1 and guide_parent[:guide_parent.rfind(':')] in guide_parent_child:
                                         father_nodes = [guide_parent_child]
                                         father_guide_loc = guide_parent_child[guide_parent_child.find('Guide_')+6:]
+                            if not father_nodes:
+                                father_nodes = [guide_parent]
+                                father_guide_loc = guide_parent[guide_parent.find('Guide_')+6:]
                     
                     # parent_node info:
                     parent_node = cmds.listRelatives(item, parent=True, type='transform')[0]

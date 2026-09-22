@@ -560,7 +560,10 @@ class Maker:
                         if self.hook[item.guide_base]['fatherCustomName']:
                             father_name = f"{side_father}{self.ar.data.prefix}{self.hook[item.guide_base]['fatherCustomName']}"
                         # get final rigged parent node from origined_from_data:
-                        father_rigged_parent_node = self.origined_from_data[f"{father_name}_Guide_{self.hook[item.guide_base]['fatherGuideLoc']}"]
+                        if f"{father_name}_Guide_{self.hook[item.guide_base]['fatherGuideLoc']}" in self.origined_from_data:
+                            father_rigged_parent_node = self.origined_from_data[f"{father_name}_Guide_{self.hook[item.guide_base]['fatherGuideLoc']}"]
+                        else:
+                           father_rigged_parent_node = self.origined_from_data[f"{father_name}_Guide_Base"]
                         if father_rigged_parent_node:
                             if len(father_mirror_names) != 1: # tell us 'the father has mirror'
                                 # parent them to the correct side of the father's mirror:

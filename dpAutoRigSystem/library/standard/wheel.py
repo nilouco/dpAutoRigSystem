@@ -61,6 +61,7 @@ class Wheel(standard.BaseStandard):
         cmds.setAttr(f"{self.guide_outside_loc}.translateZ", -0.3)
         cmds.setAttr(f"{front_loc_pos_pma}.input1D[0]", -0.5)
         cmds.setAttr(f"{inverse_radius_md}.input2X", -1)
+        cmds.setAttr(f"{self.guide_center_loc}.nJoint", 0) #hack to skip suspension to be parented to the centerLoc when getting the hook by utils
         # parenting
         cmds.parent(self.line_center, self.guide_center_loc, self.guide_base, relative=True)
         cmds.parent(self.guide_front_loc, self.guide_inside_loc, self.guide_outside_loc, self.guide_center_loc)
@@ -138,8 +139,8 @@ class Wheel(standard.BaseStandard):
                 self.wheel_ctrls.append(wheel_ctrl)
 
                 # origined from attributes:
-                self.ar.utils.set_origined_from_attr(main_ctrl, f"{self.guide_front_loc};{self.guide_radius}")
-                self.ar.utils.set_origined_from_attr(wheel_ctrl, f"{self.base};{self.guide_center_loc}")
+                self.ar.utils.set_origined_from_attr(main_ctrl, f"{self.base};{self.guide_front_loc};{self.guide_radius}")
+                self.ar.utils.set_origined_from_attr(wheel_ctrl, self.guide_center_loc)
                 self.ar.utils.set_origined_from_attr(inside_ctrl, self.guide_inside_loc)
                 self.ar.utils.set_origined_from_attr(outside_ctrl, self.guide_outside_loc)
                 
