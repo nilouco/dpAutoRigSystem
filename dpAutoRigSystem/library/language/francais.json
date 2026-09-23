@@ -5,7 +5,7 @@
     "_contact"       : "nilouco@gmail.com\nhttps://nilouco.blogspot.com",
     "_date"          : "2011-08-04",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2026-09-21",
+    "_updated"       : "2026-09-23",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas de caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -319,7 +319,7 @@
     "i148_finish"               : "Terminer",
     "i149_createLanguage"       : "Creer Langue",
     "i150_languageCreated"      : "Langue a été crée avec sucès!",
-    "i151_language"             : "Langue nom",
+    "i151_language"             : "Langue",
     "i152_noSpecialChar"        : "N'utilise pas de caractère spécial pour ce type de phrase, s'il vous plaît.",
     "i153_presentation"         : "Présentation",
     "i154_up"                   : "Haut",
@@ -535,6 +535,11 @@
     "i366_loadGeoToRivet"       : "Charger une geometrie pour l'attacher rivets, s'il tu plait.",
     "i367_selectNodeToRivet"    : "Selecioner un transform, des vertices ou des points de lattice pour les ajouter au rivet, s'il tu plait.",
     "i368_prepare_anim"         : "preparer pour l'animation",
+    "i369_settings"             : "Paramètres",
+    "i370_reload"               : "Recharger",
+    "i371_quit"                 : "Sortir",
+    "i372_help"                 : "Aide",
+    "i373_termsConditions"      : "Termes et Conditions",
 
     "m001_fkLine"                : "Fk Ligne",
     "m002_fkLineDesc"            : "Description du module Fk Ligne:\n\nCe module crée une chaîne de joints\navec le nombre de joints désiré.\n\nLorsque riggés, les contrôles seront FK (forward kinematics),\nik (inverse kinematics) ou dynamiques.\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",

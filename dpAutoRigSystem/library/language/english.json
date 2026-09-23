@@ -5,7 +5,7 @@
     "_contact"       : "nilouco@gmail.com\nhttps://nilouco.blogspot.com",
     "_date"          : "2010-10-03",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2026-09-21",
+    "_updated"       : "2026-09-23",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field below to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to add a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -535,6 +535,11 @@
     "i366_loadGeoToRivet"       : "Load one geometry to attach rivets on it, please.",
     "i367_selectNodeToRivet"    : "Please, select a tranform node, vertices or lattice points in order to add it in the item list.",
     "i368_prepare_anim"         : "prepare for animation",
+    "i369_settings"             : "Settings",
+    "i370_reload"               : "Reload",
+    "i371_quit"                 : "Quit",
+    "i372_help"                 : "Help",
+    "i373_termsConditions"      : "Terms and Conditions",
 
     "m001_fkLine"                : "Fk Line",
     "m002_fkLineDesc"            : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of desired joints.\n\nWhen rigged, the controllers will be FK (forward kinematics),\nIK (inverse kinematics), or dynamic.\n\nThis is useful to create tails, ears, hair\nor simple controllers to objects.",

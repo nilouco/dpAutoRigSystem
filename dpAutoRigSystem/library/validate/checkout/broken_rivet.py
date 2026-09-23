@@ -1,11 +1,9 @@
 import random
-from importlib import reload
 
 from maya import cmds, mel
 from maya.api import OpenMaya
 
 from ....library.base import action
-from ....library.tool import rivet
 
 # global variables to this module:
 CLASS_NAME = 'BrokenRivet'
@@ -18,9 +16,7 @@ WIKI = '07-‐-Validator#-broken-rivets'
 class BrokenRivet(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        if self.ar.dev:
-            reload(rivet)
-        self.rivet = rivet.Rivet(self.ar)
+        self.rivet = self.ar.config.get_instance('Rivet', [self.ar.data.tools_folder])
         self.rivet.ui = False
 
 

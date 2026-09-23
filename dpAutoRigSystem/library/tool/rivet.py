@@ -52,10 +52,10 @@ class Rivet(base.BaseLibrary):
         self.rivet_grp_name = RIVET_GRP
         self.maya_minimal_version = 2022.3
         self.maya_required_version = self.check_maya_version()
-        self.nets = []
         
 
     def build_tool(self, *args):
+        self.nets = []
         if self.ar.data.ui_state:
             self.ar.rivet_ui.create_ui(self)
             self.ar.rivet_ui.fill_ui()

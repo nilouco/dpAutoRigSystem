@@ -76,11 +76,11 @@ class MainUI:
 
 
     def create_settings_menu(self):
-        cmds.menu('settings_menu', label='Settings', parent='main_menu_bar')
-        self.create_radio_menu('language', 'settings_menu', self.ar.data.lang['_preset'].lower(), self.ar.data.lang_preset_data, self.ar.data.language_option_var)
-        self.create_radio_menu('validator_preset', 'settings_menu', self.ar.data.validator_preset['_preset'].lower(), self.ar.data.validator_preset_data, self.ar.data.validator_option_var)
-        self.create_radio_menu('curve_preset', 'settings_menu', self.ar.data.curve_preset['_preset'].lower(), self.ar.data.curve_preset_data, self.ar.data.curve_option_var)
-        self.create_radio_menu('curve_degree', 'settings_menu', self.ar.data.degree, {degree:n for n, degree in enumerate(self.ar.data.degrees)}, self.ar.data.degree_option_var)
+        cmds.menu('settings_menu', label=self.ar.data.lang['i369_settings'], parent='main_menu_bar')
+        self.create_radio_menu(self.ar.data.lang['i151_language'], 'settings_menu', self.ar.data.lang['_preset'].lower(), self.ar.data.lang_preset_data, self.ar.data.language_option_var)
+        self.create_radio_menu(f"{self.ar.data.lang['v000_validator']}_{self.ar.data.lang['c051_preset']}", 'settings_menu', self.ar.data.validator_preset['_preset'].lower(), self.ar.data.validator_preset_data, self.ar.data.validator_option_var)
+        self.create_radio_menu(f"{self.ar.data.lang['i189_curve']}_{self.ar.data.lang['c051_preset']}", 'settings_menu', self.ar.data.curve_preset['_preset'].lower(), self.ar.data.curve_preset_data, self.ar.data.curve_option_var)
+        self.create_radio_menu(f"{self.ar.data.lang['i189_curve']}_{self.ar.data.lang['i103_degree']}", 'settings_menu', self.ar.data.degree, {degree:n for n, degree in enumerate(self.ar.data.degrees)}, self.ar.data.degree_option_var)
         # options
         cmds.menuItem('options_mi', label=self.ar.data.lang['i002_options'], subMenu=True, parent='settings_menu')
         cmds.menuItem('opt_colorize_curve_mi', label=self.ar.data.lang['i065_colorizeCtrl'], checkBox=self.ar.data.colorize_curve, command=self.ar.opt.set_colorize_curve, parent='options_mi')
@@ -95,7 +95,7 @@ class MainUI:
 
 
     def create_the_create_menu(self):
-        cmds.menu('create_menu', label='Create', parent='main_menu_bar')
+        cmds.menu('create_menu', label=self.ar.data.lang['i158_create'], parent='main_menu_bar')
         cmds.menuItem('template_mi', label='Template', command=self.ar.maker.create_template, parent='create_menu')
         cmds.menuItem('translator_mi', label='Translator', command=self.ar.translator.translator_ui, parent='create_menu')
         cmds.menuItem('pipeliner_mi', label='Pipeliner', command=self.ar.pipeline_ui.create_ui, parent='create_menu')
@@ -104,21 +104,21 @@ class MainUI:
 
 
     def create_window_menu(self):
-        cmds.menu('window_menu', label='Window', parent='main_menu_bar')
+        cmds.menu('window_menu', label=self.ar.data.lang['c079_window'], parent='main_menu_bar')
         cmds.menuItem('dev_mode_mi', label='Dev mode', checkBox=self.ar.dev, command=self.ar.ui_manager.reload_dev_mode_ui, parent='window_menu')
-        cmds.menuItem('reload_ui_mi', label='Reload UI', command=self.ar.ui_manager.reload_ui, parent='window_menu')
-        cmds.menuItem('quit_mi', label='Quit', command=self.ar.ui_manager.delete_exist_window, parent='window_menu')
+        cmds.menuItem('reload_ui_mi', label=f"{self.ar.data.lang['i370_reload']} UI", command=self.ar.ui_manager.reload_ui, parent='window_menu')
+        cmds.menuItem('quit_mi', label=self.ar.data.lang['i371_quit'], command=self.ar.ui_manager.delete_exist_window, parent='window_menu')
 
 
     def create_help_menu(self):
-        cmds.menu('help_menu', label='Help', helpMenu=True, parent='main_menu_bar')
-        cmds.menuItem('about_mi', label='About', command=partial(self.ar.logger.infoWin, 'm015_about', 'i006_aboutDesc', self.ar.data.version, 'center', 305, 250), parent='help_menu')
-        cmds.menuItem('author_mi', label='Author', command=partial(self.ar.logger.infoWin, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250), parent='help_menu')
-        cmds.menuItem('collaborators_mi', label='Collaborators', command=partial(self.ar.logger.infoWin, 'i165_collaborators', 'i166_collabDesc', f"\n\n{self.ar.data.lang['_collaborators']}", 'center', 305, 250), parent='help_menu')
-        cmds.menuItem('donate_mi', label='Donate', command=partial(self.ar.donate_ui.create_ui), parent='help_menu')
-        cmds.menuItem('idiom_mi', label='Idioms', command=partial(self.ar.logger.infoWin, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250), parent='help_menu')
-        cmds.menuItem('terms_mi', label='Terms and Conditions', command=self.ar.agree.ask_terms_cond, parent='help_menu')
-        cmds.menuItem('update_mi', label='Update', command=partial(self.ar.updater.check_for_update, True), parent='help_menu')
+        cmds.menu('help_menu', label=self.ar.data.lang['i372_help'], helpMenu=True, parent='main_menu_bar')
+        cmds.menuItem('about_mi', label=self.ar.data.lang['m015_about'], command=partial(self.ar.logger.infoWin, 'm015_about', 'i006_aboutDesc', self.ar.data.version, 'center', 305, 250), parent='help_menu')
+        cmds.menuItem('author_mi', label=self.ar.data.lang['m016_author'], command=partial(self.ar.logger.infoWin, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250), parent='help_menu')
+        cmds.menuItem('collaborators_mi', label=self.ar.data.lang['i165_collaborators'], command=partial(self.ar.logger.infoWin, 'i165_collaborators', 'i166_collabDesc', f"\n\n{self.ar.data.lang['_collaborators']}", 'center', 305, 250), parent='help_menu')
+        cmds.menuItem('donate_mi', label=self.ar.data.lang['i167_donate'], command=partial(self.ar.donate_ui.create_ui), parent='help_menu')
+        cmds.menuItem('idiom_mi', label=self.ar.data.lang['m009_idioms'], command=partial(self.ar.logger.infoWin, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250), parent='help_menu')
+        cmds.menuItem('terms_mi', label=self.ar.data.lang['i373_termsConditions'], command=self.ar.agree.ask_terms_cond, parent='help_menu')
+        cmds.menuItem('update_mi', label=self.ar.data.lang['i089_update'], command=partial(self.ar.updater.check_for_update, True), parent='help_menu')
         cmds.menuItem('help_mi', label='Wiki...', command=partial(self.ar.web.visit_website, self.ar.data.wiki_url), parent='help_menu')
 
 
