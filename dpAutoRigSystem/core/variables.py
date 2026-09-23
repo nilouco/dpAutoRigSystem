@@ -35,7 +35,6 @@ class Data:
     
     rig_type_biped: str = 'biped'
     rig_type_quadruped: str = 'quadruped'
-    rig_type_default: str = 'unknown' #support old guide system TODO: check using...
 
     master_name: str = 'All_Grp'
     base_name: str = 'dpAR_'

@@ -539,12 +539,6 @@ class Limb(standard.BaseStandard):
     def get_limb_style(self):
         """ This function will get the limb_style
         """
-        #
-        #
-        # TODO: cleanup the returned dictionary to remove this method
-        # TODO: remove quadruped unused variable?
-        #
-        quadruped = False
         enum_style = cmds.getAttr(f"{self.guide_base}.style")
         if enum_style == 0:
             self.limb_style = self.ar.data.lang['m042_default']
@@ -552,13 +546,10 @@ class Limb(standard.BaseStandard):
             self.limb_style = self.ar.data.lang['m026_biped']
         elif enum_style == 2:
             self.limb_style = self.ar.data.lang['m037_quadruped']
-            quadruped = True
         elif enum_style == 3:
             self.limb_style = self.ar.data.lang['m043_quadSpring']
-            quadruped = True
         elif enum_style == 4:
             self.limb_style = self.ar.data.lang['m155_quadrupedExtra']
-            quadruped = True
         return self.limb_style
 
 

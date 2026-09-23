@@ -14,7 +14,6 @@ class Logger:
         self.lang = ar.data.lang
         #
         # TODO: implement Python Logger
-        # TODO: only open windows if self.ar.data.ui_state
         #
         
 

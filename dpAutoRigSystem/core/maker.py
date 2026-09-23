@@ -15,13 +15,12 @@ class Maker:
         return [mod, mod.build_raw_guide()]
 
 
-    # .............................................................................. start here --- unused yet / or delete it
-    #
-    # TODO: it isn't used yet.
-    #
     def set_new_guide(self, module, name, t=(0, 0, 0), r=(0, 0, 0), s=(1, 1, 1), size=1, radius=2, end=1.3, mirror=None, flip=1, deformed=0, indSkin=0, annot=1, annot_pos=None, parent=None, progress=True):
         """ Creates a new standard guide, set the given values and returns a list with the imported module and the created guide.
         """
+        #
+        # TODO: it isn't used yet. Should we delete this method?
+        #
         if progress:
             self.ar.ui_manager.set_progress(f"{self.ar.data.lang['m094_doing']}{name}")
             cmds.refresh()
@@ -59,9 +58,6 @@ class Maker:
         if parent:
             cmds.parent(guide, parent, absolute=True)
         return [mod, guide]
-    #
-    #
-    # .............................................................................. end here --- unused yet / or delete it
 
 
     def create_template(self, name=None, *args):
@@ -214,7 +210,7 @@ class Maker:
         if not attr in cmds.listAttr(self.all_grp):
             cmds.addAttr(self.all_grp, longName=attr, attributeType='message')
         if not cmds.objExists(item):
-            if (item != f"{self.ar.data.prefix}Option_Ctrl"):
+            if item != f"{self.ar.data.prefix}Option_Ctrl":
                 item = self.ar.ctrls.create_controller(ctrl_type, item, r=radius, d=degree, dir='+X')
             else:
                 item = self.ar.ctrls.create_character_ctrl(ctrl_type, item, r=(radius*0.2))
@@ -522,11 +518,11 @@ class Maker:
             for ctrl in self.ar.ctrls.get_controllers():
                 shapes = cmds.listRelatives(ctrl, children=True, allDescendents=True, fullPath=True, type='shape')
                 if shapes and not cmds.getAttr(f"{shapes[0]}.overrideEnabled"):
-                    if (left_pattern.match(ctrl)):
+                    if left_pattern.match(ctrl):
                         self.ar.ctrls.color_shape([ctrl], 'red')
-                    elif (right_pattern.match(ctrl)):
+                    elif right_pattern.match(ctrl):
                         self.ar.ctrls.color_shape([ctrl], 'blue')
-                    elif (ctrl in ground_ctrls):
+                    elif ctrl in ground_ctrls:
                         self.ar.ctrls.color_shape([ctrl], 'black')
                     else:
                         self.ar.ctrls.color_shape([ctrl], 'yellow')

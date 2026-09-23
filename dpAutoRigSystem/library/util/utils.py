@@ -681,18 +681,16 @@ class Utils:
     def delete_orig_shape(self, item, delete_intermediate=True, *args):
         """ Delete Orig shape if it exists.
         """
-        #TODO maybe use this command instead?
         #cmds.deformableShape(item, originalGeometry=True)
-        if item:
-            for child in cmds.listRelatives(item, children=True, allDescendents=True, fullPath=True):
-                #if 'Orig' in child:
-                if child.endswith('Orig'):
+        for child in cmds.listRelatives(item, children=True, allDescendents=True, fullPath=True):
+            #if 'Orig' in child:
+            if child.endswith('Orig'):
+                cmds.delete(child)
+            elif cmds.getAttr(f"{child}.intermediateObject") == 1:
+                if delete_intermediate:
                     cmds.delete(child)
-                elif cmds.getAttr(f"{child}.intermediateObject") == 1:
-                    if delete_intermediate:
-                        cmds.delete(child)
-                else:
-                    self.remove_user_defined_attr(child)
+            else:
+                self.remove_user_defined_attr(child)
 
 
     def reapply_deformers(self, item, defs):

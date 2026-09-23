@@ -140,7 +140,7 @@ class Wheel(standard.BaseStandard):
 
                 # origined from attributes:
                 self.ar.utils.set_origined_from_attr(main_ctrl, f"{self.base};{self.guide_front_loc};{self.guide_radius}")
-                self.ar.utils.set_origined_from_attr(wheel_ctrl, self.guide_center_loc)
+                self.ar.utils.set_origined_from_attr(wheel_ctrl, self.guide_center_loc) #set nJoints to zero to don't get guide base children
                 self.ar.utils.set_origined_from_attr(inside_ctrl, self.guide_inside_loc)
                 self.ar.utils.set_origined_from_attr(outside_ctrl, self.guide_outside_loc)
                 

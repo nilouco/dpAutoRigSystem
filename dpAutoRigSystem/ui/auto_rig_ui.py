@@ -6,8 +6,6 @@ from maya import cmds
 class MainUI:
     def __init__(self, ar):
         self.ar = ar
-
-        # TODO: remove commented blocks
     
     
     def create_ui(self):

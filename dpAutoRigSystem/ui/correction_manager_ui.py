@@ -128,9 +128,15 @@ class CorrectionManagerUI:
                     self.clear_edit_net_layout()
                     current_nets = self.ar.naming.filter_name(filter_name, current_nets, ' ')
                 for item in current_nets:
-                    if 'dpNetwork' in cmds.listAttr(item) and cmds.getAttr(f"{item}.dpNetwork") == 1 and 'dpCorrectionManager' in cmds.listAttr(item) and cmds.getAttr(f"{item}.dpCorrectionManager") == 1:
-                        #TODO validate correctionManager node integrity here
-                        self.nets.append(item)
+                    if ('dpNetwork' in cmds.listAttr(item) 
+                        and cmds.getAttr(f"{item}.dpNetwork") == 1 
+                        and 'dpCorrectionManager' in cmds.listAttr(item) 
+                        and cmds.getAttr(f"{item}.dpCorrectionManager") == 1
+                        and 'originalLoc' in cmds.listAttr(item) 
+                        and 'actionLoc' in cmds.listAttr(item)
+                        and cmds.listConnections(f"{item}.originalLoc", source=True, destination=False) 
+                        and cmds.listConnections(f"{item}.actionLoc", source=True, destination=False)):
+                            self.nets.append(item)
                 if self.nets:
                     cmds.textScrollList('correction_existing_net_tsl', edit=True, append=self.nets)
                     if self.app.net and cmds.objExists(self.app.net):

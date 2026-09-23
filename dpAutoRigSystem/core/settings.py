@@ -15,13 +15,7 @@ from maya import cmds, mel
 class Configuration:
     def __init__(self, ar):
         self.ar = ar
-        
-        #
-        # TODO: define verbose as il fault here
-        #
-        self.ar.data.verbose = self.ar.dev
-
-
+        self.ar.data.verbose = self.ar.dev #TODO: find a better definition for verbose here
         self.lib_folders = [
                             self.ar.data.standard_folder,
                             self.ar.data.curve_simple_folder,

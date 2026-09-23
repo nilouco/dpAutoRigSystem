@@ -348,7 +348,7 @@ class Spine(standard.BaseStandard):
                     size_grps.append(cmds.group(ribbon_joint_grp, name=ribbon_joint_grp.replace('_Grp', '_Size_Grp')))
                     scale_grp = cmds.group(size_grps[-1], name=ribbon_joint_grp.replace('_Grp', '_Scale_Grp'))
                     cmds.scaleConstraint(spine_clusters_grp, scale_grp, maintainOffset=True, name=f"{scale_grp}_ScC")
-                    if ((r > 0) and (r < (len(ribbon_joints_grps) - 1))):
+                    if (r > 0) and (r < (len(ribbon_joints_grps) - 1)):
                         self.ar.utils.add_attr_to_items([scale_grp], self.ar.utils.ignore_transform_io_attr)
                         self.ar.ctrls.direct_connect(scale_grp, ribbon_joint_grp, ['sx', 'sy', 'sz'])
                         cmds.connectAttr(f"{middle_scale_y_md}.outputX", f"{self.ribbon_joints[r]}.scaleY", force=True)

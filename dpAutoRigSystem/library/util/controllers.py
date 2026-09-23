@@ -1542,7 +1542,7 @@ class Controllers:
         """
         radius = float(cmds.getAttr(f"{item}.translateX"))
         parents = self.ar.utils.get_parents(item)
-        if (parents):
+        if parents:
             for parent in parents:
                 radius *= cmds.getAttr(f"{parent}.scaleX")
                 if 'worldSize' in cmds.listAttr(parent):
