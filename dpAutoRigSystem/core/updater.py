@@ -81,7 +81,7 @@ class Updater:
         try:
             got_remote_file = False
             # getting version.py file from GitHub website using the Raw URL:
-            remote_source = urllib.request.urlopen(self.ar.data.version_url)
+            remote_source = urllib.request.urlopen(self.ar.data.version_url, context=self.ar.config.os_context)
             remote_contents = TextIOWrapper(remote_source, encoding='utf-8')
             # find the line with the version and compare them:
             for line in remote_contents:
@@ -144,7 +144,7 @@ class Updater:
             
             try:
                 # get remote file from url:
-                remote_source = urllib.request.urlopen(url)
+                remote_source = urllib.request.urlopen(url, context=self.ar.config.os_context)
                 self.ar.ui_manager.set_progress('Installing')
                 
                 # read the downloaded Zip file stored in the RAM memory:

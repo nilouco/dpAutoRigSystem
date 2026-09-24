@@ -135,7 +135,10 @@ class Pipeliner:
                         self.pipe_data[dependent] = ""
                         return self.pipe_data[field]
             else:
-                name = name[:name.find('/')]
+                if os.name == 'posix':
+                    name = name.split('/')[1]
+                else:
+                    name = name[:name.find('/')]
             self.pipe_data[field] = name
             return self.pipe_data[field]
 

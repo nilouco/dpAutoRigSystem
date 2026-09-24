@@ -181,6 +181,8 @@ class Packager:
         if not destination_folder.endswith('/'):
             destination_folder += '/'
         export_path = f"{destination_folder}{pipe_data['assetName']}_{rig_preview.replace(' ', '')}.jpg"
+        if os.name == 'posix':
+            export_path = f"//{destination_folder}{pipe_data['assetName']}_{rig_preview.replace(' ', '')}.jpg"
         # playblast to make an image
         cmds.playblast(frame=current_frame, viewer=False, format='image', compression='jpg', showOrnaments=True, completeFilename=export_path, widthHeight=[width_res, height_res], percent=100, forceOverwrite=False, quality=100, editorPanelName=imager_panel)
         # clean up the UI
@@ -268,10 +270,10 @@ class Packager:
         if webhook and message_text:
             message_dic = {'content': message_text}
             message_data = json.dumps(message_dic).encode('utf8')
+            req = request.Request(webhook, message_data, {'content-type': 'application/json'})
+            req.add_header('user-agent', 'dpAR Discord Webhook')
             try:
-                req = request.Request(webhook, message_data, {'content-type': 'application/json'})
-                req.add_header('user-agent', 'dpAR Discord Webhook')
-                request.urlopen(req)
+                request.urlopen(req, context=self.ar.config.os_context)
             except:
                 return 'i088_internetFail'
         else:

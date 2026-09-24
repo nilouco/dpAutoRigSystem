@@ -4,6 +4,7 @@ import json
 import os
 import platform
 import socket
+import ssl
 import sys
 import urllib.request
 import webbrowser
@@ -29,6 +30,7 @@ class Configuration:
                             self.ar.data.deforming_folder,
                             self.ar.data.custom_folder
                             ]
+        self.get_os_context()
         self.today = str(datetime.datetime.now().date())
         self.load_path()
         self.clear_old_starter()
@@ -43,18 +45,16 @@ class Configuration:
         self.load_icons()
 
 
+    def get_os_context(self):
+        self.os_context = ssl.create_default_context()
+        if os.name == 'posix':
+            #create an unverified context to bypass SSL certificate checks, because macOS sends empty certificate
+            self.os_context = ssl._create_unverified_context()
+
+
     def load_path(self):
         path = str(os.path.join(os.path.dirname(sys._getframe(1).f_code.co_filename))).replace('\\', '/')
         self.ar.data.dp_auto_rig_path = path[:path.rfind('/')] #remove '/core'
-
-        #
-        # TODO test it in Mac to see if we need to correct the path
-        #
-        #correct_path = path[:path.rfind('/')] #remove '/core'
-        #if os.name == "posix":
-        #    self.ar.data.dp_auto_rig_path = stringPath[0:stringPath.rfind('/')]
-        #else:
-        #    self.ar.data.dp_auto_rig_path = correct_path[correct_path.find('/')-2:]
     
 
     def clear_old_starter(self):
@@ -554,7 +554,7 @@ class Agreement:
         """
         local_data = False
         try:
-            local_response = urllib.request.urlopen(self.ar.data.location_url)
+            local_response = urllib.request.urlopen(self.ar.data.location_url, context=self.ar.config.os_context)
             local_data = json.loads(local_response.read())
         except:
             pass

@@ -98,9 +98,9 @@ class PipelineUI:
         """
         result_items = cmds.fileDialog2(fileMode=3, dialogStyle=2)
         if result_items:
-            conform_info = self.conform_loaded_info(item, result_items)
+            conform_info = self.ar.pipeliner.conform_loaded_info(item, result_items)
             cmds.textFieldButtonGrp(self.ui_info[item], edit=True, text=conform_info)
-            self.set_pipeline_info_file()
+            self.ar.pipeliner.set_pipeline_info_file()
 
 
     def save_version_ui(self, *args):

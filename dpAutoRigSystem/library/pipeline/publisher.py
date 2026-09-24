@@ -156,7 +156,10 @@ class Publisher:
                         self.ar.ui_manager.set_progress(f"{self.ar.data.lang['i225_savingFile']}...", add_number=False)
                     
                     # save published file
-                    cmds.file(rename=f"{self.ar.pipeliner.pipe_data['publishPath']}/{publish_filename}")
+                    if os.name == 'posix':
+                        cmds.file(rename=f"//{self.ar.pipeliner.pipe_data['publishPath']}/{publish_filename}")
+                    else:
+                        cmds.file(rename=f"{self.ar.pipeliner.pipe_data['publishPath']}/{publish_filename}")
                     cmds.file(save=True, type=cmds.file(query=True, type=True)[0], force=True)
 
                     # packager
