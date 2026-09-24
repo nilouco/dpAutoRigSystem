@@ -792,13 +792,13 @@ class Utils:
                     if self.item_type == 'mesh' or self.item_type == 'nurbsSurface':
                         return True
                     else:
-                        mel.eval(f'warning "{item} is not a geometry.";')
+                        mel.eval(f'warning "{item} {self.ar.data.lang["i058_notGeo"]}";')
                 else:
-                    mel.eval(f'warning "Select the transform node instead of {item} shape, please.";')
+                    mel.eval(f'warning "{self.ar.data.lang["i059_selTransform"]} {item} {self.ar.data.lang["i060_shapePlease"]}";')
             else:
-                mel.eval(f'warning "{item} does not exists, maybe it was deleted, sorry.";')
+                mel.eval(f'warning "{item} {self.ar.data.lang["i061_notExists"]}";')
         else:
-            mel.eval(f'warning "Not found {item}";')
+            mel.eval(f'warning "{self.ar.data.lang["i062_notFound"]} {item}";')
 
 
     def get_keys_by_value(self, data, value):

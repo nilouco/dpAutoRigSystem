@@ -380,7 +380,7 @@ class Zipper(base.BaseLibrary):
                     self.set_controller_position(self.first_curve)
                     self.parent_zipper_ctrl()
                     self.zipper_data_grp()
-                    self.ar.ui_manager.close_ui('dpZipperWindow')
+                    self.ar.ui_manager.close_ui(self.ar.data.zipper_win_name)
                     self.ar.naming.node_renaming_treatment(list(set(cmds.ls(selection=False, type='addDoubleLinear'))-set(self.old_add_double_linear_items)), 'addDoubleLinear', '_ADL')
                     self.ar.custom_attr.add_attr(0, self.to_ids, descendents=True) #dpID
                     cmds.select(self.zipper_ctrl)

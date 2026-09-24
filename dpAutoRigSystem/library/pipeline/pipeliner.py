@@ -527,7 +527,7 @@ class Pipeliner:
         else:
             print("Unexpected Error: There's no pipeline data to save, sorry.")
         if close_ui:
-            self.ar.ui_manager.close_ui('dpPipelinerWindow')
+            self.ar.ui_manager.close_ui(self.ar.data.pipeliner_win_name)
 
 
     def mount_package_path(self):

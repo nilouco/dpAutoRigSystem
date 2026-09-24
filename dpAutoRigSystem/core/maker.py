@@ -473,7 +473,7 @@ class Maker:
                             delta += 1
                     if verbose and not self.ar.data.rebuilding:
                         self.ar.ui_manager.set_progress(end_it=True)
-                    self.ar.ui_manager.close_ui('dpReorderAttrWindow')
+                    self.ar.ui_manager.close_ui(self.ar.data.reorder_attr_win_name)
     
 
     def before_start_rig_all(self):

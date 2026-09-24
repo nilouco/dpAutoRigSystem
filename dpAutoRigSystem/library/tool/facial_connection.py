@@ -194,7 +194,7 @@ class FacialConnection(base.BaseLibrary):
                 self.ar.logger.infoWin('m085_facialConnection', 'm048_createdTgt', '\n'.join(results), 'center', 200, 350)
         else:
             mel.eval(f'warning "{self.ar.data.lang["i042_notSelection"]}";')
-        self.ar.ui_manager.close_ui('dpFacialConnectionWindow')
+        self.ar.ui_manager.close_ui(self.ar.data.facial_connection_win_name)
     
 
     def prepare_new_target(self, from_mesh, prefix, tgt, suffix):
@@ -269,7 +269,7 @@ class FacialConnection(base.BaseLibrary):
                     results.extend(comb_results)
         if not self.ar.data.rebuilding and self.ar.data.ui_state and results:
             self.ar.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(results), 'center', 200, 350)
-        self.ar.ui_manager.close_ui('dpFacialConnectionWindow')
+        self.ar.ui_manager.close_ui(self.ar.data.facial_connection_win_name)
     
 
     def connect_to_joints(self, controllers=None, *args):
@@ -332,7 +332,7 @@ class FacialConnection(base.BaseLibrary):
                     self.ar.custom_attr.add_attr(0, self.to_ids) #dpID
                     if self.ar.data.ui_state and results:
                         self.ar.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(results), 'center', 200, 350)
-        self.ar.ui_manager.close_ui('dpFacialConnectionWindow')
+        self.ar.ui_manager.close_ui(self.ar.data.facial_connection_win_name)
 
     
     def get_joint_nodes(self, items):

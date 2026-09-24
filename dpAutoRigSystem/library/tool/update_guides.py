@@ -416,7 +416,7 @@ class UpdateGuides(base.BaseLibrary):
     
 
     def do_delete(self, *args):
-        self.ar.ui_manager.close_ui('update_summary_win')
+        self.ar.ui_manager.close_ui(self.ar.data.update_summary_win_name)
         for guide in self.update_data:
             if cmds.listRelatives(guide, parent=True):
                 cmds.parent(guide, world=True)
@@ -462,7 +462,7 @@ class UpdateGuides(base.BaseLibrary):
     def do_update(self, *args):
         """ Main method to update the guides in the scene.
         """
-        self.ar.ui_manager.close_ui('updateGuidesWindow')
+        self.ar.ui_manager.close_ui(self.ar.data.update_guides_win_name)
         # Starts progress bar feedback
         self.ar.ui_manager.set_progress(self.ar.data.lang['m198_renameOldGuides'], self.ar.data.lang['m186_updateGuides'], 7, add_one=False)
         # Rename guides to discard as *_OLD

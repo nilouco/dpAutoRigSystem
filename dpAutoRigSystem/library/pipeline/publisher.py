@@ -203,7 +203,7 @@ class Publisher:
                     if self.ar.data.ui_state:
                         self.ar.publish_ui.success_published_ui(publish_filename)
                     self.ar.ui_manager.set_progress(end_it=True)
-                    self.ar.ui_manager.close_ui('dpPublisherWindow')
+                    self.ar.ui_manager.close_ui(self.ar.data.publisher_win_name)
                     if from_ui:
                         self.ask_user_choose_file(publish_filename)
             else:
@@ -220,7 +220,7 @@ class Publisher:
             Warning the raison of the error.
         """
         self.ar.ui_manager.set_progress(end_it=True)
-        self.ar.ui_manager.close_ui('dpPublisherWindow')
+        self.ar.ui_manager.close_ui(self.ar.data.publisher_win_name)
         # reopen current file
         cmds.file(self.ar.pipeliner.pipe_data['sceneName'], open=True, force=True)
         # report the error in a log window
