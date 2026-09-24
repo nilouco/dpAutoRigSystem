@@ -12,14 +12,14 @@ class CorrectionManagerUI:
         """ This is the main method to load the Correction Manager UI.
         """
         self.app = app
-        self.ar.ui_manager.close_ui('dpCorrectionManagerWindow')
+        self.ar.ui_manager.close_ui(self.ar.data.correction_manager_win_name)
         # window
         width = 380
         height = 300
-        cmds.window('dpCorrectionManagerWindow', title=f"{self.ar.data.lang['m068_correctionManager']} {self.ar.data.version}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
-        cmds.showWindow('dpCorrectionManagerWindow')
+        cmds.window(self.ar.data.correction_manager_win_name, title=f"{self.ar.data.lang['m068_correctionManager']} {self.ar.data.version}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.showWindow(self.ar.data.correction_manager_win_name)
         # create UI layout and elements:
-        cmds.columnLayout('correction_cl', adjustableColumn=True, columnOffset=('both', 10))
+        cmds.columnLayout('correction_cl', adjustableColumn=True, columnOffset=('both', 10), parent=self.ar.data.correction_manager_win_name)
         cmds.text('correction_header_txt', label=self.ar.data.lang['m066_selectTwo'], align='left', height=30, font='boldLabelFont', parent='correction_cl')
         cmds.rowColumnLayout('correction_rcl', numberOfColumns=2, columnWidth=[(1, 100), (2, 280)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'both', 10), (2, 'both', 10)], parent='correction_cl')
         cmds.button('correction_create_bt', label=self.ar.data.lang['i158_create'], command=partial(self.app.create_correction_manager_setup, from_ui=True), backgroundColor=(0.7, 1.0, 0.7), parent='correction_rcl')

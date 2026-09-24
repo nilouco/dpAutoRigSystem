@@ -10,13 +10,13 @@ class RenamerUI:
         """ This is the main method to load the Renamer UI.
         """
         self.app = app
-        self.ar.ui_manager.close_ui('dpRenamerWin')
+        self.ar.ui_manager.close_ui(self.ar.data.renamer_win_name)
         # UI:
         width = 530
         height = 280
-        cmds.window('dpRenamerWin', title=f"{self.ar.data.lang['m214_renamer']} - v{self.ar.data.version}", width=width, height=height, sizeable=False, minimizeButton=False, maximizeButton=False)
+        cmds.window(self.ar.data.renamer_win_name, title=f"{self.ar.data.lang['m214_renamer']} - v{self.ar.data.version}", width=width, height=height, sizeable=False, minimizeButton=False, maximizeButton=False)
         # UI elements:
-        cmds.rowColumnLayout('renamer_main_rcl', numberOfColumns=2, columnWidth=[(1, 200), (2, 200)], columnSpacing=[(1, 10), (2, 10)])
+        cmds.rowColumnLayout('renamer_main_rcl', numberOfColumns=2, columnWidth=[(1, 200), (2, 200)], columnSpacing=[(1, 10), (2, 10)], parent=self.ar.data.renamer_win_name)
         # fields
         cmds.columnLayout('renamer_fields_cl', adjustableColumn=True, width=150, parent='renamer_main_rcl')
         cmds.radioButtonGrp('renamer_select_rbg', labelArray2=[self.ar.data.lang['i266_selected'], self.ar.data.lang['m216_hierarchy']], numberOfRadioButtons=2, select=self.app.sel_option, changeCommand=self.change_sel_option, parent='renamer_fields_cl')
@@ -48,7 +48,7 @@ class RenamerUI:
         cmds.separator(style='none', height=5, parent='renamer_footer_cl')
         cmds.button('renamer_run_renamer_bt', label=self.ar.data.lang['m224_rename'], command=self.app.run_renamer_by_ui, parent='renamer_footer_cl')
         # calling UI:
-        cmds.showWindow('dpRenamerWin')
+        cmds.showWindow(self.ar.data.renamer_win_name)
 
 
     def edit_sequence_fields(self, value):

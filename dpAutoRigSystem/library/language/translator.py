@@ -213,7 +213,7 @@ class Translator:
         self.clear_translator_ui(1)
         self.ar.ui_manager.close_ui('translator_get_info_win')
         # starting window:
-        cmds.window('translator_get_info_win', title=self.translator_title, iconName='dpAutoRig', widthHeight=(500, 180), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=True)
+        cmds.window('translator_get_info_win', title=self.translator_title, iconName='ar', widthHeight=(500, 180), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=True)
         cmds.columnLayout('translator_get_info_cl', adjustableColumn=True, columnOffset=('both', 10), rowSpacing=10, parent='translator_get_info_win')
         cmds.separator(style='none', parent='translator_get_info_cl')
         self.author_tfg = cmds.textFieldGrp('author_tfg', label=self.ar.data.lang['t002_yourName'], text='', adjustableColumn2=1, parent='translator_get_info_cl')
@@ -275,7 +275,7 @@ class Translator:
         self.clear_translator_ui(2)
         self.ar.ui_manager.close_ui('translator_lang_win')
         # translator UI:
-        cmds.window('translator_lang_win', title=self.translator_title, iconName='dpAutoRig', widthHeight=(400, 400), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=True)
+        cmds.window('translator_lang_win', title=self.translator_title, iconName='ar', widthHeight=(400, 400), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=True)
         cmds.columnLayout('translator_lang_cl', adjustableColumn=True, columnOffset=('both', 10), rowSpacing=10, parent='translator_lang_win')
         cmds.separator(style='none', parent='translator_lang_cl')
         cmds.rowColumnLayout('lang_name_rcl', numberOfColumns=2, columnWidth=[(1, 70), (2, 200)], columnAlign=[(1, 'right'), (2, 'left')], columnAttach=[(1, 'right', 5), (2, 'left', 0)], parent='translator_lang_cl')

@@ -11,16 +11,16 @@ class PipelineUI:
     def create_ui(self, loaded_file_info=False, *args):
         """ Open an UI to load, set and save the pipeline info.
         """
-        self.ar.ui_manager.close_ui('dpPipelinerWindow')
+        self.ar.ui_manager.close_ui(self.ar.data.pipeliner_win_name)
         self.ar.pipeliner.get_pipeline_data(loaded_file_info)
         # window
         if self.ar.data.ui_state:
             win_width  = 380
             win_height = 480
-            cmds.window('dpPipelinerWindow', title=f"Pipeliner {self.ar.data.version}", widthHeight=(win_width, win_height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
-            cmds.showWindow('dpPipelinerWindow')
+            cmds.window(self.ar.data.pipeliner_win_name, title=f"Pipeliner {self.ar.data.version}", widthHeight=(win_width, win_height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+            cmds.showWindow(self.ar.data.pipeliner_win_name)
             # create UI layout and elements:
-            cmds.columnLayout('pipeline_cl', adjustableColumn=True, columnOffset=('both', 10))
+            cmds.columnLayout('pipeline_cl', adjustableColumn=True, columnOffset=('both', 10), parent=self.ar.data.pipeliner_win_name)
             # pipeline info
             cmds.columnLayout('pipeline_info_cl', adjustableColumn=True, columnOffset=('left', 10), parent='pipeline_cl')
             cmds.separator(style='in', height=20, parent='pipeline_info_cl')
@@ -113,10 +113,10 @@ class PipelineUI:
             saveVersion_winHeight = 220
             saveVersion_align = 'left'
             # window:
-            self.ar.ui_manager.close_ui('dpSaveVersionWindow')
-            cmds.window('dpSaveVersionWindow', title=saveVersion_title, iconName='dpInfo', widthHeight=(saveVersion_winWidth, saveVersion_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
+            self.ar.ui_manager.close_ui(self.ar.data.select_asset_win_name)
+            cmds.window(self.ar.data.select_asset_win_name, title=saveVersion_title, iconName='info', widthHeight=(saveVersion_winWidth, saveVersion_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
             # creating text layout:
-            cmds.columnLayout('save_version_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=3, parent='dpSaveVersionWindow')
+            cmds.columnLayout('save_version_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=3, parent=self.ar.data.select_asset_win_name)
             cmds.separator(style='none', height=10, parent='save_version_cl')
             cmds.textFieldGrp('save_version_current_path_tfg', label='Path', text=self.ar.pipeliner.pipe_data['wipPath'], columnWidth2=(80, 150), editable=False, adjustableColumn=2, parent='save_version_cl')
             cmds.textFieldGrp('save_version_current_filename_tfg', label=self.ar.data.lang['i276_current'], text=self.ar.pipeliner.get_current_filename(), columnWidth2=(80, 150), editable=False, adjustableColumn=2, parent='save_version_cl')
@@ -128,7 +128,7 @@ class PipelineUI:
             cmds.text('save_version_preview_txt', label='', font='boldLabelFont', align='center', parent='save_version_preview_sl')
             cmds.button('save_version_run_bt', label=self.ar.data.lang['i222_save'], align=saveVersion_align, command=self.ar.pipeliner.save_version, parent='save_version_cl')
             # call save asset version Window:
-            cmds.showWindow('dpSaveVersionWindow')
+            cmds.showWindow(self.ar.data.select_asset_win_name)
             self.ar.pipeliner.get_save_version_preview_text()
         else:
             cmds.confirmDialog(title=f"{self.ar.data.lang['i222_save']} {self.ar.data.lang['i303_asset']} {self.ar.data.lang['m205_version'].lower()}", message=self.ar.data.lang['r069_noAssetToSaveVersion'], button='Ok')
@@ -144,16 +144,16 @@ class PipelineUI:
         select_winWidth = 240
         select_winHeight = 285
         select_align = 'center'
-        self.ar.ui_manager.close_ui('dpSelectAssetWindow')
-        cmds.window('dpSelectAssetWindow', title=selectAsset_title, iconName='dpInfo', widthHeight=(select_winWidth, select_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
+        self.ar.ui_manager.close_ui(self.ar.data.select_asset_win_name)
+        cmds.window(self.ar.data.select_asset_win_name, title=selectAsset_title, iconName='info', widthHeight=(select_winWidth, select_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
         # creating layout:
-        cmds.columnLayout('select_asset_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=10, parent='dpSelectAssetWindow')
+        cmds.columnLayout('select_asset_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=10, parent=self.ar.data.select_asset_win_name)
         cmds.separator(style='none', height=10, parent='select_asset_cl')
         cmds.text(label=f"{self.ar.data.lang['m004_select']} {self.ar.data.lang['i303_asset']}:", align='left', parent='select_asset_cl')
         cmds.textScrollList('select_asset_tsl', allowMultiSelection=False, append=assets, parent='select_asset_cl')
         cmds.button('run_select_asset_bt', label=self.ar.data.lang['m004_select'], align=select_align, command=partial(self.load_selected_asset, path, mode), parent='select_asset_cl')
         # call Window:
-        cmds.showWindow('dpSelectAssetWindow')
+        cmds.showWindow(self.ar.data.select_asset_win_name)
 
 
     def load_selected_asset(self, path, mode, *args):
@@ -162,7 +162,7 @@ class PipelineUI:
         selected_items = cmds.textScrollList('select_asset_tsl', query=True, selectItem=True)
         if selected_items:
             self.ar.pipeliner.load_asset(path, selected_items[0], mode)
-            self.ar.ui_manager.close_ui('dpSelectAssetWindow')
+            self.ar.ui_manager.close_ui(self.ar.data.select_asset_win_name)
 
 
     def refresh_project_ui(self, path):
@@ -181,10 +181,10 @@ class PipelineUI:
         selectCB_winWidth = 240
         selectCB_winHeight = 285
         selectCB_align = 'center'
-        self.ar.ui_manager.close_ui('dpSelectAssetCBWindow')
-        cmds.window('dpSelectAssetCBWindow', title=selectAssetCB_title, iconName='dpInfo', widthHeight=(selectCB_winWidth, selectCB_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
+        self.ar.ui_manager.close_ui(self.ar.data.select_asset_checkbox_win_name)
+        cmds.window(self.ar.data.select_asset_checkbox_win_name, title=selectAssetCB_title, iconName='info', widthHeight=(selectCB_winWidth, selectCB_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
         # creating layout:
-        cmds.columnLayout('select_asset_batch_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=10, parent='dpSelectAssetCBWindow')
+        cmds.columnLayout('select_asset_batch_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=10, parent=self.ar.data.select_asset_checkbox_win_name)
         cmds.separator(style='none', height=10, parent='select_asset_batch_cl')
         cmds.text(label=f"{self.ar.data.lang['m004_select']} {self.ar.data.lang['i303_asset']}s:", align='left', parent='select_asset_batch_cl')
         if len(assets) > 1:
@@ -201,7 +201,7 @@ class PipelineUI:
         cmds.button('run_select_assets_bt', label=self.ar.data.lang['i216_publish'], align=selectCB_align, command=partial(self.ar.publisher.load_publishing_batch, path), height=30, backgroundColor=(0.75, 0.75, 0.75), parent='select_asset_batch_cl')
         cmds.separator(style='none', height=5, parent='select_asset_batch_cl')
         # call Window:
-        cmds.showWindow('dpSelectAssetCBWindow')
+        cmds.showWindow(self.ar.data.select_asset_checkbox_win_name)
 
 
     def select_all_assets(self, cb_value, *args):
@@ -228,10 +228,10 @@ class PipelineUI:
         win_height = 220
         align     = 'left'
         # creating New Asset Window:
-        self.ar.ui_manager.close_ui('dpNewAssetWindow')
-        cmds.window('dpNewAssetWindow', title=title, iconName='dpInfo', widthHeight=(win_width, win_height), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
+        self.ar.ui_manager.close_ui(self.ar.data.new_asset_win_name)
+        cmds.window(self.ar.data.new_asset_win_name, title=title, iconName='info', widthHeight=(win_width, win_height), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
         # creating text layout:
-        cmds.columnLayout('new_asset_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=3, parent='dpNewAssetWindow')
+        cmds.columnLayout('new_asset_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=3, parent=self.ar.data.new_asset_win_name)
         cmds.separator(style='none', height=10, parent='new_asset_cl')
         cmds.textFieldGrp('new_asset_name_tfg', label=f"{self.ar.data.lang['i303_asset']} {self.ar.data.lang['m006_name'].lower()}", columnWidth2=(80, 150), textChangedCommand=self.get_new_asset_preview_text, adjustableColumn=2, parent='new_asset_cl')
         cmds.textFieldGrp('new_model_version_tfg', label=f"Model {self.ar.data.lang['m205_version'].lower()}", text='0', columnWidth2=(80, 50), textChangedCommand=self.get_new_asset_preview_text, parent='new_asset_cl')
@@ -245,7 +245,7 @@ class PipelineUI:
         cmds.text('new_asset_preview_txt', label='', font='boldLabelFont', align='center', parent='preview_text_sl')
         cmds.button('run_create_new_asset_bt', label=self.ar.data.lang['i158_create'], align=align, command=self.ar.pipeliner.create_new_asset, parent='new_asset_cl')
         # call New Asset Window:
-        cmds.showWindow('dpNewAssetWindow')
+        cmds.showWindow(self.ar.data.new_asset_win_name)
         self.get_new_asset_preview_text()
 
 
@@ -279,10 +279,10 @@ class PipelineUI:
         win_height = 330+(len(self.ar.pipeliner.ios)*16)
         align     = "left"
         # creating replace dpData Window:
-        self.ar.ui_manager.close_ui('dpReplaceDPDataWindow')
-        cmds.window('dpReplaceDPDataWindow', title=title, iconName='dpInfo', widthHeight=(win_width, win_height), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
+        self.ar.ui_manager.close_ui(self.ar.data.replace_data_win_name)
+        cmds.window(self.ar.data.replace_data_win_name, title=title, iconName='info', widthHeight=(win_width, win_height), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
         # creating layout:
-        cmds.columnLayout('replace_data_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent='dpReplaceDPDataWindow')
+        cmds.columnLayout('replace_data_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=self.ar.data.replace_data_win_name)
         cmds.separator(style='none', height=10, parent='replace_data_cl')
         cmds.text('replace_data_txt', label=self.ar.data.lang['i308_toReplaceDPData'], parent='replace_data_cl')
         cmds.text('replace_data_asset_txt', label=f"\n{self.ar.pipeliner.pipe_data['assetName']}", font='boldLabelFont', parent='replace_data_cl')
@@ -295,7 +295,7 @@ class PipelineUI:
             cmds.separator(style='none', height=10, parent='replace_data_cl')
         cmds.button('run_replace_data_bt', label=f"{self.ar.data.lang['m219_replace'].upper()}\n{fromAssetName} -> {self.ar.pipeliner.pipe_data['assetName']}", align=align, command=self.set_replace_data, parent='replace_data_cl')
         # call New Asset Window:
-        cmds.showWindow('dpReplaceDPDataWindow')
+        cmds.showWindow(self.ar.data.replace_data_win_name)
         
     
     def select_all_data_to_replace(self, cb_value, *args):
@@ -314,4 +314,4 @@ class PipelineUI:
                 self.to_replace_datas.append(item)
         if self.to_replace_datas:
             self.ar.pipeliner.replace_data()
-            self.ar.ui_manager.close_ui('dpReplaceDPDataWindow')
+            self.ar.ui_manager.close_ui(self.ar.data.replace_data_win_name)

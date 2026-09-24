@@ -39,6 +39,7 @@ class MainUI:
         """
         start_selections = cmds.ls(selection=True)
         self.create_main_ui()
+        self.ar.ui_manager.delete_exist_window(True)
         self.ar.ui_manager.set_ui_state(True)
         self.ar.filler.fill_libraries()
         self.ar.ui_manager.refresh_ui()

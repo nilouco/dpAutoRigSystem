@@ -17,13 +17,13 @@ class ValueEditorUI:
     def create_ui(self, *args):
         """ Create an UI to edit the attributes default values.
         """
-        self.ar.ui_manager.close_ui('dpDefaultValueOptionWindow')
+        self.ar.ui_manager.close_ui(self.ar.data.value_editor_win_name)
         # window
         width  = 430
         height = 300
-        cmds.window('dpDefaultValueOptionWindow', title=f"{self.ar.data.lang['i270_defaultValues']} {self.ar.data.lang['i274_editor']}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.window(self.ar.data.value_editor_win_name, title=f"{self.ar.data.lang['i270_defaultValues']} {self.ar.data.lang['i274_editor']}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         # create UI layout and elements:
-        cmds.columnLayout('value_editor_main_cl', adjustableColumn=True, columnOffset=('both', 10), parent='dpDefaultValueOptionWindow')
+        cmds.columnLayout('value_editor_main_cl', adjustableColumn=True, columnOffset=('both', 10), parent=self.ar.data.value_editor_win_name)
         cmds.separator(style='none', height=5, parent='value_editor_main_cl')
         cmds.rowColumnLayout('value_editor_header_rcl', numberOfColumns=3, columnWidth=[(1, 150), (2, 10), (3, 180)], columnAlign=[(1, 'center'), (2, 'right'), (3, 'center')], columnAttach=[(1, 'both', 5), (2, 'both', 2), (3, 'both', 5)], adjustableColumn=2, parent='value_editor_main_cl')
         cmds.button('value_editor_edit_selected_ctrl_btn', label=self.ar.data.lang['i011_editSelected'], command=self.populate_selected_controllers, parent='value_editor_header_rcl')
@@ -40,7 +40,7 @@ class ValueEditorUI:
         cmds.columnLayout('value_editor_default_cl', adjustableColumn=True, columnOffset=('both', 10), parent='value_editor_default_sl')
         self.populate_selected_controllers()
         # call window
-        cmds.showWindow('dpDefaultValueOptionWindow')
+        cmds.showWindow(self.ar.data.value_editor_win_name)
 
 
     def populate_selected_controllers(self, *args):

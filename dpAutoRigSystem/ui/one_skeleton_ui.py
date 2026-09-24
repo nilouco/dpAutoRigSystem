@@ -11,12 +11,12 @@ class OneSkeletonUI:
         """
         self.app = app
         # creating Window:
-        self.ar.ui_manager.close_ui('one_skeleton_win')
+        self.ar.ui_manager.close_ui(self.ar.data.one_skeleton_win)
         width  = 230
         height = 230
-        cmds.window('one_skeleton_win', title=f"{self.ar.data.lang['m254_oneSkeleton']} {self.ar.data.version}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        cmds.window(self.ar.data.one_skeleton_win, title=f"{self.ar.data.lang['m254_oneSkeleton']} {self.ar.data.version}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
-        cmds.columnLayout('one_skeleton_cl', columnOffset=('both', 10), rowSpacing=10, adjustableColumn=True, parent='one_skeleton_win')
+        cmds.columnLayout('one_skeleton_cl', columnOffset=('both', 10), rowSpacing=10, adjustableColumn=True, parent=self.ar.data.one_skeleton_win)
         cmds.separator(height=5, style='in', horizontal=True, parent='one_skeleton_cl')
         cmds.rowColumnLayout('one_skeleton_naming_rcl', numberOfColumns=2, adjustableColumn=2, columnWidth=(80, 100), rowSpacing=(7, 7), parent='one_skeleton_cl')
         cmds.text('one_skeleton_prefix_txt', label=self.ar.data.lang['i144_prefix'], parent='one_skeleton_naming_rcl')
@@ -33,11 +33,11 @@ class OneSkeletonUI:
         cmds.button('run_one_skeleton_bt', label=self.ar.data.lang['i158_create'], command=self.create_by_ui, parent='one_skeleton_cl')
         cmds.separator(height=5, style='in', horizontal=True, parent='one_skeleton_cl')
         # call Window:
-        cmds.showWindow('one_skeleton_win')
+        cmds.showWindow(self.ar.data.one_skeleton_win)
 
 
     def create_by_ui(self, *args):
         joint_type = cmds.radioButtonGrp('one_skeleton_skeleton_rbg', query=True, select=True)-1
         use_scale = cmds.checkBox('one_skeleton_use_scale_cb', query=True, value=True)
         self.app.create_one_skeleton(hierarchy=joint_type, scale=use_scale)
-        self.ar.ui_manager.close_ui('one_skeleton_win')
+        self.ar.ui_manager.close_ui(self.ar.data.one_skeleton_win)

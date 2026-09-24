@@ -11,10 +11,10 @@ class CopyPasteAttrUI:
     def create_ui(self):
         """ This is the main method to load the Copy Paste Attr UI.
         """
-        self.ar.ui_manager.close_ui('dpCopyPasteAttrWin')
-        cmds.window('dpCopyPasteAttrWin', title=f"CopyPasteAttr - v{self.ar.data.version}", width=200, height=75, sizeable=True, minimizeButton=False, maximizeButton=False)
-        cmds.columnLayout('copy_paste_attr_cl', width=150, height=75, adjustableColumn=True, parent='dpCopyPasteAttrWin')
+        self.ar.ui_manager.close_ui(self.ar.data.copy_paste_attr_win_name)
+        cmds.window(self.ar.data.copy_paste_attr_win_name, title=f"CopyPasteAttr - v{self.ar.data.version}", width=200, height=75, sizeable=True, minimizeButton=False, maximizeButton=False)
+        cmds.columnLayout('copy_paste_attr_cl', width=150, height=75, adjustableColumn=True, parent=self.ar.data.copy_paste_attr_win_name)
         cmds.button('copy_attr_bt', label=self.ar.data.lang['i122_copyAttr'], command=partial(self.ar.ctrls.copy_attr, verbose=True), backgroundColor=(0.7, 1.0, 0.7), parent='copy_paste_attr_cl')
         cmds.button('paste_attr_bt', label=self.ar.data.lang['i123_pasteAttr'], command=partial(self.ar.ctrls.paste_attr, verbose=True), backgroundColor=(1.0, 1.0, 0.7), parent='copy_paste_attr_cl')
         cmds.button('copy_paste_attr_bt', label=self.ar.data.lang['i124_copyPasteAttr'], command=partial(self.ar.ctrls.copy_and_paste_attr, True), backgroundColor=(0.7, 0.9, 1.0), parent='copy_paste_attr_cl')
-        cmds.showWindow('dpCopyPasteAttrWin')
+        cmds.showWindow(self.ar.data.copy_paste_attr_win_name)

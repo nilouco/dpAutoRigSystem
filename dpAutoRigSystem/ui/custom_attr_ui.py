@@ -12,17 +12,17 @@ class CustomAttrUI:
         """ This is the main method to load the Custom Attr UI.
         """
         self.app = app
-        self.ar.ui_manager.close_ui('dpCustomAttributesWindow')
-        self.ar.ui_manager.close_ui('dpAddCustomAttributesWindow')
-        self.ar.ui_manager.close_ui('dpRemoveCustomAttributesWindow')
-        self.ar.ui_manager.close_ui('dpIDCustomAttributesWindow')
+        self.ar.ui_manager.close_ui(self.ar.data.custom_attr_win_name)
+        self.ar.ui_manager.close_ui(self.ar.data.custom_attr_add_win_name)
+        self.ar.ui_manager.close_ui(self.ar.data.custom_attr_remove_win_name)
+        self.ar.ui_manager.close_ui(self.ar.data.custom_attr_id_win_name)
         self.get_item_filter()
         # window
         width  = 380
         height = 350
-        cmds.window('dpCustomAttributesWindow', title=f"{self.ar.data.lang['m212_customAttr']} {self.ar.data.version}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.window(self.ar.data.custom_attr_win_name, title=f"{self.ar.data.lang['m212_customAttr']} {self.ar.data.version}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         # create UI layout and elements:
-        cmds.columnLayout('custom_attr_cl', adjustableColumn=True, columnOffset=('both', 10))
+        cmds.columnLayout('custom_attr_cl', adjustableColumn=True, columnOffset=('both', 10), parent=self.ar.data.custom_attr_win_name)
         cmds.columnLayout('custom_attr_main_cl', adjustableColumn=True, columnOffset=('both', 10), parent='custom_attr_cl')
         cmds.text('custom_attr_header_txt', label=f"{self.ar.data.lang['i267_customAttrHeader']} {self.app.start_attr}", align='left', height=30, font='boldLabelFont', parent='custom_attr_main_cl')
         # filter
@@ -77,7 +77,7 @@ class CustomAttrUI:
         self.type_cbs = ['custom_attr_type_transform_cb', 'custom_attr_type_network_cb']
         self.display_cbs = ['custom_attr_display_grp_cb', 'custom_attr_display_ctrl_cb', 'custom_attr_display_jnt_cb', 'custom_attr_display_pac_cb', 'custom_attr_display_poc_cb', 'custom_attr_display_orc_cb', 'custom_attr_display_scc_cb', 'custom_attr_display_aic_cb', 'custom_attr_display_pvc_cb', 'custom_attr_display_jxt_cb', 'custom_attr_display_jar_cb', 'custom_attr_display_jad_cb', 'custom_attr_display_jcr_cb', 'custom_attr_display_jis_cb', 'custom_attr_display_jax_cb', 'custom_attr_display_jzt_cb', 'custom_attr_display_jend_cb', 'custom_attr_display_eff_cb', 'custom_attr_display_ikh_cb', 'custom_attr_display_handle_cb']
         # call window
-        cmds.showWindow('dpCustomAttributesWindow')
+        cmds.showWindow(self.ar.data.custom_attr_win_name)
         self.update_name_display()
 
 
@@ -130,11 +130,11 @@ class CustomAttrUI:
     def add_attr_ui(self, *args):
         """ Create a window with buttons to add new attributes.
         """
-        self.ar.ui_manager.close_ui('dpAddCustomAttributesWindow')
+        self.ar.ui_manager.close_ui(self.ar.data.custom_attr_add_win_name)
         widht  = 220
         height = 260
-        cmds.window('dpAddCustomAttributesWindow', title=f"{self.ar.data.lang['m212_customAttr']} {self.ar.data.version}", widthHeight=(widht, height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
-        cmds.columnLayout('custom_attr_add_cl', adjustableColumn=True, columnOffset=('both', 10))
+        cmds.window(self.ar.data.custom_attr_add_win_name, title=f"{self.ar.data.lang['m212_customAttr']} {self.ar.data.version}", widthHeight=(widht, height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.columnLayout('custom_attr_add_cl', adjustableColumn=True, columnOffset=('both', 10), parent=self.ar.data.custom_attr_add_win_name)
         cmds.text('custom_attr_add_header_txt', label=f"{self.ar.data.lang['i045_add']} {self.ar.data.lang['m212_customAttr']}", align='left', height=30, font='boldLabelFont', parent='custom_attr_add_cl')
         cmds.separator(style='none', height=10, parent='custom_attr_add_cl')
         for a, attr in enumerate(self.app.attributes):
@@ -143,18 +143,18 @@ class CustomAttrUI:
         cmds.separator(style='in', height=10, parent='custom_attr_add_cl')
         cmds.text("custom_attr_add_txt", label=f"{self.ar.data.lang['m212_customAttr']}:", align='left', height=30, parent='custom_attr_add_cl')
         cmds.textFieldButtonGrp('custom_attr_add_tfbg', label='', text='', buttonLabel=self.ar.data.lang['i045_add'], buttonCommand=partial(self.app.add_attr, "custom"), adjustableColumn=2, columnWidth=[(1, 0), (2, 50), (3, 30)], parent='custom_attr_add_cl')
-        cmds.showWindow('dpAddCustomAttributesWindow')
+        cmds.showWindow(self.ar.data.custom_attr_add_win_name)
 
 
     def id_ui(self, id_data):
         """ Create a window with exposed dpID attributes.
         """
         if id_data:
-            self.ar.ui_manager.close_ui('dpIDCustomAttributesWindow')
+            self.ar.ui_manager.close_ui(self.ar.data.custom_attr_id_win_name)
             width  = 780
             height = 350
-            cmds.window('dpIDCustomAttributesWindow', title=f"{self.ar.data.lang['m212_customAttr']} {self.ar.data.version}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
-            cmds.columnLayout('custom_attr_id_cl', adjustableColumn=True, columnOffset=('both', 10))
+            cmds.window(self.ar.data.custom_attr_id_win_name, title=f"{self.ar.data.lang['m212_customAttr']} {self.ar.data.version}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+            cmds.columnLayout('custom_attr_id_cl', adjustableColumn=True, columnOffset=('both', 10), parent=self.ar.data.custom_attr_id_win_name)
             cmds.text('custom_attr_id_header_txt', label=f"{self.app.dpid_attr} {self.ar.data.lang['m212_customAttr']}", align='left', height=30, font='boldLabelFont', parent='custom_attr_id_cl')
             cmds.separator(style='none', height=10, parent='custom_attr_id_cl')
             cmds.rowLayout('custom_attr_id_refresh_rl', numberOfColumns=2, width=400, columnWidth2=(200, 200), adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'both', 10), (2, 'both', 10)], parent='custom_attr_id_cl')
@@ -163,7 +163,7 @@ class CustomAttrUI:
             cmds.scrollLayout('custom_attr_id_sl', width=300, parent='custom_attr_id_cl')
             self.populate_id_ui(id_data)
             cmds.separator(style='none', height=30, parent='custom_attr_id_sl')
-            cmds.showWindow('dpIDCustomAttributesWindow')
+            cmds.showWindow(self.ar.data.custom_attr_id_win_name)
 
 
     def populate_id_ui(self, id_data, *args):
@@ -198,11 +198,11 @@ class CustomAttrUI:
     def remove_attr_ui(self, *args):
         """ Create a window showing the current dp custom attributes to delete them.
         """
-        self.ar.ui_manager.close_ui('dpRemoveCustomAttributesWindow')
+        self.ar.ui_manager.close_ui(self.ar.data.custom_attr_remove_win_name)
         widht  = 200
         height = 250
-        cmds.window('dpRemoveCustomAttributesWindow', title=f"{self.ar.data.lang['m212_customAttr']} {self.ar.data.version}", widthHeight=(widht, height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
-        cmds.columnLayout('custom_attr_remove_cl', adjustableColumn=True, columnOffset=('both', 10))
+        cmds.window(self.ar.data.custom_attr_remove_win_name, title=f"{self.ar.data.lang['m212_customAttr']} {self.ar.data.version}", widthHeight=(widht, height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.columnLayout('custom_attr_remove_cl', adjustableColumn=True, columnOffset=('both', 10), parent=self.ar.data.custom_attr_remove_win_name)
         cmds.text('custom_attr_remove_header_txt', label=f"{self.ar.data.lang['i046_remove']} {self.ar.data.lang['m212_customAttr']}", align='left', height=30, font='boldLabelFont', parent='custom_attr_remove_cl')
         cmds.separator(style='none', height=10, parent='custom_attr_remove_cl')
         to_remove_attrs = self.app.get_custom_attrs()
@@ -214,7 +214,7 @@ class CustomAttrUI:
                 cmds.separator(style='none', height=5, parent='custom_attr_remove_cl')
         else:
             cmds.text('custom_attr_not_found_txt', label=f"{self.ar.data.lang['i062_notFound']} {self.ar.data.lang['m212_customAttr']}")
-        cmds.showWindow('dpRemoveCustomAttributesWindow')
+        cmds.showWindow(self.ar.data.custom_attr_remove_win_name)
 
 
     def update_type(self, type_name, value, *args):

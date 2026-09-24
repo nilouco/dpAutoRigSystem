@@ -13,12 +13,12 @@ class RivetUI:
         """
         self.app = app
         # creating dpRivetUI Window:
-        self.ar.ui_manager.close_ui('dpRivetWindow')
+        self.ar.ui_manager.close_ui(self.ar.data.rivet_win_name)
         width  = 305
         height = 470
-        cmds.window('dpRivetWindow', title=f"{self.ar.data.lang['m083_rivet']} {self.ar.data.version}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        cmds.window(self.ar.data.rivet_win_name, title=f"{self.ar.data.lang['m083_rivet']} {self.ar.data.version}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
-        cmds.tabLayout('rivet_main_tl', innerMarginWidth=5, innerMarginHeight=5, parent='dpRivetWindow')
+        cmds.tabLayout('rivet_main_tl', innerMarginWidth=5, innerMarginHeight=5, parent=self.ar.data.rivet_win_name)
         cmds.columnLayout('rivet_add_cl', columnOffset=('left', 10), parent='rivet_main_tl')
         cmds.text('rivet_load_geo_txt', label=self.ar.data.lang['m145_loadGeo'], height=30, font='boldLabelFont', parent='rivet_add_cl')
         cmds.rowColumnLayout('rivet_geo_rcl', numberOfColumns=2, columnWidth=[(1, 100), (2, 210)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent='rivet_add_cl')
@@ -75,7 +75,7 @@ class RivetUI:
         cmds.button('rivet_remove_it_bt', label=f"{self.ar.data.lang['i046_remove']} {self.ar.data.lang['m083_rivet']}", width=310, command=self.remove_rivet_from_ui, backgroundColor=(1, .56, 0.48), parent='rivet_remove_cl')
         cmds.tabLayout('rivet_main_tl', edit=True, changeCommand=self.change_tab, tabLabel=(('rivet_add_cl', self.ar.data.lang['i158_create']), ('rivet_remove_cl', self.ar.data.lang['i046_remove'])))
         # call dpRivetUI Window:
-        cmds.showWindow('dpRivetWindow')
+        cmds.showWindow(self.ar.data.rivet_win_name)
 
 
     def fill_ui(self):
@@ -196,7 +196,7 @@ class RivetUI:
         self.ar.ui_manager.set_progress(self.ar.data.lang['i318_working'], self.ar.data.lang['i317_creatingRivet'], len(items), add_one=False, add_number=False)
         self.app.create_rivet(geo_to_attach, uv_set, items, attatch_translate, attach_rotate, add_father_grp, add_invert, inv_t, inv_r, face_to_rivet, self.app.rivet_grp_name, True)
         self.ar.ui_manager.set_progress(end_it=True)
-        self.ar.ui_manager.close_ui('dpRivetWindow')
+        self.ar.ui_manager.close_ui(self.ar.data.rivet_win_name)
 
 
     def select_uv_set_dialog(self, uv_sets, *args):

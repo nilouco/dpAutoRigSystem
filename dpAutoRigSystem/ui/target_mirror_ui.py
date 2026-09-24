@@ -12,13 +12,13 @@ class TargetMirrorUI:
         """ Create a window in order to load the original model and targets to be mirrored.
         """
         self.app = app
-        self.ar.ui_manager.close_ui('dpTargetMirrorWindow')
+        self.ar.ui_manager.close_ui(self.ar.data.target_mirror_win_name)
         # creating targetMirrorUI Window:
         width  = 305
         height = 250
-        cmds.window('dpTargetMirrorWindow', title=f"{self.ar.data.lang['m055_tgtMirror']} {self.ar.data.version}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        cmds.window(self.ar.data.target_mirror_win_name, title=f"{self.ar.data.lang['m055_tgtMirror']} {self.ar.data.version}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
-        cmds.columnLayout('target_mirror_main_cl')
+        cmds.columnLayout('target_mirror_main_cl', parent=self.ar.data.target_mirror_win_name)
         cmds.rowColumnLayout('target_mirror_header_rcl', numberOfColumns=2, columnWidth=[(1, 120), (2, 190)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent='target_mirror_main_cl')
         cmds.button('target_mirror_load_orig_model_bt', label=f"{self.ar.data.lang['i043_origModel']} >", annotation=self.ar.data.lang['i044_origDesc'], backgroundColor=(1.0, 1.0, 0.7), width=120, command=self.load_original_model, parent='target_mirror_header_rcl')
         cmds.textField('target_mirror_orig_model_tf', width=160, text='', parent='target_mirror_header_rcl')
@@ -50,7 +50,7 @@ class TargetMirrorUI:
         cmds.checkBox('target_mirror_check_hist_cb', label=self.ar.data.lang['i162_checkHistory'], annotation=self.ar.data.lang['i161_historyMessage'], align='left', value=0, parent='target_mirror_cl')
         cmds.button('target_mirror_run_bt', label=self.ar.data.lang['i054_targetRun'], annotation=self.ar.data.lang['i053_targetRunDesc'], width=290, backgroundColor=(0.6, 1.0, 0.6), command=self.app.run_target_mirror, parent='target_mirror_cl')
         # call targetMirrorUI Window:
-        cmds.showWindow('dpTargetMirrorWindow')
+        cmds.showWindow(self.ar.data.target_mirror_win_name)
 
 
     def load_original_model(self, *args):

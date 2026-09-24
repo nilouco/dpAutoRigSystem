@@ -13,13 +13,13 @@ class ZipperUI:
         """ This is the main method to load the Zipper UI.
         """
         self.app = app
-        self.ar.ui_manager.close_ui('dpZipperWindow')
+        self.ar.ui_manager.close_ui(self.ar.data.zipper_win_name)
         width  = 380
         height = 280
-        cmds.window('dpZipperWindow', title=f"{self.app.zipper_name} {self.ar.data.version}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
-        cmds.showWindow('dpZipperWindow')
+        cmds.window(self.ar.data.zipper_win_name, title=f"{self.app.zipper_name} {self.ar.data.version}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.showWindow(self.ar.data.zipper_win_name)
         # create UI layout and elements:
-        cmds.columnLayout('zipper_main_cl', adjustableColumn=True, columnOffset=('left', 10))
+        cmds.columnLayout('zipper_main_cl', adjustableColumn=True, columnOffset=('left', 10), parent=self.ar.data.zipper_win_name)
         cmds.text('zipper_select_poly_txt', label=self.ar.data.lang['i191_selectPoly'], align='left', height=30, font='boldLabelFont', parent='zipper_main_cl')
         # original model layout:
         cmds.rowColumnLayout('zipper_model_rcl', numberOfColumns=2, columnWidth=[(1, 160), (2, 210)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'both', 10), (2, 'both', 10)], parent='zipper_main_cl')

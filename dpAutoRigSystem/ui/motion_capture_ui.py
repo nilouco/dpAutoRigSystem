@@ -11,12 +11,12 @@ class MotionCaptureUI:
         """
         self.app = app
         # creating MotionCaptureUI Window:
-        self.ar.ui_manager.close_ui('dpMotionCaptureWindow')
+        self.ar.ui_manager.close_ui(self.ar.data.motion_capture_win_name)
         width  = 280
         height = 470
-        cmds.window('dpMotionCaptureWindow', title=f"{self.ar.data.lang['m239_motionCapture']} {self.ar.data.version}", widthHeight=(width, height), menuBar=False, sizeable=False, minimizeButton=True, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        cmds.window(self.ar.data.motion_capture_win_name, title=f"{self.ar.data.lang['m239_motionCapture']} {self.ar.data.version}", widthHeight=(width, height), menuBar=False, sizeable=False, minimizeButton=True, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
-        cmds.formLayout('mocap_main_fl')
+        cmds.formLayout('mocap_main_fl', parent=self.ar.data.motion_capture_win_name)
         cmds.tabLayout('mocap_tl', innerMarginWidth=5, innerMarginHeight=5, parent='mocap_main_fl')
         cmds.formLayout('mocap_main_fl', edit=True, attachForm=(('mocap_tl', 'top', 5), ('mocap_tl', 'left', 0), ('mocap_tl', 'bottom', 0), ('mocap_tl', 'right', 0)))
         cmds.formLayout('mocap_hik_fl', numberOfDivisions=100, parent='mocap_tl')
@@ -60,7 +60,7 @@ class MotionCaptureUI:
         cmds.button('mocap_remove_hik_bt', label=f"{self.ar.data.lang['i046_remove']} HumanIk", annotation='removeHumanIk', width=240, command=self.app.hik_remove_mocap, parent='mocap_cl')
         cmds.tabLayout('mocap_tl', edit=True, tabLabel=(('mocap_hik_fl', 'HumanIk')))
         # call Window:
-        cmds.showWindow('dpMotionCaptureWindow')
+        cmds.showWindow(self.ar.data.motion_capture_win_name)
 
 
     def get_ik_modes_from_ui(self):

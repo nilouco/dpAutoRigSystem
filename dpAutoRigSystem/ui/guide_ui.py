@@ -440,7 +440,7 @@ class GuideUI:
         if cmds.window(self.ar.data.plus_info_win_name, query=True, exists=True):
             cmds.deleteUI('plus_fl')
         else:
-            cmds.window(self.ar.data.plus_info_win_name, title=f"dpAutoRig - {self.ar.data.lang['i205_guide']} "+self.ar.data.lang['i013_info'], iconName='dpPlus', widthHeight=(win_width, win_height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
+            cmds.window(self.ar.data.plus_info_win_name, title=f"dpAutoRig - {self.ar.data.lang['i205_guide']} "+self.ar.data.lang['i013_info'], iconName='plus', widthHeight=(win_width, win_height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
         cmds.formLayout('plus_fl', numberOfDivisions=100, parent=self.ar.data.plus_info_win_name)
         cmds.scrollLayout('plus_sl', parent='plus_fl')
         cmds.formLayout('plus_fl', edit=True, attachForm=(('plus_sl', 'bottom', 10), ('plus_sl', 'top', 10), ('plus_sl', 'left', 10), ('plus_sl', 'right', 10)))
@@ -562,7 +562,7 @@ class GuideUI:
         # creating colorOverride Window:
         width  = 170
         height = 115
-        cmds.window(self.ar.data.color_override_win_name, title=self.ar.data.lang['m047_colorOver'], iconName='dpColorOverride', widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        cmds.window(self.ar.data.color_override_win_name, title=self.ar.data.lang['m047_colorOver'], iconName='override', widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         cmds.tabLayout('colorize_tl', innerMarginWidth=5, innerMarginHeight=5, parent=self.ar.data.color_override_win_name)
         # Index layout:

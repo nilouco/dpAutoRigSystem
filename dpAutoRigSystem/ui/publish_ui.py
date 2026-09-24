@@ -11,8 +11,8 @@ class PublishUI:
     def create_ui(self, *args):
         """ This is the main method to load the Publisher UI.
         """
-        self.ar.ui_manager.close_ui('dpSuccessPublishedWindow')
-        self.ar.ui_manager.close_ui('dpPublisherWindow')
+        self.ar.ui_manager.close_ui(self.ar.data.success_published_win_name)
+        self.ar.ui_manager.close_ui(self.ar.data.publisher_win_name)
         saved_scene = self.ar.utils.check_saved_scene()
         if not saved_scene:
             saved_scene = self.ar.pipeliner.confirm_save_this_scene(True)
@@ -21,9 +21,9 @@ class PublishUI:
             # window
             win_width  = 450
             win_height = 160
-            cmds.window('dpPublisherWindow', title=f"{self.ar.data.lang['m046_publisher']} {self.ar.data.version}", widthHeight=(win_width, win_height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+            cmds.window(self.ar.data.publisher_win_name, title=f"{self.ar.data.lang['m046_publisher']} {self.ar.data.version}", widthHeight=(win_width, win_height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
             # create UI layout and elements:
-            cmds.columnLayout('publisher_cl', adjustableColumn=True, columnOffset=('both', 10))
+            cmds.columnLayout('publisher_cl', adjustableColumn=True, columnOffset=('both', 10), parent=self.ar.data.publisher_win_name)
             cmds.separator(style='none', height=20, parent='publisher_cl')
             # fields
             cmds.textFieldButtonGrp('publisher_file_path_tfbg', label=self.ar.data.lang['i220_filePath'], text='', buttonLabel=self.ar.data.lang['i187_load'], buttonCommand=self.user_load_file_path, adjustableColumn=2, changeCommand=self.edit_publish_path, parent='publisher_cl')
@@ -36,7 +36,7 @@ class PublishUI:
             cmds.button('diagnosing_bt', label=self.ar.data.lang['i224_diagnose'], command=self.ar.publisher.run_diagnosing, height=30, backgroundColor=(0.5, 0.5, 0.5), parent='publisher_pl')
             cmds.button('run_publishing_bt', label=self.ar.data.lang['i216_publish'], command=partial(self.ar.publisher.run_publishing, True, self.ar.data.verbose), height=30, backgroundColor=(0.75, 0.75, 0.75), parent='publisher_pl')
             cmds.button('publish_batch_bt', label=self.ar.data.lang['i358_batch'], command=partial(self.ar.pipeliner.load_asset, mode=2), height=30, backgroundColor=(0.75, 0.75, 0.75), parent='publisher_pl')
-            cmds.showWindow('dpPublisherWindow')
+            cmds.showWindow(self.ar.data.publisher_win_name)
             self.set_publish_file_path()
 
 
@@ -61,7 +61,7 @@ class PublishUI:
             # try to load a pipeline structure to get the file_path to set it up
             file_path = self.ar.pipeliner.load_publish_path()
         if file_path:
-            if self.ar.data.ui_state and cmds.window('dpPublisherWindow', query=True, exists=True):
+            if self.ar.data.ui_state and cmds.window(self.ar.data.publisher_win_name, query=True, exists=True):
                 cmds.textFieldButtonGrp('publisher_file_path_tfbg', edit=True, text=str(file_path))
                 cmds.textFieldGrp('publisher_filename_tfg', edit=True, text=str(self.ar.pipeliner.get_pipe_filename(file_path)))
             self.ar.pipeliner.pipe_data['publishPath'] = file_path
@@ -70,14 +70,14 @@ class PublishUI:
     def success_published_ui(self, published_file, errors=False, *args):
         """ If everything works well we can call a success publishing window here.
         """
-        self.ar.ui_manager.close_ui('dpSuccessPublishedWindow')
+        self.ar.ui_manager.close_ui(self.ar.data.success_published_win_name)
         self.ar.ui_manager.set_progress(end_it=True)
         # window
         win_width  = 250
         win_height = 130
-        cmds.window('dpSuccessPublishedWindow', title=f"{self.ar.data.lang['m046_publisher']} {self.ar.data.version}", widthHeight=(win_width, win_height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.window(self.ar.data.success_published_win_name, title=f"{self.ar.data.lang['m046_publisher']} {self.ar.data.version}", widthHeight=(win_width, win_height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         # create UI layout and elements:
-        cmds.columnLayout('success_published_cl', adjustableColumn=True, columnOffset=('both', 10))
+        cmds.columnLayout('success_published_cl', adjustableColumn=True, columnOffset=('both', 10), parent=self.ar.data.success_published_win_name)
         if published_file:
             cmds.separator(style='none', height=20, parent='success_published_cl')
             cmds.text(label=self.ar.data.lang['v023_successPublished'], font='boldLabelFont', parent='success_published_cl')
@@ -94,4 +94,4 @@ class PublishUI:
         else:
             cmds.separator(style='none', height=20, parent='success_published_cl')
             cmds.text(label=self.ar.data.lang['i018_thanks'], parent='success_published_cl')
-        cmds.showWindow('dpSuccessPublishedWindow')
+        cmds.showWindow(self.ar.data.success_published_win_name)

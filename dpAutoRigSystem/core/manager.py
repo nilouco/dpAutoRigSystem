@@ -109,28 +109,50 @@ class UIManager:
                 cmds.text('skin_footer_txt', edit=True, label=self.ar.data.lang['i029_skinNothing'])
 
 
-    def delete_exist_window(self, *args):
+    def delete_exist_window(self, keep_main=False, *args):
         """ Check if there are the dpAutoRigWindow and a control element to delete the UI.
         """
-        if cmds.workspaceControl(self.ar.data.workspace_control_name, query=True, exists=True):
+        if not keep_main and cmds.workspaceControl(self.ar.data.workspace_control_name, query=True, exists=True):
             cmds.workspaceControl(self.ar.data.workspace_control_name, edit=True, close=True)
             #cmds.deleteUI('dpAutoRigSystemWC', control=True)
         win_names = [
-                        'dpARLoadWin', 
-                        'dpInfoWindow', 
-                        'dpNewAssetWindow', 
-                        'dpReplaceDPDataWindow', 
-                        'dpSelectAssetWindow', 
-                        'dpSaveVersionWindow', 
-                        'dpTermsCondWindow', 
-                        'dpUpdateWindow',
-                        'dpDonateWindow',
+                        #'dpar_load_win', 
+                        self.ar.data.info_win_name, 
+                        self.ar.data.new_asset_win_name, 
+                        self.ar.data.replace_data_win_name, 
+                        self.ar.data.select_asset_win_name, 
+                        self.ar.data.select_asset_win_name, 
+                        self.ar.data.terms_cond_win_name, 
+                        self.ar.data.terms_cond_win_name,
+                        self.ar.data.donate_win_name,
                         self.ar.data.plus_info_win_name, 
-                        self.ar.data.color_override_win_name
+                        self.ar.data.color_override_win_name,
+                        self.ar.data.copy_paste_attr_win_name,
+                        self.ar.data.correction_manager_win_name,
+                        self.ar.data.custom_attr_win_name,
+                        self.ar.data.custom_attr_add_win_name,
+                        self.ar.data.custom_attr_remove_win_name,
+                        self.ar.data.custom_attr_id_win_name,
+                        self.ar.data.facial_connection_win_name,
+                        self.ar.data.joint_display_win_name,
+                        self.ar.data.motion_capture_win_name,
+                        self.ar.data.one_skeleton_win_name,
+                        self.ar.data.pipeliner_win_name,
+                        self.ar.data.select_asset_checkbox_win_name,
+                        self.ar.data.publisher_win_name,
+                        self.ar.data.success_published_win_name,
+                        self.ar.data.renamer_win_name,
+                        self.ar.data.reorder_attr_win_name,
+                        self.ar.data.rivet_win_name,
+                        self.ar.data.target_mirror_win_name,
+                        self.ar.data.update_guides_win_name,
+                        self.ar.data.update_summary_win_name,
+                        self.ar.data.value_editor_win_name,
+                        self.ar.data.zipper_win_name
                        ]
         for win_name in win_names:
             self.ar.ui_manager.close_ui(win_name)
-        self.set_ui_state(False)
+        self.set_ui_state(keep_main)
 
     
     def set_ui_state(self, value):

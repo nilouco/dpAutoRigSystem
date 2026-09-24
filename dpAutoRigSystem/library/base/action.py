@@ -96,9 +96,7 @@ class BaseAction(base.BaseLibrary):
         self.good_results = []
         self.messages = []
         self.log_data = {}
-        # close info log window if it exists
-        if cmds.window('dpInfoWindow', query=True, exists=True):
-            cmds.deleteUI('dpInfoWindow', window=True)
+        self.ar.ui_manager.close_ui(self.ar.data.info_win_name)
         self.update_button_colors(True) #running
         cmds.refresh()
 

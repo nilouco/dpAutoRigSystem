@@ -18,10 +18,10 @@ class UpdateUI:
         win_width = 305
         win_height = 300
         # creating Update Window:
-        self.ar.ui_manager.close_ui('dpUpdateWindow')
-        cmds.window('dpUpdateWindow', title=f"dpAutoRigSystem - {self.ar.data.lang['i089_update']}", iconName='dpInfo', widthHeight=(win_width, win_height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
+        self.ar.ui_manager.close_ui(self.ar.data.terms_cond_win_name)
+        cmds.window(self.ar.data.terms_cond_win_name, title=f"dpAutoRigSystem - {self.ar.data.lang['i089_update']}", iconName='info', widthHeight=(win_width, win_height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
         # creating text layout:
-        cmds.columnLayout('update_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent='dpUpdateWindow')
+        cmds.columnLayout('update_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=self.ar.data.terms_cond_win_name)
         cmds.text('update_description_txt', label=f"\n{self.ar.data.lang[text]}", align='center', parent='update_cl')
         cmds.text('update_current_version_txt', label=f"\n{self.ar.data.version}{self.ar.data.lang['i090_currentVersion']}", align='left', parent='update_cl')
         if remote_version:
@@ -42,4 +42,4 @@ class UpdateUI:
         cmds.checkBox('update_auto_check_cb', label=self.ar.data.lang['i092_autoCheckUpdate'], align='left', value=self.ar.data.auto_check_update, changeCommand=self.ar.opt.set_auto_check_update, parent='update_cl')
         cmds.separator(height=30)
         # call Update Window:
-        cmds.showWindow('dpUpdateWindow')
+        cmds.showWindow(self.ar.data.terms_cond_win_name)

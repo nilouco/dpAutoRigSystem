@@ -733,7 +733,7 @@ class Pipeliner:
                 this_type = 'mayaBinary'
             cmds.file(rename=self.saveVersionFile)
             cmds.file(save=True, type=this_type, force=True)
-            self.ar.ui_manager.close_ui('dpSaveVersionWindow')
+            self.ar.ui_manager.close_ui(self.ar.data.select_asset_win_name)
             self.ar.data.rebuilding = False
             self.refresh_asset_data()
 
@@ -874,7 +874,7 @@ class Pipeliner:
                 cmds.file(rename=self.new_asset_file)
                 cmds.workspace(directory=folder)
                 cmds.file(save=True, type='mayaAscii', force=True)
-                self.ar.ui_manager.close_ui('dpNewAssetWindow')
+                self.ar.ui_manager.close_ui(self.ar.data.new_asset_win_name)
                 self.ar.data.rebuilding = False
                 self.refresh_asset_data()
             else:

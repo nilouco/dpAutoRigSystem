@@ -11,11 +11,11 @@ class UpdateGuidesUI:
         """ This is the main method to load the Update Guides UI.
         """
         self.app = app
-        self.ar.ui_manager.close_ui('updateGuidesWindow')
-        self.ar.ui_manager.close_ui('update_summary_win')
+        self.ar.ui_manager.close_ui(self.ar.data.update_guides_win_name)
+        self.ar.ui_manager.close_ui(self.ar.data.update_summary_win_name)
         if self.ar.data.ui_state:
-            cmds.window('updateGuidesWindow', title='Guides Info')
-            cmds.columnLayout('update_guide_main_cl', adjustableColumn=1, rowSpacing=10, columnOffset=('both', 10), parent='updateGuidesWindow')
+            cmds.window(self.ar.data.update_guides_win_name, title='Guides Info')
+            cmds.columnLayout('update_guide_main_cl', adjustableColumn=1, rowSpacing=10, columnOffset=('both', 10), parent=self.ar.data.update_guides_win_name)
             cmds.text('update_guide_header_txt', label=f"DPAR {self.ar.data.lang['m194_currentVersion']} {self.ar.data.version}", height=30, align='center', parent='update_guide_main_cl')
             if len(self.app.update_data) > 0:
                 cmds.scrollLayout('update_guide_sl', width=330, height=400, parent='update_guide_main_cl')
@@ -32,18 +32,18 @@ class UpdateGuidesUI:
             else:
                 cmds.text('update_guide_nothing_txt', label=self.ar.data.lang['m188_noGuidesToUpdate'], align='left', parent='update_guide_main_cl')
             cmds.separator(style='none', height=10, parent='update_guide_main_cl')
-            cmds.window('updateGuidesWindow', edit=True, height=1)
+            cmds.window(self.ar.data.update_guides_win_name, edit=True, height=1)
             cmds.select(clear=True)
-            cmds.showWindow('updateGuidesWindow')
+            cmds.showWindow(self.ar.data.update_guides_win_name)
 
 
     def summary_ui(self):
         """ Update Guides Summary UI for log info.
         """
-        self.ar.ui_manager.close_ui('update_summary_win')
+        self.ar.ui_manager.close_ui(self.ar.data.update_summary_win_name)
         new_data = self.app.get_new_attr()
-        cmds.window('update_summary_win', title='Update Summary')
-        cmds.columnLayout('summary_cl', adjustableColumn=1, rowSpacing=10, columnOffset=('both', 10), parent='update_summary_win')
+        cmds.window(self.ar.data.update_summary_win_name, title='Update Summary')
+        cmds.columnLayout('summary_cl', adjustableColumn=1, rowSpacing=10, columnOffset=('both', 10), parent=self.ar.data.update_summary_win_name)
         cmds.text('summary_header_txt', label=f"{len(self.app.update_data)} {self.ar.data.lang['m189_guidesUpdatedSuccess']}", align='center', height=30, parent='summary_cl')
         if new_data:
             cmds.text('summary_new_attr_found_txt', label=self.ar.data.lang['m190_newAttrFound'], align='center', parent='summary_cl')
@@ -60,4 +60,4 @@ class UpdateGuidesUI:
         cmds.separator(style='none', height=10, parent='summary_cl')
         cmds.button('summary_delete_old_bt', label=self.ar.data.lang['m193_deleteOldGuides'], command=self.app.do_delete, backgroundColor=(1.0, 0.6, 0.4), parent='summary_cl')
         cmds.separator(style='none', height=10, parent='summary_cl')
-        cmds.showWindow('update_summary_win')
+        cmds.showWindow(self.ar.data.update_summary_win_name)

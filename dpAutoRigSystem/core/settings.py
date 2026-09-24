@@ -582,17 +582,17 @@ class Agreement:
             terms_width  = 205
             terms_height = 200
             # creating Terms and Conditions Window:
-            self.ar.ui_manager.close_ui('dpTermsCondWindow')
-            cmds.window('dpTermsCondWindow', title=f"dpAutoRigSystem - {self.ar.data.lang['i281_termsCond']}", iconName='dpInfo', widthHeight=(terms_width, terms_height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
+            self.ar.ui_manager.close_ui(self.ar.data.terms_cond_win_name)
+            cmds.window(self.ar.data.terms_cond_win_name, title=f"dpAutoRigSystem - {self.ar.data.lang['i281_termsCond']}", iconName='info', widthHeight=(terms_width, terms_height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
             # creating text layout:
-            cmds.columnLayout('terms_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent='dpTermsCondWindow')
+            cmds.columnLayout('terms_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=self.ar.data.terms_cond_win_name)
             cmds.text(f"\n{self.ar.data.lang['i282_termsCondDesc']}", align='center', parent='terms_cl')
             # agreement:
             cmds.separator(height=30)
             cmds.checkBox('terms_cond_cb', label=self.ar.data.lang['i280_iAgreeTermsCond'], align='left', value=self.ar.data.agree_terms, changeCommand=self.ar.opt.set_agree_terms_cond, parent='terms_cl')
             cmds.separator(height=30)
             # call window:
-            cmds.showWindow('dpTermsCondWindow')
+            cmds.showWindow(self.ar.data.terms_cond_win_name)
 
 
 

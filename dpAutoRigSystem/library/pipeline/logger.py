@@ -28,10 +28,10 @@ class Logger:
         self.info_winHeight   = height
         self.info_align       = align
         # creating Info Window:
-        self.ar.ui_manager.close_ui('dpInfoWindow')
-        cmds.window('dpInfoWindow', title=f"dpAutoRig - v{self.ar.data.version} - {self.lang['i013_info']} - {self.lang[self.info_title]}", iconName='dpInfo', widthHeight=(self.info_winWidth, self.info_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
+        self.ar.ui_manager.close_ui(self.ar.data.info_win_name)
+        cmds.window(self.ar.data.info_win_name, title=f"dpAutoRig - v{self.ar.data.version} - {self.lang['i013_info']} - {self.lang[self.info_title]}", iconName='ar', widthHeight=(self.info_winWidth, self.info_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
         # creating text layout:
-        infoColumnLayout = cmds.columnLayout('infoColumnLayout', adjustableColumn=True, columnOffset=['both', 20], parent='dpInfoWindow')
+        infoColumnLayout = cmds.columnLayout('infoColumnLayout', adjustableColumn=True, columnOffset=['both', 20], parent=self.ar.data.info_win_name)
         cmds.separator(style='none', height=10, parent=infoColumnLayout)
         infoLayout = cmds.scrollLayout('infoLayout', parent=infoColumnLayout)
         if self.info_description:
@@ -48,7 +48,7 @@ class Logger:
             cmds.button(label='Wiki', command=partial(self.ar.web.visit_website, f"{self.ar.data.wiki_url}{wiki}"), backgroundColor=[1, 1, 1], align=self.info_align, parent=infoLayout)
         # call Info Window:
         if self.ar.data.ui_state:
-            cmds.showWindow('dpInfoWindow')
+            cmds.showWindow(self.ar.data.info_win_name)
 
 
     def logWin(self, *args):

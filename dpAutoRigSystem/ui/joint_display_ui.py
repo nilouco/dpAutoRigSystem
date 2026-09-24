@@ -14,12 +14,12 @@ class JointDisplayUI:
         """ This is the main method to load the Joint Display UI.
         """
         self.app = app
-        self.ar.ui_manager.close_ui('dpJointDisplayWindow')
+        self.ar.ui_manager.close_ui(self.ar.data.joint_display_win_name)
         width  = 660
         height = 410
-        cmds.window('dpJointDisplayWindow', title=f"{self.ar.data.lang['m233_jointDisplay']} {self.ar.data.version}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        cmds.window(self.ar.data.joint_display_win_name, title=f"{self.ar.data.lang['m233_jointDisplay']} {self.ar.data.version}", widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating Main layout:
-        cmds.columnLayout('joint_display_cl', columnOffset=('both', 5), adjustableColumn=True)
+        cmds.columnLayout('joint_display_cl', columnOffset=('both', 5), adjustableColumn=True, parent=self.ar.data.joint_display_win_name)
         cmds.separator(style='none', height=10, parent='joint_display_cl')
         cmds.rowColumnLayout('joint_display_header_rcl', adjustableColumn=1, numberOfColumns=2, columnWidth=[(1, 140), (2, 320)], columnAlign=[(1, 'left'), (2, 'right')], columnAttach=[(1, 'left', 10), (2, 'right', 10)], parent='joint_display_cl')
         # filter
@@ -55,10 +55,10 @@ class JointDisplayUI:
         cmds.menuItem('joint_display_none_mi', label='None', parent='joint_display_change_om' )
         cmds.menuItem('joint_display_joint_mi', label='Joint', parent='joint_display_change_om' )
         cmds.button('joint_display_move_to_left_bt', label=f"<< {self.ar.data.lang['c034_move']}", backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.app.move_to_left, parent='joint_display_button_rcl')
-        cmds.showWindow('dpJointDisplayWindow')
+        cmds.showWindow(self.ar.data.joint_display_win_name)
         self.app.clear_items()
         self.refresh_ui()
-        self.ar.job.refresh_preview_win(self.refresh_ui, 'dpJointDisplayWindow')
+        self.ar.job.refresh_preview_win(self.refresh_ui, self.ar.data.joint_display_win_name)
     
 
     def refresh_ui(self, *args):
