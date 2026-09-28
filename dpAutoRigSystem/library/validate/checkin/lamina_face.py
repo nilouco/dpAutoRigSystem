@@ -78,7 +78,7 @@ class LaminaFace(action.BaseAction):
                                             # found laminaFaces
                                             if not item_name in lamina_items:
                                                 lamina_items.append(item_name)
-                                            lamina_faces.append(f"{item_name}.f['{iter_face.index()}')")
+                                            lamina_faces.append(f"{item_name}.f[{iter_face.index()})")
                                     iter_face.next()
                         # Move to the next selected node in the list
                         iter.next()

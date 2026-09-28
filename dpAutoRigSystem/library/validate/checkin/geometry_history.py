@@ -47,7 +47,7 @@ class GeometryHistory(action.BaseAction):
                                 if histories:
                                     for history in histories:
                                         # Pass through tweak and initialShading nodes
-                                        if not cmds.nodeType(history) in ignore_types and history != 'initialShadingGroup':
+                                        if cmds.objExists(history) and cmds.nodeType(history) not in ignore_types and history != 'initialShadingGroup':
                                             geos.append(transform)
                         # Merge duplicated names
                         to_clean_geo_fullpaths = list(set(geos))

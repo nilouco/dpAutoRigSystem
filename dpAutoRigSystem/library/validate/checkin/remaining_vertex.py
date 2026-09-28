@@ -74,9 +74,9 @@ class RemainingVertex(action.BaseAction):
                                     if len(index_con_edges) < 3:
                                         if border_edge_indexes:
                                             if not set(index_con_edges).intersection(border_edge_indexes):
-                                                remaining_vertices.append(f"{item_name}.vtx['{iter_vertex.index()}']")
+                                                remaining_vertices.append(f"{item_name}.vtx[{iter_vertex.index()}]")
                                         else:
-                                            remaining_vertices.append(f"{item_name}.vtx['{iter_vertex.index()}'']")
+                                            remaining_vertices.append(f"{item_name}.vtx[{iter_vertex.index()}]")
                                     # Move to next vertex in the mesh list
                                     iter_vertex.next()
                         # Move to the next selected node in the list
