@@ -13,6 +13,7 @@ WIKI = '06-‐-Tools#-facial-connection'
 MIDDLE = 'Middle'
 SIDED = 'Sided'
 FACIALPRESET = 'joints'
+FOLLOWINGPRESET = 'following'
 
 
 
@@ -87,13 +88,7 @@ class FacialConnection(base.BaseLibrary):
             Rebuild a dictionary value string variables to current mounted language names.
             Return the preset_content
         """
-        # load json file:
-        founds, datas = self.ar.config.get_json_file_content(self.ar.data.facial_preset_folder)
-        if founds and datas:
-            for found in founds:
-                if found == FACIALPRESET:
-                    preset_content = datas[found]
-                    break
+        preset_content = self.get_preset_data(FACIALPRESET)
         if preset_content:
             # rebuild dictionary using object variables:
             for stored_attr in list(preset_content):
@@ -219,7 +214,7 @@ class FacialConnection(base.BaseLibrary):
             controllers = self.ar.ctrls.get_controllers()
         if controllers:
             for ctrl in controllers:
-                if cmds.objExists(f"{ctrl}.facialList"):
+                if 'facialList' in cmds.listAttr(ctrl):
                     result_data[ctrl] = self.ar.ctrls.get_items_from_string_attr(ctrl, 'facialList')
         return result_data
     
@@ -295,44 +290,90 @@ class FacialConnection(base.BaseLibrary):
                                 side_prefix = facial_attr[0]
                                 side_attr = facial_attr[2:]
                             # work with Middle, L_Middle, R_Middle or Sided data
-                            for middle_or_sided in list(tweaks_data[side_attr].keys()):
-                                node_datas = []
-                                if middle_or_sided == MIDDLE:
-                                    node_datas.append(tweaks_data[side_attr][middle_or_sided])
-                                elif middle_or_sided == SIDED:
-                                    data = {}
-                                    for s in ['L', 'R']:
-                                        if side_prefix == None or side_prefix == s:
-                                            for n in list(tweaks_data[side_attr][middle_or_sided].keys()):
-                                                # add prefix to the destination joint target node
-                                                data[f"{s}_{n}"] = tweaks_data[side_attr][middle_or_sided][n]
-                                    node_datas.append(data)
-                                else:
-                                    for s in ['L', 'R']:
-                                        if middle_or_sided == f"{s}_{MIDDLE}" and side_prefix == 'L':
-                                            # simple connection
-                                            node_datas.append(tweaks_data[side_attr][middle_or_sided])
-                                if node_datas:
-                                    for node_data in node_datas:
-                                        for to_node in list(node_data.keys()):
-                                            for joint_target in self.joint_targets:
-                                                if cmds.objExists(joint_target) and joint_target.startswith(to_node):
-                                                    # caculate factor for scaled item:
-                                                    size_factor = self.get_size_factor(joint_target)
-                                                    if not size_factor:
-                                                        size_factor = 1
-                                                    for to_attr in list(node_data[to_node].keys()):
-                                                        # read stored values in order to call function to make the setup
-                                                        output_min = node_data[to_node][to_attr][0]
-                                                        output_max = node_data[to_node][to_attr][1]
-                                                        self.create_remap_node(facial_ctrl, facial_attr, joint_target, to_attr, self.rmv_number, size_factor, output_min, output_max)
-                                                        self.rmv_number = self.rmv_number+1
-                                                    print(self.ar.data.lang['m143_connected'], f"{facial_ctrl}.{facial_attr}", '->', joint_target)
-                                                    results.append(f"{facial_ctrl}.{facial_attr} -> {joint_target}")
+                            if side_attr in tweaks_data:
+                                for middle_or_sided in list(tweaks_data[side_attr].keys()):
+                                    node_datas = []
+                                    if middle_or_sided == MIDDLE:
+                                        node_datas.append(tweaks_data[side_attr][middle_or_sided])
+                                    elif middle_or_sided == SIDED:
+                                        data = {}
+                                        for s in [self.ar.data.lang['p002_left'], self.ar.data.lang['p003_right']]:
+                                            if side_prefix == None or side_prefix == s:
+                                                for n in list(tweaks_data[side_attr][middle_or_sided].keys()):
+                                                    # add prefix to the destination joint target node
+                                                    data[f"{s}_{n}"] = tweaks_data[side_attr][middle_or_sided][n]
+                                        node_datas.append(data)
+                                    else:
+                                        for s in [self.ar.data.lang['p002_left'], self.ar.data.lang['p003_right']]:
+                                            if middle_or_sided == f"{s}_{MIDDLE}" and side_prefix == self.ar.data.lang['p002_left']:
+                                                # simple connection
+                                                node_datas.append(tweaks_data[side_attr][middle_or_sided])
+                                    if node_datas:
+                                        for node_data in node_datas:
+                                            for to_node in list(node_data.keys()):
+                                                for joint_target in self.joint_targets:
+                                                    if cmds.objExists(joint_target) and joint_target.startswith(to_node):
+                                                        # caculate factor for scaled item:
+                                                        size_factor = self.get_size_factor(joint_target)
+                                                        if not size_factor:
+                                                            size_factor = 1
+                                                        for to_attr in list(node_data[to_node].keys()):
+                                                            # read stored values in order to call function to make the setup
+                                                            output_min = node_data[to_node][to_attr][0]
+                                                            output_max = node_data[to_node][to_attr][1]
+                                                            self.create_remap_node(facial_ctrl, facial_attr, joint_target, to_attr, self.rmv_number, size_factor, output_min, output_max)
+                                                            self.rmv_number = self.rmv_number+1
+                                                        print(self.ar.data.lang['m143_connected'], f"{facial_ctrl}.{facial_attr}", '->', joint_target)
+                                                        results.append(f"{facial_ctrl}.{facial_attr} -> {joint_target}")
                     self.ar.custom_attr.add_attr(0, self.to_ids) #dpID
                     if self.ar.data.ui_state and results:
                         self.ar.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(results), 'center', 200, 350)
+        self.set_joint_following()
+        self.hide_lip_main()
         self.ar.ui_manager.close_ui(self.ar.data.facial_connection_win_name)
+
+
+    def set_joint_following(self):
+        nodes = cmds.ls(type='transform')
+        controllers = self.ar.ctrls.get_controllers()
+        if controllers:
+            following_data = self.get_preset_data(FOLLOWINGPRESET)
+            if following_data:
+                for side_name in following_data:
+                    if side_name == MIDDLE:
+                        for ctrl in controllers:
+                            for driver in following_data[side_name]:
+                                if ctrl.endswith(f'{driver}_Ctrl'):
+                                    for item in following_data[side_name][driver]:
+                                        for node in nodes:
+                                            if node.endswith(f'{item}_Ctrl_Zero_0_Grp'):
+                                                self.ar.custom_attr.add_attr(0, cmds.parentConstraint(ctrl, node, maintainOffset=True, name=f'{node}_PaC')) #dpID
+                    else: #SIDDED
+                        for s in [self.ar.data.lang['p002_left'], self.ar.data.lang['p003_right']]:
+                            for ctrl in controllers:
+                                if ctrl.startswith(s):
+                                    for driver in following_data[side_name]:
+                                        if ctrl.endswith(f'{driver}_Ctrl'):
+                                            for item in following_data[side_name][driver]:
+                                                for node in nodes:
+                                                    if node.startswith(s) and node.endswith(f'{item}_Ctrl_Zero_0_Grp'):
+                                                        self.ar.custom_attr.add_attr(0, cmds.parentConstraint(ctrl, node, maintainOffset=True, name=f'{node}_PaC')) #dpID
+
+
+    def hide_lip_main(self):
+        controllers = self.ar.ctrls.get_controllers()
+        for ctrl in controllers:
+            if ctrl.endswith('Lip_Main_Ctrl'):
+                cmds.setAttr(f"{ctrl}0Shape.visibility", 0)
+
+
+    def get_preset_data(self, item):
+        # load json file:
+        founds, datas = self.ar.config.get_json_file_content(self.ar.data.facial_preset_folder)
+        if founds and datas:
+            for found in founds:
+                if found == item:
+                    return datas[found]
 
     
     def get_joint_nodes(self, items):

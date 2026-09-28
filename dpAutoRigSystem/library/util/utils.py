@@ -342,11 +342,11 @@ class Utils:
                 if guide_namespace in cmds.namespaceInfo(listOnlyNamespaces=True):
                     number_name = guide_module.number_name
                     if not cmds.objExists(f"{number_name}_Static_Grp"):
-                        if not 'dpHead' in str(guide_module):
-                            guides_to_rig.append(guide_module)
-                        else:
+                        if guide_module.name == 'Head':
                             # store Head guides to rig it later
                             head_modules.append(guide_module)
+                        else:
+                            guides_to_rig.append(guide_module)
         if head_modules:
             # hack to rig Head modules at the end in order to call FacialConnection properly for joint target Singles tweakers.
             guides_to_rig.extend(head_modules)

@@ -126,6 +126,8 @@ class Single(standard.BaseStandard):
                     cmds.addAttr(single_ctrl, longName='scaleCompensate', attributeType='short', minValue=0, maxValue=1, defaultValue=1, keyable=False)
                     cmds.setAttr(f"{single_ctrl}.scaleCompensate", channelBox=True)
                     cmds.connectAttr(f"{single_ctrl}.scaleCompensate", f"{jnt}.segmentScaleCompensate", force=True)
+                    if self.ar.data.lang['c046_holder'] in single_ctrl:
+                        cmds.setAttr(f"{single_ctrl}0Shape.visibility", 0)
                 if self.get_guide_attr('indirectSkin'):
                     # create fatherJoints in order to create_zero_out the skinning joint:
                     cmds.select(clear=True)

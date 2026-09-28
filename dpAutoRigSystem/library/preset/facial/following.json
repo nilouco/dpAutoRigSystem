@@ -1,0 +1,11 @@
+{
+    "Middle" : {
+                "UpperHead" : ["Middle_Eyebrow", "Eyebrow_Main"],
+                "UpperJaw" : ["Squint_Main", "Cheek_01", "Cheek_02"],
+                "UpperLip" : ["Upper_Lip_00", "Upper_Lip_01", "Upper_Lip_02"],
+                "LowerLip" : ["Lower_Lip_00", "Lower_Lip_01", "Lower_Lip_02"]                
+                },
+    "Sidded" :{
+                "CornerLip" : ["Corner_Lip"]
+                }
+}
