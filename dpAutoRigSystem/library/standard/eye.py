@@ -69,8 +69,7 @@ class Eye(standard.BaseStandard):
         self.line_lower_eyelid = cmds.joint(name=f"{self.name_guide}_JLowerEyelid", radius=0.001)
         # setup
         self.ar.utils.set_template([self.line, self.line_end, self.line_upper_eyelid, self.line_lower_eyelid])
-        cmds.setAttr(f"{self.guide_end_loc}.translateZ", 13)
-        cmds.setAttr(f"{self.guide_up_loc}.translateY", 13)
+        self.ar.ctrls.shape_size_setup(self.guide_end_loc)
         cmds.setAttr(f"{self.guide_upper_eyelid_loc}.translateY", 0.5)
         cmds.setAttr(f"{self.guide_upper_eyelid_loc}.translateZ", 0.5)
         cmds.setAttr(f"{self.guide_lower_eyelid_loc}.translateY", -0.5)
@@ -84,6 +83,7 @@ class Eye(standard.BaseStandard):
         # parenting
         self.guide_end_loc_zero = cmds.group(self.guide_end_loc, self.guide_up_loc, name=f"{self.guide_end_loc}_Grp")
         self.guide_end_back_rot_zero = cmds.group(self.guide_end_loc_zero, name=f"{self.guide_end_loc_zero}_Back_Grp")
+        
         cmds.parent(self.line, self.guide_base, relative=True)
         cmds.parent(self.guide_loc, self.guide_end_back_rot_zero, self.guide_base)
         cmds.parent(self.guide_lid_pivot_loc, self.guide_iris_loc, self.guide_pupil_loc, self.guide_loc)
@@ -91,16 +91,17 @@ class Eye(standard.BaseStandard):
         cmds.parent(self.guide_specular_loc, self.guide_loc)
         cmds.parent(self.line_upper_eyelid, self.line_lower_eyelid, self.line_eyelid)
         cmds.parent(self.line_end, self.line)
+        # edit
+        cmds.setAttr(f"{self.guide_up_loc}.translateY", 13)
+        cmds.setAttr(f"{self.guide_end_loc}.translateZ", 13)
         cmds.parentConstraint(self.guide_loc, self.line, maintainOffset=False, name=f"{self.line}_PaC")
         cmds.parentConstraint(self.guide_upper_eyelid_loc, self.line_upper_eyelid, maintainOffset=False, name=f"{self.line_upper_eyelid}_PaC")
         cmds.parentConstraint(self.guide_lower_eyelid_loc, self.line_lower_eyelid, maintainOffset=False, name=f"{self.line_lower_eyelid}_PaC")
         cmds.parentConstraint(self.guide_end_loc, self.line_end, maintainOffset=False, name=f"{self.line_end}_PaC")
         cmds.parentConstraint(self.guide_lid_pivot_loc, self.line_eyelid, maintainOffset=False, name=f"{self.line_eyelid}_PaC")
-        # edit
         cmds.transformLimits(self.guide_end_loc, tz=(0.01, 1), etz=(True, False))
         cmds.orientConstraint(self.ar.data.temp_grp, self.guide_end_back_rot_zero, maintainOffset=False, name=f"{self.guide_end_back_rot_zero}_OrC")
         self.ar.ctrls.color_shape([self.guide_end_loc], 'blue')
-        self.ar.ctrls.shape_size_setup(self.guide_end_loc)
         self.ar.ctrls.set_lock_hide([self.guide_end_loc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         self.ar.ctrls.set_lock_hide([self.guide_upper_eyelid_loc, self.guide_lower_eyelid_loc], ['tx', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
 
