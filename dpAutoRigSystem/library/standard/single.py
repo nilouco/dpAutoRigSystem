@@ -199,7 +199,7 @@ class Single(standard.BaseStandard):
                 self.main_jis_items.append(jnt)
                 # create a masterModuleGrp to be checked if this rig exists:
                 if self.get_guide_attr('indirectSkin'):
-                    self.create_hook_setup(side, [f"{side}{self.number_name}_Ctrl_Zero_0_Grp"], staticList=[f"{side}{self.number_name}_Jxt"])
+                    self.create_hook_setup(side, [f"{side}{self.number_name}_Ctrl_Zero_0_Grp"], statics=[f"{side}{self.number_name}_Jxt"])
                 else:
                     self.create_hook_setup(side, [f"{side}{self.number_name}_Ctrl_Zero_0_Grp"], [f"{side}{self.number_name}_Jnt"])
                 self.static_grps.append(self.static_hook_grp)
