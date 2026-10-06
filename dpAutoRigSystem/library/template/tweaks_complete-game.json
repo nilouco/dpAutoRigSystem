@@ -9,7 +9,7 @@
         ],
         "GuideData": {
             "Single__dpAR_000:Guide_Base": {
-                "FatherNode": null,
+                "FatherNode": "Head_UpperJaw_Ctrl",
                 "customName": "Tweaks_Holder_Main",
                 "deformedBy": 0,
                 "degree": 0,
