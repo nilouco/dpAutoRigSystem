@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
 """Package declaring dpAutoRigSystem version: Major.Minor.Patch"""
 
-__version__: str = '5.02.22'
+__version__: str = '5.02.23'
 _update_log: str = 'Refactory.'
