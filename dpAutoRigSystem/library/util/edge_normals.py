@@ -82,7 +82,7 @@ class ConvertNormals:
         m_util = OpenMaya.MScriptUtil() 
         m_util.createFromList([0, 0], 2)
         m_ptr = m_util.asInt2Ptr()
-        self.m_fn_mesh.get_edge_vertices(m_edge_id, m_ptr)
+        self.m_fn_mesh.getEdgeVertices(m_edge_id, m_ptr)
         m_start = m_util.getInt2ArrayItem(m_ptr,0,0)
         m_end = m_util.getInt2ArrayItem(m_ptr,0,1)
         return m_start, m_end
