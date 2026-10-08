@@ -24,9 +24,9 @@ class UpdateGuidesUI:
                 cmds.text('update_guide_name_txt', label=self.ar.data.lang['m006_name'], align='center', font='boldLabelFont', parent='update_guide_base_rcl')
                 cmds.text('update_guide_version_title_txt', label=self.ar.data.lang['m205_version'], align='center', font='boldLabelFont', parent='update_guide_base_rcl')
                 for guide in self.app.update_data:
-                    cmds.text('update_guide_node_txt', label=guide, align='left', parent='update_guide_base_rcl')
-                    cmds.text('update_guide_attr_txt', label=str(self.app.update_data[guide]['attributes']['customName']), align='center', parent='update_guide_base_rcl')
-                    cmds.text('update_guide_version_txt', label=self.app.update_data[guide]['attributes']['dpARVersion'], align='left', parent='update_guide_base_rcl')
+                    cmds.text(f'{guide}update_guide_node_txt', label=guide, align='left', parent='update_guide_base_rcl')
+                    cmds.text(f'{guide}update_guide_attr_txt', label=str(self.app.update_data[guide]['attributes']['customName']), align='center', parent='update_guide_base_rcl')
+                    cmds.text(f'{guide}update_guide_version_txt', label=self.app.update_data[guide]['attributes']['dpARVersion'], align='left', parent='update_guide_base_rcl')
                 cmds.separator(style='none', height=10, parent='update_guide_base_rcl')
                 cmds.button('update_guide_run_bt', label=self.ar.data.lang['m186_updateGuides'], command=self.app.do_update, backgroundColor=(0.6, 1.0, 0.7), parent='update_guide_main_cl')
             else:

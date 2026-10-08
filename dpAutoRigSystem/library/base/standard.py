@@ -207,8 +207,8 @@ class BaseStandard(base.BaseLibrary):
                         dpar_names.append(cmds.getAttr(f"{net}.guideName"))
                 if dpar_names and self.custom_name in dpar_names:
                     for n in range(1, len(dpar_names)+2):
-                        if not f"{base_name}{n.zfill(pad)}" in dpar_names:
-                            self.custom_name = f"{base_name}{n.zfill(pad)}"
+                        if not f"{base_name}{str(n).zfill(pad)}" in dpar_names:
+                            self.custom_name = f"{base_name}{str(n).zfill(pad)}"
                             break
                 # edit the prefixTextField with the normalText:
                 if self.ar.data.ui_state:
