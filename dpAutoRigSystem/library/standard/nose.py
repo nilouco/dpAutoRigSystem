@@ -135,9 +135,9 @@ class Nose(standard.BaseStandard):
                     cmds.parent(self.line, f"{self.name_guide}_JGuideTop{n-1}", relative=True)
                     cmds.parentConstraint(self.guide_top_loc, self.line, maintainOffset=False, name=f"{self.line}_PaC")
                     cmds.scaleConstraint(self.guide_top_loc, self.line, maintainOffset=False, name=f"{self.line}_ScC")
-                    self.add_node_to_guide_net([self.guide_top_loc], [f"guide_top_loc{n}"])
+                    self.add_node_to_guide_net([self.guide_top_loc], [f"cvTopLoc{n}"])
             elif joint_number < self.current_joint_number:
-                self.guide_top_loc = self.reduce_joint_number(joint_number, 'guide_top_loc', 'Top')
+                self.guide_top_loc = self.reduce_joint_number(joint_number, 'cvTopLoc', 'Top')
             cmds.setAttr(f"{self.guide_base}.nJoints", joint_number)
             self.current_joint_number = joint_number
             self.create_mirror_preview()
