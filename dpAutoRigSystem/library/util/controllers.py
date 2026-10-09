@@ -1457,7 +1457,7 @@ class Controllers:
                 self.ar.ui_manager.set_progress(end_it=True)
             else: #set default values
                 for item in items:
-                    attributes = self.ar.value_editor_ui.reset_pose.getSetupAttrList(item, self.ignore_default_value_attrs)
+                    attributes = self.ar.value_editor_ui.reset_pose.get_setup_attrs(item, self.ignore_default_value_attrs)
                     if attributes:
                         for attr in attributes:
                             # hack to avoid Maya limitation to edit boolean attributes

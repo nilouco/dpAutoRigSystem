@@ -53,7 +53,7 @@ class ValueEditorUI:
         if controllers:
             controllers.sort()
             for c, ctrl in enumerate(controllers):
-                attributes = self.reset_pose.getSetupAttrList(ctrl, self.ar.ctrls.ignore_default_value_attrs)
+                attributes = self.reset_pose.get_setup_attrs(ctrl, self.ar.ctrls.ignore_default_value_attrs)
                 if attributes:
                     for a, attr in enumerate(attributes):
                         cmds.rowLayout(numberOfColumns=4, columnWidth4=(150, 100, 50, 50), columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2)], parent='value_editor_default_cl')
