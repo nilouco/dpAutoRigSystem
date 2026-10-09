@@ -117,7 +117,7 @@ class Rivet(base.BaseLibrary):
                     cmds.deleteAttr(connection)
                     break
         else:
-            cmds.deleteAttr(connection[0])
+            cmds.deleteAttr(connections[0])
 
         # check if attached geometry should be discarded
         networks = cmds.listConnections(attached_geo, type='network')
