@@ -298,6 +298,8 @@ class UpdateGuides(base.BaseLibrary):
             current_new_guide.set_guide_custom_name(name_guide)
             self.update_data[guide]['new_guide'] = current_new_guide.guide_base
             self.new_guides_instances[current_new_guide.guide_base] = current_new_guide
+            # set guide attributes
+            self.copy_attr_from_guides(self.update_data[guide]['new_guide'], self.update_data[guide]['attributes'])
             if self.ar.data.ui_state:
                 cmds.refresh()
 
@@ -460,17 +462,15 @@ class UpdateGuides(base.BaseLibrary):
     def do_update(self, *args):
         """ Main method to update the guides in the scene.
         """
+        self.ar.data.collapse_edit_sel_mod = True
         self.ar.ui_manager.close_ui(self.ar.data.update_guides_win_name)
         # Starts progress bar feedback
-        self.ar.ui_manager.set_progress(self.ar.data.lang['m198_renameOldGuides'], self.ar.data.lang['m186_updateGuides'], 7, add_one=False)
+        self.ar.ui_manager.set_progress(self.ar.data.lang['m198_renameOldGuides'], self.ar.data.lang['m186_updateGuides'], 6, add_one=False)
         # Rename guides to discard as *_OLD
         self.rename_old_guides()
         self.ar.ui_manager.set_progress(self.ar.data.lang['m199_creatingNewGuides'])
         # Create the new base guides to replace the old ones
         self.create_new_guides()
-        self.ar.ui_manager.set_progress(self.ar.data.lang['m200_setAttrs'])
-        # Set all attributes except transforms, it's needed for parenting
-        self.set_new_guide_attr('attributes')
         self.ar.ui_manager.set_progress(self.ar.data.lang['m201_parentGuides'])
         # Parent all new guides;
         self.parent_new_guides()
@@ -487,6 +487,7 @@ class UpdateGuides(base.BaseLibrary):
         cmds.select(clear=True)
         # Ends progress bar feedback
         self.ar.ui_manager.set_progress(end_it=True)
+        self.ar.data.collapse_edit_sel_mod = False
         if self.ar.data.ui_state:
             # Calls for summary window
             self.ar.update_guides_ui.summary_ui()

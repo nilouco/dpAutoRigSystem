@@ -506,6 +506,8 @@ class Maker:
                 elif user_choose == update_guides_text:
                     self.ar.config.get_instance('UpdateGuides', [self.ar.data.tools_folder]).build_tool()
                     return False
+                else: #yes
+                    return True
         return True
 
 
