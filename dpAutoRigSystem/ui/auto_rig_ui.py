@@ -13,10 +13,6 @@ class MainUI:
         """
         if cmds.workspaceControl(self.ar.data.workspace_control_name, query=True, exists=True):
             cmds.workspaceControl(self.ar.data.workspace_control_name, edit=True, close=True)
-        label_text = 'dpAutoRigSystem'
-        label_text += f" - {self.ar.data.version}"
-        if self.ar.dev:
-            label_text += ' ~ dev'
         ui_call_script = f"import dpAutoRigSystem; from dpAutoRigSystem.core import main; ar = main.Start({self.ar.dev}, intro=False); ar.auto_rig_ui.show_ui();"
         cmds.workspaceControl(
                                 self.ar.data.workspace_control_name, 
@@ -29,7 +25,7 @@ class MainUI:
                                 widthProperty='preferred',
                                 visible=True,
                                 loadImmediately=True,
-                                label=label_text,
+                                label='dpAutoRigSystem',
                                 uiScript=ui_call_script
                                 )
     
@@ -74,6 +70,7 @@ class MainUI:
         self.create_window_menu()
         self.create_help_menu()
         self.create_dev_menu()
+        cmds.menu('main_version_menu_txt', label=self.ar.data.version, helpMenu=True, parent='main_menu_bar')
 
 
     def create_settings_menu(self):
@@ -112,7 +109,7 @@ class MainUI:
 
 
     def create_help_menu(self):
-        cmds.menu('help_menu', label=self.ar.data.lang['i372_help'], helpMenu=True, parent='main_menu_bar')
+        cmds.menu('help_menu', label=self.ar.data.lang['i372_help'], parent='main_menu_bar')
         cmds.menuItem('about_mi', label=self.ar.data.lang['m015_about'], command=partial(self.ar.logger.infoWin, 'm015_about', 'i006_aboutDesc', self.ar.data.version, 'center', 305, 250), parent='help_menu')
         cmds.menuItem('author_mi', label=self.ar.data.lang['m016_author'], command=partial(self.ar.logger.infoWin, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250), parent='help_menu')
         cmds.menuItem('collaborators_mi', label=self.ar.data.lang['i165_collaborators'], command=partial(self.ar.logger.infoWin, 'i165_collaborators', 'i166_collabDesc', f"\n\n{self.ar.data.lang['_collaborators']}", 'center', 305, 250), parent='help_menu')
