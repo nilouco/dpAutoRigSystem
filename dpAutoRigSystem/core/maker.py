@@ -483,6 +483,7 @@ class Maker:
         self.ar.ui_manager.set_progress(self.ar.data.lang['i178_startRigging'], 'dpAutoRigSystem', add_one=False, add_number=False)
         self.ar.ui_manager.close_ui(self.ar.data.plus_info_win_name)
         self.ar.ui_manager.close_ui(self.ar.data.color_override_win_name)
+        self.ar.ui_manager.close_ui('nodeEditorWindow')
 
 
     def refresh_before_build(self):

@@ -247,6 +247,7 @@ class UIManager:
             first_mode = True for verify/export
                        = False for fix/import
         """
+        self.ar.ui_manager.close_ui('nodeEditorWindow')
         if first_mode and action_type == 'r000_rebuilder' and self.ar.naming.get_duplicated_names(): #splitData
             confirm = cmds.confirmDialog(title=self.ar.data.lang['v024_duplicatedName'], icon='question', message=self.ar.data.lang['i355_uniqueNameDependence'], button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no']], defaultButton=self.ar.data.lang['i072_no'], cancelButton=self.ar.data.lang['i072_no'], dismissString=self.ar.data.lang['i072_no'])
             if confirm == self.ar.data.lang['i072_no']:
