@@ -90,7 +90,7 @@ class Rivet(base.BaseLibrary):
         rivet_transform = cmds.listConnections(f"{rivetNetNode}.rivet", destination=False)
         if rivet_transform:
             rivet_transform = rivet_transform[0]
-        rivet_ctrl = cmds.listConnections(f"{rivetNetNode}.item_node", destination=False)[0]
+        rivet_ctrl = cmds.listConnections(f"{rivetNetNode}.itemNode", destination=False)[0]
         follicle = cmds.listConnections(f"{rivetNetNode}.follicle", destination=False)[0]
         attached_geo = cmds.listConnections(f"{rivetNetNode}.geoToAttach", destination=False)[0]
         try:
@@ -149,7 +149,7 @@ class Rivet(base.BaseLibrary):
             ctrls = []
             self.rivet_nets = []
             for rivet_node in rivet_networks:
-                rivet_controllers = cmds.listConnections(f"{rivet_node}.item_node", destination=False)
+                rivet_controllers = cmds.listConnections(f"{rivet_node}.itemNode", destination=False)
                 if rivet_controllers:
                     ctrls.append(rivet_controllers[0])
                     self.rivet_nets.append(rivet_node)
@@ -436,7 +436,7 @@ class Rivet(base.BaseLibrary):
                 # add
                 cmds.addAttr(self.net, longName='dpNetwork', attributeType='bool', defaultValue=1)
                 cmds.addAttr(self.net, longName='dpRivetNet', attributeType='bool', defaultValue=1)
-                cmds.addAttr(self.net, longName='item_node', attributeType='message')
+                cmds.addAttr(self.net, longName='itemNode', attributeType='message')
                 cmds.addAttr(self.net, longName='rivet', attributeType='message')
                 cmds.addAttr(self.net, longName='follicle', attributeType='message')
                 cmds.addAttr(self.net, longName='geoToAttach', attributeType='message')
@@ -458,7 +458,7 @@ class Rivet(base.BaseLibrary):
                     cmds.connectAttr(f"{self.deformer_node_items[0]}.message", f"{self.net}.deformerGeo", force=True)
                     cmds.connectAttr(f"{self.deformer_node_items[1]}.message", f"{self.net}.deformerNode", force=True)
                 if len(items) == len(rivets) and cmds.objExists(items[r]):
-                    cmds.connectAttr(f"{items[r]}.message", f"{self.net}.item_node", force=True)
+                    cmds.connectAttr(f"{items[r]}.message", f"{self.net}.itemNode", force=True)
                     if not cmds.objExists(f"{items[r]}.rivetNet"):
                         cmds.addAttr(items[r], longName="rivetNet", attributeType='message')
                         cmds.connectAttr(f"{self.net}.message", f"{items[r]}.rivetNet", force=True)
