@@ -20,10 +20,10 @@ class Finger(standard.BaseStandard):
         self.create_guide_base()
         self.create_guide_custom_attr()
         self.create_guide_elements()
-        self.change_joint_number(3)
-        self.set_guide_base_initial_position()
         self.add_node_to_guide_net([self.guide_base_joint_loc, self.guide_joint_1_loc, self.guide_loc, self.guide_end_loc], 
                                    ['JointLoc0', 'JointLoc1', 'JointLoc2', 'JointEnd'])
+        self.change_joint_number(3)
+        self.set_guide_base_initial_position()
 
 
     def create_guide_custom_attr(self):
@@ -73,8 +73,6 @@ class Finger(standard.BaseStandard):
         cmds.setAttr(f"{self.guide_base}.rotateX", 90)
         cmds.setAttr(f"{self.guide_base}.rotateZ", 90)
 
-
-        
 
     def change_joint_number(self, inputted, *args):
         """ Edit the number of joints in the guide.

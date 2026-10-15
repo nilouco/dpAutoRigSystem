@@ -224,15 +224,14 @@ class GuideIO(action.BaseAction):
     def setup_guide_transformations(self):
         """ Work with guide transformations to put the transform as imported data.
         """
-        for item in list(self.net_data['GuideData']):
-            if item in self.net_data['GuideData']:
-                new_item = self.get_new_name(item)
-                if 'guideBase' in cmds.listAttr(new_item) and cmds.getAttr(f"{new_item}.guideBase") == 1 and cmds.listRelatives(new_item, parent=True): #main
-                    cmds.parent(new_item, world=True)
-                for attr in list(self.net_data['GuideData'][item]):
-                    if attr in self.ar.data.transform_attrs and not cmds.getAttr(f"{new_item}.{attr}", lock=True) and not cmds.listConnections(f"{new_item}.{attr}", destination=False, source=True): #unlocked attribute / without input connection
-                        cmds.setAttr(f"{new_item}.{attr}", self.net_data['GuideData'][item][attr])
-                    cmds.refresh()
+        for item in self.net_data['GuideData']:
+            new_item = self.get_new_name(item)
+            if 'guideBase' in cmds.listAttr(new_item) and cmds.getAttr(f"{new_item}.guideBase") == 1 and cmds.listRelatives(new_item, parent=True): #main
+                cmds.parent(new_item, world=True)
+            for attr in self.net_data['GuideData'][item]:
+                if attr in self.ar.data.transform_attrs and not cmds.getAttr(f"{new_item}.{attr}", lock=True) and not cmds.listConnections(f"{new_item}.{attr}", destination=False, source=True): #unlocked attribute / without input connection
+                    cmds.setAttr(f"{new_item}.{attr}", self.net_data['GuideData'][item][attr])
+                cmds.refresh()
 
 
     def setup_guide_base_parenting(self, guide_data):

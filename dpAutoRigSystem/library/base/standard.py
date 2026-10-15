@@ -756,10 +756,8 @@ class BaseStandard(base.BaseLibrary):
         # re-define cvEndJoint:
         joint_loc = f"{self.name_guide}_{name}{joint_number}"
         # re-parent the children guides:
-        children = self.ar.utils.get_guide_children(joint_loc)
-        if children:
-            for child in children:
-                cmds.parent(child, joint_loc)
+        for child in self.ar.utils.get_guide_children(joint_loc) or []:
+            cmds.parent(child, joint_loc)
         # delete difference of nJoints:
         cmds.delete(f"{self.name_guide}_{name}{joint_number+add}")
         cmds.delete(f"{self.name_guide}_JGuide{extra}{joint_number+add}")
