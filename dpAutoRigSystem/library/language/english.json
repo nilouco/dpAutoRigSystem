@@ -339,7 +339,7 @@
     "i168_donateDesc"           : "dpAutoRigSystem is a free and open source\nPython script shared with the community.\n\nIf you want to support the development,\nyou can donate using PayPal.\n\nThank you!",
     "i169_startFrame"           : "Start Frame",
     "i170_showControls"         : "Show Controllers",
-    "i171_updateLog"            : "Last update log",
+    "i171_changeLog"            : "Last update log",
     "i172_updateManual"         : "If the automatic update doesn't work well,\ndownload the last version and replace\nthe files manually, please. Thanks!",
     "i173_reloadScript"         : "Reload the script, please.\nWe hope you enjoy it.",
     "i174_continue"             : "Continue",

@@ -15,19 +15,16 @@ class Maker:
         return [mod, mod.build_raw_guide()]
 
 
-    def set_new_guide(self, module, name, t=(0, 0, 0), r=(0, 0, 0), s=(1, 1, 1), size=1, radius=2, end=1.3, mirror=None, flip=1, deformed=0, indSkin=0, annot=1, annot_pos=None, parent=None, progress=True):
+    def set_new_guide(self, module, name, t=(0, 0, 0), r=(0, 0, 0), s=(1, 1, 1), size=1, radius=2, end=1.3, mirror=None, flip=1, deformed=0, indSkin=0, annot=1, parent=None, progress=True):
         """ Creates a new standard guide, set the given values and returns a list with the imported module and the created guide.
         """
-        #
-        # TODO: it isn't used yet. Should we delete this method?
-        #
         if progress:
             self.ar.ui_manager.set_progress(f"{self.ar.data.lang['m094_doing']}{name}")
             cmds.refresh()
         mod, guide = self.create_raw_guide(module)
         mod.set_guide_custom_name(name)
         cmds.setAttr(f"{mod.radius_ctrl}.translateX", radius)
-        cmds.setAttr(f"{mod.cvEndJoint}.translateZ", end)
+        cmds.setAttr(f"{mod.guide_end_loc}.translateZ", end)
         cmds.setAttr(f"{guide}.translateX", t[0])
         cmds.setAttr(f"{guide}.translateY", t[1])
         cmds.setAttr(f"{guide}.translateZ", t[2])
@@ -47,14 +44,6 @@ class Maker:
             cmds.setAttr(f"{guide}.indirectSkin", indSkin)
         cmds.setAttr(f"{guide}.displayAnnotation", annot)
         cmds.setAttr(f"{guide}_Ant.visibility", annot)
-        if annot_pos:
-            cmds.setAttr(f"{mod.annotation}.translateX", annot_pos[0])
-            cmds.setAttr(f"{mod.annotation}.translateY", annot_pos[1])
-            cmds.setAttr(f"{mod.annotation}.translateZ", annot_pos[2])
-        else:
-            cmds.setAttr(f"{mod.annotation}.translateX", 0)
-            cmds.setAttr(f"{mod.annotation}.translateY", radius)
-            cmds.setAttr(f"{mod.annotation}.translateZ", 0)
         if parent:
             cmds.parent(guide, parent, absolute=True)
         return [mod, guide]
@@ -1332,74 +1321,3 @@ class Composer:
             self.to_ids.extend(cmds.parentConstraint(self.ar.maker.root_ctrl, world_ref, maintainOffset=True, name=f"{world_ref}_PaC"))
             # remove dpControl attribute
             self.ar.custom_attr.remove_attr('dpControl', [world_ref])
-
-
-
-class Launcher:
-    def __init__(self, ar):
-        self.ar = ar
-            
-    def guide(self, name):
-        """ Returns the standard module instance and the created guide base.
-        """
-        return self.ar.maker.create_raw_guide(name)
-
-
-    def template(self, name):
-        template = self.ar.config.get_instance(name, [self.ar.data.template_folder])
-        if template:
-            template.build_template()
-        
-
-    def tool(self, name):
-        tool = self.ar.config.get_instance(name, [self.ar.data.tools_folder])
-        if tool:
-            tool.build_tool()
-            return tool
-
-
-    def curve(self, name, ui=False):
-        curve = self.ar.config.get_instance(name, [self.ar.data.curve_simple_folder, self.ar.data.curve_combined_folder])
-        if curve:
-            curve.cv_main(use_ui=ui)
-            return curve
-
-
-    def validate(self, name):
-        """ Getter validate instance.
-        """
-        for item in self.ar.config.get_validator_instances():
-            if item.name == name:
-                return item
-
-
-    def validate_checked(self, verify=True):
-        """ If verify is False, then it'll run the fix mode.
-        """
-        self.ar.publisher.run_checked_validators(first_mode=verify)
-
-
-    def publish(self, comments="Launcher"):
-        self.ar.publisher.run_publishing(comments=comments)
-
-
-    def publish_batch(self, assets, comments="Launcher"):
-        for asset in assets:
-            self.ar.pipeliner.load_asset(file=asset)
-            self.ar.publisher.run_publishing(comments=comments)
-
-
-    def rebuild(self, name):
-        """ Getter rebuild instance.
-        """
-        for item in self.ar.config.get_rebuilder_instances():
-            if item.name == name:
-                return item
-
-
-    def rebuilder_split_data(self):
-        self.ar.ui_manager.run_selected_actions(self.ar.config.get_rebuilder_instances(), True, True, action_type='r000_rebuilder')
-
-
-    def rebuilder_rebuild(self):
-        self.ar.ui_manager.run_selected_actions(self.ar.config.get_rebuilder_instances(), False, True, action_type='r000_rebuilder')

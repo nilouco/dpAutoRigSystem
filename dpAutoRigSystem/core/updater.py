@@ -94,7 +94,7 @@ class Updater:
                     else:
                         # 1 - there's a new version
                         for extra_line in remote_contents:
-                            if '_update_log' in extra_line:
+                            if '_change_log' in extra_line:
                                 remote_log = extra_line[self.version_start_length:self.version_end_length] #these magic numbers filter only the log string sentence
                                 return [1, remote_version, remote_log]
                         return [1, remote_version, None]

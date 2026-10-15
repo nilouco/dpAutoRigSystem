@@ -47,7 +47,7 @@ class Skinning(weights.Weights):
             cmds.setAttr(f"{sc_node}.relativeSpaceMode", sc_mode)
     
 
-    def run_skinning(self, geos, joints, mode, log_win=False):
+    def run_skinning(self, geos, joints, mode=None, log_win=False):
         # check if we have repeated listed geometries in case of the user choose to not display long names:
         if self.validate_geos(geos, mode):
             if joints and geos:

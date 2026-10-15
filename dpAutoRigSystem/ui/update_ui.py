@@ -30,7 +30,7 @@ class UpdateUI:
             cmds.separator(height=30)
             if remote_log:
                 remote_log = remote_log.replace('\\n', '\n')
-                cmds.text('update_log_txt', label=f"{self.ar.data.lang['i171_updateLog']}:\n", align='center', parent='update_cl')
+                cmds.text('change_log_txt', label=f"{self.ar.data.lang['i171_changeLog']}:\n", align='center', parent='update_cl')
                 cmds.text('update_remote_log_txt', label=remote_log, align='left', parent='update_cl')
                 cmds.separator(height=30)
             cmds.button('update_whats_changed_bt', label=self.ar.data.lang['i117_whatsChanged'], align='center', command=partial(self.ar.web.visit_website, self.ar.data.whats_changed_url), parent='update_cl')

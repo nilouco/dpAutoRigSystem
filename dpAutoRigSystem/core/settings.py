@@ -66,7 +66,7 @@ class Configuration:
 
     def load_version(self):
         self.ar.data.version = self.ar.version.__version__
-        self.ar.data.update_log = self.ar.version._update_log
+        self.ar.data.change_log = self.ar.version._change_log
         if cmds.text('loading_text', query=True, exists=True):
             cmds.text('loading_text', edit=True, label=f"Loading dpAutoRigSystem v{self.ar.data.version} ... ")
             cmds.refresh()
