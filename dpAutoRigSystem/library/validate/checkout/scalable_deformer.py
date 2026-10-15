@@ -13,7 +13,7 @@ WIKI = '07-‐-Validator#-scalable-deformer-checker'
 class ScalableDeformer(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.rig_scale_output_attr = 'rig_scale_output'
+        self.rig_scale_output_attr = 'rigScaleOutput'
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
