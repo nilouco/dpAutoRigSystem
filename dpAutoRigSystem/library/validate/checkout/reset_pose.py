@@ -59,7 +59,7 @@ class ResetPose(action.BaseAction):
                 for item in check_items:
                     self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                     # conditional to check here
-                    if cmds.objExists(f"{item}.dpControl"):
+                    if 'dpControl' in cmds.listAttr(item):
                         self.checked_items.append(item)
                         edited_attrs = []
                         attr_data = self.get_attr_default_value_data(item)
