@@ -84,7 +84,7 @@ class Repair:
         #url = 'https://github.com/nilouco/dpAutoRigSystem/zipball/master/'
         url = 'https://github.com/nilouco/dpAutoRigSystem/zipball/699-dev-mode-reload/'
         
-        remote_source = urllib.request.urlopen(url)
+        remote_source = urllib.request.urlopen(url, timeout=3)
         ar_zip = zipfile.ZipFile(io.BytesIO(remote_source.read()))
         zip_names = ar_zip.namelist()
         for file_name in zip_names:

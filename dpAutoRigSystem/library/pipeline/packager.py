@@ -4,9 +4,9 @@ import platform
 import shutil
 import subprocess
 import sys
+import urllib.request
 import zipfile
 from importlib import reload
-from urllib import request
 
 from maya import cmds, mel
 
@@ -270,10 +270,10 @@ class Packager:
         if webhook and message_text:
             message_dic = {'content': message_text}
             message_data = json.dumps(message_dic).encode('utf8')
-            req = request.Request(webhook, message_data, {'content-type': 'application/json'})
+            req = urllib.request.Request(webhook, message_data, {'content-type': 'application/json'})
             req.add_header('user-agent', 'dpAR Discord Webhook')
             try:
-                request.urlopen(req, context=self.ar.config.os_context)
+                urllib.request.urlopen(req, context=self.ar.config.os_context, timeout=4)
             except:
                 return 'i088_internetFail'
         else:
