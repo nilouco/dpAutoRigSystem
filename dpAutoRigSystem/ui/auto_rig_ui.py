@@ -305,12 +305,12 @@ class MainUI:
         # RGB layout:
         cmds.columnLayout('ctr_color_rgb_cl', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent='ctr_color_tab')
         cmds.separator(height=10, style='none', parent='ctr_color_rgb_cl')
-        cmds.colorSliderGrp('ctr_color_rgb_csg', label='Color', columnAlign3=('right', 'left', 'left'), columnWidth3=(30, 60, 50), columnOffset3=(10, 10, 10), rgbValue=(0, 0, 0), changeCommand=partial(self.ar.ctrls.set_color_rgb_by_ui, slider='colorRGBSlider'), parent='ctr_color_rgb_cl')
+        cmds.colorSliderGrp('ctr_color_rgb_csg', label='Color', columnAlign3=('right', 'left', 'left'), columnWidth3=(30, 60, 50), columnOffset3=(10, 10, 10), rgbValue=(0, 0, 0), changeCommand=partial(self.ar.ctrls.set_color_rgb_by_ui, slider='ctr_color_rgb_csg'), parent='ctr_color_rgb_cl')
         cmds.button('ctr_remove_override_color_bt', label=self.ar.data.lang['i046_remove'], command=self.ar.ctrls.remove_color, parent='ctr_color_rgb_cl')
         # outliner layout:
         cmds.columnLayout('ctr_color_outliner_cl', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent='ctr_color_tab')
         cmds.separator(height=10, style='none', parent='ctr_color_outliner_cl')
-        cmds.colorSliderGrp('ctr_color_outliner_csg', label='Outliner', columnAlign3=('right', 'left', 'left'), columnWidth3=(45, 60, 50), columnOffset3=(10, 10, 10), rgbValue=(0, 0, 0), changeCommand=partial(self.ar.ctrls.set_color_outliner_by_ui, slider='colorOutlinerSlider'), parent='ctr_color_outliner_cl')
+        cmds.colorSliderGrp('ctr_color_outliner_csg', label='Outliner', columnAlign3=('right', 'left', 'left'), columnWidth3=(45, 60, 50), columnOffset3=(10, 10, 10), rgbValue=(0, 0, 0), changeCommand=partial(self.ar.ctrls.set_color_outliner_by_ui, slider='ctr_color_outliner_csg'), parent='ctr_color_outliner_cl')
         cmds.button('ctr_remove_outliner_color_bt', label=self.ar.data.lang['i046_remove'], command=self.ar.ctrls.remove_color, parent='ctr_color_outliner_cl')
         # renaming color tabLayouts:
         cmds.tabLayout('ctr_color_tab', edit=True, tabLabel=(('ctr_color_index_gl', 'Index'), ('ctr_color_rgb_cl', 'RGB'), ('ctr_color_outliner_cl', 'Outliner')))

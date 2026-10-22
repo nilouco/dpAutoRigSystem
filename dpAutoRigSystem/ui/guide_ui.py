@@ -573,12 +573,12 @@ class GuideUI:
         # RGB layout:
         cmds.columnLayout('colorize_rgb_cl', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent='colorize_tl')
         cmds.separator(height=10, style='none', parent='colorize_rgb_cl')
-        cmds.colorSliderGrp('colorize_rgb_csg', label='Color', columnAlign3=('right', 'left', 'left'), columnWidth3=(30, 60, 50), columnOffset3=(10, 10, 10), rgbValue=self.ar.ctrls.get_current_rgb_color(standard.guide_base), changeCommand=partial(self.ar.ctrls.set_color_rgb_by_ui, [standard.guide_base], 'colorRGBSlider', standard), parent='colorize_rgb_cl')
+        cmds.colorSliderGrp('colorize_rgb_csg', label='Color', columnAlign3=('right', 'left', 'left'), columnWidth3=(30, 60, 50), columnOffset3=(10, 10, 10), rgbValue=self.ar.ctrls.get_current_rgb_color(standard.guide_base), changeCommand=partial(self.ar.ctrls.set_color_rgb_by_ui, [standard.guide_base], 'colorize_rgb_csg', standard), parent='colorize_rgb_cl')
         cmds.button('colorize_remove_rgb_btn', label=self.ar.data.lang['i046_remove'], command=self.ar.ctrls.remove_color, parent='colorize_rgb_cl')
         # Outliner layout:
         cmds.columnLayout('colorize_outliner_cl', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent='colorize_tl')
         cmds.separator(height=10, style='none', parent='colorize_outliner_cl')
-        cmds.colorSliderGrp('colorize_outliner_csg', label='Outliner', columnAlign3=('right', 'left', 'left'), columnWidth3=(45, 60, 50), columnOffset3=(10, 10, 10), rgbValue=self.ar.ctrls.get_current_rgb_color(standard.guide_base, True), changeCommand=partial(self.ar.ctrls.set_color_outliner_by_ui, [standard.guide_base], 'colorOutlinerSlider'), parent='colorize_outliner_cl')
+        cmds.colorSliderGrp('colorize_outliner_csg', label='Outliner', columnAlign3=('right', 'left', 'left'), columnWidth3=(45, 60, 50), columnOffset3=(10, 10, 10), rgbValue=self.ar.ctrls.get_current_rgb_color(standard.guide_base, True), changeCommand=partial(self.ar.ctrls.set_color_outliner_by_ui, [standard.guide_base], 'colorize_outliner_csg'), parent='colorize_outliner_cl')
         cmds.button('colorize_remove_outliner_btn', label=self.ar.data.lang['i046_remove'], command=self.ar.ctrls.remove_color, parent='colorize_outliner_cl')
         # renaming tabLayouts:
         cmds.tabLayout('colorize_tl', edit=True, tabLabel=(('colorize_gl', 'Index'), ('colorize_rgb_cl', 'RGB'), ('colorize_outliner_cl', 'Outliner')))

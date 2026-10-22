@@ -554,7 +554,7 @@ class Agreement:
         """
         local_data = False
         try:
-            local_response = urllib.request.urlopen(self.ar.data.location_url, context=self.ar.config.os_context, timeout=2)
+            local_response = urllib.request.urlopen(self.ar.data.location_url, context=self.ar.config.os_context)
             local_data = json.loads(local_response.read())
         except:
             pass

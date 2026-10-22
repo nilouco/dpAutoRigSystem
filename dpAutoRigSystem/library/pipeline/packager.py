@@ -273,7 +273,7 @@ class Packager:
             req = urllib.request.Request(webhook, message_data, {'content-type': 'application/json'})
             req.add_header('user-agent', 'dpAR Discord Webhook')
             try:
-                urllib.request.urlopen(req, context=self.ar.config.os_context, timeout=4)
+                urllib.request.urlopen(req, context=self.ar.config.os_context)
             except:
                 return 'i088_internetFail'
         else:
