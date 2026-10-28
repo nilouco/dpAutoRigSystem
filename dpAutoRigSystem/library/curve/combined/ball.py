@@ -1,0 +1,41 @@
+from maya import cmds, mel
+
+from ...base import curve
+
+# global variables to this module:    
+CLASS_NAME = 'Ball'
+TITLE = 'm116_ball'
+DESCRIPTION = 'm099_cvControlDesc'
+
+
+
+class Ball(curve.BaseCurve):
+    def __init__(self, ar):
+        curve.BaseCurve.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, None)
+        self.dependences = ['Circle']
+    
+    
+    def cv_main(self, use_ui, cv_id=None, cv_name=f"{CLASS_NAME}_Ctrl", cv_size=1.0, cv_degree=1, cv_direction='+Y', cv_rot=(0, 0, 0), cv_action=1, guide=False):
+        """ The principal method to call all other methods in order to build the create_controller curve.
+            Return the result: new control curve or the destination list depending of action.
+        """
+        # check modules integrity:
+        missing_modules = self.ar.lib.check_missing_modules(self.ar.data.curve_simple_folder, self.dependences)
+        if not missing_modules:
+            # call combine function:
+            return self.cv_create(use_ui, cv_id, cv_name, cv_size, cv_degree, cv_direction, cv_rot, cv_action, guide, True)
+        else:
+            # error checking modules in the folder:
+            mel.eval(f'error "{self.ar.data.lang["e001_guideNotChecked"]} - {(", ").join(missing_modules)}";')
+    
+    
+    def create_combined_curves(self, cv_id, cv_name, cv_size, cv_degree):
+        """ Combine controllers in order to return it.
+        """
+        circle = self.ar.config.get_instance('Circle', [self.ar.data.curve_simple_folder])
+        curve1 = circle.cv_main(False, cv_id, cv_name, cv_size, cv_degree)
+        curve2 = circle.cv_main(False, cv_id, cv_name, cv_size, cv_degree)
+        curve3 = circle.cv_main(False, cv_id, cv_name, cv_size, cv_degree)
+        cmds.setAttr(f"{curve2}.rotateY", -90)
+        cmds.setAttr(f"{curve3}.rotateX", 90)
+        return self.combine_curves([curve1, curve2, curve3])

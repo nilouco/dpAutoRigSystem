@@ -1,0 +1,714 @@
+import datetime
+import getpass
+import json
+import os
+import platform
+import socket
+import ssl
+import sys
+import urllib.request
+import webbrowser
+from importlib import reload
+
+from maya import cmds, mel
+
+
+class Configuration:
+    def __init__(self, ar):
+        self.ar = ar
+        self.ar.data.verbose = self.ar.dev #TODO: find a better definition for verbose here
+        self.lib_folders = [
+                            self.ar.data.standard_folder,
+                            self.ar.data.curve_simple_folder,
+                            self.ar.data.curve_combined_folder,
+                            self.ar.data.checkin_folder,
+                            self.ar.data.checkout_folder,
+                            self.ar.data.prepare_anim_folder,
+                            self.ar.data.start_folder,
+                            self.ar.data.source_folder,
+                            self.ar.data.setup_folder,
+                            self.ar.data.deforming_folder,
+                            self.ar.data.custom_folder
+                            ]
+        self.get_os_context()
+        self.today = str(datetime.datetime.now().date())
+        self.load_path()
+        self.clear_old_starter()
+        self.load_version()
+        self.load_language()
+        self.load_validator_preset()
+        self.load_curve_preset()
+        self.load_curve_degree()
+        self.load_menu_options()
+        self.load_agree_terms()
+        self.load_auto_check_update()
+        self.load_icons()
+
+
+    def get_os_context(self):
+        self.os_context = ssl.create_default_context()
+        if os.name == 'posix':
+            #create an unverified context to bypass SSL certificate checks, because macOS sends empty certificate
+            self.os_context = ssl._create_unverified_context()
+
+
+    def load_path(self):
+        path = str(os.path.join(os.path.dirname(sys._getframe(1).f_code.co_filename))).replace('\\', '/')
+        self.ar.data.dp_auto_rig_path = path[:path.rfind('/')] #remove '/core'
+    
+
+    def clear_old_starter(self):
+        if not self.ar.dev:
+            old_starter = f"{self.ar.data.dp_auto_rig_path}/dpAutoRig.py"
+            if os.path.isfile(old_starter):
+                os.remove(old_starter)
+
+
+    def load_version(self):
+        self.ar.data.version = self.ar.version.__version__
+        self.ar.data.change_log = self.ar.version._change_log
+        if cmds.text('loading_text', query=True, exists=True):
+            cmds.text('loading_text', edit=True, label=f"Loading dpAutoRigSystem v{self.ar.data.version} ... ")
+            cmds.refresh()
+
+
+    def load_language(self):
+        self.ar.data.lang, self.ar.data.lang_preset_data = self.check_option_data(
+                                                                                    self.ar.data.language_option_var,
+                                                                                    self.ar.data.language_default,
+                                                                                    self.ar.data.language_folder
+                                                                                    )
+        if not self.ar.data.lang:
+            raise FileExistsError('Language')
+
+
+    def load_validator_preset(self):
+        self.ar.data.validator_preset, self.ar.data.validator_preset_data = self.check_option_data(
+                                                                                                    self.ar.data.validator_option_var,
+                                                                                                    self.ar.data.validator_default,
+                                                                                                    self.ar.data.validate_preset_folder
+                                                                                                    )
+        
+
+    def load_curve_preset(self):
+        self.ar.data.curve_preset, self.ar.data.curve_preset_data = self.check_option_data(
+                                                                                            self.ar.data.curve_option_var,
+                                                                                            self.ar.data.curve_default,
+                                                                                            self.ar.data.curve_preset_folder
+                                                                                            )
+
+    
+    def load_curve_degree(self):
+        self.ar.data.degree = self.check_last_option_var(
+                                                            self.ar.data.degree_option_var, 
+                                                            self.ar.data.degree_default, 
+                                                            self.ar.data.degrees
+                                                         )
+        self.ar.data.degree_option = int(self.ar.data.degree[-1])
+
+
+    def load_menu_options(self):
+        values = []
+        for item, option_var in zip([
+                                        self.ar.data.colorize_curve,
+                                        self.ar.data.supplementary_attr,
+                                        self.ar.data.display_joint,
+                                        self.ar.data.display_sub_shape,
+                                        self.ar.data.display_temp_grp,
+                                        self.ar.data.compose_all,
+                                        self.ar.data.default_render_layer
+                                   ], 
+                                   [
+                                        self.ar.data.colorize_curve_option_var,
+                                        self.ar.data.supplementary_attr_option_var,
+                                        self.ar.data.display_joint_option_var,
+                                        self.ar.data.display_sub_shape_option_var,
+                                        self.ar.data.display_temp_grp_option_var,
+                                        self.ar.data.compose_all_option_var,
+                                        self.ar.data.default_render_layer_option_var
+                                   ]):
+            values.append(self.check_last_option_var(
+                                                        option_var, 
+                                                        item, 
+                                                        self.ar.data.booleans,
+                                                        string=False
+                                                    ))
+        self.ar.data.colorize_curve = values[0]
+        self.ar.data.supplementary_attr = values[1]
+        self.ar.data.display_joint = values[2]
+        self.ar.data.display_sub_shape = values[3]
+        self.ar.data.display_temp_grp = values[4]
+        self.ar.data.compose_all = values[5]
+        self.ar.data.default_render_layer = values[6]
+
+
+    def load_agree_terms(self):
+        self.ar.data.agree_terms = self.check_last_option_var(
+                                                                self.ar.data.terms_cond_option_var,
+                                                                self.ar.data.agree_terms,
+                                                                self.ar.data.booleans,
+                                                                string=False
+                                                                )
+
+
+    def load_auto_check_update(self):
+        self.ar.data.auto_check_update = self.check_last_option_var(
+                                                                self.ar.data.check_update_option_var,
+                                                                self.ar.data.auto_check_update,
+                                                                self.ar.data.booleans,
+                                                                string=False
+                                                                )
+    
+
+    def load_icons(self):
+        self.ar.data.icon = {i[:-4]: f"{self.ar.data.dp_auto_rig_path}/{self.ar.data.icons_folder}/{i}" for i in os.listdir(f"{self.ar.data.dp_auto_rig_path}/{self.ar.data.icons_folder}") if i.endswith('.png')}
+
+
+    def check_option_data(self, name, default, folder):
+        founds, datas = self.get_json_file_content(folder)
+        if founds and datas:
+            last_name = self.check_last_option_var(name, default, founds)
+            return datas[last_name], datas
+
+
+    def get_json_file_content(self, folder, absolute=False):
+        """ Find all json files in the given path and get contents used for each file.
+            Create a dictionary with dictionaries of all file found.
+            Return a list with the name of the found files and a dictionary with the content.
+        """
+        # declare the resulted list:
+        items = []
+        content = {}
+        folder = folder.replace('.', '/')
+        path = folder
+        if not absolute:
+            # find path where 'dpAutoRig.py' is been executed:
+            path = os.path.dirname(__file__)
+            # hack in order to avoid "\\" from os.sep, them we need to use the replace string method:
+            path = os.path.join(path.split('core')[0], folder, '').replace('\\', '/')
+        # list all files in this directory:
+        found_files = os.listdir(path)
+        for file in found_files:
+            # verify if there is the extension ".json"
+            if file.endswith('.json'):
+                # get the name of the type from the file name:
+                name = file.partition('.json')[0]
+                # clear the old variable content and open the json file as read:
+                loaded_content = None
+                opened_file = open(f"{path}{file}", 'r', encoding='utf-8')
+                try:
+                    # read the json file content and store it in a dictionary:
+                    loaded_content = json.loads(opened_file.read())
+                    content[name] = loaded_content
+                    items.append(name)
+                except:
+                    print('Error: corrupted json file:', file)
+                # close the json file:
+                opened_file.close()
+        return items, content
+    
+
+    def check_last_option_var(self, name, preferable, founds, string=True):
+        """ Verify if there's an optionVar with this name or create it with the preferable given value.
+            Returns the last_value found.
+        """
+        if not cmds.optionVar(exists=name):
+            # if not exists a last optionVar, set it to preferable if it exists, or to the first value in the list:
+            if preferable in founds:
+                if string:
+                    cmds.optionVar(stringValue=(name, preferable))
+                else:
+                    cmds.optionVar(intValue=(name, preferable))
+            elif string:
+                cmds.optionVar(stringValue=(name, founds[0]))
+            else:
+                cmds.optionVar(intValue=(name, preferable))
+        # get its value puting in a variable to return it:
+        result_value = cmds.optionVar(query=name)
+        # if the last value in the system was different of json files, set it to preferable or to the first value in the list also:
+        if not result_value in founds:
+            if result_value.lower() in founds:
+                result_value = result_value.lower()
+            elif preferable in founds:
+                result_value = preferable
+            else:
+                result_value = result_value[0]
+        return result_value
+
+
+    def create_preset(self, preset_type, preset_folder, set_option_var=True, *args):
+        """ Just call ctrls create preset and set it as userDefined preset.
+        """
+        new_preset = None
+        if preset_type == 'curve':
+            preset_option_var = self.ar.data.curve_option_var
+            new_preset = self.ar.ctrls.create_curve_preset()
+        elif preset_type == 'validator':
+            preset_option_var = self.ar.data.validator_option_var
+            new_preset = self.ar.config.create_validator_preset()
+        if new_preset:
+            # create json file:
+            result_data = self.save_json_file(new_preset, preset_folder, '_preset')
+            preset_name = result_data['_preset']
+            # set this new preset as userDefined preset:
+            if set_option_var:
+                self.ar.opt.set_option_var(preset_option_var, preset_name)
+            # show preset creation result window:
+            button_label = f"{self.ar.data.lang['c108_open']} {self.ar.data.lang['i298_folder']}"
+            button_command = self.ar.packager.open_folder
+            button_argument = os.path.join(self.ar.data.dp_auto_rig_path, preset_folder.replace('.', '/'))
+            self.ar.logger.infoWin('i129_createPreset', 'i133_presetCreated', f"\n{preset_name}\n\n{self.ar.data.lang['i134_rememberPublish']}\n\n{self.ar.data.lang['i018_thanks']}", 'center', 205, 270, buttonList=[button_label, button_command, button_argument])
+            # close and reload dpAR UI in order to avoid Maya crash
+            self.ar.ui_manager.reload_ui()
+
+
+    def create_validator_preset(self):
+        """ Creates a json file as a Validator Preset and returns it.
+        """
+        result = None
+        validators = self.get_validator_instances()
+        if validators:
+            result_dialog = cmds.promptDialog(
+                                                title=self.ar.data.lang['i129_createPreset'],
+                                                message=self.ar.data.lang['i130_presetName'],
+                                                button=[self.ar.data.lang['i131_ok'], self.ar.data.lang['i132_cancel']],
+                                                defaultButton=self.ar.data.lang['i131_ok'],
+                                                cancelButton=self.ar.data.lang['i132_cancel'],
+                                                dismissString=self.ar.data.lang['i132_cancel'])
+            if result_dialog == self.ar.data.lang['i131_ok']:
+                result_name = cmds.promptDialog(query=True, text=True)
+                result_name = f"{result_name[0].upper()}{result_name[1:]}"
+                author = getpass.getuser()
+                date = str(datetime.datetime.now().date())
+                result = '{"_preset":"'+result_name+'","_author":"'+author+'","_date":"'+date+'","_updated":"'+date+'"'
+                # add validators and its current active values
+                for validator in validators:
+                    result += ',"'+validator.name+'" : '+str(validator.active).lower()
+                result += "}"
+        return result
+
+
+    def save_json_file(self, data, folder, file_name_id, *args):
+        """ Load given string as a json dictionary and save it as a json file with the file_name_id in the folder.
+            Returns the loaded json dictionary.
+        """
+        # json file:
+        result_data = json.loads(data)
+        # hack in order to avoid "\\" from os.sep, them we need to use the replace string method:
+        path = os.path.join(self.ar.data.dp_auto_rig_path, folder.replace('.', '/'), "").replace('\\', '/')
+        # write json file in the HD:
+        with open(f"{path}{result_data[file_name_id]}.json", 'w') as json_file:
+            json.dump(result_data, json_file, indent=4, sort_keys=True)
+        return result_data
+
+
+    def get_validator_addons(self, path='addOnsPath'):
+        """ Return a list of Validator's AddOns or Finishing to load and mount their folder.
+        """
+        if os.path.exists(self.ar.pipeliner.pipe_data[path]):
+            start_path = self.ar.pipeliner.pipe_data[path][:self.ar.pipeliner.pipe_data[path].rfind('/')]
+            end_path = self.ar.pipeliner.pipe_data[path][self.ar.pipeliner.pipe_data[path].rfind('/')+1:]
+            return self.ar.env.find_modules_by_folder(start_path, end_path)
+                    
+
+    def get_validator_instances(self):
+        validators = []
+        if self.ar.data.checkaddon_folder:
+            validators.extend(self.ar.data.lib[self.ar.data.checkaddon_folder]['instances'])
+        validators.extend(self.ar.data.lib[self.ar.data.checkin_folder]['instances'])
+        validators.extend(self.ar.data.lib[self.ar.data.checkout_folder]['instances'])
+        validators.extend(self.ar.data.lib[self.ar.data.prepare_anim_folder]['instances'])
+        if self.ar.data.checkfinishing_folder:
+            validators.extend(self.ar.data.lib[self.ar.data.checkfinishing_folder]['instances'])
+        return validators
+
+
+    def get_rebuilder_instances(self):
+        rebuilders = []
+        for folder in self.ar.filler.rebuilder_folders:
+            rebuilders.extend(self.ar.data.lib[folder]['instances'])
+        return rebuilders
+
+
+    def get_instance(self, name, folders=None, info='instances'):
+        if not folders:
+            folders = self.lib_folders
+        for folder in folders:
+            if folder in self.ar.data.lib:
+                for i, item in enumerate(self.ar.data.lib[folder]['names']):
+                    if name == item:
+                        return self.ar.data.lib[folder][info][i]
+
+
+    def get_template_name(self, name):
+        keys = self.ar.utils.get_keys_by_value(self.ar.data.lang_preset_data[self.ar.data.language_default], name.capitalize())
+        if keys:
+            for key in keys:
+                if key.startswith(('m', 'i')):
+                    return key
+            return keys[0]
+        return self.ar.data.template_default
+    
+
+    def get_father_instance(self, name):
+        for item in self.ar.maker.guides_to_rig:
+            if item.guide_base == name:
+                return item
+
+
+    def check_loaded_plugin(self, plugin_name, message='Not loaded plugin'):
+        """ Check if the plugin is loaded and try to load it.
+            Returns True if ok (loaded)
+            Returns False if not found or not loaded.
+        """
+        loaded_plugin = True
+        if not (cmds.pluginInfo(plugin_name, query=True, loaded=True)):
+            loaded_plugin = False
+            try:
+                cmds.loadPlugin(f"{plugin_name}.mll")
+                loaded_plugin = True
+            except:
+                pass
+        if not loaded_plugin:
+            print(message, plugin_name)
+        return loaded_plugin
+
+
+
+class Option:
+    def __init__(self, ar):
+        self.ar = ar
+
+
+    def set_verbose(self, value):
+        """ Set the dev verbose variable.
+        """
+        self.ar.data.verbose = value
+
+
+    def check_use_default_render_layer(self):
+        if self.ar.data.default_render_layer:
+            self.set_default_render_layer(True)
+
+    
+    def set_option_var(self, opt_var, value, string=True):
+        cmds.optionVar(remove=opt_var)
+        if string:
+            cmds.optionVar(stringValue=(opt_var, value))
+        else:
+            cmds.optionVar(intValue=(opt_var, value))
+
+
+    def change_degree(self, value, *args):
+        self.set_option_var(self.ar.data.degree_option_var, value)
+        self.ar.data.degree_option = int(value[-1])
+        for module_instance in self.ar.data.guide_instances:
+            if 'degree' in cmds.listAttr(module_instance.guide_base):
+                cmds.setAttr(f"{module_instance.guide_base}.degree", self.ar.data.degree_option)
+
+
+    def change_validator_preset(self, value, *args):
+        self.set_option_var(self.ar.data.validator_option_var, value, True)
+        self.ar.data.validator_preset = self.ar.data.validator_preset_data[value]
+        self.ar.lib.set_validator_preset()
+
+
+    def set_curve_preset(self, value, *args):
+        self.ar.data.curve_preset = self.ar.data.curve_preset_data[value]
+        self.set_option_var(self.ar.data.curve_option_var, value, True)
+
+
+    def set_colorize_curve(self, value):
+        self.ar.data.colorize_curve = value
+        self.set_option_var(self.ar.data.colorize_curve_option_var, value, False)
+
+
+    def set_supplementary_attr(self, value):
+        self.ar.data.supplementary_attr = value
+        self.set_option_var(self.ar.data.supplementary_attr_option_var, value, False)
+
+
+    def set_display_joint(self, value):
+        self.ar.data.display_joint = value
+        self.set_option_var(self.ar.data.display_joint_option_var, value, False)
+
+    
+    def set_display_sub_shape(self, value):
+        self.ar.data.display_sub_shape = value
+        self.set_option_var(self.ar.data.display_sub_shape_option_var, value, False)
+
+
+    def set_display_temp_grp(self, value):
+        """ Change display hidden guide groups in the Outliner:
+            dpAR_Temp_Grp
+            dpAR_GuideMirror_Grp
+        """
+        self.ar.data.display_temp_grp = not value #invert value (True -> False or False -> True)
+        if cmds.objExists(self.ar.data.temp_grp):
+            cmds.setAttr(f"{self.ar.data.temp_grp}.hiddenInOutliner", self.ar.data.display_temp_grp)
+        if cmds.objExists(self.ar.data.guide_mirror_grp):
+            cmds.setAttr(f"{self.ar.data.guide_mirror_grp}.hiddenInOutliner", self.ar.data.display_temp_grp)
+        mel.eval('source AEdagNodeCommon;')
+        mel.eval('AEdagNodeCommonRefreshOutliners();')
+        self.set_option_var(self.ar.data.display_temp_grp_option_var, value, False)
+
+
+    def set_compose_all(self, value):
+        self.ar.data.compose_all = value
+        self.set_option_var(self.ar.data.compose_all_option_var, value, False)
+
+
+    def set_default_render_layer(self, value):
+        """ Analisys if must use the Default Render Layer (masterLayer) checking the option in the UI.
+            Set to use it if need.
+        """
+        self.ar.data.default_render_layer = value
+        self.set_option_var(self.ar.data.default_render_layer_option_var, value, False)
+        if value:
+            cmds.editRenderLayerGlobals(currentRenderLayer='defaultRenderLayer')
+
+
+    def set_prefix(self, prefix=False):
+        if not prefix:
+            result_dialog = cmds.promptDialog(
+                                                title=self.ar.data.lang['i144_prefix'],
+                                                message=self.ar.data.lang['i003_prefixAll'],
+                                                button=[self.ar.data.lang['i131_ok'], self.ar.data.lang['i132_cancel']],
+                                                defaultButton=self.ar.data.lang['i131_ok'],
+                                                cancelButton=self.ar.data.lang['i132_cancel'],
+                                                dismissString=self.ar.data.lang['i132_cancel'])
+            if result_dialog == self.ar.data.lang['i131_ok']:
+                prefix = cmds.promptDialog(query=True, text=True)
+        if prefix:
+            prefix = self.ar.naming.normalize_text(prefix, prefixMax=10)
+            if not prefix:
+                self.ar.data.prefix = ""
+                if self.ar.data.verbose:
+                    mel.eval(f'warning "{self.ar.data.lang["p001_prefixText"]}";')
+            else:
+                if not prefix.endswith('_'):
+                    prefix = f"{prefix}_"
+                self.ar.data.prefix = prefix
+                if self.ar.data.ui_state and cmds.text('rig_prefix_txt', query=True, exists=True):
+                    cmds.text('rig_prefix_txt', edit=True, label=f"{self.ar.data.lang['i144_prefix']}: {prefix}", visible=True)
+        else:
+            self.reset_prefix()
+
+        
+    def reset_prefix(self):
+        self.ar.data.prefix = ""
+        if self.ar.data.ui_state and cmds.text('rig_prefix_txt', query=True, exists=True):
+            cmds.text('rig_prefix_txt', edit=True, label='', visible=False)
+
+
+    def reset_options_to_default(self, *args):
+        self.set_option_var(self.ar.data.language_option_var, self.ar.data.language_default)
+        self.set_option_var(self.ar.data.validator_option_var, self.ar.data.validator_default)
+        self.set_option_var(self.ar.data.curve_option_var, self.ar.data.curve_default)
+        self.change_degree(self.ar.data.degree_default)
+        # same hard coded number than variables dataclass
+        self.set_colorize_curve(1)
+        self.set_supplementary_attr(1)
+        self.set_display_joint(1)
+        self.set_display_sub_shape(1)
+        self.set_display_temp_grp(0)
+        self.set_compose_all(1)
+        self.set_default_render_layer(1)
+        self.reset_prefix()
+        self.set_agree_terms_cond(1)
+        self.set_auto_check_update(1)
+        # reload UI
+        cmds.evalDeferred(f'ar = dpAutoRig.Start("{self.ar.dev}", intro=False); ar.ui();', lowestPriority=True)
+
+
+    def set_agree_terms_cond(self, value):
+        self.ar.data.agree_terms = value
+        self.set_option_var(self.ar.data.terms_cond_option_var, value, False)
+
+
+    def set_auto_check_update(self, value):
+        self.ar.data.auto_check_update = value
+        self.set_option_var(self.ar.data.check_update_option_var, value, False)
+
+
+
+class Agreement:
+    def __init__(self, ar):
+        self.ar = ar
+
+    
+    def load_terms_cond(self):
+        if self.ar.data.ui_state and not self.ar.dev:
+            if cmds.optionVar(exists=self.ar.data.terms_cond_option_var):
+                if cmds.optionVar(query=self.ar.data.terms_cond_option_var) and cmds.optionVar(query=self.ar.data.terms_cond_last_option_var) != self.ar.config.today:
+                    self.get_local_data()
+            else:
+                self.ar.opt.set_option_var(self.ar.data.terms_cond_option_var, 1, False)
+                self.ask_terms_cond()
+                self.get_local_data()
+            self.ar.opt.set_option_var(self.ar.data.terms_cond_last_option_var, self.ar.config.today)
+
+
+    def get_local_data(self):
+        """ Collect info for statistical purposes.
+        """
+        local_data = False
+        try:
+            local_response = urllib.request.urlopen(self.ar.data.location_url, context=self.ar.config.os_context)
+            local_data = json.loads(local_response.read())
+        except:
+            pass
+        if local_data:
+            local_info = {}
+            local_info['country'] = local_data['country']
+            local_info['region'] = local_data['region']
+            local_info['city'] = local_data['city']
+            local_info['user'] = getpass.getuser()
+            local_info['host'] = socket.gethostname()
+            local_info['os'] = platform.system()
+            local_info['lang'] = self.ar.data.lang['_preset']
+            local_info['Maya'] = cmds.about(version=True)
+            local_info['dpAR'] = self.ar.data.version
+            #print(local_info)
+            if local_info:
+                wh = self.ar.web.mount_wh(self.ar.data.discord_url, self.ar.pipeliner.pipe_data['h000_location'])
+                self.ar.packager.to_discord(wh, str(local_info))
+
+
+    def ask_terms_cond(self, *args):
+        """ Create a window to ask user if agree to terms and conditions.
+        """
+        if self.ar.data.ui_state:
+            terms_width  = 205
+            terms_height = 200
+            # creating Terms and Conditions Window:
+            self.ar.ui_manager.close_ui(self.ar.data.terms_cond_win_name)
+            cmds.window(self.ar.data.terms_cond_win_name, title=f"dpAutoRigSystem - {self.ar.data.lang['i281_termsCond']}", iconName='info', widthHeight=(terms_width, terms_height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
+            # creating text layout:
+            cmds.columnLayout('terms_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=self.ar.data.terms_cond_win_name)
+            cmds.text(f"\n{self.ar.data.lang['i282_termsCondDesc']}", align='center', parent='terms_cl')
+            # agreement:
+            cmds.separator(height=30)
+            cmds.checkBox('terms_cond_cb', label=self.ar.data.lang['i280_iAgreeTermsCond'], align='left', value=self.ar.data.agree_terms, changeCommand=self.ar.opt.set_agree_terms_cond, parent='terms_cl')
+            cmds.separator(height=30)
+            # call window:
+            cmds.showWindow(self.ar.data.terms_cond_win_name)
+
+
+
+class Environment:
+    def __init__(self, ar):
+        self.ar = ar
+        self.order = '_order'
+
+
+    def find_env(self, key, path):
+        """ Find and return the environ directory of this system.
+        """
+        env = os.environ[key]
+        split_envs = []
+        if os.name == 'posix':
+            split_envs = env.split(':')
+        else:
+            split_envs = env.split(';')
+        env_path = ""
+        if split_envs:
+            split_envs = [x for x in split_envs if x != "" and x != ' ' and x != None]
+            for env in split_envs:
+                env = os.path.abspath(env) # Fix crash when there's relative path in os.environ
+                if env in self.ar.data.dp_auto_rig_path:
+                    try:
+                        env_path = self.ar.data.dp_auto_rig_path.split(env)[1][+1:].split(path)[0][:-1].replace('/','.')
+                    except:
+                        pass
+                    if len(env) < 4:
+                        env_path = self.ar.data.dp_auto_rig_path.split(env)[1][0:].split(path)[0][:-1].replace('/','.')
+                        return f"{env_path}.{path}"
+                    break
+        # if we are here, we must return a default path:
+        split_envs = env.rpartition(path)
+        if os.name == 'posix':
+            if env_path != "":
+                env_path = f"{env_path}.dpAutoRigSystem"
+            else:
+                env_path = 'dpAutoRigSystem'
+        else:
+            if ':' in env_path:
+                env_path = split_envs[0][split_envs[0].rfind(':')-1:]
+        if env_path == "" or env_path == ' ' or env_path == None:
+            return path
+        return env_path
+
+
+    def find_files_by_folder(self, path, folder, ext='py'):
+        """ Find all files in the directory with the extension.
+            Return a list of all module names (without the given extension).
+        """
+        file_dir = f"{path}/{folder.replace('.', '/')}"
+        all_files = os.listdir(file_dir)
+        # select only files with extension:
+        files = []
+        for file in all_files:
+            if file.endswith(f".{ext}") and str(file) != '__init__.py':
+                files.append(str(file)[:file.rfind('.')])
+        return files
+
+
+    def find_modules_by_folder(self, path, folder, ext='py'):
+        """ Find all modules in the directory.
+            If find an _order*.txt file it will order the list for priority proporses.
+            Return a list of all module names (without the given extension).
+        """
+        folder = folder.replace('.', '/')
+        modules = self.find_files_by_folder(path, folder, ext)
+        for text in self.find_files_by_folder(path, folder, 'txt'):
+            if text.startswith(self.order):
+                desired_order_items = []
+                dups = modules.copy()
+                modules = []
+                with open(f"{path}/{folder}/{text}.txt", encoding='utf8') as filename:
+                    for line in filename:
+                        desired_order_items.append(line.strip())
+                if desired_order_items:
+                    for item in desired_order_items:
+                        if item in dups:
+                            modules.append(item)
+                            dups.remove(item)
+                if dups:
+                    modules.extend(dups)
+        return modules
+
+
+    def find_module_names_by_folder(self, path, folder):
+        """ Find all modules names for this directory.
+            Return a list with the valid modules and valid modules names.
+        """
+        valid_modules = self.find_modules_by_folder(path, folder)
+        valid_module_names = []
+        guide_folder = f"{self.find_env('PYTHONPATH', 'dpAutoRigSystem')}.{self.ar.data.standard_folder}"
+        for m in valid_modules:
+            mod = __import__(f"{guide_folder}.{m}", {}, {}, [m])
+            if self.ar.dev:
+                reload(mod)
+            valid_module_names.append(mod.CLASS_NAME)
+        return(valid_modules, valid_module_names)
+
+
+
+class Web:
+    def __init__(self, ar):
+        self.ar = ar
+
+    def visit_website(self, url, *args):
+        """ Start browser with the given website URL address.
+        """
+        #webSiteString = "start "+URL
+        #os.popen(webSiteString)
+        webbrowser.open(url, new=2)
+
+
+    def mount_wh(self, start, end):
+        """ Mount and return path.
+        """
+        #return "{}{}{}".format(start, "/", end)
+        return f"{start}/{end}"

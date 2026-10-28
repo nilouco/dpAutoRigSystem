@@ -1,0 +1,124 @@
+from maya import cmds
+
+from ....library.base import action
+
+# global variables to this module:
+CLASS_NAME = 'BlendshapeTarget'
+TITLE = 'v012_blendshapeTarget'
+DESCRIPTION = 'v013_blendshapeTargetDesc'
+WIKI = '07-‐-Validator#-blendshape-target-cleaner'
+
+DPKEEPITATTR = 'dpKeepIt'
+
+
+
+class BlendshapeTarget(action.BaseAction):
+    def __init__(self, ar):
+        action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+    
+
+    def run_action(self, first_mode=True, inputs=None, *args):
+        """ Main method to process this validator instructions.
+            It's in verify mode by default.
+            If first_mode parameter is False, it'll run in fix mode.
+            Returns dataLog with the validation result as:
+                - checked_items = node list of checked items
+                - found_issues = True if an issue was found, False if there isn't an issue for the checked node
+                - good_results = True if well done, False if we got an error
+                - messages = reported text
+        """
+        # starting
+        self.first_mode = first_mode
+        self.cleanup_to_start()
+        
+        # ---
+        # --- validator code --- beginning
+        if not cmds.file(query=True, reference=True):
+            if inputs:
+                check_items = inputs
+            else:
+                check_items = None
+                meshes = cmds.ls(selection=False, type='mesh')
+                if meshes:
+                    check_items = list(set(cmds.listRelatives(meshes, type='transform', parent=True, fullPath=False)))
+            if check_items:
+                self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
+                # get exception list to keep nodes in the scene
+                to_keep_deformers = ['skinCluster', 'blendShape', 'wrap', 'cluster', 'ffd', 'wire', 'shrinkWrap', 'sculpt', 'morph']
+                exceptions = self.get_children_nodes(['supportGrp', 'renderGrp', 'proxyGrp'])
+                for item in check_items:
+                    if cmds.objExists(item):
+                        if cmds.objExists(f"{item}.{DPKEEPITATTR}") and cmds.getAttr(f"{item}.{DPKEEPITATTR}"):
+                            if not item in exceptions:
+                                exceptions.append(item)
+                        elif self.ar.naming.get_suffix_numbers(item)[1].endswith('Base'):
+                            exceptions.append(item)
+                        else:
+                            try:
+                                input_deformers = cmds.findDeformers(item)
+                            except:
+                                self.messages.append(f"{self.ar.data.lang['i075_moreOne']}: {item}")
+                                input_deformers = False
+                            if input_deformers:
+                                for deformer_node in input_deformers:
+                                    if cmds.objectType(deformer_node) in to_keep_deformers:
+                                        if not item in exceptions:
+                                            exceptions.append(item)
+                                        if cmds.objectType(deformer_node) == 'wrap':
+                                            wrap_attrs = ['basePoints', 'driverPoints']
+                                            for wrap_attr in wrap_attrs:
+                                                wrap_connections = cmds.listConnections(f"{deformer_node}.{wrap_attr}", source=True, destination=False)
+                                                if wrap_connections:
+                                                    exceptions.append(wrap_connections[0])
+                                            
+                # run validation tasks
+                for item in check_items:
+                    self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
+                    if cmds.objExists(item):
+                        self.checked_items.append(item)
+                        if not item in exceptions:
+                            self.found_issues.append(True)
+                            if self.first_mode:
+                                self.good_results.append(False)
+                            else: #fix        
+                                try:
+                                    father_items = cmds.listRelatives(item, parent=True, type='transform')
+                                    cmds.delete(item)
+                                    if father_items:
+                                        brother_items = cmds.listRelatives(father_items[0], allDescendents=True, children=True)
+                                        if not brother_items:
+                                            cmds.delete(father_items[0])
+                                    self.good_results.append(True)
+                                    self.messages.append(f"{self.ar.data.lang['v004_fixed']}: {item}")
+                                except:
+                                    self.good_results.append(False)
+                                    self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}")
+                        else:
+                            self.found_issues.append(False)
+                            self.good_results.append(True)
+            else:
+                self.not_found_node()
+        else:
+            self.fail_io(self.ar.data.lang['r072_noReferenceAllowed'])
+        # --- validator code --- end
+        # ---
+
+        # finishing
+        self.update_action_buttons()
+        self.report_log()
+        self.end_progress()
+        return self.log_data
+
+
+    def get_children_nodes(self, grps):
+        """ Check if there're some nodes in the given group to return them.
+        """
+        results = []
+        if grps:
+            for item in grps:
+                node_grp = self.ar.utils.get_node_by_message(item)
+                if node_grp:
+                    nodes = cmds.listRelatives(node_grp, allDescendents=True, children=True, type='transform', fullPath=False)
+                    if nodes:
+                        results.extend(nodes)
+        return results

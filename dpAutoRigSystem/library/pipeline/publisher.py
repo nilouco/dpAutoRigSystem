@@ -1,0 +1,274 @@
+import os
+
+from maya import cmds, mel
+
+
+class Publisher:
+    def __init__(self, ar):
+        """ Initialize the module class loading variables.
+        """
+        self.ar = ar
+        self.validate_checked = True
+
+
+    def set_publish_validate_checked(self, value, *args):
+        self.validate_checked = value
+
+
+    def get_file_type_by_extension(self, file_name):
+        """ Return the file type based in the extension of the given file name.
+        """
+        ext = file_name[-2:]
+        if ext == 'mb':
+            return 'mayaBinary'
+        return 'mayaAscii'
+
+
+    def run_checked_validators(self, first_mode=True, stop_if_found_block=True, publish_log=None):
+        """ Run the verify of fix of checked validators.
+        """
+        validators = self.ar.config.get_validator_instances()
+        if validators:
+            validation_results = self.ar.ui_manager.run_selected_actions(validators, first_mode, True, stop_if_found_block, publish_log)
+            if validation_results[1]: #found issue
+                stopped_message = f"{self.ar.data.lang['v020_publishStopped']} {validators[validation_results[2]].name}"
+                return stopped_message
+        return False
+        
+
+    def run_diagnosing(self, *args):
+        """ Check all active validators in the verify mode and return the result in a log window.
+        """
+        validation_results = self.run_checked_validators() #verify mode
+        if validation_results:
+            mel.eval(f'warning "{validation_results}";')
+            self.ar.ui_manager.set_progress(end_it=True)
+        else:
+            validation_results = self.ar.data.lang['v007_allOk']
+        self.ar.logger.infoWin('i019_log', 'i224_diagnose', validation_results, 'left', 250, 150)
+
+
+    def run_publishing(self, from_ui=False, verify_validator=True, comments=False, *args):
+        """ Start the publishing process
+            - use dpPipeliner.pipe_data info to publish the current file
+            - check if there's a publish path to export the file
+            - check if there's a file name to publish the file
+            - get comments to log
+            - run validators in a fix mode (or not)
+            - store data info like publishedFromFile and model version into the All_Grp if it exists
+            - create the folders to publish file if them not exists yet
+            - save the published file
+            - backup old published file version in the dpOld folder
+            - packaging the delivered files as toClient zip_file, toCloud dropbox, toHist folders
+            - generate the image preview
+            If it fails, it'll reopen the current file without save any change and returns False.
+        """
+        self.ar.pipeliner.load_publish_path()
+        if self.ar.pipeliner.pipe_data['publishPath']:
+            # Starting progress window
+            self.ar.ui_manager.set_progress(f"{self.ar.data.lang['i335_starting']}...", self.ar.data.lang['m046_publisher'], 5, add_one=False, add_number=False)
+
+            # check if there'a a file name to publish this scene
+            publish_filename = self.ar.pipeliner.get_pipe_filename(self.ar.pipeliner.pipe_data['publishPath'])
+            if from_ui:
+                publish_filename = cmds.textFieldGrp('publisher_filename_tfg', query=True, text=True)
+            if publish_filename:
+                # start logging
+                publish_log = {}
+                publish_log['scene'] = self.ar.pipeliner.pipe_data['sceneName']
+                if publish_filename[-3:-1] != '.m':
+                    publish_filename += f".m{self.ar.pipeliner.pipe_data['sceneName'][-1]}"
+                self.ar.pipeliner.pipe_data['publishFileName'] = publish_filename
+                publish_log['published'] = f"{self.ar.pipeliner.pipe_data['publishPath']}/{publish_filename}"
+                publish_log['exportPath'] = f"{self.ar.pipeliner.pipe_data['f_drive']}/{self.ar.pipeliner.pipe_data['f_studio']}/{self.ar.pipeliner.pipe_data['f_project']}/{self.ar.pipeliner.pipe_data['f_toClient']}/{self.ar.pipeliner.get_today()}"
+                # comments
+                publish_log['comments'] = ''
+                comment_value = comments
+                if from_ui and not comments:
+                    comment_value = cmds.textFieldGrp('publisher_comment_tfg', query=True, text=True)
+                if comment_value:
+                    publish_log['comments'] = comment_value
+                
+                # checking validators
+                validation_results = False
+                if verify_validator and self.validate_checked:
+                    validation_results = self.run_checked_validators(False, True, publish_log) #fix mode
+                if validation_results:
+                    self.abort_publishing(validation_results)
+                    return False
+                else:
+                    self.ar.ui_manager.set_progress(f"{self.ar.data.lang['i336_storingData']}...", add_number=False)
+                    
+                    self.ar.pipeliner.pipe_data.update(publish_log)
+
+                    # try to store data into All_Grp if it exists
+                    self.ar.pipeliner.pipe_data['modelVersion'] = None
+                    all_grp = self.ar.utils.get_all_grp()
+                    if all_grp:
+                        # published from file
+                        if not cmds.objExists(f"{all_grp}.publishedFromFile"):
+                            cmds.addAttr(all_grp, longName='publishedFromFile', dataType='string')
+                        cmds.setAttr(f"{all_grp}.publishedFromFile", self.ar.pipeliner.pipe_data['sceneName'], type='string')
+                        # asset name
+                        if not cmds.objExists(f"{all_grp}.assetName"):
+                            cmds.addAttr(all_grp, longName='assetName', dataType='string')
+                        cmds.setAttr(f"{all_grp}.assetName", self.ar.pipeliner.pipe_data['assetName'], type='string')
+                        # comments
+                        if not cmds.objExists(f"{all_grp}.comment"):
+                            cmds.addAttr(all_grp, longName='comment', dataType='string')
+                        cmds.setAttr(f"{all_grp}.comment", comment_value, type='string')
+                        # model version
+                        short_name = cmds.file(query=True, sceneName=True, shortName=True)
+                        if self.ar.pipeliner.pipe_data['s_model'] in short_name:
+                            model_version = short_name[short_name.find(self.ar.pipeliner.pipe_data['s_model'])+len(self.ar.pipeliner.pipe_data['s_model']):]
+                            model_version = int(model_version[:model_version.find('_')])
+                            if not cmds.objExists(f"{all_grp}.modelVersion"):
+                                cmds.addAttr(all_grp, longName='modelVersion', attributeType='long')
+                            cmds.setAttr(f"{all_grp}.modelVersion", model_version)
+                            self.ar.pipeliner.pipe_data['modelVersion'] = model_version
+                        if cmds.objExists(f"{all_grp}.system"):
+                            built_version = cmds.getAttr(f"{all_grp}.system")
+                            if 'dpAutoRig_' in built_version: #suport old rigged files
+                                built_version = built_version.split('dpAutoRig_')[1]
+                    else:
+                        built_version = self.ar.data.version
+
+                    self.ar.ui_manager.set_progress(f"{self.ar.data.lang['i227_getImage']}...", add_number=False)
+
+                    # publishing file
+                    # create folders to publish file if needed
+                    if not os.path.exists(self.ar.pipeliner.pipe_data['publishPath']):
+                        try:
+                            os.makedirs(self.ar.pipeliner.pipe_data['publishPath'])
+                        except:
+                            self.abort_publishing(self.ar.data.lang['v022_noFilePath'])
+                            return False
+                    
+                    # mount folders
+                    if self.ar.pipeliner.pipe_data['b_deliver']:
+                        self.ar.pipeliner.mount_package_path()
+                        # rigging preview image
+                        if self.ar.pipeliner.pipe_data['toClientPath'] and self.ar.pipeliner.pipe_data['b_imager']:
+                            self.ar.pipeliner.pipe_data['imagePreviewPath'] = self.ar.packager.imager(self.ar.pipeliner.pipe_data, built_version, self.ar.pipeliner.get_today())
+                            self.ar.ui_manager.set_progress(end_it=True)
+                            self.ar.ui_manager.set_progress(f"{self.ar.data.lang['i225_savingFile']}...", self.ar.data.lang['m046_publisher'], 8, add_one=False, add_number=False)
+                    else:
+                        self.ar.ui_manager.set_progress(f"{self.ar.data.lang['i225_savingFile']}...", add_number=False)
+                    
+                    # save published file
+                    if os.name == 'posix':
+                        cmds.file(rename=f"//{self.ar.pipeliner.pipe_data['publishPath']}/{publish_filename}")
+                    else:
+                        cmds.file(rename=f"{self.ar.pipeliner.pipe_data['publishPath']}/{publish_filename}")
+                    cmds.file(save=True, type=cmds.file(query=True, type=True)[0], force=True)
+
+                    # packager
+                    if self.ar.pipeliner.pipe_data['b_deliver']:
+                        if self.ar.pipeliner.pipe_data['toClientPath']:
+                            # toClient
+                            self.ar.ui_manager.set_progress(f"{self.ar.data.lang['i226_exportFiles']}... Zipping", add_number=False)
+                            zip_file = self.ar.packager.create_zip_to_client(self.ar.pipeliner.pipe_data['publishPath'], publish_filename, self.ar.pipeliner.pipe_data['toClientPath'], self.ar.pipeliner.get_today())
+                            # dropbox
+                            self.ar.ui_manager.set_progress(f"{self.ar.data.lang['i226_exportFiles']}... Clouding", add_number=False)
+                            if zip_file and self.ar.pipeliner.pipe_data['dropboxPath']:
+                                self.ar.packager.to_dropbox(zip_file, self.ar.pipeliner.pipe_data['dropboxPath'])
+                            # open folder
+                            self.ar.ui_manager.set_progress(f"{self.ar.data.lang['i226_exportFiles']}... Folder openning", add_number=False)
+                            self.ar.packager.open_folder(self.ar.pipeliner.pipe_data['toClientPath'])
+                        # hist
+                        if self.ar.pipeliner.pipe_data['historyPath']:
+                            self.ar.ui_manager.set_progress(f"{self.ar.data.lang['i226_exportFiles']}... dpHist", add_number=False)
+                            self.ar.packager.to_history(self.ar.pipeliner.pipe_data['scenePath'], self.ar.pipeliner.pipe_data['shortName'], self.ar.pipeliner.pipe_data['historyPath'])
+                        # organize old published files
+                        if self.ar.pipeliner.asset_names:
+                            self.ar.ui_manager.set_progress(f"{self.ar.data.lang['i226_exportFiles']}... dpOld", add_number=False)
+                            self.ar.packager.to_old(self.ar.pipeliner.pipe_data['publishPath'], publish_filename, self.ar.pipeliner.asset_names, f"{self.ar.pipeliner.pipe_data['publishPath']}/{self.ar.pipeliner.pipe_data['s_old']}")
+                        # discord
+                        if self.ar.pipeliner.pipe_data['b_discord']:
+                            self.ar.ui_manager.set_progress(f"{self.ar.data.lang['i226_exportFiles']}... dpLog", add_number=False)
+                            message_text = f"{self.ar.pipeliner.pipe_data['sceneName']}\n{self.ar.pipeliner.pipe_data['publishPath']}/**{self.ar.pipeliner.pipe_data['publishFileName']}**\n*{self.ar.pipeliner.pipe_data['comments']}*"
+                            result = self.ar.packager.to_discord(self.ar.pipeliner.pipe_data['publishedWebhook'], message_text)
+                            if result: #error
+                                print(self.ar.data.lang[result])
+
+                    # publishing callback
+                    if self.ar.pipeliner.pipe_data['s_callback']:
+                        self.ar.ui_manager.set_progress('Callback...', add_number=False)
+                        if self.ar.pipeliner.pipe_data['callbackPath'] and self.ar.pipeliner.pipe_data['callbackFile']:
+                            callback_result = self.ar.packager.to_callback(self.ar.pipeliner.pipe_data['callbackPath'], self.ar.pipeliner.pipe_data['callbackFile'], self.ar.pipeliner.pipe_data)
+                            if callback_result:
+                                print('Callback result =', callback_result)
+
+                    # publisher log window
+                    if self.ar.data.ui_state:
+                        self.ar.publish_ui.success_published_ui(publish_filename)
+                    self.ar.ui_manager.set_progress(end_it=True)
+                    self.ar.ui_manager.close_ui(self.ar.data.publisher_win_name)
+                    if from_ui:
+                        self.ask_user_choose_file(publish_filename)
+            else:
+                mel.eval(f'warning "{self.ar.data.lang["v021_noFileName"]}";')
+        else:
+            mel.eval(f'warning "{self.ar.data.lang["v022_noFilePath"]}";')
+
+
+    def abort_publishing(self, raison=None):
+        """ Stop the publishing process because we found an error somewhere.
+            Reopen the rig file.
+            Log error in a window.
+            End progressWindow.
+            Warning the raison of the error.
+        """
+        self.ar.ui_manager.set_progress(end_it=True)
+        self.ar.ui_manager.close_ui(self.ar.data.publisher_win_name)
+        # reopen current file
+        cmds.file(self.ar.pipeliner.pipe_data['sceneName'], open=True, force=True)
+        # report the error in a log window
+        if raison:
+            self.ar.logger.infoWin('i019_log', 'i216_publish', raison, "left", 250, 150)
+            mel.eval(f'warning "{raison}";')
+
+
+    def ask_user_choose_file(self, publish_filename):
+        """ Ask user witch file want to open:
+            1 - WIP file
+            2 - Published file
+        """
+        wip = f"1 - {self.ar.pipeliner.pipe_data['shortName']}"
+        pub = f"2 - {publish_filename}"
+        result = cmds.confirmDialog(title=self.ar.data.lang['m046_publisher'], message=self.ar.data.lang['v098_askUserChooseFile'], button=[wip, pub], defaultButton=pub, cancelButton=pub, dismissString=pub)
+        if result == wip:
+            cmds.file(self.ar.pipeliner.pipe_data['sceneName'], open=True, force=True)
+
+
+    def load_publishing_batch(self, path, assets=None, comments=None, *args):
+        """ Load assets to batch publish them.
+        """
+        if path:
+            published_items, errors = [], []
+            if not comments:
+                if self.ar.data.ui_state and cmds.textFieldGrp('comment_batch_tfg', query=True, exists=True):
+                    comments = cmds.textFieldGrp('comment_batch_tfg', query=True, text=True)
+                if not comments:
+                    comments = f"{self.ar.data.lang['m046_publisher']} v{self.ar.data.version}"
+            if not comments.startswith(self.ar.data.lang['i358_batch']) and not comments.endswith(self.ar.data.lang['i358_batch']):
+                comments = f"{self.ar.data.lang['i358_batch']} - {comments}"
+            if not assets and self.ar.data.ui_state:
+                assets = [a[a.rfind('|')+1:-3] for a in self.ar.pipeline_ui.select_asset_checkboxes if cmds.checkBox(a, query=True, value=True)] #removed '_cb'
+            if assets:
+                print(f"{self.ar.data.lang['i335_starting']} {self.ar.data.lang['i358_batch']} {self.ar.data.lang['m046_publisher']}...")
+                print(f"{self.ar.data.lang['i219_comments']}: {comments}")
+                print(f"{self.ar.data.lang['i303_asset']}s: {assets}")
+                for asset in assets:
+                    self.ar.pipeliner.load_asset(path, asset)
+                    publish_result = self.run_publishing(from_ui=False, comments=comments)
+                    if publish_result == False:
+                        errors.append(asset)
+                    else:
+                        published_items.append(self.ar.pipeliner.pipe_data['publishFileName'])
+                if errors:
+                    self.ar.publish_ui.success_published_ui('\n'.join(published_items), errors)
+                else:
+                    cmds.file(newFile=True, force=True)
+                    self.ar.publish_ui.success_published_ui('\n'.join(published_items))
+            self.ar.ui_manager.close_ui("dpSelectAssetCBWindow")

@@ -1,0 +1,79 @@
+import time
+from functools import partial
+
+from maya import cmds
+
+
+class Logger:
+    def __init__(self, ar, ui=True, verbose=True):
+        """ Initialize the module class loading variables.
+        """
+        # defining variables:
+        self.ar = ar
+        self.ar.data.verbose = verbose
+        self.lang = ar.data.lang
+        #
+        # TODO: implement Python Logger
+        #
+        
+
+    def infoWin(self, title, description, text, align, width, height, buttonList=False, wiki=None, *args):
+        """ Create a window showing the text info with the description about any module.
+        """
+        # declaring variables:
+        self.info_title       = title
+        self.info_description = description
+        self.info_text        = text
+        self.info_winWidth    = width
+        self.info_winHeight   = height
+        self.info_align       = align
+        # creating Info Window:
+        self.ar.ui_manager.close_ui(self.ar.data.info_win_name)
+        cmds.window(self.ar.data.info_win_name, title=f"dpAutoRig - v{self.ar.data.version} - {self.lang['i013_info']} - {self.lang[self.info_title]}", iconName='ar', widthHeight=(self.info_winWidth, self.info_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
+        # creating text layout:
+        infoColumnLayout = cmds.columnLayout('infoColumnLayout', adjustableColumn=True, columnOffset=['both', 20], parent=self.ar.data.info_win_name)
+        cmds.separator(style='none', height=10, parent=infoColumnLayout)
+        infoLayout = cmds.scrollLayout('infoLayout', parent=infoColumnLayout)
+        if self.info_description:
+            cmds.text(self.lang[self.info_description], align=self.info_align, parent=infoLayout) #infoDesc
+        if self.info_text:
+            cmds.text(self.info_text, align=self.info_align, parent=infoLayout) #info_text
+            if buttonList:
+                if buttonList[0] != 'None':
+                    cmds.button(label=buttonList[0], command=partial(buttonList[1], buttonList[2]), parent=infoLayout)
+                else:
+                    cmds.text(self.lang['i305_none'], align=self.info_align, parent=infoLayout) #noneText
+        if wiki:
+            cmds.separator(style='none', height=20, parent=infoLayout)
+            cmds.button(label='Wiki', command=partial(self.ar.web.visit_website, f"{self.ar.data.wiki_url}{wiki}"), backgroundColor=[1, 1, 1], align=self.info_align, parent=infoLayout)
+        # call Info Window:
+        if self.ar.data.ui_state:
+            cmds.showWindow(self.ar.data.info_win_name)
+
+
+    def logWin(self, *args):
+        """ Just create a window with all information log and print the principal result.
+        """
+        # create the log_text:
+        log_text = f"{self.lang['i014_logStart']}\n"
+        log_text += f"{time.asctime(time.localtime(time.time()))}\n\n"
+        # get the number of riggedModules:
+        nRiggedModule = len(self.ar.maker.guides_to_rig)
+        # pass for rigged module to add informations in log_text:
+        if nRiggedModule != 0:
+            success = 'i016_success'
+            if nRiggedModule == 1:
+                success = 'i015_success'
+            log_text += f"{str(nRiggedModule).zfill(3)} {self.lang[success]}:\n\n"
+            print(f"\ndpAutoRigSystem Log: {str(nRiggedModule).zfill(3)} {self.lang[success]} , thanks!\n")
+            for item in self.ar.maker.guides_to_rig:
+                log_text += item.guide_namespace
+                if item.custom_name:
+                    log_text += f" as {item.custom_name}"
+                log_text += '\n'
+        else:
+            log_text += f"{self.lang['i017_nothing']} \n"
+        log_text += f"\n{self.lang['i018_thanks']}"
+        # creating a info window to show the log:
+        if self.ar.data.ui_state:
+            self.infoWin('i019_log', None, log_text, 'center', 250, min((350, 150+(nRiggedModule*13))))

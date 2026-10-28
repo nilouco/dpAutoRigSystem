@@ -1,0 +1,87 @@
+from maya import cmds, mel
+
+from ....library.base import action
+
+# global variables to this module:
+CLASS_NAME = 'OneVertex'
+TITLE = 'v132_oneVertex'
+DESCRIPTION = 'v133_oneVertexDesc'
+WIKI = '07-‐-Validator#-one-vertex'
+
+
+
+class OneVertex(action.BaseAction):
+    def __init__(self, ar):
+        action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+    
+
+    def run_action(self, first_mode=True, inputs=None, *args):
+        """ Main method to process this validator instructions.
+            It's in verify mode by default.
+            If first_mode parameter is False, it'll run in fix mode.
+            Returns dataLog with the validation result as:
+                - checked_items = node list of checked items
+                - found_issues = True if an issue was found, False if there isn't an issue for the checked node
+                - good_results = True if well done, False if we got an error
+                - messages = reported text
+        """
+        # starting
+        self.first_mode = first_mode
+        self.cleanup_to_start()
+        
+        # ---
+        # --- validator code --- beginning
+        if not self.ar.utils.get_all_grp():
+            if not self.ar.utils.get_network_by_attr('dpGuideNet'):
+                if not cmds.file(query=True, reference=True):
+                    if inputs:
+                        check_items = cmds.ls(inputs, type='mesh')
+                    else:
+                        check_items = cmds.ls(selection=False, type='mesh')
+                    if check_items:
+                        self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
+                        one_vertices = self.check_non_manifold_vertex(check_items)
+                        # conditional to check here
+                        if one_vertices:
+                            one_vertices.sort()
+                            for item in one_vertices:
+                                self.checked_items.append(item)
+                                self.found_issues.append(True)
+                                if self.first_mode:
+                                    self.good_results.append(False)
+                                else: #fix
+                                    self.good_results.append(False)
+                                    self.messages.append(f"{self.ar.data.lang['v005_cantFix']}: {item}")
+                            self.messages.append(f"---\n{self.ar.data.lang['v121_sharePythonSelect']}\nmaya.cmds.select('{one_vertices}')\n---")
+                            cmds.select(one_vertices)
+                    else:
+                        self.not_found_node()
+                else:
+                    self.fail_io(self.ar.data.lang['r072_noReferenceAllowed'])
+            else:
+                self.fail_io(self.ar.data.lang['v100_cantExistsGuides'])
+        else:
+            self.fail_io(self.ar.data.lang['v099_cantExistsAllGrp'])
+        # --- validator code --- end
+        # ---
+
+        # finishing
+        self.update_action_buttons()
+        self.report_log()
+        self.end_progress()
+        return self.log_data
+
+
+    def check_non_manifold_vertex(self, items):
+        """ Return a list of nonManifold vertex if exists.
+        """
+        nm_vertices, found_items = [], []
+        for item in items:
+            cmds.select(item)
+            found_items.extend(mel.eval('polyCleanupArgList 4 { "0","2","0","0","0","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","1","0","0" };'))
+        if found_items:
+            for sel in found_items:
+                if '.vtx[' in sel:
+                    nm_vertices.append(sel)
+        cmds.select(nm_vertices)
+        return nm_vertices

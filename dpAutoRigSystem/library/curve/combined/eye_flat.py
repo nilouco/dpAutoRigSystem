@@ -1,0 +1,43 @@
+from maya import cmds, mel
+
+from ...base import curve
+
+# global variables to this module:    
+CLASS_NAME = 'EyeFlat'
+TITLE = 'm211_eyeFlat'
+DESCRIPTION = 'm099_cvControlDesc'
+
+
+
+class EyeFlat(curve.BaseCurve):
+    def __init__(self, ar):
+        curve.BaseCurve.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, None)
+        self.dependences = ['Lens', 'Circle']
+    
+    
+    def cv_main(self, use_ui, cv_id=None, cv_name=f"{CLASS_NAME}_Ctrl", cv_size=1.0, cv_degree=0, cv_direction='+Y', cv_rot=(0, 0, 0), cv_action=1, guide=False):
+        """ The principal method to call all other methods in order to build the create_controller curve.
+            Return the result: new control curve or the destination list depending of action.
+        """
+        # check modules integrity:
+        missing_modules = self.ar.lib.check_missing_modules(self.ar.data.curve_simple_folder, self.dependences)
+        if not missing_modules:
+            # call combine function:
+            return self.cv_create(use_ui, cv_id, cv_name, cv_size, cv_degree, cv_direction, cv_rot, cv_action, guide, True)
+        else:
+            # error checking modules in the folder:
+            mel.eval(f'error "{self.ar.data.lang["e001_guideNotChecked"]} - {(", ").join(missing_modules)}";')
+    
+    
+    def create_combined_curves(self, cv_id, cv_name, cv_size, cv_degree):
+        """ Combine controllers in order to return it.
+        """
+        lens = self.ar.config.get_instance('Lens', [self.ar.data.curve_simple_folder])
+        circle = self.ar.config.get_instance('Circle', [self.ar.data.curve_simple_folder])
+        curve1 = lens.cv_main(False, cv_id, cv_name, cv_size, cv_degree)
+        curve2 = circle.cv_main(False, cv_id, cv_name, cv_size, cv_degree)
+        cmds.setAttr(f"{curve1}.rotateZ", 90)
+        cmds.setAttr(f"{curve2}.scaleX", 0.38)
+        cmds.setAttr(f"{curve2}.scaleY", 0.38)
+        return self.combine_curves([curve1, curve2])
+

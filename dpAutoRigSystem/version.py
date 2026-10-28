@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 """Package declaring dpAutoRigSystem version: Major.Minor.Patch"""
 
-__version__: str = "5.02.00"
-_update_log: str = "Refactory."
+__version__: str = '6.00.00'
+_change_log: str = 'Refactory.'
