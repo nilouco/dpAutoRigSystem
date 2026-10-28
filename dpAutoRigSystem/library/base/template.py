@@ -51,7 +51,7 @@ class BaseTemplate(base.BaseLibrary):
 
     def get_template_variations(self, name):
         names, splitted = [], []
-        for item in self.ar.data.lib[self.ar.data.template_folder]['templates']:
+        for item in self.ar.data.lib[self.ar.data.template_folder]['names']:
             if item.startswith(name):
                 names.append(item)
                 splitted.append(item.split('_')[1])

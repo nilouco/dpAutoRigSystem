@@ -12,6 +12,7 @@ def onMayaDroppedPythonFile(*args):
     try:
         installer = MayaInstaller()
         installer.define_paths()
+        print("\n----------\nStart installing dpAutoRigSystem...\n----------\n")
         installer.delete_old_files()
         installer.copy_files()
         installer.create_shelf_button()
@@ -49,26 +50,37 @@ class MayaInstaller:
         print('Deleting old files...')
         if not folder:
             folder = self.dp_ar_folder
-        for each_file in next(os.walk(folder))[2]:
-            os.remove(f"{folder}/{each_file}")
-        for each_folder in next(os.walk(folder))[1]:
-            if not f"-{self.ar_name}-" in each_folder:
-                try:
-                    shutil.rmtree(f"{folder}/{each_folder}", onexc=self.remove_readonly)
-                except:
-                    shutil.rmtree(f"{folder}/{each_folder}", onerror=self.remove_readonly) #for Python 3.11 and older
-        print('Successfully deleted all old files.')
+        try:
+            if os.path.exists(folder):
+                print(f'Old folder: {folder}')
+                for each_file in next(os.walk(folder))[2]:
+                    os.remove(f"{folder}/{each_file}")
+                for each_folder in next(os.walk(folder))[1]:
+                    if not f"-{self.ar_name}-" in each_folder:
+                        try:
+                            shutil.rmtree(f"{folder}/{each_folder}", onexc=self.remove_readonly)
+                        except:
+                            shutil.rmtree(f"{folder}/{each_folder}", onerror=self.remove_readonly) #for Python 3.11 and older
+                print('Successfully deleted all old files.')
+            else:
+                print("The old dpAutoRigSystem folder doesn't exists")
+        except Exception as e:
+            print(f'Error deleting the old files. Error: {e}')
 
 
     def copy_files(self):
         # copy files to scripts
         self.create_folder(self.dp_ar_folder)
-        for source_folder, folders, files in os.walk(self.installer_folder):       
-            dest_path = source_folder.replace(self.installer_folder, self.dp_ar_folder, 1).replace('\\', '/')
-            self.create_folder(dest_path)
-            for ar_file in files:
-                source_file = os.path.join(source_folder, ar_file).replace('\\', '/')
-                shutil.copy2(source_file, dest_path)
+        try:
+            for source_folder, folders, files in os.walk(self.installer_folder):       
+                dest_path = source_folder.replace(self.installer_folder, self.dp_ar_folder, 1).replace('\\', '/')
+                self.create_folder(dest_path)
+                for ar_file in files:
+                    source_file = os.path.join(source_folder, ar_file).replace('\\', '/')
+                    shutil.copy2(source_file, dest_path)
+            print('Copied updated files with sucess.')
+        except Exception as e:
+            print(f'Files not copied as expected. Error: {e}')
 
 
     def create_shelf_button(self, folder=None):
@@ -108,6 +120,9 @@ class MayaInstaller:
     def create_folder(self, folder):
         if not os.path.exists(folder):
             os.makedirs(folder)
+            print(f'Created folder with sucess: {folder}')
+        else:
+            print(f'The folder already exists: {folder}')
     
     
     def finish(self):
