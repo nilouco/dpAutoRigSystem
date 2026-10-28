@@ -84,9 +84,9 @@ class Lib:
         if templates:
             libs = self.initialize_templates(templates, content)
             self.ar.data.lib[self.ar.data.template_folder] = {
-                                                                'templates' : templates,
+                                                                'instances' : libs,
                                                                 'content' : content,
-                                                                'instances' : libs
+                                                                'names' : templates
                                                               }
             if self.ar.data.verbose:
                 print(f"{self.ar.data.template_folder} : {templates}")

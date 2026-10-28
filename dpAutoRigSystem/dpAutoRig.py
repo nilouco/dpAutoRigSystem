@@ -78,12 +78,7 @@ class Repair:
 
     def reinstall(self):
         print('Reinstalling...')
-        #
-        # TODO change URL to master after 
-        #
-        #url = 'https://github.com/nilouco/dpAutoRigSystem/zipball/master/'
-        url = 'https://github.com/nilouco/dpAutoRigSystem/zipball/699-dev-mode-reload/'
-        
+        url = 'https://github.com/nilouco/dpAutoRigSystem/zipball/master/'
         remote_source = urllib.request.urlopen(url)
         ar_zip = zipfile.ZipFile(io.BytesIO(remote_source.read()))
         zip_names = ar_zip.namelist()

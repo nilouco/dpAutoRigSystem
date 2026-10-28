@@ -47,7 +47,7 @@ class API:
         self.ar.publisher.run_publishing(comments=comments)
 
 
-    def publish_batch(self, assets, comments="API"):
+    def publish_batch(self, assets, comments="Batch - API"):
         for asset in assets:
             self.ar.pipeliner.load_asset(file=asset)
             self.ar.publisher.run_publishing(comments=comments)

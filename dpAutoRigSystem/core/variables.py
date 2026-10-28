@@ -183,11 +183,3 @@ class Data:
     curve_preset_data: dict = field(default_factory=dict)
     validator_preset: dict = field(default_factory=dict)
     validator_preset_data: dict = field(default_factory=dict)
-
-
-    #
-    # TODO: WIP = to delete after dev:
-    #
-    #raw_url: str = 'https://raw.githubusercontent.com/nilouco/dpAutoRigSystem/699-dev-mode-reload/dpAutoRigSystem/dpAutoRig.py'
-    #master_url: str = 'https://github.com/nilouco/dpAutoRigSystem/zipball/699-dev-mode-reload/'
-    #version_url: str = 'https://github.com/nilouco/dpAutoRigSystem/raw/refs/heads/699-dev-mode-reload/dpAutoRigSystem/version.py'
