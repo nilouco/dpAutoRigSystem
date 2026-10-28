@@ -126,6 +126,7 @@ class UIManager:
                         self.ar.data.terms_cond_win_name,
                         self.ar.data.donate_win_name,
                         self.ar.data.plus_info_win_name, 
+                        self.ar.data.calibrate_facial_joints_win_name,
                         self.ar.data.color_override_win_name,
                         self.ar.data.copy_paste_attr_win_name,
                         self.ar.data.correction_manager_win_name,

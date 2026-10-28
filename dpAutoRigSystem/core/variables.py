@@ -64,6 +64,7 @@ class Data:
     terms_cond_win_name: str = 'terms_cond_win'
     update_win_name: str = 'update_win'
     donate_win_name: str = 'donate_win'
+    calibrate_facial_joints_win_name: str = 'calibrate_facial_joints_win'
     copy_paste_attr_win_name: str = 'copy_paste_attr_win'
     correction_manager_win_name: str = 'correction_manager_win'
     custom_attr_win_name: str = 'custom_attr_win'

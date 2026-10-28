@@ -135,9 +135,8 @@ class SoftIk:
             cmds.connectAttr(f"{stretch_bc}.outputG", f"{soft_ik_rig_scale_clp}.inputR", force=True)
             i = 0
             while ( i < len(ik_joints)-1 ):
-                for k in self.ar.data.axes:
-                    cmds.connectAttr(f"{lenght_output_md}.outputX", f"{ik_joints[i]}.scale{k}", force=True)
-                    cmds.connectAttr(f"{lenght_output_md}.outputX", f"{skin_joints[i]}.scale{k}", force=True)
+                cmds.connectAttr(f"{lenght_output_md}.outputX", f"{ik_joints[i]}.scaleZ", force=True)
+                cmds.connectAttr(f"{lenght_output_md}.outputX", f"{skin_joints[i]}.scaleZ", force=True)
                 i += 1
         
         self.ar.custom_attr.add_attr(0, self.to_ids) #dpID

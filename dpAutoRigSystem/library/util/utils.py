@@ -763,11 +763,12 @@ class Utils:
             render_sets = cmds.listSets(object=item, extendToShape=True, type=1) #rendering sets
             sets = list(set(sets)-set(render_sets))
             if sets:
-                for set_nodes in sets:
-                    cmds.sets(item, remove=set_nodes)
-                    cmds.sets(f"{item}.vtx[*]", remove=set_nodes)
-                    cmds.sets(f"{item}.f[*]", remove=set_nodes)
-                    cmds.sets(f"{item}.e[*]", remove=set_nodes)
+                for set_node in sets:
+                    if cmds.objExists(set_node):
+                        cmds.sets(item, remove=set_node)
+                        cmds.sets(f"{item}.vtx[*]", remove=set_node)
+                        cmds.sets(f"{item}.f[*]", remove=set_node)
+                        cmds.sets(f"{item}.e[*]", remove=set_node)
 
 
     def replace_item_suffix(self, item, source_data, suffixes=None):
@@ -816,4 +817,5 @@ class Utils:
         not_connected =  not cmds.listConnections(f"{node}.envelope", source=True, destination=False)
         node_state_normal = cmds.getAttr(f"{node}.nodeState") == 0
         not_user_defined = not 'envelope' in (cmds.listAttr(node, userDefined=True) or [])
-        return not_connected and node_state_normal and not_user_defined
+        not_locked = not cmds.getAttr(f"{node}.envelope", lock=True)
+        return not_connected and node_state_normal and not_user_defined and not_locked

@@ -610,6 +610,8 @@ class Limb(standard.BaseStandard):
 
 
     def rig_me(self, *args):
+        loaded_quaternion_plugin = self.ar.config.check_loaded_plugin('quatNodes', self.ar.data.lang['e014_cantLoadQuatNode'])
+        loaded_matrix_plugin = self.ar.config.check_loaded_plugin('matrixNodes', self.ar.data.lang['e002_matrixPluginNotFound'])
         standard.BaseStandard.rig_me(self)
         # verify if the guide exists:
         if cmds.objExists(self.guide_base):
@@ -1225,14 +1227,21 @@ class Limb(standard.BaseStandard):
                     cmds.addAttr(forearm_ctrl, longName=self.ar.data.lang['c033_autoOrient'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.75, keyable=True)
                     self.ar.ctrls.set_lock_hide([forearm_ctrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'sx', 'sy', 'sz', 'v', 'ro'])
                     # make rotate connections:
-                    forearm_md = cmds.createNode('multiplyDivide', name=f"{side}{self.number_name}_{self.ar.data.lang[ 'c030_forearm']}_MD")
-                    self.to_ids.append(forearm_md)
-                    cmds.connectAttr(f"{forearm_ctrl}.{self.ar.data.lang['c033_autoOrient']}", f"{forearm_md}.input1X")
-                    cmds.connectAttr(f"{skin_joints[3]}.rotateZ", f"{forearm_md}.input2X")
-                    cmds.connectAttr(f"{forearm_md}.outputX", f"{forearm_grp}.rotateZ")
                     ik_extreme_orient_pac = cmds.parentConstraint(forearm_ctrl, ik_extreme_sub_ctrl, fk_joints[-2], extreme_orient_ctrl_zero, skipTranslate=['x', 'y', 'z'], maintainOffset=True, name=f"{extreme_orient_ctrl_zero}_PaC")[0]
                     ik_extreme_orient_pac_w0 = f"{forearm_ctrl}W0"
                     cmds.pointConstraint(skin_joints[-2], extreme_orient_ctrl_zero, maintainOffset=True, name=f"{extreme_orient_ctrl_zero}_PoC")
+                    # autoRotate forearm by quaternion
+                    if loaded_quaternion_plugin and loaded_matrix_plugin:
+                        forearm_wrist_loc = cmds.spaceLocator(name=f"{side}{self.number_name}_{self.ar.data.lang['c030_forearm']}_Wrist_Loc")[0]
+                        forearm_elbow_loc = cmds.spaceLocator(name=f"{side}{self.number_name}_{self.ar.data.lang['c030_forearm']}_Elbow_Loc")[0]
+                        cmds.setAttr(f'{forearm_wrist_loc}.visibility', 0)
+                        cmds.setAttr(f'{forearm_elbow_loc}.visibility', 0)
+                        cmds.matchTransform(forearm_elbow_loc, skin_joints[3], position=True, rotation=True)
+                        cmds.parent(forearm_elbow_loc, skin_joints[2])
+                        cmds.parent(forearm_wrist_loc, skin_joints[3], relative=True)
+                        forearm_twist_bone_md = self.ar.math.create_twist_bone_matrix(forearm_elbow_loc, forearm_wrist_loc, f"{side}{self.number_name}_{self.ar.data.lang['c030_forearm']}_TwistBone")
+                        cmds.connectAttr(f"{forearm_ctrl}.{self.ar.data.lang['c033_autoOrient']}", f'{forearm_twist_bone_md}.input1Z')
+                        cmds.connectAttr(f'{forearm_twist_bone_md}.outputZ', f'{forearm_grp}.rotateZ')
 
                 # creating a group to receive the reverseFootCtrlGrp (if module integration is on):
                 to_rf_blend_grp = cmds.group(empty=True, name=f"{side}{self.number_name}_IkFkBlendGrpToRevFoot_Grp")
@@ -1388,9 +1397,6 @@ class Limb(standard.BaseStandard):
                         skin_joints[jnt_index] = skin_joints[jnt_index].replace('_Jnt', '_Jxt')
                     
                     # implementing auto rotate twist bones:
-                    # check if we have loaded the quatNode.mll Maya plugin in order to create quatToEuler node, also decomposeMatrix from matrixNodes:
-                    loaded_quaternion_plugin = self.ar.config.check_loaded_plugin('quatNodes', self.ar.data.lang['e014_cantLoadQuatNode'])
-                    loaded_matrix_plugin = self.ar.config.check_loaded_plugin('matrixNodes', self.ar.data.lang['e002_matrixPluginNotFound'])
                     if loaded_quaternion_plugin and loaded_matrix_plugin:
                         twist_bone_md = bend_grps['twistBoneMD']
                         shoulder_child_loc = cmds.spaceLocator(name=f"{twist_bone_md}_Child_Loc")[0]
@@ -1425,9 +1431,6 @@ class Limb(standard.BaseStandard):
                     cmds.connectAttr(f"{world_ref}.{attr_name_lower}Fk_ikFkBlend", f"{ik_extreme_orient_pac}.{fk_joints[-2]}W2")
 
                 # auto clavicle:
-                # loading Maya matrix node
-                loaded_quaternion_plugin = self.ar.config.check_loaded_plugin('quatNodes', self.ar.data.lang['e014_cantLoadQuatNode'])
-                loaded_matrix_plugin = self.ar.config.check_loaded_plugin('matrixNodes', self.ar.data.lang['e002_matrixPluginNotFound'])
                 if loaded_quaternion_plugin and loaded_matrix_plugin:
                     # create auto clavicle group:
                     clavicle_ctrl_grp = cmds.group(name=f"{fk_ctrls[0]}_Grp", empty=True)

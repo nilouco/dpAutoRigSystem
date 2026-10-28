@@ -141,6 +141,8 @@ class FacialConnection(base.BaseLibrary):
                                                 dismissString=bt_cancel)
                     if result == bt_continue:
                         prefix = cmds.promptDialog(query=True, text=True)
+                    else: #cancel
+                        return
                 if prefix == "": # if no name provided in the promptDialog, use the geo_base name
                     prefix = geo_base
                     if '|' in geo_base:
@@ -607,6 +609,8 @@ class FacialConnection(base.BaseLibrary):
                 if targets:
                     self.ar.ui_manager.set_progress(self.ar.data.lang['c110_start'], self.ar.data.lang['m092_recreateTargets'], max=len(targets), add_one=False, add_number=False)
                     reconnect_items = []
+                    locked_items = []
+                    values = []
                     cmds.select([new_mesh, old_mesh])
                     mel.eval('CreateWrap;')
                     target_grps = cmds.group(name='New_Tgt_Grp', empty=True)
@@ -614,14 +618,18 @@ class FacialConnection(base.BaseLibrary):
                     cmds.select(clear=True)
                     new_targets = []
                     for item in targets:
+                        if item != old_mesh:
+                            values.append(cmds.getAttr(f'{bs_node[0]}.{item}'))
+                            locked_items.append(cmds.getAttr(f'{bs_node[0]}.{item}', lock=True))
+                            cmds.setAttr(f'{bs_node[0]}.{item}', lock=False)
+                            reconnect_items.append(cmds.listConnections(f'{bs_node[0]}.{item}', source=True, destination=False, plugs=True) or None)
+                            if reconnect_items[-1]:
+                                cmds.disconnectAttr(reconnect_items[-1][0], f'{bs_node[0]}.{item}')
+                            # set blendShape slider as 0
+                            cmds.setAttr(f'{bs_node[0]}.{item}', 0)
+                    for item in targets:
                         self.ar.ui_manager.set_progress(f"Target: {item}")
                         if item != old_mesh:
-                            has_connection = cmds.listConnections(f"{bs_node[0]}.{item}", source=True, destination=False, plugs=True)
-                            if has_connection:
-                                cmds.disconnectAttr(has_connection[0], f"{bs_node[0]}.{item}")
-                                reconnect_items.append(has_connection[0])
-                            else:
-                                reconnect_items.append(None)
                             # set blendShape slider as 1
                             cmds.setAttr(f"{bs_node[0]}.{item}", 1)
                             # renaming old target
@@ -631,17 +639,115 @@ class FacialConnection(base.BaseLibrary):
                             new_targets.append(tgt)
                             # back to zero
                             cmds.setAttr(f"{bs_node[0]}.{item}", 0)
-                            if has_connection:
-                                cmds.connectAttr(has_connection[0], f"{bs_node[0]}.{item}")
                             # clear undo
                             mel.eval('flushUndo;')
                     cmds.delete(new_mesh, constructionHistory=True)
                     cmds.rename(bs_node[0], f"{bs_node[0]}_Old")
                     cmds.blendShape(new_targets, new_mesh, topologyCheck=False, name=bs_node[0])
+                    for v, value in enumerate(values):
+                        cmds.setAttr(f'{bs_node[0]}.{new_targets[v]}', value)
+                        cmds.setAttr(f'{bs_node[0]}_Old.{new_targets[v]}', value)
                     for p, plug in enumerate(reconnect_items):
                         if plug:
-                            cmds.connectAttr(plug, f"{bs_node[0]}.{new_targets[p]}", force=True)
+                            cmds.connectAttr(plug[0], f'{bs_node[0]}.{new_targets[p]}', force=True)
+                            cmds.connectAttr(plug[0], f'{bs_node[0]}_Old.{new_targets[p]}', force=True)
+                            if locked_items[p]:
+                                cmds.setAttr(f'{bs_node[0]}.{new_targets[p]}', lock=True)
+                                cmds.setAttr(f'{bs_node[0]}_Old.{new_targets[p]}', lock=True)
                     if cmds.objExists(f"{old_mesh}Base"):
                         cmds.delete(f"{old_mesh}Base")
                     self.ar.ui_manager.set_progress(end_it=True)
                     cmds.select(clear=True)
+
+
+    def get_facial_controllers(self):
+            facial_controllers = []
+            facial_controller_ids = ['id_046_FacialBrow', 'id_047_FacialEyelid', 'id_048_FacialMouth', 'id_049_FacialLips', 'id_050_FacialSneer', 'id_051_FacialGrimace', 'id_052_FacialFace']
+            all_controllers = self.ar.ctrls.get_controllers()
+            if all_controllers:
+                for ctrl in all_controllers:
+                    if cmds.getAttr(f'{ctrl}.controlID') in facial_controller_ids:
+                        facial_controllers.append(ctrl)
+            return facial_controllers
+
+
+    def get_facial_attributes(self, ctrl):
+            return [a for a in cmds.listAttr(ctrl, userDefined=True) if not any(char.isdigit() for char in a) and cmds.listConnections(f'{ctrl}.{a}', destination=True, source=False) and cmds.objectType(cmds.listConnections(f'{ctrl}.{a}', destination=True, source=False)[0]) == 'remapValue']
+
+
+    def get_facial_calibration_attributes(self, ctrl, attr):
+            attributes = []
+            if attr in cmds.listAttr(ctrl):
+                outputs = cmds.listConnections(f'{ctrl}.{attr}', destination=True, source=False) or []
+                for item in outputs:
+                    if cmds.objectType(item) == 'remapValue':
+                        source_node = cmds.listConnections(f'{item}.outputMax', destination=False, source=True)[0]
+                        plug = cmds.listConnections(f'{item}.outputMax', destination=False, source=True, plugs=True)[0]
+                        if source_node == ctrl:
+                            attributes.append(plug[plug.rfind('.')+1:])
+                        elif cmds.objectType(source_node) == 'multiplyDivide':
+                            plug = cmds.listConnections(f'{source_node}.input1X', destination=False, source=True, plugs=True)[0]
+                            attributes.append(plug[plug.rfind(".")+1:])
+            return attributes
+
+    
+    def get_facial_opposite_side(self, name, n=2):
+        opposite, start, end = None, None, None
+        l = f'{self.ar.data.lang["p002_left"]}_'
+        r = f'{self.ar.data.lang["p003_right"]}_'
+        if name.startswith(l):
+            opposite = f'{r}{name[2:]}'
+        elif name.startswith(r):
+            opposite = f'{l}{name[2:]}'
+        if opposite:
+            start, end = self.get_name_start_end(opposite, n)
+        return [opposite, start, end]
+
+
+    def get_name_start_end(self, name, n=2):
+        start = name[:name.rfind("_")]
+        if n > 1:
+            for s in range(1, n):
+                if s == (n-1):
+                    start = start[:start.rfind('_')+1]
+                else:
+                    start = start[:start.rfind('_')]
+        end = name[name.rfind('_'):]
+        return [start, end]
+
+
+    def set_facial_joint_calibration(self, ctrl, attr, calib_attr, value, *args):
+        if calib_attr in cmds.listAttr(ctrl):
+            cmds.setAttr(f'{ctrl}.{calib_attr}', value)
+            if cmds.checkBox("facial_ctrl_auto_calibrate_cb", query=True, exists=True) and cmds.checkBox("facial_ctrl_auto_calibrate_cb", query=True, value=True):
+                self.set_facial_opposite_calibration(ctrl, attr, calib_attr, value)
+                opposite_ctrls = self.get_facial_opposite_side(ctrl, 1)
+                if opposite_ctrls[0]:
+                    ctrls = self.get_facial_controllers()
+                    for another_ctrl in ctrls:
+                        if another_ctrl.startswith(opposite_ctrls[1]) and another_ctrl.endswith(opposite_ctrls[2]):
+                            self.set_facial_opposite_calibration(another_ctrl, attr, calib_attr, value)
+
+
+    def set_facial_opposite_calibration(self, ctrl, attr, calib_attr, value):
+        opposite_calib_attrs = self.get_facial_opposite_side(calib_attr)
+        if opposite_calib_attrs[0]:
+            calib_attrs = self.get_facial_calibration_attributes(ctrl, attr)
+            for another_calib_attr in calib_attrs:
+                self.set_facial_opposite_calibration_attribute(ctrl, another_calib_attr, value, opposite_calib_attrs[1], opposite_calib_attrs[2])
+        opposite_attrs = self.get_facial_opposite_side(attr, 1)
+        if opposite_attrs[0] and opposite_attrs[0] in cmds.listAttr(ctrl):
+            attributes = self.get_facial_calibration_attributes(ctrl, opposite_attrs[0])
+            for another_attr in attributes:
+                if opposite_calib_attrs[1]:
+                    self.set_facial_opposite_calibration_attribute(ctrl, another_attr, value, opposite_calib_attrs[1], opposite_calib_attrs[2])
+                else:
+                    start_attr, end_attr = self.get_name_start_end(calib_attr)
+                    self.set_facial_opposite_calibration_attribute(ctrl, another_attr, value, start_attr, end_attr)
+
+
+    def set_facial_opposite_calibration_attribute(self, ctrl, attr, value, start, end):
+        if attr.startswith(start) and attr.endswith(end):
+            cmds.setAttr(f'{ctrl}.{attr}', value)
+            if cmds.floatSliderButtonGrp(f'{attr}_fsbg', query=True, exists=True):
+                cmds.floatSliderButtonGrp(f'{attr}_fsbg', edit=True, value=value)
