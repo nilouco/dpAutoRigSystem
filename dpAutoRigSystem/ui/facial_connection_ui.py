@@ -61,7 +61,7 @@ class FacialConnectionUI:
         cmds.text("attribute_txt", label="Attribute", parent="facial_ctrl_rcl")
         cmds.textScrollList("facial_ctrl_tsl", selectCommand=self.load_selected_attrs, allowMultiSelection=False, parent='facial_ctrl_rcl')
         cmds.textScrollList("attr_ctrl_tsl", selectCommand=self.load_selected_offsets, allowMultiSelection=False, parent='facial_ctrl_rcl')
-        cmds.checkBox('facial_ctrl_auto_calibrate_cb', label=self.ar.data.lang['c121_side']+" "+self.ar.data.lang['c119_auto']+" "+self.ar.data.lang['c111_calibrate'], value=True, parent='calibrate_facial_joints_cl')
+        cmds.checkBox('facial_ctrl_auto_calibrate_cb', label=f"{self.ar.data.lang['c121_side']} {self.ar.data.lang['c119_auto']} {self.ar.data.lang['c111_calibrate']}", value=True, parent='calibrate_facial_joints_cl')
         cmds.separator(height=5, style="in", horizontal=True, width=width, parent='calibrate_facial_joints_cl')
         cmds.text(label=self.ar.data.lang['i193_calibration'], parent='calibrate_facial_joints_cl')
         cmds.separator(height=3, style="none", horizontal=True, width=width, parent='calibrate_facial_joints_cl')
@@ -99,7 +99,7 @@ class FacialConnectionUI:
             offset_ctrl = calib_attr[:calib_attr.rfind("_")]
             offset_ctrl = f'{offset_ctrl[:offset_ctrl.rfind("_")]}_Ctrl'
             calib_attr_value = cmds.getAttr(f'{ctrl}.{calib_attr}')
-            cmds.floatSliderButtonGrp(f'{calib_attr}_fsbg', label=calib_attr, field=True, buttonLabel=self.ar.data.lang['m004_select'], value=calib_attr_value, minValue=-360, maxValue=360, dragCommand=partial(self.set_facial_joint_calibration, ctrl, attr, calib_attr), changeCommand=partial(self.set_facial_joint_calibration, ctrl, attr, calib_attr), buttonCommand=partial(cmds.select, offset_ctrl), columnWidth4=(180, 50, 120, 50), adjustableColumn=3, parent='calibrate_facial_joints_attributes_cl')
+            cmds.floatSliderButtonGrp(f'{calib_attr}_fsbg', label=calib_attr, field=True, buttonLabel=self.ar.data.lang['m004_select'], value=calib_attr_value, minValue=-360, maxValue=360, dragCommand=partial(self.app.set_facial_joint_calibration, ctrl, attr, calib_attr), changeCommand=partial(self.app.set_facial_joint_calibration, ctrl, attr, calib_attr), buttonCommand=partial(cmds.select, offset_ctrl), columnWidth4=(180, 50, 120, 50), adjustableColumn=3, parent='calibrate_facial_joints_attributes_cl')
 
 
     def clear_facial_calibration_attributes_layout(self):
