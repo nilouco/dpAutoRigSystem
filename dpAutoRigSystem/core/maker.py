@@ -15,7 +15,7 @@ class Maker:
         return [mod, mod.build_raw_guide()]
 
 
-    def set_new_guide(self, module, name, t=(0, 0, 0), r=(0, 0, 0), s=(1, 1, 1), size=1, radius=2, end=1.3, mirror=None, flip=1, deformed=0, indSkin=0, annot=1, parent=None, progress=True):
+    def set_new_guide(self, module, name, t=(0, 0, 0), r=(0, 0, 0), s=(1, 1, 1), size=1, radius=2, end=1.3, mirror=None, flip=1, deformed=0, ind_skin=0, annot=1, parent=None, progress=True):
         """ Creates a new standard guide, set the given values and returns a list with the imported module and the created guide.
         """
         if progress:
@@ -40,8 +40,8 @@ class Maker:
             cmds.setAttr(f"{guide}.flip", flip)
         if deformed:
             cmds.setAttr(f"{guide}.deformedBy", deformed)
-        if indSkin:
-            cmds.setAttr(f"{guide}.indirectSkin", indSkin)
+        if ind_skin:
+            cmds.setAttr(f"{guide}.indirectSkin", ind_skin)
         cmds.setAttr(f"{guide}.displayAnnotation", annot)
         cmds.setAttr(f"{guide}_Ant.visibility", annot)
         if parent:

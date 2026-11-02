@@ -3,9 +3,9 @@ class API:
         self.ar = ar
 
 
-    def guide(self, module, name=None, t=(0, 0, 0), r=(0, 0, 0), s=(1, 1, 1), size=1, radius=2, end=1.3, mirror=None, flip=1, deformed=0, indSkin=0, annot=1, parent=None, progress=False):
+    def guide(self, module, name=None, t=(0, 0, 0), r=(0, 0, 0), s=(1, 1, 1), size=1, radius=2, end=1.3, mirror=None, flip=1, deformed=0, ind_skin=0, annot=1, parent=None, progress=False):
         if name:
-            return self.ar.maker.set_new_guide(module, name, t, r, s, size, radius, end, mirror, flip, deformed, indSkin, annot, parent, progress)
+            return self.ar.maker.set_new_guide(module, name, t, r, s, size, radius, end, mirror, flip, deformed, ind_skin, annot, parent, progress)
         return self.ar.maker.create_raw_guide(module)
 
 
