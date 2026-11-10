@@ -195,23 +195,16 @@ class Chain(standard.BaseStandard):
             cmds.connectAttr(f"{dyn_stretch_bc}.outputR", f"{new_skin_joints[j]}.scaleX", force=True)
             cmds.connectAttr(f"{dyn_stretch_bc}.outputG", f"{new_skin_joints[j]}.scaleY", force=True)
             cmds.connectAttr(f"{dyn_stretch_bc}.outputB", f"{new_skin_joints[j]}.scaleZ", force=True)
-
+        
         # hairSystem
         mel.eval('DynCreateHairMenu MayaWindow|mainHairMenu; HairAssignHairSystemMenu MayaWindow|mainHairMenu|hairAssignHairSystemItem;')
         cmds.select(f"{main_crv}Shape")
-        dp_hair_system_node = None
-        transforms = cmds.ls(selection=False, type='transform')
-        if transforms:
-            for transform in transforms:
-                if 'dpHairSystem' in cmds.listAttr(transform):
-                    dp_hair_system_node = transform
-                    break
-        if not dp_hair_system_node:
+        dp_hair_system_node = 'dpHairSystemShape'
+        if not cmds.objExists(dp_hair_system_node):
             mel.eval('assignNewHairSystem;')
             # rename nodes
             if cmds.objExists('hairSystem1'):
                 cmds.rename('hairSystem1', 'dpHairSystem')
-            dp_hair_system_node = 'dpHairSystemShape'
             cmds.addAttr(dp_hair_system_node, longName='dpHairSystem', attributeType='bool', defaultValue=1)
             if cmds.objExists('nucleus1'):
                 cmds.rename('nucleus1', 'dpNucleus')
